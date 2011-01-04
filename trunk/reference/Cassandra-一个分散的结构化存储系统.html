@@ -1,0 +1,666 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0029)http://www.dbthink.com/?p=372 -->
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="google-site-verification" content="G5jGqcQL_TRdAo_UDbG0ar9ns5zrxswi4SM_Vtn4hQQ">
+
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta http-equiv="Accept-Encoding" content="gzip,deflate">
+<meta http-equiv="Cache-Control" content="must-revalidate">
+<title>Cassandra &amp;#8211; 一个分散的结构化存储系统 « a db thinker's home</title>
+<link rel="shortcut icon" href="http://www.dbthink.com/wp-content/themes/atahualpa346/images/favicon/new-favicon.ico"><link rel="canonical" href="./Cassandra-一个分散的结构化存储系统_files/Cassandra-一个分散的结构化存储系统.html"><link rel="alternate" type="application/rss+xml" title="a db thinker&#39;s home RSS Feed" href="http://www.dbthink.com/?feed=rss2">
+<link rel="alternate" type="application/atom+xml" title="a db thinker&#39;s home Atom Feed" href="http://www.dbthink.com/?feed=atom">
+<link rel="pingback" href="http://www.dbthink.com/xmlrpc.php">
+<link rel="alternate" type="application/rss+xml" title="a db thinker&#39;s home » Cassandra – 一个分散的结构化存储系统 Comments Feed" href="http://www.dbthink.com/?feed=rss2&p=372">
+<script type="text/javascript" async="" src="./Cassandra-一个分散的结构化存储系统_files/ga.js"></script><script type="text/javascript" src="./Cassandra-一个分散的结构化存储系统_files/jquery.js"></script>
+<script type="text/javascript">addComment={moveForm:function(d,f,i,c){var m=this,a,h=m.I(d),b=m.I(i),l=m.I("cancel-comment-reply-link"),j=m.I("comment_parent"),k=m.I("comment_post_ID");if(!h||!b||!l||!j){return}m.respondId=i;c=c||false;if(!m.I("wp-temp-form-div")){a=document.createElement("div");a.id="wp-temp-form-div";a.style.display="none";b.parentNode.insertBefore(a,b)}h.parentNode.insertBefore(b,h.nextSibling);if(k&&c){k.value=c}j.value=f;l.style.display="";l.onclick=function(){var n=addComment,e=n.I("wp-temp-form-div"),o=n.I(n.respondId);if(!e||!o){return}n.I("comment_parent").value="0";e.parentNode.insertBefore(o,e);e.parentNode.removeChild(e);this.style.display="none";this.onclick=null;return false};try{m.I("comment").focus()}catch(g){}return false},I:function(a){return document.getElementById(a)}};</script>
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.dbthink.com/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.dbthink.com/wp-includes/wlwmanifest.xml">
+<link rel="index" title="a db thinker&#39;s home" href="http://www.dbthink.com/">
+<link rel="start" title="Blog开始了." href="http://www.dbthink.com/?p=1">
+<link rel="prev" title="可伸缩性最佳实践：来自eBay的经验" href="http://www.dbthink.com/?p=366">
+<link rel="next" title="HBase vs Cassandra: 我们迁移系统的原因" href="http://www.dbthink.com/?p=379">
+<link rel="canonical" href="./Cassandra-一个分散的结构化存储系统_files/Cassandra-一个分散的结构化存储系统.html">
+<link rel="hub" href="http://pubsubhubbub.appspot.com/"><link rel="hub" href="http://superfeedr.com/hubbub">	<link rel="stylesheet" type="text/css" href="./Cassandra-一个分散的结构化存储系统_files/cc.0f17e3f59d9cceed2505b8b3163ce720.shCore,s+shThemeDefault,s.css">
+<script type="text/javascript" src="./Cassandra-一个分散的结构化存储系统_files/ce.4aac9d9e62f2058d7f3b78ea8daafffd.shCore,l.js"></script>
+<script type="text/javascript" src="./Cassandra-一个分散的结构化存储系统_files/ce.387d01de9cb05b5c05c4b553d0614d54.shBrushAll,l.js"></script>
+<script type="text/javascript">		
+		SyntaxHighlighter.config.clipboardSwf = 'http://www.dbthink.com/wp-content/plugins/syntax-highlighter-and-code-prettifier/scripts/clipboard.swf';
+		SyntaxHighlighter.all();
+	</script>
+<style type="text/css">body{text-align:center;margin:0;padding:0;font-family:tahoma,arial,sans-serif;font-size:0.8em;color:#000000;background:#ffffff}a:link,a:visited,a:active{color:#666666;font-weight:bold;text-decoration:none;}a:hover{color:#cc0000;font-weight:bold;text-decoration:underline}ul,ol,dl,p,h1,h2,h3,h4,h5,h6{margin-top:10px;margin-bottom:10px;padding-top:0;padding-bottom:0;}ul ul,ul ol,ol ul,ol ol{margin-top:0;margin-bottom:0}h1,h2,h3,h4,h5,h6{color:#000;display:block;font-smooth:always}h1{font-size:34px;line-height:1.2;margin:0.3em 0 10px;}h2{font-size:28px;line-height:1.3;margin:1em 0 .2em;}h3{font-size:24px;line-height:1.3;margin:1em 0 .2em;}h4{font-size:19px;margin:1.33em 0 .2em;}h5{font-size:1.3em;margin:1.67em 0;font-weight:bold;}h6{font-size:1.15em;margin:1.67em 0;font-weight:bold;}h1 a,h2 a,h1 a:link,h2 a:link,h1 a:visited,h2 a:visited{color:#000;}h1 a:active,h2 a:active,h1 a:focus,h2 a:focus,h1 a:hover,h2 a:hover{color:#669900;}code,pre{font-family:"Courier New",Courier,monospace;font-size:1em}pre{overflow:auto;word-wrap:normal;padding-bottom:1.5em;overflow-y:hidden;width:99%}abbr[title],acronym[title]{border-bottom:1px dotted}hr{display:block;height:2px;border:none;margin:0.5em auto;color:#cccccc;background-color:#cccccc}table{font-size:1em;}div.post,ul.commentlist li,ol.commentlist li{word-wrap:break-word;}pre,.wp_syntax{word-wrap:normal;}div#wrapper{text-align:center;margin-left:auto;margin-right:auto;display:block;width:99%}div#container{padding:0;width:auto;margin-left:auto;margin-right:auto;text-align:left;display:block}table#layout{font-size:100%;width:100%;table-layout:fixed}.colone{width:200px}.colone-inner{width:200px}.coltwo{width:100% }.colthree-inner{width:200px}.colthree{width:200px}td#header{width:auto;padding:0}table#logoarea,table#logoarea tr,table#logoarea td{margin:0;padding:0;background:none;border:0}table#logoarea{width:100%;border-spacing:0px}img.logo{display:block;margin:0 10px 0 0}td.logoarea-logo{width:1%}h1.blogtitle,h2.blogtitle{ display:block;margin:0;padding:0;letter-spacing:-1px;line-height:1.0em;font-family:tahoma,arial,sans-serif;font-size:240%;font-smooth:always}h1.blogtitle a:link,h1.blogtitle a:visited,h1.blogtitle a:active,h2.blogtitle a:link,h2.blogtitle a:visited,h2.blogtitle a:active{ text-decoration:none;color:#666666;font-weight:bold;font-smooth:always}h1.blogtitle a:hover,h2.blogtitle a:hover{ text-decoration:none;color:#000000;font-weight:bold}p.tagline{margin:0;padding:0;font-size:1.2em;font-weight:bold;color:#666666}td.feed-icons{white-space:nowrap;}div.rss-box{height:1%;display:block;padding:10px 0 10px 10px;margin:0;width:280px}a.comments-icon{height:22px;line-height:22px;margin:0 5px 0 5px;padding-left:22px;display:block;text-decoration:none;float:right;white-space:nowrap}a.comments-icon:link,a.commentss-icon:active,a.comments-icon:visited{background:transparent url(http://www.dbthink.com/wp-content/themes/atahualpa346/images/comment-gray.png) no-repeat scroll center left}a.comments-icon:hover{background:transparent url(http://www.dbthink.com/wp-content/themes/atahualpa346/images/comment.png) no-repeat scroll center left}a.posts-icon{height:22px;line-height:22px;margin:0 5px 0 0;padding-left:20px;display:block;text-decoration:none;float:right;white-space:nowrap}a.posts-icon:link,a.posts-icon:active,a.posts-icon:visited{background:transparent url(http://www.dbthink.com/wp-content/themes/atahualpa346/images/rss-gray.png) no-repeat scroll center left}a.posts-icon:hover{background:transparent url(http://www.dbthink.com/wp-content/themes/atahualpa346/images/rss.png) no-repeat scroll center left}a.email-icon{height:22px;line-height:22px;margin:0 5px 0 5px;padding-left:24px;display:block;text-decoration:none;float:right;white-space:nowrap}a.email-icon:link,a.email-icon:active,a.email-icon:visited{background:transparent url(http://www.dbthink.com/wp-content/themes/atahualpa346/images/email-gray.png) no-repeat scroll center left}a.email-icon:hover{background:transparent url(http://www.dbthink.com/wp-content/themes/atahualpa346/images/email.png) no-repeat scroll center left}td.search-box{height:1%}div.searchbox{height:35px;border:1px dashed #cccccc;border-bottom:0;width:200px;margin:0;padding:0}div.searchbox-form{margin:5px 10px 5px 10px}div.horbar1,div.horbar2{font-size:1px;clear:both;display:block;position:relative;padding:0;margin:0;width:100%;}div.horbar1{height:5px;background:#ffffff;border-top:dashed 1px #cccccc}div.horbar2{height:5px;background:#ffffff;border-bottom:dashed 1px #cccccc}div.header-image-container{position:relative;margin:0;padding:0;height:150px;}div.opacityleft{position:absolute;z-index:2;top:0;left:0;background-color:#ffffff;height:150px;width:200px;filter:alpha(opacity=40);-moz-opacity:.40;opacity:.40}div.opacityright{position:absolute;z-index:2;top:0;right:0;background-color:#ffffff;height:150px;width:200px;filter:alpha(opacity=40);-moz-opacity:.40;opacity:.40}a.divclick:link,a.divclick:visited,a.divclick:active,a.divclick:hover{width:100%;height:100%;display:block;text-decoration:none}td#left{vertical-align:top;border-right:dashed 1px #CCCCCC;padding:10px 10px 10px 10px;background:#ffffff}td#left-inner{vertical-align:top;border-right:dashed 1px #CCCCCC;padding:10px 10px 10px 10px;background:#ffffff}td#right{vertical-align:top;border-left:dashed 1px #CCCCCC;padding:10px 10px 10px 10px;background:#ffffff}td#right-inner{vertical-align:top;border-left:dashed 1px #CCCCCC;padding:10px 10px 10px 10px;background:#ffffff}td#middle{vertical-align:top;width:100%;padding:10px 15px}td#footer{width:auto;background-color:#ffffff;border-top:dashed 1px #cccccc;padding:10px;text-align:center;color:#777777;font-size:95%}td#footer a:link,td#footer a:visited,td#footer a:active{text-decoration:none;color:#777777;font-weight:normal}td#footer a:hover{text-decoration:none;color:#777777;font-weight:normal}div.widget{display:block;width:auto;margin:0 0 15px 0}div.widget-title{display:block;width:auto}div.widget-title h3,td#left h3.tw-widgettitle,td#right h3.tw-widgettitle,td#left ul.tw-nav-list,td#right ul.tw-nav-list{padding:0;margin:0;font-size:1.2em;font-weight:bold}div.widget ul,div.textwidget{display:block;width:auto}div.widget select{width:98%;margin-top:5px;font-size:10px;}div.widget ul{list-style-type:none;margin:0;padding:0;width:auto}div.widget ul li{display:block;margin:2px 0 2px 0px;padding:0 0 0 5px;border-left:solid 7px #CCCCCC}div.widget ul li:hover,div.widget ul li.sfhover{display:block;width:auto;border-left:solid 7px #000000;}div.widget ul li ul li{margin:2px 0 2px 5px;padding:0 0 0 5px;border-left:solid 7px #CCCCCC;}div.widget ul li ul li:hover,div.widget ul li ul li.sfhover{border-left:solid 7px #000000;}div.widget ul li ul li ul li{margin:2px 0 2px 5px;padding:0 0 0 5px;border-left:solid 7px #CCCCCC;}div.widget ul li ul li ul li:hover,div.widget ul li ul li ul li.sfhover{border-left:solid 7px #000000;}div.widget ul li a:link,div.widget ul li a:visited,div.widget ul li a:active{text-decoration:none;font-weight:normal;color:#666666;font-weight:normal;}div.widget ul li ul li a:link,div.widget ul li ul li a:visited,div.widget ul li ul li a:active{color:#666666;font-weight:normal;}div.widget ul li ul li ul li a:link,div.widget ul li ul li ul li a:visited,div.widget ul li ul li ul li a:active{color:#666666;font-weight:normal;}div.widget ul li a:hover{color:#000000;}div.widget ul li ul li a:hover{color:#000000;}div.widget ul li ul li ul li a:hover{color:#000000;}div.widget ul li a:link,div.widget ul li a:visited,div.widget ul li a:active,div.widget ul li a:hover{display:inline}* html div.widget ul li a:link,* html div.widget ul li a:visited,* html div.widget ul li a:active,* html div.widget ul li a:hover{height:1%; } div.widget_pages ul li,div.widget_categories ul li{border-left:0 !important;padding:0 !important}div.widget_pages ul li a:link,div.widget_pages ul li a:visited,div.widget_pages ul li a:active,div.widget_categories ul li a:link,div.widget_categories ul li a:visited,div.widget_categories ul li a:active{padding:0 0 0 5px;border-left:solid 7px #CCCCCC}div.widget_pages ul li a:hover,div.widget_categories ul li a:hover{border-left:solid 7px #000000;}div.widget_pages ul li ul li a:link,div.widget_pages ul li ul li a:visited,div.widget_pages ul li ul li a:active,div.widget_categories ul li ul li a:link,div.widget_categories ul li ul li a:visited,div.widget_categories ul li ul li a:active{padding:0 0 0 5px;border-left:solid 7px #CCCCCC}div.widget_pages ul li ul li a:hover,div.widget_categories ul li ul li a:hover{border-left:solid 7px #000000;}div.widget_pages ul li ul li ul li a:link,div.widget_pages ul li ul li ul li a:visited,div.widget_pages ul li ul li ul li a:active,div.widget_categories ul li ul li ul li a:link,div.widget_categories ul li ul li ul li a:visited,div.widget_categories ul li ul li ul li a:active{padding:0 0 0 5px;border-left:solid 7px #CCCCCC}div.widget_pages ul li ul li ul li a:hover,div.widget_categories ul li ul li ul li a:hover{border-left:solid 7px #000000;}div.widget_pages ul li a:link,div.widget_pages ul li a:active,div.widget_pages ul li a:visited,div.widget_pages ul li a:hover{display:block !important}div.widget_categories ul li a:link,div.widget_categories ul li a:active,div.widget_categories ul li a:visited,div.widget_categories ul li a:hover{display:inline !important}table.subscribe{width:100%}table.subscribe td.email-text{padding:0 0 5px 0;vertical-align:top}table.subscribe td.email-field{padding:0;width:100%}table.subscribe td.email-button{padding:0 0 0 5px}table.subscribe td.post-text{padding:7px 0 0 0;vertical-align:top}table.subscribe td.comment-text{padding:7px 0 0 0;vertical-align:top}div.post,div.page{display:block;margin:0 0 30px 0}div.sticky{background:#eee url(http://www.dbthink.com/wp-content/themes/atahualpa346/images/sticky.gif) 99% 5% no-repeat;border:dashed 1px #cccccc;padding:10px}div.post-kicker{margin:0 0 5px 0}div.post-kicker a:link,div.post-kicker a:visited,div.post-kicker a:active{color:#000000;text-decoration:none;text-transform:uppercase}div.post-kicker a:hover{color:#cc0000}div.post-headline{}div.post-headline h1,div.post-headline h2{ margin:0; padding:0;padding:0;margin:0}div.post-headline h2 a:link,div.post-headline h2 a:visited,div.post-headline h2 a:active,div.post-headline h1 a:link,div.post-headline h1 a:visited,div.post-headline h1 a:active{color:#666666;text-decoration:none}div.post-headline h2 a:hover,div.post-headline h1 a:hover{color:#000000;text-decoration:none}div.post-byline{margin:5px 0 10px 0}div.post-byline a:link,div.post-byline a:visited,div.post-byline a:active{}div.post-byline a:hover{}div.post-bodycopy{}div.post-bodycopy p{margin:1em 0;padding:0;display:block}div.post-pagination{}div.post-footer{clear:both;display:block;margin:0;padding:5px;background:#eeeeee;color:#666;line-height:18px}div.post-footer a:link,div.post-footer a:visited,div.post-footer a:active{color:#333;font-weight:normal;text-decoration:none}div.post-footer a:hover{color:#333;font-weight:normal;text-decoration:underline}div.post-kicker img,div.post-byline img,div.post-footer img{border:0;padding:0;margin:0 0 -1px 0;background:none}span.post-ratings{display:inline-block;width:auto;white-space:nowrap}div.navigation-top{display:block;width:100%;margin:0 0 10px 0;padding:0 0 10px 0;border-bottom:dashed 1px #cccccc}div.navigation-middle{display:block;width:100%;margin:10px 0 20px 0;padding:10px 0 10px 0;border-top:dashed 1px #cccccc;border-bottom:dashed 1px #cccccc}div.navigation-bottom{display:block;width:100%;margin:20px 0 0 0;padding:10px 0 0 0;border-top:dashed 1px #cccccc}div.navigation-comments-above{display:block;width:100%;margin:0 0 10px 0;padding:5px 0 5px 0}div.navigation-comments-below{display:block;width:100%;margin:0 0 10px 0;padding:5px 0 5px 0}div.older{float:left;width:49%;text-align:left;margin:0;padding:0}div.newer{float:right;width:49%;text-align:right;margin:0;padding:0;}div.older-home{float:left;width:45%;text-align:left;margin:0;padding:0}div.newer-home{float:right;width:45%;text-align:right;margin:0;padding:0;}div.home{float:left;width:9%;text-align:center;margin:0;padding:0}form,.feedburner-email-form{margin:0;padding:0;}fieldset{border:1px solid #cccccc;width:auto;padding:0.35em 0.625em 0.75em;display:block;}legend{color:#000000;background:#f4f4f4;border:1px solid #cccccc;padding:2px 6px;margin-bottom:15px;}form p{margin:5px 0 0 0;padding:0;}label{margin-right:0.5em;font-family:arial;cursor:pointer;}input.text,input.textbox,input.password,input.file,input.TextField,textarea{padding:3px;color:#000000;border-top:solid 1px #333333;border-left:solid 1px #333333;border-right:solid 1px #999999;border-bottom:solid 1px #cccccc;background:url(http://www.dbthink.com/wp-content/themes/atahualpa346/images/inputbackgr.gif) top left no-repeat}textarea{width:96%;}input.inputblur{color:#777777;width:95%}input.inputfocus{color:#000000;width:95%}input.highlight,textarea.highlight{background:#e8eff7;border-color:#37699f}.button,.Button{padding:0 2px;height:24px;line-height:16px;background-color:#777777;color:#ffffff;border:solid 2px #555555;font-weight:bold}.buttonhover{padding:0 2px;cursor:pointer;background-color:#6b9c6b;color:#ffffff;border:solid 2px #496d49}form#commentform input#submit{padding:4px 10px 4px 10px;font-size:1.2em;line-height:1.5em;height:36px}table.searchform{width:100%}table.searchform td.searchfield{padding:0;width:100%}table.searchform td.searchbutton{padding:0 0 0 5px}table.searchform td.searchbutton input{padding:0 0 0 5px}blockquote{height:1%;display:block;clear:both;color:#555555;padding:1em 1em;background:#f4f4f4;border:solid 1px #e1e1e1}blockquote blockquote{height:1%;display:block;clear:both;color:#444444;padding:1em 1em;background:#e1e1e1;border:solid 1px #d3d3d3}div.post table{border-collapse:collapse;margin:10px 0}div.post table caption{width:auto;margin:0 auto;background:#eeeeee;border:#999999;padding:4px 8px;color:#666666}div.post table th{background:#888888;color:#ffffff;font-weight:bold;font-size:90%;padding:4px 8px;border:solid 1px #ffffff;text-align:left}div.post table td{padding:4px 8px;background-color:#ffffff;border-bottom:1px solid #dddddd;text-align:left}div.post table tfoot td{}div.post table tr.alt td{background:#f4f4f4}div.post table tr.over td{background:#e2e2e2}#calendar_wrap{padding:0;border:none}table#wp-calendar{width:100%;font-size:90%;border-collapse:collapse;background-color:#ffffff;margin:0 auto}table#wp-calendar caption{width:auto;background:#eeeeee;border:none;;padding:3px;margin:0 auto;font-size:1em}table#wp-calendar th{border:solid 1px #eeeeee;background-color:#999999;color:#ffffff;font-weight:bold;padding:2px;text-align:center}table#wp-calendar td{padding:0;line-height:18px;background-color:#ffffff;border:1px solid #dddddd;text-align:center}table#wp-calendar tfoot td{border:solid 1px #eeeeee;background-color:#eeeeee}table#wp-calendar td a{display:block;background-color:#eeeeee;width:100%;height:100%;padding:0}div#respond{margin:25px 0;padding:25px;background:#eee;-moz-border-radius:8px;-khtml-border-radius:8px;-webkit-border-radius:8px;border-radius:8px;}p.thesetags{margin:10px 0}h3.reply{margin:0;padding:0 0 10px 0}ol.commentlist{margin:15px 0 25px 0;list-style-type:none;padding:0;display:block;border-top:dotted 1px #cccccc}ol.commentlist li{padding:15px 10px;display:block;height:1%;margin:0;background-color:#ffffff;border-bottom:dotted 1px #cccccc}ol.commentlist li.alt{display:block;height:1%;background-color:#eeeeee;border-bottom:dotted 1px #cccccc}ol.commentlist li.authorcomment{display:block;height:1%;background-color:#ffecec}ol.commentlist span.authorname{font-weight:bold;font-size:110%}ol.commentlist span.commentdate{color:#666666;font-size:90%;margin-bottom:5px;display:block}ol.commentlist span.editcomment{display:block}ol.commentlist li p{margin:2px 0 5px 0}div.comment-number{float:right;font-size:2em;line-height:2em;font-family:georgia,serif;font-weight:bold;color:#ddd;margin:-10px 0 0 0;position:relative;height:1%}div.comment-number a:link,div.comment-number a:visited,div.comment-number a:active{color:#ccc}textarea#comment{width:98%;margin:10px 0;display:block}ul.commentlist{margin:15px 0 15px 0;list-style-type:none;padding:0;display:block;border-top:dotted 1px #cccccc}ul.commentlist ul{margin:0;border:none;list-style-type:none;padding:0}ul.commentlist li{padding:0; margin:0;display:block;clear:both;height:1%;}ul.commentlist ul.children li{ margin-left:30px}ul.commentlist div.comment-container{padding:10px;margin:0}ul.children div.comment-container{background-color:transparent;border:dotted 1px #ccc;padding:10px;margin:0 10px 8px 0; -moz-border-radius:5px; -khtml-border-radius:5px; -webkit-border-radius:5px; border-radius:5px}ul.children div.bypostauthor{}ul.commentlist li.thread-even{background-color:#ffffff;border-bottom:dotted 1px #cccccc}ul.commentlist li.thread-odd{background-color:#eeeeee;border-bottom:dotted 1px #cccccc}ul.commentlist div.bypostauthor{background-color:#ffecec}ul.children div.bypostauthor{border:dotted 1px #ffbfbf}ul.commentlist span.authorname{font-size:110%}div.comment-meta a:link,div.comment-meta a:visited,div.comment-meta a:active,div.comment-meta a:hover{font-weight:normal}div#cancel-comment-reply{margin:-5px 0 10px 0}div.comment-number{float:right;font-size:2em;line-height:2em;font-family:georgia,serif;font-weight:bold;color:#ddd;margin:-10px 0 0 0;position:relative;height:1%}div.comment-number a:link,div.comment-number a:visited,div.comment-number a:active{color:#ccc}.page-numbers{padding:2px 6px;border:solid 1px #000000;-moz-border-radius:6px;-khtml-border-radius:6px;-webkit-border-radius:6px;border-radius:6px}span.current{background:#ddd}a.prev,a.next{border:none}a.page-numbers:link,a.page-numbers:visited,a.page-numbers:active{text-decoration:none;color:#666666;border-color:#666666}a.page-numbers:hover{text-decoration:none;color:#cc0000;border-color:#cc0000}div.xhtml-tags{display:none}abbr em{border:none !important;border-top:dashed 1px #aaa !important;display:-moz-inline-box !important;display:inline-block !important;background:url(http://www.dbthink.com/wp-content/themes/atahualpa346/images/commentluv.gif) 0% 90% no-repeat;margin-top:8px;padding:5px 5px 2px 20px !important;font-style:normal}p.subscribe-to-comments{margin-bottom:10px}div#gsHeader{display:none;}div.g2_column{margin:0 !important;width:100% !important;font-size:1.2em}div#gsNavBar{border-top-width:0 !important}p.giDescription{font-size:1.2em;line-height:1 !important}p.giTitle{margin:0.3em 0 !important;font-size:1em;font-weight:normal;color:#666}div#wp-email img{border:0;padding:0}div#wp-email input,div#wp-email textarea{margin-top:5px;margin-bottom:2px}div#wp-email p{margin-bottom:10px}input#wp-email-submit{ padding:0; font-size:30px; height:50px; line-height:50px; overflow:visible;}img.WP-EmailIcon{ vertical-align:text-bottom !important}.tw-accordion .tw-widgettitle,.tw-accordion .tw-widgettitle:hover,.tw-accordion .tw-hovered,.tw-accordion .selected,.tw-accordion .selected:hover{ background:transparent !important; background-image:none !important}.tw-accordion .tw-widgettitle span{ padding-left:0 !important}.tw-accordion h3.tw-widgettitle{border-bottom:solid 1px #ccc}.tw-accordion h3.selected{border-bottom:none}td#left .without_title,td#right .without_title{ margin-top:0;margin-bottom:0}ul.tw-nav-list{border-bottom:solid 1px #999;display:block;margin-bottom:5px !important}td#left ul.tw-nav-list li,td#right ul.tw-nav-list li{padding:0 0 1px 0;margin:0 0 -1px 5px; border:solid 1px #ccc;border-bottom:none;-moz-border-radius:5px;-khtml-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;-moz-border-radius-bottomright:0;-moz-border-radius-bottomleft:0;-webkit-border-bottom-right-radius:0;-webkit-border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom-left-radius:0;background:#eee}td#left ul.tw-nav-list li.ui-tabs-selected,td#right ul.tw-nav-list li.ui-tabs-selected{ background:none;border:solid 1px #999;border-bottom:solid 1px #fff !important}ul.tw-nav-list li a:link,ul.tw-nav-list li a:visited,ul.tw-nav-list li a:active,ul.tw-nav-list li a:hover{padding:0 8px !important;background:none;border-left:none !important;outline:none}td#left ul.tw-nav-list li.ui-tabs-selected a,td#left li.ui-tabs-selected a:hover,td#right ul.tw-nav-list li.ui-tabs-selected a,td#right li.ui-tabs-selected a:hover{ color:#000000; text-decoration:none;font-weight:bold;background:none !important;outline:none}td#left .ui-tabs-panel,td#right .ui-tabs-panel{ margin:0; padding:0}img{border:0}#dbem-location-map img{ background:none !important}.post img{padding:5px;border:solid 1px #dddddd;background-color:#f3f3f3;-moz-border-radius:3px;-khtml-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;}.post img.size-full{max-width:96%;width:auto 100%;margin:5px 0 5px 0}div.post img[class~=size-full]{height:auto;}.post img.alignleft{float:left;margin:10px 10px 5px 0;}.post img.alignright{float:right;margin:10px 0 5px 10px;}.post img.aligncenter{display:block;margin:10px auto}.aligncenter,div.aligncenter{ display:block; margin-left:auto; margin-right:auto}.alignleft,div.alignleft{float:left;margin:10px 10px 5px 0}.alignright,div.alignright{ float:right; margin:10px 0 5px 10px}div.archives-page img{border:0;padding:0;background:none;margin-bottom:0;vertical-align:-10%}.wp-caption{max-width:96%;width:auto 100%;height:auto;display:block;border:1px solid #dddddd;text-align:center;background-color:#f3f3f3;padding-top:4px;margin:10px 0 0 0;-moz-border-radius:3px;-khtml-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;}* html .wp-caption{height:100%;}.wp-caption img{ margin:0 !important; padding:0 !important; border:0 none !important}.wp-caption p.wp-caption-text{font-size:0.8em;line-height:13px;padding:2px 4px 5px;margin:0;color:#666666}img.wp-post-image{float:left;border:0;padding:0;background:none;margin:0 10px 5px 0}img.wp-smiley{ float:none;border:none !important;margin:0 1px -1px 1px;padding:0 !important;background:none !important}img.avatar{float:left;display:block;margin:0 8px 1px 0;padding:3px;border:solid 1px #ddd;background-color:#f3f3f3;-moz-border-radius:3px;-khtml-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;}#comment_quicktags{text-align:left;padding:10px 0 2px 0;display:block}#comment_quicktags input.ed_button{background:#f4f4f4;border:2px solid #cccccc;color:#444444;margin:2px 4px 2px 0;width:auto;padding:0 4px;height:24px;line-height:16px}#comment_quicktags input.ed_button_hover{background:#dddddd;border:2px solid #666666;color:#000000;margin:2px 4px 2px 0;width:auto;padding:0 4px;height:24px;line-height:16px;cursor:pointer}#comment_quicktags #ed_strong{font-weight:bold}#comment_quicktags #ed_em{font-style:italic}@media print{body{background:white;color:black;margin:0;font-size:10pt !important;font-family:arial,sans-serif;}div.post-footer{line-height:normal !important;color:#555 !important;font-size:9pt !important}a:link,a:visited,a:active,a:hover{text-decoration:underline !important;color:#000}h2{color:#000;font-size:14pt !important;font-weight:normal !important}h3{color:#000;font-size:12pt !important;}#header,#footer,.colone,.colthree,.navigation,.navigation-top,.navigation-middle,.navigation-bottom,.wp-pagenavi-navigation,#comment,#respond,.remove-for-print{display:none}td#left,td#right,td#left-inner,td#right-inner{width:0}td#middle{width:100%}*:lang(en) td#left{ display:none}*:lang(en) td#right{ display:none}*:lang(en) td#left-inner{ display:none}*:lang(en) td#right-inner{ display:none}td#left:empty{ display:none}td#right:empty{ display:none}td#left-inner:empty{ display:none}td#right-inner:empty{ display:none}}ul.rMenu,ul.rMenu ul,ul.rMenu li,ul.rMenu a{display:block;margin:0;padding:0}ul.rMenu,ul.rMenu li,ul.rMenu ul{list-style:none}ul.rMenu ul{display:none}ul.rMenu li{position:relative;z-index:1}ul.rMenu li:hover{z-index:999}ul.rMenu li:hover > ul{display:block;position:absolute}ul.rMenu li:hover{background-position:0 0} ul.rMenu-hor li{float:left;width:auto}ul.rMenu-hRight li{float:right}ul.rMenu-ver li{float:none}div#menu1 ul.rMenu-ver,div#menu1 ul.rMenu-ver ul{width:11em}div#menu2 ul.rMenu-ver,div#menu2 ul.rMenu-ver ul{width:11em}ul.rMenu-wide{width:100%}ul.rMenu-vRight{float:right}ul.rMenu-lFloat{float:left}ul.rMenu-noFloat{float:none}div.rMenu-center ul.rMenu{float:left;position:relative;left:50%}div.rMenu-center ul.rMenu li{position:relative;left:-50%}div.rMenu-center ul.rMenu li li{left:auto}ul.rMenu-hor ul{top:auto;right:auto;left:auto;margin-top:-1px}ul.rMenu-hor ul ul{margin-top:0;margin-left:0px}ul.rMenu-ver ul{left:100%;right:auto;top:auto;top:0}ul.rMenu-vRight ul,ul.rMenu-hRight ul.rMenu-ver ul{left:-100%;right:auto;top:auto}ul.rMenu-hRight ul{left:auto;right:0;top:auto;margin-top:-1px}div#menu1 ul.rMenu{background:#ffffff;border:dashed 1px #cccccc}div#menu2 ul.rMenu{background:#777777;border:solid 1px #000000}div#menu1 ul.rMenu li a{border:dashed 1px #cccccc}div#menu2 ul.rMenu li a{border:solid 1px #000000}ul.rMenu-hor li{margin-bottom:-1px;margin-top:-1px;margin-left:-1px}ul#rmenu li{}ul#rmenu li ul li{}ul.rMenu-hor{padding-left:1px }ul.rMenu-ver li{margin-left:0;margin-top:-1px; }div#menu1 ul.rMenu-ver{border-top:dashed 1px #cccccc}div#menu2 ul.rMenu-ver{border-top:solid 1px #000000}div#menu1 ul.rMenu li a{padding:4px 5px}div#menu2 ul.rMenu li a{padding:4px 5px}div#menu1 ul.rMenu li a:link,div#menu1 ul.rMenu li a:hover,div#menu1 ul.rMenu li a:visited,div#menu1 ul.rMenu li a:active{text-decoration:none;margin:0;padding:4px 5px;color:#777777;text-transform:uppercase;font:11px Arial,Verdana,sans-serif;}div#menu2 ul.rMenu li a:link,div#menu2 ul.rMenu li a:hover,div#menu2 ul.rMenu li a:visited,div#menu2 ul.rMenu li a:active{text-decoration:none;margin:0;padding:4px 5px;color:#ffffff;text-transform:uppercase;font:11px Arial,Verdana,sans-serif;}div#menu1 ul.rMenu li{background-color:#ffffff}div#menu2 ul.rMenu li{background-color:#777777}div#menu1 ul.rMenu li:hover,div#menu1 ul.rMenu li.sfhover{background:#dddddd}div#menu2 ul.rMenu li:hover,div#menu2 ul.rMenu li.sfhover{background:#000000}div#menu1 ul.rMenu li.current_page_item > a:link,div#menu1 ul.rMenu li.current_page_item > a:active,div#menu1 ul.rMenu li.current_page_item > a:hover,div#menu1 ul.rMenu li.current_page_item > a:visited{background-color:#eeeeee;color:#000000}div#menu1 ul.rMenu li.current_page_item a:link,div#menu1 ul.rMenu li.current_page_item a:active,div#menu1 ul.rMenu li.current_page_item a:hover,div#menu1 ul.rMenu li.current_page_item a:visited,div#menu1 ul.rMenu li a:hover{background-color:#eeeeee;color:#000000}div#menu2 ul.rMenu li.current-cat > a:link,div#menu2 ul.rMenu li.current-cat > a:active,div#menu2 ul.rMenu li.current-cat > a:hover,div#menu2 ul.rMenu li.current-cat > a:visited{background-color:#cc0000;color:#ffffff}div#menu2 ul.rMenu li.current-cat a:link,div#menu2 ul.rMenu li.current-cat a:active,div#menu2 ul.rMenu li.current-cat a:hover,div#menu2 ul.rMenu li.current-cat a:visited,div#menu2 ul.rMenu li a:hover{background-color:#cc0000;color:#ffffff}div#menu1 ul.rMenu li.rMenu-expand a,div#menu1 ul.rMenu li.rMenu-expand li.rMenu-expand a,div#menu1 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand a,div#menu1 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,div#menu1 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,div#menu1 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,div#menu1 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,div#menu1 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,div#menu1 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,div#menu1 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a{padding-right:15px;padding-left:5px;background-repeat:no-repeat;background-position:100% 50%;background-image:url(http://www.dbthink.com/wp-content/themes/atahualpa346/images/expand-right.gif)}div#menu2 ul.rMenu li.rMenu-expand a,div#menu2 ul.rMenu li.rMenu-expand li.rMenu-expand a,div#menu2 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand a,div#menu2 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,div#menu2 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,div#menu2 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,div#menu2 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,div#menu2 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,div#menu2 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,div#menu2 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a{padding-right:15px;padding-left:5px;background-repeat:no-repeat;background-position:100% 50%;background-image:url(http://www.dbthink.com/wp-content/themes/atahualpa346/images/expand-right-white.gif)}ul.rMenu-vRight li.rMenu-expand a,ul.rMenu-vRight li.rMenu-expand li.rMenu-expand a,ul.rMenu-vRight li.rMenu-expand li.rMenu-expand li.rMenu-expand a,ul.rMenu-vRight li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,ul.rMenu-vRight li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,ul.rMenu-vRight li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,ul.rMenu-vRight li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,ul.rMenu-vRight li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,ul.rMenu-vRight li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,ul.rMenu-vRight li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,ul.rMenu-hRight li.rMenu-expand a,ul.rMenu-hRight li.rMenu-expand li.rMenu-expand a,ul.rMenu-hRight li.rMenu-expand li.rMenu-expand li.rMenu-expand a,ul.rMenu-hRight li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,ul.rMenu-hRight li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,ul.rMenu-hRight li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,ul.rMenu-hRight li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,ul.rMenu-hRight li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,ul.rMenu-hRight li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a,ul.rMenu-hRight li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand a{padding-right:5px;padding-left:20px;background-image:url(http://www.dbthink.com/wp-content/themes/atahualpa346/images/expand-left.gif);background-repeat:no-repeat;background-position:-5px 50%}div#menu1 ul.rMenu-hor li.rMenu-expand a{padding-left:5px;padding-right:15px !important;background-position:100% 50%;background-image:url(http://www.dbthink.com/wp-content/themes/atahualpa346/images/expand-down.gif)}div#menu2 ul.rMenu-hor li.rMenu-expand a{padding-left:5px;padding-right:15px !important;background-position:100% 50%;background-image:url(http://www.dbthink.com/wp-content/themes/atahualpa346/images/expand-down-white.gif)}div#menu1 ul.rMenu li.rMenu-expand li a,div#menu1 ul.rMenu li.rMenu-expand li.rMenu-expand li a,div#menu1 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li a,div#menu1 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li a,div#menu1 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li a{background-image:none;padding-right:5px;padding-left:5px}div#menu2 ul.rMenu li.rMenu-expand li a,div#menu2 ul.rMenu li.rMenu-expand li.rMenu-expand li a,div#menu2 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li a,div#menu2 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li a,div#menu2 ul.rMenu li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li.rMenu-expand li a{background-image:none;padding-right:5px;padding-left:5px}* html ul.rMenu{display:inline-block;display:block;position:relative;position:static}* html ul.rMenu ul{float:left;float:none}ul.rMenu ul{}* html ul.rMenu-ver li,* html ul.rMenu-hor li ul.rMenu-ver li{width:100%;float:left;clear:left}*:first-child+html ul.rMenu-ver > li{width:100%;float:left;clear:left}ul.rMenu li a{position:relative;min-width:0}* html ul.rMenu-hor li{width:11em;width:auto}* html div.rMenu-center{position:relative;z-index:1}* html ul.rMenu ul{display:block;position:absolute}* html ul.rMenu ul,* html ul.rMenu-hor ul,* html ul.rMenu-ver ul,* html ul.rMenu-vRight ul,* html ul.rMenu-hRight ul.rMenu-ver ul,* html ul.rMenu-hRight ul{left:-10000px}* html ul.rMenu li.sfhover{z-index:999}* html ul.rMenu li.sfhover ul{left:auto}* html ul.rMenu li.sfhover ul ul,* html ul.rMenu li.sfhover ul ul ul,* html ul.rMenu li.sfhover ul ul ul ul,* html ul.rMenu li.sfhover ul ul ul ul ul,* html ul.rMenu li.sfhover ul ul ul ul ul ul{display:none}* html ul.rMenu li.sfhover ul,* html ul.rMenu li li.sfhover ul,* html ul.rMenu li li li.sfhover ul,* html ul.rMenu li li li li.sfhover ul,* html ul.rMenu li li li li li.sfhover ul{display:block}* html ul.rMenu-ver li.sfhover ul{left:100%}* html ul.rMenu-vRight li.sfhover ul,* html ul.rMenu-hRight ul.rMenu-ver li.sfhover ul{left:-100%}* html ul.rMenu iframe{position:absolute;left:0;top:0;z-index:-1}* html ul.rMenu{margin-left:1px}* html ul.rMenu ul,* html ul.rMenu ul ul,* html ul.rMenu ul ul ul,* html ul.rMenu ul ul ul ul{margin-left:0}* html ul.rMenu{display:inline-block;display:block;position:relative;position:static}* html ul.rMenu ul{float:left;float:none}ul.rMenu ul{background-color:#fff}* html ul.rMenu-ver li,* html ul.rMenu-hor li ul.rMenu-ver li{width:100%;float:left;clear:left}*:first-child+html ul.rMenu-ver > li:hover ul{min-width:0}ul.rMenu li a{position:relative;min-width:0}* html ul.rMenu-hor li{width:6em;width:auto}* html div.rMenu-center{position:relative;z-index:1}html:not([lang*=""]) div.rMenu-center ul.rMenu li a:hover{height:100%}html:not([lang*=""]) div.rMenu-center ul.rMenu li a:hover{height:auto}* html ul.rMenu ul{display:block;position:absolute}* html ul.rMenu ul,* html ul.rMenu-hor ul,* html ul.rMenu-ver ul,* html ul.rMenu-vRight ul,* html ul.rMenu-hRight ul.rMenu-ver ul,* html ul.rMenu-hRight ul{left:-10000px}* html ul.rMenu li.sfhover{z-index:999}* html ul.rMenu li.sfhover ul{left:auto}* html ul.rMenu li.sfhover ul ul,* html ul.rMenu li.sfhover ul ul ul{display:none}* html ul.rMenu li.sfhover ul,* html ul.rMenu li li.sfhover ul,* html ul.rMenu li li li.sfhover ul{display:block}* html ul.rMenu-ver li.sfhover ul{left:60%}* html ul.rMenu-vRight li.sfhover ul,* html ul.rMenu-hRight ul.rMenu-ver li.sfhover ul{left:-60%}* html ul.rMenu iframe{position:absolute;left:0;top:0;z-index:-1}.clearfix:after{ content:".";display:block;height:0;clear:both;visibility:hidden}.clearfix{min-width:0;display:inline-block;display:block}* html .clearfix{height:1%;}* html a.posts-icon,a.comments-icon,a.email-icon,img.logo{behavior:url("http://www.dbthink.com/wp-content/themes/atahualpa346/js/iepngfix.php") }.clearfix:after{ content:".";display:block;height:0;clear:both;visibility:hidden}.clearfix{min-width:0;display:inline-block;display:block}* html .clearfix{height:1%;}.clearboth{clear:both;height:1%;font-size:1%;line-height:1%;display:block;padding:0;margin:0}</style>
+<script type="text/javascript">
+//<![CDATA[
+
+
+
+/* JQUERY */
+
+jQuery(document).ready(function(){  
+  
+	/* For IE6 */
+	if (jQuery.browser.msie && /MSIE 6\.0/i.test(window.navigator.userAgent) && !/MSIE 7\.0/i.test(window.navigator.userAgent) && !/MSIE 8\.0/i.test(window.navigator.userAgent)) {
+
+		/* Max-width for images in IE6 */		
+		var centerwidth = jQuery("td#middle").width(); 
+		
+		/* Images without caption */
+		jQuery(".post img").each(function() { 
+			var maxwidth = centerwidth - 10 + 'px';
+			var imgwidth = jQuery(this).width(); 
+			var imgheight = jQuery(this).height(); 
+			var newimgheight = (centerwidth / imgwidth * imgheight) + 'px';	
+			if (imgwidth > centerwidth) { 
+				jQuery(this).css({width: maxwidth}); 
+				jQuery(this).css({height: newimgheight}); 
+			}
+		});
+		
+		/* Images with caption */
+		jQuery("div.wp-caption").each(function() { 
+			var captionwidth = jQuery(this).width(); 
+			var maxcaptionwidth = centerwidth + 'px';
+			var captionheight = jQuery(this).height();
+			var captionimgwidth =  jQuery("div.wp-caption img").width();
+			var captionimgheight =  jQuery("div.wp-caption img").height();
+			if (captionwidth > centerwidth) { 
+				jQuery(this).css({width: maxcaptionwidth}); 
+				var newcaptionheight = (centerwidth / captionwidth * captionheight) + 'px';
+				var newcaptionimgheight = (centerwidth / captionimgwidth * captionimgheight) + 'px';
+				jQuery(this).css({height: newcaptionheight}); 
+				jQuery("div.wp-caption img").css({height: newcaptionimgheight}); 
+				}
+		});
+		
+		/* sfhover for LI:HOVER support in IE6: */
+		jQuery("ul li").
+			hover( function() {
+					jQuery(this).addClass("sfhover")
+				}, 
+				function() {
+					jQuery(this).removeClass("sfhover")
+				} 
+			); 
+
+	/* End IE6 */
+	}
+	
+	jQuery(".post table tr").
+		mouseover(function() {
+			jQuery(this).addClass("over");
+		}).
+		mouseout(function() {
+			jQuery(this).removeClass("over");
+		});
+
+	
+	jQuery(".post table tr:even").
+		addClass("alt");
+
+	
+	jQuery("input.text, input.TextField, input.file, input.password, textarea").
+		focus(function () {  
+			jQuery(this).addClass("highlight"); 
+		}).
+		blur(function () { 
+			jQuery(this).removeClass("highlight"); 
+		})
+	
+	jQuery("input.inputblur").
+		focus(function () {  
+			jQuery(this).addClass("inputfocus"); 
+		}).
+		blur(function () { 
+			jQuery(this).removeClass("inputfocus"); 
+		})
+
+		
+
+	
+	jQuery("input.button, input.Button").
+		mouseover(function() {
+			jQuery(this).addClass("buttonhover");
+		}).
+		mouseout(function() {
+			jQuery(this).removeClass("buttonhover");
+		});
+
+	/* toggle "you can use these xhtml tags" */
+	jQuery("a.xhtmltags").
+		click(function(){ 
+			jQuery("div.xhtml-tags").slideToggle(300); 
+		});
+
+	/* For the Tabbed Widgets plugin: */
+	jQuery("ul.tw-nav-list").
+		addClass("clearfix");
+
+		
+	
+});
+
+//]]>
+</script>
+<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+<!--[if IE 6]>
+<script type="text/javascript" src="http://www.dbthink.com/wp-content/themes/atahualpa346/js/DD_roundies.js"></script>
+<script type="text/javascript">DD_roundies.addRule('a.posts-icon, a.comments-icon, a.email-icon, img.logo');</script>
+<![endif]-->
+</head>
+<body class="single single-post postid-372">
+<div id="wrapper">
+<div id="container">
+<table id="layout" border="0" cellspacing="0" cellpadding="0">
+<colgroup>
+<col class="colone"><col class="coltwo">
+<col class="colthree"></colgroup>
+<tbody><tr>
+<!-- Header -->
+<td id="header" colspan="3">
+<div id="menu1"><ul id="rmenu2" class="clearfix rMenu-hor rMenu">
+<li class="page_item"><a href="http://www.dbthink.com/" title="a db thinker&#39;s home">Home</a></li>
+<li class="page_item page-item-2"><a href="http://www.dbthink.com/?page_id=2">个人简介</a></li>
+</ul></div>
+<table id="logoarea" cellpadding="0" cellspacing="0" border="0" width="100%"><tbody><tr><td rowspan="2" valign="middle" class="logoarea-logo"><a href="http://www.dbthink.com/"><img class="logo" src="./Cassandra-一个分散的结构化存储系统_files/ce.9cc17192bc0acbe5bd0c33560aec8dcf.logo,p.png" alt="a db thinker&#39;s home" width="68" height="68"></a></td><td rowspan="2" valign="middle" class="logoarea-title"><h2 class="blogtitle"><a href="http://www.dbthink.com/">a db thinker's home</a></h2><p class="tagline">An Oracle DBA's thought about DB,Web Architect etc..</p></td><td class="feed-icons" valign="middle" align="right"><div class="clearfix rss-box"><a class="comments-icon" href="http://www.dbthink.com/?feed=comments-rss2" title="Subscribe to the COMMENTS feed">Comments</a><a class="posts-icon" href="http://www.dbthink.com/?feed=rss2" title="Subscribe to Dbthink">Posts</a></div></td></tr><tr><td valign="bottom" class="search-box" align="right"><div class="searchbox">
+<form method="get" class="searchform" action="http://www.dbthink.com/">
+<div class="searchbox-form">
+<input type="text" class="text inputblur" onfocus="this.value=&#39;&#39;" value="" onblur="this.value=&#39;&#39;" name="s"></div>
+</form>
+</div>
+</td></tr></tbody></table> <div class="horbar1">&nbsp;</div> <div id="imagecontainer" class="header-image-container" style="background: url(&#39;http://www.dbthink.com/wp-content/themes/atahualpa346/images/header/IMG_1479.jpg&#39;) top center no-repeat;"><div class="opacityleft">&nbsp;</div><div class="opacityright">&nbsp;</div></div> <div class="horbar2">&nbsp;</div>
+</td>
+<!-- / Header -->
+</tr>
+<!-- Main Body -->
+<tr id="bodyrow">
+<!-- Left Sidebar -->
+<td id="left">
+<div id="search-3" class="widget widget_search"><form method="get" class="searchform" action="http://www.dbthink.com/">
+<table class="searchform" cellpadding="0" cellspacing="0" border="0">
+<tbody><tr>
+<td class="searchfield">
+<input type="text" class="text inputblur" value="" name="s">
+</td>
+<td class="searchbutton">
+<input name="submit" value="Search" type="image" src="./Cassandra-一个分散的结构化存储系统_files/magnifier2-gray.gif" style="display: block; border:none; padding: 0 0 0 5px; margin: 0;">
+</td>
+</tr></tbody></table>
+</form></div><div id="categories-3" class="widget widget_categories"><div class="widget-title"><h3>文章分类</h3></div>	<ul>
+<li class="cat-item cat-item-4"><a href="http://www.dbthink.com/?cat=4" title="View all posts filed under 社会评论">社会评论</a> (2)
+</li>
+<li class="cat-item cat-item-55"><a href="http://www.dbthink.com/?cat=55" title="View all posts filed under My Reading">My Reading</a> (28)
+</li>
+<li class="cat-item cat-item-67"><a href="http://www.dbthink.com/?cat=67" title="View all posts filed under mysql">mysql</a> (6)
+</li>
+<li class="cat-item cat-item-57"><a href="http://www.dbthink.com/?cat=57" title="View all posts filed under nosql">nosql</a> (23)
+</li>
+<li class="cat-item cat-item-34"><a href="http://www.dbthink.com/?cat=34" title="View all posts filed under oracle">oracle</a> (50)
+<ul class="children">
+<li class="cat-item cat-item-81"><a href="http://www.dbthink.com/?cat=81" title="View all posts filed under dataguard">dataguard</a> (6)
+</li>
+<li class="cat-item cat-item-16"><a href="http://www.dbthink.com/?cat=16" title="View all posts filed under Index">Index</a> (6)
+</li>
+<li class="cat-item cat-item-10"><a href="http://www.dbthink.com/?cat=10" title="View all posts filed under oracle 11g 新特性">oracle 11g 新特性</a> (9)
+</li>
+<li class="cat-item cat-item-20"><a href="http://www.dbthink.com/?cat=20" title="View all posts filed under physical design">physical design</a> (1)
+</li>
+<li class="cat-item cat-item-26"><a href="http://www.dbthink.com/?cat=26" title="View all posts filed under temporary object">temporary object</a> (1)
+</li>
+</ul>
+</li>
+<li class="cat-item cat-item-104"><a href="http://www.dbthink.com/?cat=104" title="View all posts filed under Translation">Translation</a> (31)
+</li>
+<li class="cat-item cat-item-1"><a href="http://www.dbthink.com/?cat=1" title="View all posts filed under Uncategorized">Uncategorized</a> (9)
+</li>
+</ul>
+</div><div id="recent-comments-3" class="widget widget_recent_comments"><div class="widget-title"><h3>最近评论</h3></div><ul id="recentcomments"><li class="recentcomments"><a href="http://terry.cnemb.com/%e6%8a%80%e6%9c%af%e6%96%87%e6%a1%a3/cassandra-%e6%8a%80%e6%9c%af%e6%96%87%e6%a1%a3/cassandra%e5%86%85%e9%83%a8%e6%9c%ba%e5%88%b6-%e8%af%bb%e6%93%8d%e4%bd%9c/" rel="external nofollow" class="url">夏客行 » Cassandra内部机制 : 读操作</a> on <a href="http://www.dbthink.com/?p=420&cpage=1#comment-496">Cassandra内核介绍–写操作</a></li><li class="recentcomments"><a href="http://terry.cnemb.com/%e6%8a%80%e6%9c%af%e6%96%87%e6%a1%a3/cassandra-%e6%8a%80%e6%9c%af%e6%96%87%e6%a1%a3/%e4%b8%ba%e4%bb%80%e4%b9%88flowdock%e4%bb%8ecassandra%e8%bf%81%e7%a7%bb%e5%88%b0mongodb/" rel="external nofollow" class="url">夏客行 » 为什么Flowdock从Cassandra迁移到MongoDB</a> on <a href="http://www.dbthink.com/?p=599&cpage=1#comment-495">为什么Flowdock从Cassandra迁移到MongoDB</a></li><li class="recentcomments">Eagle Fan on <a href="http://www.dbthink.com/?p=669&cpage=1#comment-494">分区表操作update global indexes涉及到的表锁</a></li><li class="recentcomments"><a href="http://topsy.com/trackback?url=http%3A%2F%2Fwww.dbthink.com%2F%3Fp%3D677&utm_source=pingback&utm_campaign=L2" rel="external nofollow" class="url">Tweets that mention 分页、内存和 I/O 延迟(转载) « a db thinker's home -- Topsy.com</a> on <a href="http://www.dbthink.com/?p=677&cpage=1#comment-490">分页、内存和 I/O 延迟(转载)</a></li><li class="recentcomments"><a href="http://www.yiihsia.com/" rel="external nofollow" class="url">yiihsia</a> on <a href="http://www.dbthink.com/?p=666&cpage=1#comment-487">数据科学家的七个秘密武器.</a></li></ul></div><div id="archives-3" class="widget widget_archive"><div class="widget-title"><h3>文章归档</h3></div>	<ul>
+<li><a href="http://www.dbthink.com/?m=201011" title="November 2010">November 2010</a>&nbsp;(4)</li>
+<li><a href="http://www.dbthink.com/?m=201009" title="September 2010">September 2010</a>&nbsp;(4)</li>
+<li><a href="http://www.dbthink.com/?m=201008" title="August 2010">August 2010</a>&nbsp;(5)</li>
+<li><a href="http://www.dbthink.com/?m=201007" title="July 2010">July 2010</a>&nbsp;(12)</li>
+<li><a href="http://www.dbthink.com/?m=201006" title="June 2010">June 2010</a>&nbsp;(8)</li>
+<li><a href="http://www.dbthink.com/?m=201005" title="May 2010">May 2010</a>&nbsp;(14)</li>
+<li><a href="http://www.dbthink.com/?m=201004" title="April 2010">April 2010</a>&nbsp;(13)</li>
+<li><a href="http://www.dbthink.com/?m=201003" title="March 2010">March 2010</a>&nbsp;(20)</li>
+<li><a href="http://www.dbthink.com/?m=201002" title="February 2010">February 2010</a>&nbsp;(11)</li>
+<li><a href="http://www.dbthink.com/?m=201001" title="January 2010">January 2010</a>&nbsp;(5)</li>
+<li><a href="http://www.dbthink.com/?m=200912" title="December 2009">December 2009</a>&nbsp;(4)</li>
+</ul>
+</div><div id="tag_cloud-3" class="widget widget_tag_cloud"><div class="widget-title"><h3>Most used Tags</h3></div><div><a href="http://www.dbthink.com/?tag=bigtable" class="tag-link-126" title="2 topics" style="font-size: 11.230769230769pt;">BigTable</a>
+<a href="http://www.dbthink.com/?tag=bloom-filter" class="tag-link-158" title="2 topics" style="font-size: 11.230769230769pt;">bloom filter</a>
+<a href="http://www.dbthink.com/?tag=buffer-cache" class="tag-link-36" title="4 topics" style="font-size: 15.179487179487pt;">buffer cache</a>
+<a href="http://www.dbthink.com/?tag=cap" class="tag-link-150" title="2 topics" style="font-size: 11.230769230769pt;">CAP</a>
+<a href="http://www.dbthink.com/?tag=cassandra" class="tag-link-56" title="11 topics" style="font-size: 22pt;">cassandra</a>
+<a href="http://www.dbthink.com/?tag=checkpoint" class="tag-link-69" title="2 topics" style="font-size: 11.230769230769pt;">checkpoint</a>
+<a href="http://www.dbthink.com/?tag=commit-log" class="tag-link-140" title="2 topics" style="font-size: 11.230769230769pt;">commit log</a>
+<a href="http://www.dbthink.com/?tag=dataguard" class="tag-link-81" title="3 topics" style="font-size: 13.384615384615pt;">dataguard</a>
+<a href="http://www.dbthink.com/?tag=dataguard-broker" class="tag-link-83" title="3 topics" style="font-size: 13.384615384615pt;">dataguard broker</a>
+<a href="http://www.dbthink.com/?tag=enqueue-lock" class="tag-link-200" title="2 topics" style="font-size: 11.230769230769pt;">enqueue lock</a>
+<a href="http://www.dbthink.com/?tag=eventual-consistency" class="tag-link-151" title="2 topics" style="font-size: 11.230769230769pt;">Eventual Consistency</a>
+<a href="http://www.dbthink.com/?tag=facebook" class="tag-link-127" title="4 topics" style="font-size: 15.179487179487pt;">Facebook</a>
+<a href="http://www.dbthink.com/?tag=fast_start-failover" class="tag-link-84" title="2 topics" style="font-size: 11.230769230769pt;">fast_start failover</a>
+<a href="http://www.dbthink.com/?tag=flash-cache" class="tag-link-35" title="5 topics" style="font-size: 16.615384615385pt;">flash cache</a>
+<a href="http://www.dbthink.com/?tag=free-buffer-waits" class="tag-link-44" title="2 topics" style="font-size: 11.230769230769pt;">free buffer waits</a>
+<a href="http://www.dbthink.com/?tag=google-file-system" class="tag-link-183" title="3 topics" style="font-size: 13.384615384615pt;">google file system</a>
+<a href="http://www.dbthink.com/?tag=google-gfs" class="tag-link-186" title="2 topics" style="font-size: 11.230769230769pt;">google gfs</a>
+<a href="http://www.dbthink.com/?tag=hadoop" class="tag-link-130" title="2 topics" style="font-size: 11.230769230769pt;">hadoop</a>
+<a href="http://www.dbthink.com/?tag=index" class="tag-link-16" title="3 topics" style="font-size: 13.384615384615pt;">Index</a>
+<a href="http://www.dbthink.com/?tag=index-rebuild" class="tag-link-29" title="2 topics" style="font-size: 11.230769230769pt;">index rebuild</a>
+<a href="http://www.dbthink.com/?tag=index-rebuild-online" class="tag-link-160" title="2 topics" style="font-size: 11.230769230769pt;">index rebuild online</a>
+<a href="http://www.dbthink.com/?tag=jonathan-lewis" class="tag-link-50" title="7 topics" style="font-size: 18.769230769231pt;">Jonathan Lewis</a>
+<a href="http://www.dbthink.com/?tag=kernel-parameter" class="tag-link-218" title="2 topics" style="font-size: 11.230769230769pt;">kernel parameter</a>
+<a href="http://www.dbthink.com/?tag=latency" class="tag-link-80" title="2 topics" style="font-size: 11.230769230769pt;">latency</a>
+<a href="http://www.dbthink.com/?tag=map-reduce" class="tag-link-131" title="2 topics" style="font-size: 11.230769230769pt;">map reduce</a>
+<a href="http://www.dbthink.com/?tag=memtable" class="tag-link-156" title="3 topics" style="font-size: 13.384615384615pt;">Memtable</a>
+<a href="http://www.dbthink.com/?tag=mlc" class="tag-link-40" title="2 topics" style="font-size: 11.230769230769pt;">mlc</a>
+<a href="http://www.dbthink.com/?tag=mysql" class="tag-link-67" title="3 topics" style="font-size: 13.384615384615pt;">mysql</a>
+<a href="http://www.dbthink.com/?tag=new-feature" class="tag-link-12" title="3 topics" style="font-size: 13.384615384615pt;">new feature</a>
+<a href="http://www.dbthink.com/?tag=nosql" class="tag-link-57" title="4 topics" style="font-size: 15.179487179487pt;">nosql</a>
+<a href="http://www.dbthink.com/?tag=oracle-11g" class="tag-link-11" title="3 topics" style="font-size: 13.384615384615pt;">Oracle 11g</a>
+<a href="http://www.dbthink.com/?tag=performance" class="tag-link-13" title="5 topics" style="font-size: 16.615384615385pt;">performance</a>
+<a href="http://www.dbthink.com/?tag=plan-stability" class="tag-link-31" title="3 topics" style="font-size: 13.384615384615pt;">plan stability</a>
+<a href="http://www.dbthink.com/?tag=read-repair" class="tag-link-145" title="2 topics" style="font-size: 11.230769230769pt;">read repair</a>
+<a href="http://www.dbthink.com/?tag=scalability" class="tag-link-120" title="4 topics" style="font-size: 15.179487179487pt;">scalability</a>
+<a href="http://www.dbthink.com/?tag=scale-out" class="tag-link-121" title="2 topics" style="font-size: 11.230769230769pt;">scale-out</a>
+<a href="http://www.dbthink.com/?tag=slc" class="tag-link-39" title="2 topics" style="font-size: 11.230769230769pt;">slc</a>
+<a href="http://www.dbthink.com/?tag=ssd" class="tag-link-37" title="5 topics" style="font-size: 16.615384615385pt;">ssd</a>
+<a href="http://www.dbthink.com/?tag=sstable" class="tag-link-157" title="3 topics" style="font-size: 13.384615384615pt;">SSTable</a>
+<a href="http://www.dbthink.com/?tag=stored-outlines" class="tag-link-33" title="3 topics" style="font-size: 13.384615384615pt;">stored outlines</a>
+<a href="http://www.dbthink.com/?tag=%e4%b8%ad%e7%bb%84%e9%83%a8" class="tag-link-8" title="1 topic" style="font-size: 8pt;">中组部</a>
+<a href="http://www.dbthink.com/?tag=%e5%8f%af%e4%bc%b8%e7%bc%a9%e6%80%a7" class="tag-link-124" title="2 topics" style="font-size: 11.230769230769pt;">可伸缩性</a>
+<a href="http://www.dbthink.com/?tag=%e6%94%b9%e9%9d%a9" class="tag-link-7" title="1 topic" style="font-size: 8pt;">改革</a>
+<a href="http://www.dbthink.com/?tag=%e6%9d%83%e8%b4%b5%e8%b5%84%e6%9c%ac%e4%b8%bb%e4%b9%89" class="tag-link-6" title="1 topic" style="font-size: 8pt;">权贵资本主义</a>
+<a href="http://www.dbthink.com/?tag=%e6%9e%b6%e6%9e%84%e5%b8%88" class="tag-link-78" title="2 topics" style="font-size: 11.230769230769pt;">架构师</a></div>
+</div>
+</td>
+<!-- / Left Sidebar -->
+<!-- Main Column -->
+<td id="middle">
+<div class="navigation-top">
+<div class="older">« <a href="http://www.dbthink.com/?p=379" rel="next">HBase vs Cassandra: 我们迁移系统的原因</a> &nbsp;</div><div class="newer">&nbsp; <a href="http://www.dbthink.com/?p=366" rel="prev">可伸缩性最佳实践：来自eBay的经验</a> »</div><div class="clearboth"></div></div>
+<div class="post-372 post type-post hentry category-translation category-nosql tag-bigtable tag-cassandra tag-facebook tag-scalability" id="post-372">
+<div class="post-headline">	<h1>Cassandra - 一个分散的结构化存储系统</h1>
+</div>
+<div class="post-bodycopy clearfix"><blockquote><p>本文翻译自Facebook员工在LADIS大会上发布的论文.<a href="http://www.cs.cornell.edu/projects/ladis2009/papers/lakshman-ladis2009.pdf">Cassandra – A Decentralized Structured Storage System</a><br>
+这篇论文中,两位作者详细介绍了Cassandra的系统架构,它的设计初衷,设计应用时使用到的相关技术,以及设计/实现/使用过程中得到的经验教训.</p></blockquote>
+<p>Cassandra – 一个分散的非结构化存储系统<br>
+By Avinash Lakshman Facebook ,Prashant Malik Facebook; Translated By <a href="http://www.dbthink.com/">Jametong</a></p>
+<p><strong>概要</strong></p>
+<p>Cassandra是一个分布式的存储系统,可用来管理分布在大量廉价服务器上的巨量结构化数据,并同时提供没有单点故障的高可用服务.Cassandra的设计目的是运行在由几百个节点(可能分布在多个不同的数据中心)组成的基础设施(infrastructure)上.当节点达到这个规模时,大大小小的组件出现故障就可能经常发生了.Cassandra在管理持久状态时面临这些故障,这种情况也驱动软件系统的可靠性(reliability)与可伸缩性(scalability)会依赖于Cassandra的服务.虽然大部分情况,Cassandra看上去像一个数据库系统, 也与数据库系统共享大量的设计与实现手段,但是Cassandra并不支持完整的关系数据模型;相反,它提供了一个简单数据模型的客户端,支持对数据布局与数据格式的动态控制.我们设计Cassandra的初衷是,可以运行在廉价硬件上,并能在不牺牲读效率的情况下实现高的写吞吐量.</p>
+<p><strong>1.	导论</strong></p>
+<p>Facebook维护着世界上最大的社交网络平台,利用分布在世界各地的大量数据中心的成千上万台服务器,为上亿的用户提供服务.Facebook平台有严格的业务要求,包含性能、可靠性、效率以及高度的可伸缩性以支持平台的持续增长.在一个包含成千上万的组件的基础设施上处理故障是我们的标准运作模式;在任何时候,随时都可能出现相当数量的服务器或网络组件故障.这样,软件系统在构建时就需要将故障当作一种常态而不是异常来处理.为了满足上面描述的这些可靠性与可伸缩性,Facebook开发了Cassandra系统.<br>
+为了实现可伸缩性与可靠性,Cassandra组合了多项众所周知的技术.我们设计Cassandra的最初目的是解决收件箱搜索的存储需要.在Facebook,这意味着这个系统需要能够处理非常大的写吞吐量,每天几十亿的写请求,随着用户数的规模而增长.由于我们是通过在地理上分布的数据中心对用户进行服务的,因此支持跨越多个数据中心的数据复制对于降低搜索延时就非常关键了.当我们在2008年6月发布收件箱搜索项目时,我们有1亿的用户,现在我们差不多有2.5亿的用户,Cassandra一直保持了其对业务的承诺.目前,Facebook内部已经有多个服务部署了Cassandra作为其后端存储系统.<br>
+本文的结构如下.第2节讨论相关研究,其中的部分研究对我们的设计有很大影响.第3节介绍详细的数据模型.第4节简要介绍客户端API.第5节介绍系统设计以及Cassandra中应用到的分布式算法.第6节介绍我们如何使用Cassandra部署Facebook平台的一个应用.</p>
+<p><strong>2.	相关研究</strong></p>
+<p>对于为了性能、可用性与数据持久性对数据进行分布，文件系统与数据库社区已经进行了广泛的研究.与仅支持扁平命名空间(namespace)的点对点(P2P)存储系统相比,分布式文件系统通常支持层次化(hierarchical)的命名空间.与Ficus[14]与Coda[16]类似的系统都是通过牺牲一致性来复制文件以实现高可用(high availability).通常使用特别的冲突解决(conflict resolution)程序来管理更新冲突(update conflict). Farsite[2]是一个没有使用任何中心服务器的分布式文件系统. Farsite使用复制来实现高可用性与可伸缩性.Google文件系统(GFS)[9]是另一个分布式文件系统,用来存储Google内部应用的各种状态数据.GFS设计比较简单,用一台主服务器存储所有的元数据(metadata),数据拆分成块(chunk)存储在多个块服务器(chunk server)上.不过,目前Google已经使用Chubby[3]抽象层为GFS的主服务器做了容错处理(fault tolerant).Bayou[18]是一个分布式的关系数据库系统,它支持断开操作(个人理解为网络断开以后的操作)并提供最终的数据一致性(eventual data consistency).在这些系统中,Bayou、Coda与Ficus允许断开操作，并且在遇到类似与网络断开与停机时能够做到自动复原.这些系统在冲突解决程序上存在差异.例如,Coda与Ficus执行系统级别的冲突解决,而Bayou允许应用级别的冲突解决.但所有这些都保证最终一致性(eventual consistency).与这些系统类似,即使在网络段开的时候,Dynamo[6]也允许进行读写操作,并使用不同的冲突解决机制(部分客户端驱动)来解决更新冲突.传统的基于复制的关系数据库系统重点在保证复制数据的强一致性(strong consistency).虽然强一致性为应用写程序提供了一个方便的编程模型,但是,这些系统在伸缩性与可用性方面却受到了限制.因为这些系统提供强一致性的保证,所以在网络分开时,它们就无法进行处理.<br>
+Dynamo[6]是一个Amazon开发的存储系统,Amazon用它来存储检索用户的购物车.Dynamo利用基于Gossip的会员算法来维护每个节点上所有其他节点的信息.可以认为Dynamo是一个只支持一跳路由请求(one-hop request routing)的结构化覆盖层(structured overlay).Dynamo使用一个向量时钟(vector lock)概要来发现更新冲突,但偏爱客户端的冲突解决机制.为了管理向量时间戳(vector timestamp),Dynamo中的写操作同时也需要执行一次读操作.在一个需要处理非常大的写吞吐量的系统中,这可能会成为瓶颈. Bigtable[4]既提供了结构化也支持数据的分布式,不过它依赖于一个分布式的文件系统来保证数据的持久化.</p>
+<p><strong>3.	数据模型</strong></p>
+<p>Cassandra中的表是一个按照主键索引的分布式多维图.它的值是一个高度结构化的对象.表中的记录键是一个没有大小限制的字符串,虽然它通常都只有16-36个字节的长度.无论需要读写多少列,单一记录键的每个副本的每次操作都是一个原子操作.多个列可以组合在一起形成一个称为column family的列的集合,这一点与Bigtable[4]系统非常相似.Cassandra提供两种类型的column family,简单的column family与超级的column family.可以将超级column family想象成column family里面嵌入column family.进一步,应用还可以指定超级column family或者简单column family里面的列的排序顺序.系统允许按时间或者名称对列进行排序.按照时间对列进行排序可以被类似于收件箱搜索这样的应用使用,因为它们的结果始终需要按照时间顺序进行展示.column family中的每个列都需要通过规范column family : column来进行访问,每个超级column family中的列都通过规范column family : super column : column来进行访问.小节6.1给出了一个展示超级column family抽象能力的非常好的例子.通常,应用都会使用一个独占的Cassandra集群,并将它们当作服务的一部分进行管理.虽然,Cassandra系统支持多表的概念,在部署时每个概要中都只能有一个表.</p>
+<p><strong>4.	API</strong></p>
+<p>Cassandra的API由下面三种方法组成.</p>
+<ul>
+<li>insert(table, key, rowMutation)</li>
+<li>get(table, key, columnName)</li>
+<li>delete(table, key, columnName) 列名可以是column family里面的一个特定列,或column family,或超级column family,或超级列里面的一个列</li>
+</ul>
+<p><strong>5.	系统架构</strong><br>
+一个需要在生产环境运转的存储系统的架构是很复杂的.除了真实的数据持久化组件外,这个系统还需要包含以下特性;可伸缩性与强大负载均衡解决方案、会员与故障检测、故障恢复、副本同步、超负荷处理、状态转移、并发与任务调度、请求编组、请求路由、系统监控与报警以及配置管理.详细描述这里的每一个解决方案超出了本论文的范围,我们将集中介绍Cassandra使用的核心的分布式系统技术:分区、复制、会员、故障处理以及伸缩性.处理读写请求需要所有这些模块的协同处理.通常,一个键的请求可能被路由到Cassandra集群的任何一个节点去处理.这个节点会确定这个特定的键的副本.对于写操作来讲,系统会将请求路由到副本上,并且等待仲裁数量的副本以确认写操作完成.对于读操作来讲,基于客户端要求的一致性保证,系统要么将请求路由到最近的副本,要么将请求路由到所有的副本并等待达到仲裁数量的响应.</p>
+<p><strong>5.1	分区.</strong></p>
+<p>增量扩展的能力是我们设计Cassandra时考虑的一个关键特性.它要求做到在集群中的一组节点(Node)之间动态的对数据进行分区.Cassandra使用一致性散列(consistent hash[11])技术在整个集群上对数据进行分区,但是使用一种保证顺序(order preserving)的散列函数来实现.在一致性散列中,散列函数的输出结果区间可以看作是一个封闭的圆形空间或者”环”(例如,最大的散列值回绕到最小的散列值).为系统中的每个节点分配这个空间上的一个随机值,代表它在这个环上的位置.每个数据项都会根据它的键被指派给一个节点,通过对这个数据项的键做散列计算,获得它在环上的位置,然后按照顺时针找到比它的位置大的第一个节点.这个节点就被认为是这个键的协调器.应用指定这个键,Cassandra利用它来对请求做路由.这样,每个节点都会负责环上的一个区间-节点与它在环上的前一个节点(逆时针)之间的区间.一致性散列的主要优势是增加或删除节点只会影响到它的近邻,其他的节点都不会受影响.基本的一致性散列算法还面临一些挑战.首先,在环上随机的为每个节点指定位置可能导致数据与负载的分布不均衡.其次,基本的一致性算法会抹杀节点之间性能的异质性(差异).解决这个问题一般有两种方法:一种方法是在环上为节点指定多个位置(Dynamo采用的方法),另一种方法是分析环上的负载信息,并移动负载较低的节点的位置以缓解负载过重的节点,引文[17]对此有详细描述.Cassandra选择了后者,因为使用它可以简化设计与实现,并且可以让负载均衡的选择更加具有确定性.</p>
+<p><strong>5.2	复制</strong></p>
+<p>Cassandra使用复制来实现高可用性与持久性.每个数据项都会被复制到N台主机,N是通过参数”per-instance”配置的复制因子.每个键(k)都被指派给一个协调节点(上一节介绍的).由协调节点负责复制落在这个节点范围的数据项的复制.除了将本节点范围内的数据存储到本地外,协调器需要将这些键复制到环上的其他N-1个节点.关于如何复制数据,Cassandra为客户端提供了多个选项.另外,Cassandra还提供了多种不同的复制策略,例如”机架不可知”(rack unaware)、”机架可知”(rack aware)(同一个数据中心内)与”数据中心可知”(data-center aware).应用选择的复制策略决定了副本的数量.使用”机架可知”与”数据中心可知”复制策略时复制的算法要稍微复杂一点.Cassandra使用一个称为Zookeeper[13]的系统在这些节点中选择一个引导者(leader).所有节点在加入集群时都需要与此引导者联系,并由引导者告知它们负责哪个环上哪个范围的副本,引导者还需保持协调一致的努力来保持不变,以确保没有哪个节点负责环上的超过N-1个范围.关于一个节点负责的范围的元数据(metadata)信息都会在每个节点做本地缓存,并在Zookeeper内做容错处理,这样当一个节点崩溃并返回的时候就可以知道它到底负责哪个范围.借用Dynamo的措辞,我们认为负责一个给定范围的节点是这个范围的”优选清单”.</p>
+<p>5.1节已经介绍了每个节点都知悉系统中的所有其他节点,以及它们各自负责的范围.通过放宽5.2节介绍的仲裁数(quorum)的要求,即使在出现节点故障与网络分区的情况下,Cassandra也可以保证持久性.在断电、冷却故障、网络故障或自然灾害时，数据中心也会发生故障.可以配置Cassandra使得每条记录都被复制到多个不同的数据中心.实际上,可以这样构建一个键的偏好列表,以实现键的存储节点分布在多个数据中心.这些数据中心都是通过高速网络进行互联.即使整个数据中心出现故障,这种跨越多个数据中心的复制架构允许我们做到不宕机.</p>
+<p><strong>5.3	会员</strong></p>
+<p>Cassandra中的集群会员是基于Scuttlebutt[19]的,一个非常高效的反熵闲话(anti-entropy Gossip)机制. Scuttlebutt的突出的特点是它非常高效的CPU利用率以及非常高效的Gossip通道利用率.在Cassandra中,系统Gossip不止用来管理会员信息,也用来传输其他系统相关的控制状态.</p>
+<p><strong>5.3.1	故障检测</strong></p>
+<p>故障检测是这样一种机制,通过它一个节点在本地就可以确定系统中的任一其他节点是活着还是死了.在Cassandra中,故障检测还被用来避免在多个操作中与不可达节点的进行通讯.Cassandra使用的是Φ Accrual故障检测器[8]的一个改进版本. Accrual故障检测器的设计思路是,故障检测模块并不是产生一个布尔值来标记一个节点是活着还是死了.相反,故障检测模块为每个被监控节点产生一个代表其怀疑级别的数值.此值被定义为Φ.其基本的思路是用Φ的值来表示一个范围,可以动态对其进行调整以反映监控节点上的网络与负载情况.<br>
+Φ有以下几种涵义:给定部分阈值Φ,并假定当Φ=1时我们就决定怀疑一个节点A,我们犯错误(例如,这个决定在将来可能由于心跳接收延迟而被证明是错误的)的概率为10%.Φ=2时出错的概率大约为1%,Φ=3大约为0.1%,等等.系统中的每个节点都会维护一个滑动窗口,来表示集群中其他节点的gossip信息的到达间隔时间.确定了这些到达间隔时间的分布后,就可以计算出Φ的值了.虽然原论文认为这个分布近似于高斯分布(Gaussian distribution),由于gossip通道的本性以及他对延时(latency)的影响,我们认为它与指数分布(Exponential Distribution)更加相似.据我们所知,我们实现的Accrual故障检测在基于Gossip的配置中还属首创. Accrual故障检测器在准确性与速度上表现都非常好, 它们也能很好的适应不同的网络环境或服务器负载环境.</p>
+<p><strong>5.4	引导程序</strong></p>
+<p>当一个节点第一次启动的时候,它会随机的选择一个令牌(token)作为它在环上的位置.为了容错的需要,映射关系会被持久化到本地磁盘以及Zookeeper中.接着令牌信息会被传播到整个集群.我们就是通过它来知道集群中的所有节点以及它们在环上的位置的.通过它,任何一个节点都可以将一个键(key)的请求路由到集群中的合适的节点.在引导过程中,当一个新的节点需要加入集群时,它需要读取它的配置文件,配置文件中包含集群中的几个联络点名单.我们将这些联络点称为集群的种子(seed).种子也可以来自一个类似于Zookeeper的配置服务(configuration service).<br>
+在Facebook的环境中,节点停机时间(由于故障或维护任务)通常都很短暂,但有时也会延长一段时间.故障可能有多种形式,如磁盘故障、CPU损坏等.节点停机很少不表示永远离开(删除节点),因此,不该导致分区指派的重新平衡或不可达副本的修复.类似地,手工错误可能会导致意外地启动新的Cassandra节点.为了避免出现这种效果,所有消息中都包含了每个Cassandra实例集群名称.如果配置中的手工错误导致一个节点尝试加入一个错误的Cassandra实例,就可以根据集群名称来阻止它.由于上述原因,使用一种明确的机制来往Cassandra实例中添加或从中删除节点或许更加合适.管理员使用命令行(command line)工具或者浏览器登陆到Cassandra的节点,提出一个会员变更(节点变更)来加入或离开集群.</p>
+<p><strong>5.5	集群的扩展</strong></p>
+<p>当有一个新节点加入系统时,它会被分配一个令牌,这样就可以缓解负载过重的节点的负载.这样导致的结果是,这个新的节点会分担部分先前由其他节点负责的范围.Cassandra的引导算法可由系统中的任何其他节点通过命令行工具或Cassandra的网络仪表盘(web dashboard)来启动.放弃这部分数据的节点通过内核到内核的拷贝技术将数据拷贝到新的节点.我们的运维经验显示,从单个节点传输的速率可以达到40MB/s.我们还在努力对它进行改善,通过让多个副本来参与并行化引导传输,类似于Bittorrent技术.</p>
+<p><strong>5.6	本地持久化</strong></p>
+<p>Cassandra系统要依赖于本地文件系统做数据的持久化.这些数据是以一种易于高效检索的格式存储在磁盘上.通常,一次写操作会涉及提交日志(Commit Log,为了数据耐用性与可恢复性)写入,以及一次内存数据结构的更新.只有在写入提交日志成功返回后,才会执行内存数据结构的写入操作.在每台主机上,我们都单独地分配了一块磁盘存放提交日志.由于提交日志地所有写入操作都是连续的(sequential),所以我们可以最大程度的利用磁盘吞吐量.当内存数据结构的大小(根据数据量大小与对象数量计算得出)超过一定的阈值,它就会将自身转储到磁盘.这个写操作会机器配备大量的廉价磁盘的某一个上执行.所有到磁盘的写操作都是顺序写.随着时间的推移,磁盘上就会存在多个这样的文件,后台会有一个合并进程(merge process)将这些文件合并成一个文件.这个进程与Bigtable系统中的压缩进程(compact process)非常类似.<br>
+通常,一个读操作在检索磁盘文件之前会先查询这个内存数据结构.检索磁盘文件是按照先新后旧的方式进行的.当发生磁盘检索时,我们可能需要查看多个磁盘文件.为了避免查看不包含相应键(key)的文件,我们使用了布隆过滤器(bloom filter),它对文件中的键进行了汇总,它同时存在于每一个数据文件中并常驻在内存中.当需要检索某个键时,会先查阅此布隆过滤器以确认给定的文件是否确实包含此键.column family中的一个键可以包含大量的列.当检索的列距离键较远时还需要利用一些特殊的索引.为了避免在磁盘上扫描每一列,我们维护了一份列索引来帮助我们直接定位到磁盘上的对应块.由于指定键的列已经被序列化并写出到磁盘,我们是按照每个块(chunk)256K的范围创建索引的.块的范围大小是可配置的,不过,我们发现256K的大小在我们的生产工作负载下运作良好.</p>
+<p><strong>5.7	实现细节</strong></p>
+<p>单台机器上的Cassandra进程主要由以下模块组成:分区模块、集群会员管理模块、故障检测模块与存储引擎模块.所有这些模块都依赖于一个事件驱动的底层模块,它是按照SEDA[20]架构设计的,将消息处理管道与任务管道切分成了多个阶段.所有这些模块都是完全利用Java实现.集群会员模块与故障检测模块都建立在使用非堵塞IO的网络层上.所有的系统控制信息都依赖于基于UDP协议的消息传输,而复制与请求路由等应用相关的消息则依赖于TCP协议传输.请求路由模块的实现使用了一个固定的状态机.当集群的任一节点收到一个读/写请求时,状态机都会在以下几种状态之间切换: (i)定位拥有这个键的数据的节点(ii)将请求路由到此节点并等待响应到达(iii)如果答复没有在配置的超时时间内到达,就将此请求置为失败并返回给客户端(iv)根据时间戳算出最新的答复(v)为任何数据不是最新的副本的安排数据修复.出于论述起见,详细的故障情况我们就不在此讨论了.这个系统的复制模式可以配置为同步写(synchronous write)也可以配置为异步写(asynchronous write).对于特定的需要高吞吐量的系统,我们会选择依赖于异步复制.这时,系统接收到的写操作远远超过读操作.对于使用同步的例子,在返回给用户之前我们会等待达到仲裁的响应数量.<br>
+在任何日志文件系统中,都需要有一个机制来清理提交日志项(commit log entry), 在Cassandra中,我们使用一种滚动的提交日志,在一个旧的提交日志超过一个特定的可配置大小后,就推出一个新的提交日志.在我们的生产环境中,我们发现128M的滚动提交日志运作良好. 每个提交日志都有一个头信息,基本上是一个大小固定的位向量,其大小通常超过一个系统可能处理的column family的个数.在我们的实现中,对于每个column family,我们都会生成一个内存数据结构以及一个数据文件.每当一个特定的column family的内存数据结构转储到磁盘,我们都会在提交日志中记录它对应的位,说明这个column family已经被成功地持久化到磁盘.这表明这部分信息已经提交了.每个提交日志都有一份对应的位向量,这些位向量的信息同时也在内存中进行维护.每当发生提交日志滚动的时候,它的位向量,以及它之前滚动的提交日志的位向量都会被检查一下.如果确定所有的数据都已经被成功地持久化到磁盘,就删除这些提交日志.到提交日志的写操作可以是普通模式(normal mode)也可以是快速同步模式(fast sync mode).在快速同步模式下,到提交日志的写操作会被缓冲(buffered).这表明在机器崩溃时可能会出现潜在的数据丢失.在这种模式下,内存数据结构转储到磁盘也会被缓冲.传统的数据库通常都不会被设计用来处理特别高的写入吞吐量.Cassandra将所有的写入操作都转换成顺序写操作以最大限度地利用磁盘的写入吞吐量.由于转储到磁盘的文件不再会被修改,从而在读取它们的时候也不需要持有任何锁.Cassandra的服务实例的读写操作实际上都是无锁操作.所以,我们并不需要应付基于B-Tree的数据库实现中存在的并发问题.<br>
+Cassandra系统通过主键来来索引所有数据.磁盘上的数据文件被分解成一系列的块.每个块内最多包含128个键,并通过一个块索引来区分.块索引抓取块内的键的相对偏移量以及其数据大小.当内存数据结构被转储到磁盘时,系统会为其生成一个索引,它的偏移量会被写当作索引写到磁盘上.内存中也会维护一份这个索引以提供快速访问.一个典型的读操作总是会先检索内存数据结构.如果找到就将数据返回给应用程序,因为内存数据结构中包含任何键的最新数据.如果没有找到,那么我们就需要对所有磁盘数据文件按照时间逆序来执行磁盘IO.由于总是寻求最新的数据,我们就先查阅最新的文件,一旦找到数据就返回.随着时间的推移,磁盘上的数据文件数量会出现增加.我们会运行一个非常类似于Bigtable系统的压缩进程,通过它将多个文件压缩成一个文件.基本上是对很多排序好的数据文件进行合并排序.系统总是会压缩大小彼此接近的文件,例如,永远不会出现一个100GB的文件与另一个小于50GB的文件进行合并的情形.每隔一段时间,就会运行一个主压缩程序来将所有相关的数据文件压缩成一个大文件.这个压缩进程是一个磁盘IO密集型的操作.需要对此做大量的优化以做到不影响后续的读请求.</p>
+<p><strong>6.	实践经验</strong></p>
+<p>在设计、实现以及维护Cassandra的过程中,我们积累了不少有益的经验,也获得了许多经验教训.一个非常基本的经验教训是,在没有理解应用的使用效果之前不要增加任何新特性.最成问题的情况不仅仅来自节点崩溃与网络分区.我们将在此分享几个有趣的场景.</p>
+<ul>
+<li>在发布收件箱搜索应用之前,我们必须先为超过1亿用户的7TB的收件箱数据创建索引,接着将它们存储到我们的MySQL[1]基础结构中,然后再将它们加载到Cassandra系统中.整个处理过程涉及到在MySQL数据文件上运行Map/Reduce[7]任务,为它们创建索引,并按照逆序索引的方式将它们存储到Cassandra中.实际上,M/R进程是作为Cassandra的客户端运行的.我们为M/R进程开放了后端通道,使它们可以按用户汇总逆序索引,并将序列化后的数据传输给Cassandra实例,以节省序列化/反序列化的开销.这样,Cassandra实例的瓶颈就只剩下网络带宽了.</li>
+<li>大部分应用都是只需要每个键的每个副本的原子操作.不过,还是有部分应用需要交易支持,它的主要目的是维护辅助索引.大部分有着多年RDBMS相关开发经验的开发人员都认为这个特性很有用.我们正在研究开放此类原子操作的机制.</li>
+<li>我们尝试实现了多种故障检测器,包含[15]与[5]中所描述的故障检测器.我们得到的经验是,随着集群规模的增长,检测到故障的时间也会出现增长,超出了我们的接受限度.在一个特定的包含100个节点的实验中,检测一个故障节点竟然耗费大约2分钟的时间.在我们的环境中,这实际上是不可接受的.利用accrual故障检测器并设置一个稍显保守的PHI(Φ)值(设置为5),在上面的实验中检测到故障的平均时间大约为15秒.</li>
+<li>不要对监控想当然.Cassandra系统与Ganglia[12]做了很好的集成,Ganglia是一个分布式的性能监控工具.我们向Ganglia开放了各种系统级别的指标,在Cassandra部署到我们的生产环境时,这一点帮助我们更深的理解了这个系统的行为.磁盘会无缘无故地出现故障.当磁盘出现故障时,引导算法中有多个异常分支(hook)来修复这个节点.但是,这实际上是一个管理操作.</li>
+<li>虽然Cassandra是一个完全分散地系统,我们了解到,为了使一些分布式特性的实现更加可控,支持一定数量的协调操作还是非常必要的.我们打算对部分关键特性使用Zookeeper抽象,这些特性实际上与使用Cassandra作为存储引擎的应用关系不大.</li>
+</ul>
+<p><strong>6.1	Facebook的收件箱搜索</strong></p>
+<p>对于收件箱搜索,我们为每个用户维护了一份所有消息的索引,这些消息包含用户作为发送者的消息也包含其作为接收者的消息.目前启用了两种类型的索引(a)术语搜索(b)互动搜索,根据与此用户给定互动的人的名称返回用户发送给此人以及从此人处接收的所有消息.这个概要(schema)包含两个column family,对于查询(a),用user id作为键(key),以构成消息的单词作为超级列(super column).对于查询(b),user id仍然是键(key),接收者的id都是super column.对于这些super column中的每一个,单个消息的识别符都是列.为了实现快速检索,Cassandra为数据的智能缓存提供了特定的钩子(hook)代码.例如,当用户点击到搜索栏时,会有一条异步消息发送给Cassandra集群,再通过用户索引在高速缓存(buffer cache)中准备好该用户的数据.这样,当实际的搜索查询请求到达时,搜索结果很可能已经在内存中了.目前,这个系统在150个节点的集群上存储了大约50多TB的数据,这些节点分布在美国东西海岸的多个数据中心.下面展示了部分生长环境中测量出来的读性能数据.</p>
+<table border="1" cellspacing="0" cellpadding="0">
+<tbody>
+<tr class="alt">
+<th>延时统计</th>
+<th>搜索交互</th>
+<th>术语</th>
+</tr>
+<tr>
+<td>最小</td>
+<td>7.69ms</td>
+<td>7.78ms</td>
+</tr>
+<tr class="alt">
+<td>中数</td>
+<td>15.69ms</td>
+<td>18.27ms</td>
+</tr>
+<tr>
+<td>最大</td>
+<td>26.13ms</td>
+<td>44.41ms</td>
+</tr>
+</tbody>
+</table>
+<p><strong>7.	结论</strong></p>
+<p>我们已经建立、实现并维护的存储系统，可以提供可伸缩性、高性能与广泛的适用性.我们的经验表明,Cassandra可以在提供低延时(low latency)的同时提高非常高的更新吞吐量(thoughput).后期的工作涉及增加压缩功能、跨越多个键的原子操作支持以及辅助索引支持.</p>
+<p><strong>8.	致谢</strong></p>
+<p>Cassandra极大地受益与Facebook公司内部许多同事的反馈.另外还要特别感谢Karthik Ranganathan,他对MySQL中的所有数据建立了索引并将这些数据迁移到Cassandra中作为我们第一份正式部署.另外还要感谢来自EPFL的Dan Dumitriu,感谢他对我们提出的宝贵建议(关于[19]与[8]).</p>
+<p><strong>9.	参考文献</strong></p>
+<p>[1] MySQL AB. Mysql.<br>
+[2] Atul Adya, William J. Bolosky, Miguel Castro, Gerald Cermak, Ronnie Chaiken, John R. Douceur, Jon Howell, Jacob R. Lorch, Marvin Theimer, and Roger P. Wattenhofer. Farsite: Federated, available, and reliable storage for an incompletely trusted environment. In In Proceedings of the 5th Symposium on Operating Systems Design and Implementation (OSDI, pages 1-14, 2002.<br>
+[3] Mike Burrows. The chubby lock service for loosely-coupled distributed systems. In OSDI ’06: Proceedings of the 7th symposium on Operating systems design and implementation, pages 335-350, Berkeley, CA, USA, 2006. USENIX Association.<br>
+[4] Fay Chang, Jeffrey Dean, Sanjay Ghemawat, Wilson C. Hsieh, Deborah A. Wallach, Mike Burrows, Tushar Chandra, Andrew Fikes, and Robert E. Gruber. Bigtable: A distributed storage system for structured data. In In Proceedings of the 7th Conference on USENIX Symposium on Operating Systems Design and Implementation – Volume 7, pages 205-218, 2006.<br>
+[5] Abhinandan Das, Indranil Gupta, and Ashish Motivala. Swim: Scalable weakly-consistent infection-style process group membership protocol. In DSN ’02: Proceedings of the 2002 International Conference on Dependable Systems and Networks, pages 303-312, Washington, DC, USA, 2002. IEEE Computer Society.<br>
+[6] Giuseppe de Candia, Deniz Hastorun, Madan Jampani, Gunavardhan Kakulapati, Alex Pilchin, Swaminathan Sivasubramanian, Peter Vosshall, and Werner Vogels. Dynamo: amazonO? s highly available key-value store. In Proceedings of twenty-first ACM SIGOPS symposium on Operating systems principles, pages 205-220. ACM, 2007.<br>
+[7] Jeffrey Dean and Sanjay Ghemawat. Mapreduce: simplified data processing on large clusters. Commun. ACM, 51(1):107-113, 2008.<br>
+[8] Xavier D?efago, P?eter Urba?n, Naohiro Hayashibara, and Takuya Katayama. The φ accrual failure detector. In RR IS-RR-2004-010, Japan Advanced Institute of Science and Technology, pages 66-78, 2004.<br>
+[9] Sanjay Ghemawat, Howard Gobioff, and Shun-Tak Leung. The google file system. In SOSP ’03: Proceedings of the nineteenth ACM symposium on Operating systems principles, pages 29-43, New York, NY, USA, 2003. ACM.<br>
+[10] Jim Gray and Pat Helland. The dangers of replication and a solution. In In Proceedings of the 1996 ACM SIGMOD International Conference on Management of Data, pages 173-182, 1996.<br>
+[11] David Karger, Eric Lehman, Tom Leighton, Matthew Levine, Daniel Lewin, and Rina Panigrahy. Consistent hashing and random trees: Distributed caching protocols for relieving hot spots on the world wide web. In In ACM Symposium on Theory of Computing, pages 654-663, 1997.<br>
+[12] Matthew L. Massie, Brent N. Chun, and David E.Culler. The ganglia distributed monitoring system: Design, implementation, and experience. Parallel Computing, 30:2004, 2004.<br>
+[13] Benjamin Reed and Flavio Junquieira. Zookeeper.<br>
+[14] Peter Reiher, John Heidemann, David Ratner, Greg Skinner, and Gerald Popek. Resolving file conflicts in the ficus file system. In USTC’94: Proceedings of the USENIX Summer 1994 Technical Conference on USENIX Summer 1994 Technical Conference, pages 12-12, Berkeley, CA, USA, 1994. USENIX Association.<br>
+[15] Robbert Van Renesse, Yaron Minsky, and Mark Hayden. A gossip-style failure detection service. In Service,Tˇ Proc. Conf. Middleware, pages 55-70, 1996.<br>
+[16] Mahadev Satyanarayanan, James J. Kistler, Puneet Kumar, Maria E. Okasaki, Ellen H. Siegel, and David C. Steere. Coda: A highly available file system for a distributed workstation environment. IEEE Trans. Comput., 39(4):447-459, 1990.<br>
+[17] Ion Stoica, Robert Morris, David Liben-nowell, David R. Karger, M. Frans Kaashoek, Frank Dabek, and Hari Balakrishnan. Chord: a scalable peer-to-peer lookup protocol for internet applications. IEEE/ACM Transactions on Networking, 11:17-32, 2003.<br>
+[18] D. B. Terry, M. M. Theimer, Karin Petersen, A. J. Demers, M. J. Spreitzer, and C. H. Hauser. Managing update conflicts in bayou, a weakly connected replicated storage system. In SOSP ’95: Proceedings of the fifteenth ACM symposium on Operating systems principles, pages 172-182, New York, NY, USA, 1995. ACM.<br>
+[19] Robbert van Renesse, Dan Mihai Dumitriu, Valient Gough, and Chris Thomas. Efficient reconciliation and flow control for anti-entropy protocols. In Proceedings of the 2nd Large Scale Distributed Systems and Middleware Workshop (LADIS ’08), New York, NY, USA, 2008. ACM.<br>
+[20] Matt Welsh, David Culler, and Eric Brewer. Seda: an architecture for well-conditioned, scalable internet services. In SOSP ’01: Proceedings of the eighteenth ACM symposium on Operating systems principles, pages 230-243, New York, NY, USA, 2001. ACM.</p>
+<p>Related posts:</p><ol><li><a href="http://www.dbthink.com/?p=571" rel="bookmark" title="Permanent Link: Cassandra Vs HBase">Cassandra Vs HBase</a></li>
+<li><a href="http://www.dbthink.com/?p=489" rel="bookmark" title="Permanent Link: 选择一个键值存储系统(Cassandra Vs Voldemort)">选择一个键值存储系统(Cassandra Vs Voldemort)</a></li>
+<li><a href="http://www.dbthink.com/?p=493" rel="bookmark" title="Permanent Link: Bigtable：一个分布式的结构化数据存储系统(转载)">Bigtable：一个分布式的结构化数据存储系统(转载)</a></li>
+</ol></div>
+<div class="post-footer">April 21st, 2010 | Tags: <a href="http://www.dbthink.com/?tag=bigtable" rel="tag">BigTable</a>, <a href="http://www.dbthink.com/?tag=cassandra" rel="tag">cassandra</a>, <a href="http://www.dbthink.com/?tag=facebook" rel="tag">Facebook</a>, <a href="http://www.dbthink.com/?tag=scalability" rel="tag">scalability</a> | Category: <a href="http://www.dbthink.com/?cat=104" title="View all posts in Translation" rel="category">Translation</a>, <a href="http://www.dbthink.com/?cat=57" title="View all posts in nosql" rel="category">nosql</a> </div>
+</div><!-- / Post -->
+<a name="comments"></a><!-- named anchor for skip links -->
+<h3 id="comments">10 comments to Cassandra – 一个分散的结构化存储系统</h3>
+<!-- Comment List -->
+<ul class="commentlist">
+<li class="comment even thread-even depth-1 clearfix" id="comment-153">
+<div id="div-comment-153" class="clearfix comment-container">
+<div class="comment-author vcard">
+<img alt="" src="./Cassandra-一个分散的结构化存储系统_files/5d27430a05284da69e28b12d70970c4e" class="avatar avatar-55 photo" height="55" width="55">	<span class="authorname"><a href="http://twitter.com/mujiang" rel="external nofollow" class="url">木匠 Charlie</a></span>
+</div>
+<div class="comment-meta commentmetadata">
+<a href="http://www.dbthink.com/?p=372&cpage=1#comment-153">
+April 23rd, 2010 at 2:54 pm</a>
+</div>
+<p>打印,以备空闲间隙阅读.</p>
+</div>
+</li>
+<li class="comment odd alt thread-odd thread-alt depth-1 clearfix" id="comment-157">
+<div id="div-comment-157" class="clearfix comment-container">
+<div class="comment-author vcard">
+<img alt="" src="./Cassandra-一个分散的结构化存储系统_files/828cd3abfb1ec184afd1eaa0d394e662" class="avatar avatar-55 photo" height="55" width="55">	<span class="authorname"><a href="http://oss-tw.blogspot.com/" rel="external nofollow" class="url">郭朝益(ChaoYi, Kuo)</a></span>
+</div>
+<div class="comment-meta commentmetadata">
+<a href="http://www.dbthink.com/?p=372&cpage=1#comment-157">
+April 28th, 2010 at 3:19 am</a>
+</div>
+<p>您好～對於本篇文的轉載與轉譯正體中文許可至我的個人Blog中.~謝謝</p>
+</div>
+</li>
+<li class="comment byuser comment-author-admin bypostauthor even thread-even depth-1 clearfix" id="comment-160">
+<div id="div-comment-160" class="clearfix comment-container bypostauthor">
+<div class="comment-author vcard">
+<img alt="" src="./Cassandra-一个分散的结构化存储系统_files/511f78d60818288a9942a31e34428bb9" class="avatar avatar-55 photo" height="55" width="55">	<span class="authorname"><a href="http://www.dbthink.com/" rel="external nofollow" class="url">jametong</a></span>
+</div>
+<div class="comment-meta commentmetadata">
+<a href="http://www.dbthink.com/?p=372&cpage=1#comment-160">
+April 28th, 2010 at 9:01 am</a>
+</div>
+<p>谢谢对我博文的关注. 你可以随意转载转译,不过请注明引用.</p>
+</div>
+</li>
+<li class="comment odd alt thread-odd thread-alt depth-1 clearfix" id="comment-187">
+<div id="div-comment-187" class="clearfix comment-container">
+<div class="comment-author vcard">
+<img alt="" src="./Cassandra-一个分散的结构化存储系统_files/f9798cb348a2b42bd5aaab6230f30d33" class="avatar avatar-55 photo" height="55" width="55">	<span class="authorname"><a href="http://www.replicachanelbag.com/" rel="external nofollow" class="url">chanel handbags</a></span>
+</div>
+<div class="comment-meta commentmetadata">
+<a href="http://www.dbthink.com/?p=372&cpage=1#comment-187">
+May 20th, 2010 at 6:48 pm</a>
+</div>
+<p>I would like to see more blog entries like this one</p>
+</div>
+</li>
+<li class="comment byuser comment-author-admin bypostauthor even thread-even depth-1 clearfix" id="comment-191">
+<div id="div-comment-191" class="clearfix comment-container bypostauthor">
+<div class="comment-author vcard">
+<img alt="" src="./Cassandra-一个分散的结构化存储系统_files/511f78d60818288a9942a31e34428bb9" class="avatar avatar-55 photo" height="55" width="55">	<span class="authorname"><a href="http://www.dbthink.com/" rel="external nofollow" class="url">jametong</a></span>
+</div>
+<div class="comment-meta commentmetadata">
+<a href="http://www.dbthink.com/?p=372&cpage=1#comment-191">
+May 21st, 2010 at 12:45 am</a>
+</div>
+<p>在时间允许的情况下, 我相信我会在此发布更多类似的文章的..谢谢关注.</p>
+</div>
+</li>
+<li class="comment odd alt thread-odd thread-alt depth-1 clearfix" id="comment-253">
+<div id="div-comment-253" class="clearfix comment-container">
+<div class="comment-author vcard">
+<img alt="" src="./Cassandra-一个分散的结构化存储系统_files/3b983d961f893f7bbf973558a72d2a55" class="avatar avatar-55 photo" height="55" width="55">	<span class="authorname">xoyo</span>
+</div>
+<div class="comment-meta commentmetadata">
+<a href="http://www.dbthink.com/?p=372&cpage=1#comment-253">
+July 5th, 2010 at 6:22 pm</a>
+</div>
+<p>哥们，标题structured翻译错了，这是“结构化”。还有decentralized一般是叫去中心化吧？</p>
+</div>
+</li>
+<li class="comment byuser comment-author-admin bypostauthor even thread-even depth-1 clearfix" id="comment-254">
+<div id="div-comment-254" class="clearfix comment-container bypostauthor">
+<div class="comment-author vcard">
+<img alt="" src="./Cassandra-一个分散的结构化存储系统_files/511f78d60818288a9942a31e34428bb9" class="avatar avatar-55 photo" height="55" width="55">	<span class="authorname"><a href="http://www.dbthink.com/" rel="external nofollow" class="url">jametong</a></span>
+</div>
+<div class="comment-meta commentmetadata">
+<a href="http://www.dbthink.com/?p=372&cpage=1#comment-254">
+July 5th, 2010 at 7:10 pm</a>
+</div>
+<p>decentralized 本来也是使用去中心化的，不过觉得太长了，分散的意思也可以，简洁点就这么用了。</p>
+<p>不过structured 我确实是搞错了。。：=（</p>
+<p>文章标题已经修改，在此谢过。</p>
+</div>
+</li>
+<li class="comment odd alt thread-odd thread-alt depth-1 clearfix" id="comment-272">
+<div id="div-comment-272" class="clearfix comment-container">
+<div class="comment-author vcard">
+<img alt="" src="./Cassandra-一个分散的结构化存储系统_files/0e2c12841789aaefe3958184f4b2e8c9" class="avatar avatar-55 photo" height="55" width="55">	<span class="authorname"><a href="http://mimihe.weebly.com/" rel="external nofollow" class="url">Lucien Kuks</a></span>
+</div>
+<div class="comment-meta commentmetadata">
+<a href="http://www.dbthink.com/?p=372&cpage=1#comment-272">
+July 13th, 2010 at 9:32 am</a>
+</div>
+<p>try it best .</p>
+</div>
+</li>
+<li class="comment even thread-even depth-1 clearfix" id="comment-273">
+<div id="div-comment-273" class="clearfix comment-container">
+<div class="comment-author vcard">
+<img alt="" src="./Cassandra-一个分散的结构化存储系统_files/ed5aea5edcb7821c37a4ad4a9defa1bc" class="avatar avatar-55 photo" height="55" width="55">	<span class="authorname"><a href="http://www.getsofts.net/" rel="external nofollow" class="url">Charla Greenhalge</a></span>
+</div>
+<div class="comment-meta commentmetadata">
+<a href="http://www.dbthink.com/?p=372&cpage=1#comment-273">
+July 13th, 2010 at 2:38 pm</a>
+</div>
+<p>Hello This is a great blog keep your good work and thank you for hvar in with me So nice to hear frome you.Thanks!</p>
+</div>
+</li>
+<li class="pingback odd alt thread-odd thread-alt depth-1 clearfix" id="comment-293">
+<div id="div-comment-293" class="clearfix comment-container">
+<div class="comment-author vcard">
+<span class="authorname"><a href="http://community.orcworks.com/blog/2010-07-23/learnning-cassandra/" rel="external nofollow" class="url">Cassandra简单研究长明 | 长明</a></span>
+</div>
+<div class="comment-meta commentmetadata">
+<a href="http://www.dbthink.com/?p=372&cpage=1#comment-293">
+July 23rd, 2010 at 4:28 am</a>
+</div>
+<p>[...] 2. Cassandra – A Decentralized Structured Storage System，(中文翻译在http://www.dbthink.com/?p=372) 3. Running Cassandra In [...]</p>
+</div>
+</li>
+</ul>
+<!-- / Comment List -->
+<!-- Comment Form -->
+<div id="respond">
+<a name="commentform"></a><!-- named anchor for skip links -->
+<h3 class="reply">Leave a Reply</h3>
+<div id="cancel-comment-reply">
+<a rel="nofollow" id="cancel-comment-reply-link" href="http://www.dbthink.com/?p=372#respond" style="display:none;">Cancel</a>	</div>
+<form action="http://www.dbthink.com/wp-comments-post.php" method="post" id="commentform">
+<p>
+<input class="text author" type="text" name="author" id="author" value="" size="30" tabindex="1">&nbsp;
+<label for="author"> <strong>
+Name </strong>(required)</label>
+</p>
+<p>
+<input class="text email" type="text" name="email" id="email" value="" size="30" tabindex="2">&nbsp;
+<label for="email"> <strong>
+Mail</strong> (will not be published) (required)</label>
+</p>
+<p>
+<input class="text url" type="text" name="url" id="url" value="" size="30" tabindex="3">&nbsp;
+<label for="url">
+Website</label>
+</p>
+<p class="thesetags clearfix">
+You can use <a class="xhtmltags" href="http://www.dbthink.com/?p=372#" onclick="return false;">these HTML tags</a></p>
+<div class="xhtml-tags"><p><code>&lt;a href="" title=""&gt; &lt;abbr title=""&gt; &lt;acronym title=""&gt; &lt;b&gt; &lt;blockquote cite=""&gt; &lt;cite&gt; &lt;code&gt; &lt;del datetime=""&gt; &lt;em&gt; &lt;i&gt; &lt;q cite=""&gt; &lt;strike&gt; &lt;strong&gt; </code></p></div>
+<!-- Comment Textarea -->
+<p><textarea name="comment" id="comment" rows="10" cols="10" tabindex="4"></textarea></p>
+<!-- Submit -->
+<p><input name="submit" type="submit" class="button" id="submit" tabindex="5" value="Submit Comment">
+<input type="hidden" name="comment_post_ID" value="372" id="comment_post_ID">
+<input type="hidden" name="comment_parent" id="comment_parent" value="0">
+</p>
+</form>
+</div><!-- / respond -->
+<!-- / Comment Form -->
+</td>
+<!-- / Main Column -->
+<!-- Right Sidebar -->
+<td id="right">
+<div id="text-3" class="widget widget_text"><div class="widget-title"><h3>RSS订阅</h3></div>	<div class="textwidget"><ul>
+<a href="http://feeds.feedburner.com/dbthink"><img src="data:image/gif;base64,R0lGODlhIAAgAPenAPukMfzEfPuZO/uXPfzCfvzCf/uXPvy/gPzBf/ukMPuWPvuVQPuVP/zAgPuaO/uUQPzEe/ubOfuaOvyucfudN/7z5/ujMfuiMvuaTfufNvugNPucOP/79//58/3LnvuiM/7r2/ueNv7kz/7ew/yhWP3Yr/7lz/zBcfufNfufQ/7k0PudSv3Rn/7gv/ygWvy2e/3Mnfy0ffuZTv3bs/ulQv7nzPy+dP3WsPyvS/zDiPy9fP3UqPuhM/udPf/37/7v3/3Rq/3QmPyyZf3WuPuiRv3dsf/y5/3Xt/3JoP3RmPy+gvytTfyvcP3IoPy+gf7oy/705/7s2vuqPfyxbv3Zrv/48/uuTv3Up/uiOPzBh/ueSfy9b/zAc/yhWfy7cP29h/zCify5c/3Ekv7jx/ukN/utSP2+hvzEh/y+bfzCdv7w3/ueSPubTP7Xt/ufR/y+dfurRfy2Yf2/hfykVfzJj/3Fkvy6ZPy2W/yvb/ulNvzKjfy3bvy3ev3MmPzAePy8afuiP/yzbP3XsP3LmPuuT/yzV/ysYPzHkPylVP3GkfujRf/y5vupRvuxUf7Ztv7s2/y1YvyuYvufSP3dtvumSf3Dk/ylVf7ozvyxWf7YtvyoZPzIj/3Sp/7kx/3Kn/zEffzDffzCffzAf/uYPPuTQfuSQv///////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAKcALAAAAAAgACAAAAj/AE8JHFjkhJQECBMqVCjlRJGBEAc+wQGgosWLGDHieBJRYBILIMvc+ZMGgsmTKCGgsdMoD8gkEYNcuACHS4CbOHPqzFloZpCBNT58sPKpqNGjSJN+2kLmQw2BS3gQAkW1qtWrWKvG4bHk1AwNWPyECmWqLJRLk/SMXcu27VhGGmbY0IBpbdm7Zqm43RsKkgYbNFB4IUAYr2EfVAgrXqz4DQoaGTIUmFzAsGU1dChr1hw5BCAEoBGwYFGiUwXLpjhcCc06dIgQFCiJmk2b9qYWHCyXqM2bgm9FvIOfaaE7+GzfGzaEacA89Y8xO5gz73Mab3TpzPckjxCBiI4DBw4L/wJ/IEf1shwOkT+ggwj39z2EhLdcYRB483h/kBfS472E//+lgFpZNzjhBBjnmcJJJCkA+J8DEEYYCAyOdGDZDUookQVei0TooQAghhiiG4lYiJchIMKAlxwigjjKizDGOAoiUeBlxIuSmGhKFDL26OMaj+DlwYse4GWJjAMkqeQAZpiQyRRJaqGjEUnOgVcdSw5gwJZcFnnXFFuKgRcfW4Jw1whcbrmCAmyyWQVeI7T5ZllAsAnEXSC0qcAKLzDgp5+GmfBnG3cJysAXeP3JwAtHLOCooyLg5cmjleDlKB6WPnrEKSQ84OkDmphpyghsfMoEXp6eelenD5AgkAikxEQqaxcYyBorBhPkOsGtuk5QKykiDISErcQWa6ytSETURCnMNuvss9A220RHp6jgQrTYPuuCCtQONEQMMmT7rAwxDNFRQAA7"></a><br>
+<a href="http://www.zhuaxia.com/add_channel.php?url=http://feeds.feedburner.com/dbthink">抓虾订阅</a><br>
+<a href="http://fusion.google.com/add?feedurl=http://feeds.feedburner.com/dbthink">Google Reader 订阅</a><br>
+<a href="http://feeds.feedburner.com/dbthink"><img src="http://feeds.feedburner.com/~fc/dbthink?bg=99CCFF&fg=444444&anim=0" height="26" width="88" style="border:0" alt=""></a><br>
+</ul></div>
+</div>	<div id="recent-posts-3" class="widget widget_recent_entries">	<div class="widget-title"><h3>Recent Posts</h3></div>	<ul>
+<li><a href="http://www.dbthink.com/?p=677" title="分页、内存和 I/O 延迟(转载)">分页、内存和 I/O 延迟(转载)</a></li>
+<li><a href="http://www.dbthink.com/?p=674" title="磁盘 I/O 和网络(转载)">磁盘 I/O 和网络(转载)</a></li>
+<li><a href="http://www.dbthink.com/?p=669" title="分区表操作update global indexes涉及到的表锁">分区表操作update global indexes涉及到的表锁</a></li>
+<li><a href="http://www.dbthink.com/?p=666" title="数据科学家的七个秘密武器.">数据科学家的七个秘密武器.</a></li>
+<li><a href="http://www.dbthink.com/?p=660" title="MySQL系统的一个异常错误">MySQL系统的一个异常错误</a></li>
+<li><a href="http://www.dbthink.com/?p=652" title="Tanel Poder的两篇ppt以及其它">Tanel Poder的两篇ppt以及其它</a></li>
+<li><a href="http://www.dbthink.com/?p=647" title="Linux环境下的Oracle数据库常用内核参数介绍">Linux环境下的Oracle数据库常用内核参数介绍</a></li>
+<li><a href="http://www.dbthink.com/?p=639" title="Digg在挣扎,技术副总裁已卷铺盖走人">Digg在挣扎,技术副总裁已卷铺盖走人</a></li>
+<li><a href="http://www.dbthink.com/?p=630" title="你需要知道的关于NoSQL数据库的10件事">你需要知道的关于NoSQL数据库的10件事</a></li>
+<li><a href="http://www.dbthink.com/?p=621" title="纪念曹行,纪念曹老大">纪念曹行,纪念曹老大</a></li>
+</ul>
+</div><div id="linkcat-3" class="widget widget_links"><div class="widget-title"><h3>友情链接</h3></div>
+<ul class="xoxo blogroll">
+<li><a href="http://www.dbanotes.net/" rel="friend">大辉(Fenng)的blog.</a></li>
+<li><a href="http://www.luanxiang.org/blog" title="精通正则表达式一书的译者">乱象-印迹(余晟)</a></li>
+<li><a href="http://www.isky000.com/" rel="friend">简朝阳</a></li>
+<li><a href="http://www.anysql.net/">d.c.b.a</a></li>
+</ul>
+</div>
+<div id="linkcat-192" class="widget widget_links"><div class="widget-title"><h3>MySQL Expert Links</h3></div>
+<ul class="xoxo blogroll">
+<li><a href="http://www.xaprb.com/blog" title="Baron Schwartz behind the book ">Baron Schwartz</a></li>
+<li><a href="http://dimitrik.free.fr/blog/index.html" title="InnoDB kernel hacker">DimitriK's (dim) Weblog</a></li>
+<li><a href="http://www.facebook.com/notes.php?id=102841356695" title="blog of Facebook MySQL Team">Facebook MySQL Team blog</a></li>
+<li><a href="http://blog.zawodny.com/" title="author of  From craigslist  ">Jeremy Zawodny</a></li>
+<li><a href="http://mysqlha.blogspot.com/" title="mysql DBA of facebook">Mark Callaghan</a></li>
+<li><a href="http://mike.kruckenberg.com/" title="Author of ">Mike Kruckenberg</a></li>
+<li><a href="http://www.mysqlperformanceblog.com/" title="corporate blog of Percona ">MySQL Performance Blog</a></li>
+<li><a href="http://www.sheeri.com/rss.xml" title="MySQL Expert From Pythian,Author of book ">Sheeri Cabral</a></li>
+<li><a href="http://datacharmer.blogspot.com/" title="MySQL DBA from Sun MySQL (Now Oracle Mysql)">The Data Charmer</a></li>
+<li><a href="http://venublog.com/" title="MySQL Geek From Yahoo!">Venu Anuganti</a></li>
+<li><a href="http://yoshinorimatsunobu.blogspot.com/" title="MySQL Expert from Sun Mysql Japan support center">Yoshinori Matsunobu</a></li>
+</ul>
+</div>
+<div id="linkcat-2" class="widget widget_links"><div class="widget-title"><h3>Oracle Guru's Blog</h3></div>
+<ul class="xoxo blogroll">
+<li><a href="http://www.oracle-developer.net/" title="Oracle plsql 开发方面的特性介绍">Adrian Billington</a></li>
+<li><a href="http://www.adellera.it/" title="plsql 开发">Alberto Dell'Era</a></li>
+<li><a href="http://afatkulin.blogspot.com/">Alex Fatkulin</a></li>
+<li><a href="http://carymillsap.blogspot.com/" title="Oracle 数据库优化方法论的推广者.">Cary Millsap</a></li>
+<li><a href="http://hoopercharles.wordpress.com/">Charles Hooper</a></li>
+<li><a href="http://antognini.ch/">Chris Antognini</a></li>
+<li><a href="http://coskan.wordpress.com/" title="每周都有一些不错的Oracle相关blog推荐.">Coskan's Approach to Oracle</a></li>
+<li><a href="http://el-caro.blogspot.com/" title="一个韩国的DBA">Dion Cho</a></li>
+<li><a href="http://oracledoug.com/">Doug Burns</a></li>
+<li><a href="http://structureddata.org/" title="Oracle Real Performance Team的工程师">Greg Rahn</a></li>
+<li><a href="http://guyharrison.squarespace.com/" title="Oracle性能调优领域的牛人, Quest公司的架构师">Guy Harrison</a></li>
+<li><a href="http://izoratti.blogspot.com/" title="mysql data warehouse">Ivan's Blog (on MySQL)</a></li>
+<li><a href="http://jamesmorle.wordpress.com/" title="Scaling Oracle 8i的作者, 对于Scalability有深入的洞见.">James Morle</a></li>
+<li><a href="http://oradeblog.blogspot.com/" title="前amazon的首席DBA">Jeremiah Wilton</a></li>
+<li><a href="http://jonathanlewis.wordpress.com/">Jonathan Lewis's Blog</a></li>
+<li><a href="http://joze-senegacnik.blogspot.com/" title="www.dbprof.com 网站的主人">joze-senegacnik</a></li>
+<li><a href="http://karenmorton.blogspot.com/">Karen Morton</a></li>
+<li><a href="http://kerryosborne.oracle-guy.com/">Kerry Osborne</a></li>
+<li><a href="http://kevinclosson.wordpress.com/" title="Exadata 的架构师">Kevin Closson</a></li>
+<li><a href="http://richardfoote.wordpress.com/" title="Oracle index 领域的牛人">Richard Foote</a></li>
+<li><a href="http://orainternals.wordpress.com/" title="主要领域为Oracle internals,,文章有较大深度">Riyaj Shamsudeen</a></li>
+<li><a href="http://ronaldbradford.com/blog">ronald bradford</a></li>
+<li><a href="http://blog.tanelpoder.com/" title="Oracle internal 领域的牛人">Tanel Poder</a></li>
+<li><a href="http://blogs.oracle.com/datawarehousing/">The Data Warehouse Insider</a></li>
+<li><a href="http://www.oracle-base.com/">Tim Hall</a></li>
+<li><a href="http://tkyte.blogspot.com/" title="Tom’s Blog">Tom Kyte</a></li>
+<li><a href="http://thehelsinkideclaration.blogspot.com/" title="索引设计领域的牛人">Toon Koppelaars</a></li>
+</ul>
+</div>
+</td>
+<!-- / Right Sidebar -->
+</tr>
+<!-- / Main Body -->
+<tr>
+<!-- Footer -->
+<td id="footer" colspan="3">
+<p>
+Copyright © 2010 <a href="http://www.dbthink.com/">a db thinker's home</a> - All Rights Reserved<br>Powered by <a href="http://wordpress.org/">WordPress</a> &amp; the <a href="http://wordpress.bytesforall.com/" title="Customizable WordPress themes">Atahualpa Theme</a> by <a href="http://www.bytesforall.com/" title="BFA Webdesign">BytesForAll</a>. Discuss on our <a href="http://forum.bytesforall.com/" title="Atahualpa &amp; WordPress">WP Forum</a> </p>
+</td>
+<!-- / Footer -->
+</tr>
+</tbody></table><!-- / layout -->
+</div><!-- / container -->
+</div><!-- / wrapper -->
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-16539768-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+
+<!-- Dynamic page generated in 1.560 seconds. -->
+<!-- Cached page generated by WP-Super-Cache on 2010-12-05 22:27:48 -->
+<!-- Compression = gzip --></body></html>
