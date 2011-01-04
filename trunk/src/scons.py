@@ -3,7 +3,7 @@
 
 import glob
 common = glob.glob('common/*.c')
-print common
+#print common
 
 test_src = common + ['test/network_test.c']
 
