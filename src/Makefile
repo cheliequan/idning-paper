@@ -3,3 +3,7 @@ all:
 
 clean:
 	scons -f scons.py -c
+
+#cscope
+cs:
+	cscope -R
