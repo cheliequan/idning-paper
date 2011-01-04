@@ -1,7 +1,7 @@
 all:
 	scons -Q -f scons.py
 
-clean:
+c:
 	scons -f scons.py -c
 
 #cscope

@@ -6,19 +6,23 @@ common = glob.glob('common/*.c')
 #print common
 
 tests = ['network_test']
+
+Library('common/common', common)
+
 for t in tests:
     target = 'test/%s.out'%t
     src = 'test/%s.c'%t
     print target, src
-    Program(target, common + [src], CPPPATH = ['common'])
+    Program(target, [src], LIBS=['common'], LIBPATH=['common'], CPPPATH = ['common'], CCFLAGS='-D_DEBUG')
 
 #test_src = common + ['test/network_test.c']
 
+osd_src = glob.glob('osd/*.c')
 
-#Program(
-    #target = 'test/test.out', 
-    #source = test_src, 
-    ##LIBS = ['lib1', 'lib2'], 
-    ##LIBPATH = ['lib1/lib', 'lib2/lib'], 
-    #CPPPATH = ['common'], 
-    #CCFLAGS='-D_DEBUG')
+Program(
+    'osd/osd.out', 
+    osd_src, 
+    LIBS = ['common'], 
+    LIBPATH = ['common'], 
+    CPPPATH = ['common'], 
+    CCFLAGS='-D_DEBUG')
