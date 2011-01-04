@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <stdint.h>
 
 #include "network.h"
 #include "log.h"
@@ -384,7 +385,7 @@ int32_t tcpwrite(int sock,const void *buff,uint32_t leng) {
 }
 */
 
-int32_t tcptoread(int sock,void *buff,uint32_t leng,uint32_t msecto) {
+int32_t tcpread(int sock,void *buff,uint32_t leng,uint32_t msecto) {
 	uint32_t rcvd=0;
 	int i;
 	struct pollfd pfd;
@@ -409,7 +410,7 @@ int32_t tcptoread(int sock,void *buff,uint32_t leng,uint32_t msecto) {
 	return rcvd;
 }
 
-int32_t tcptowrite(int sock,const void *buff,uint32_t leng,uint32_t msecto) {
+int32_t tcpwrite(int sock,const void *buff,uint32_t leng,uint32_t msecto) {
 	uint32_t sent=0;
 	int i;
 	struct pollfd pfd;
@@ -501,8 +502,7 @@ int udpclose(int sock) {
 /* ----------------- API ----------------- */
 
 /* ning:
- * 这是从 matomlserv.c, matocsserv.c, matocuserv.c 三个代码里面提出来的公用代码
-
+ * 这是从 mfs matomlserv.c, matocsserv.c, matocuserv.c 三个代码里面提出来的公用代码
 */
 int server_socket(char * host, char * port){
     int lsock = tcpsocket();
@@ -546,7 +546,7 @@ int client_socket (char * host, char * port) {
         logging(LOG_INFO,"connected immediately");
         tcpnodelay(lsock);
     } else {
-        logging(LOG_INFO,"connecting ...");
+        logging(LOG_INFO,"connecting to %s:%s...", host, port);
     }
     return lsock;
 }
