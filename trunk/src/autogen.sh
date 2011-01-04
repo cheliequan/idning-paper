@@ -1576,3 +1576,8 @@ fi
 # indent-tabs-mode: t
 # End:
 # ex: shiftwidth=4 tabstop=8
+
+rm -rf autom4te.cache/
+rm -rf *.backup *.log
+rm -rf config.h.in~
+rm -rf config.status
