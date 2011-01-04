@@ -39,6 +39,7 @@
 #include <errno.h>
 
 #include "sockets.h"
+#include "log.h"
 /* Acid's simple socket library - ver 2.0 */
 
 /* ---------------SOCK ADDR--------------- */
@@ -496,6 +497,9 @@ int udpclose(int sock) {
  *                      API 
  * **********************************************************/
 
+
+/* ----------------- API ----------------- */
+
 /* ning:
  * 这是从 matomlserv.c, matocsserv.c, matocuserv.c 三个代码里面提出来的公用代码
 
@@ -503,8 +507,7 @@ int udpclose(int sock) {
 int server_socket(char * host, char * port){
     int lsock = tcpsocket();
     if (lsock<0) {
-        syslog(LOG_ERR,"matoml: socket error: %m");
-        fprintf(msgfd,"master <-> metaloggers module: can't create socket\n");
+        log("Error : can't create socket !!!");
         return -1;
     }
     tcpnonblock(lsock);
@@ -521,8 +524,6 @@ int server_socket(char * host, char * port){
     syslog(LOG_NOTICE,"matoml: listen on %s:%s",ListenHost,ListenPort);
     fprintf(msgfd,"master <-> metaloggers module: listen on %s:%s\n",ListenHost,ListenPort);
     return lsock;
-
-
 }
 
 
@@ -560,3 +561,5 @@ int client_socket (csserventry *eptr) {
     return 0;
 }
  
+
+
