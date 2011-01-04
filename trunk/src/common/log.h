@@ -6,7 +6,7 @@ const int LOG_INFO = 2;
 const int LOG_WARN = 3;
 const int LOG_ERROR = 4;
 
-int log(int level, char * fmt, ...){
+int logging(int level, char * fmt, ...){
     va_list ap;
     va_start(ap, fmt);
     vprintf(fmt, ap); //注意这里要是vprintf
