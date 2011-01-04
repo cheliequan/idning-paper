@@ -1,3 +1,5 @@
+#include<stdio.h>
+#include<stdarg.h>
 
 const int LOG_DEUBG = 1;
 const int LOG_INFO = 2;

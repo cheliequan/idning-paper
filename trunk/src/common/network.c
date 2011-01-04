@@ -507,59 +507,46 @@ int udpclose(int sock) {
 int server_socket(char * host, char * port){
     int lsock = tcpsocket();
     if (lsock<0) {
-        log("Error : can't create socket !!!");
+        log(LOG_ERROR, "can't create socket !!!");
         return -1;
     }
     tcpnonblock(lsock);
     tcpnodelay(lsock);
     tcpreuseaddr(lsock);
     if (tcpsetacceptfilter(lsock)<0) {
-        syslog(LOG_NOTICE,"matoml: can't set accept filter: %m");
+        log(LOG_INFO,"can't set accept filter: %m"); //TODO: I do not know what this for
     }
     if (tcpstrlisten(lsock, host ,port,100)<0) {
-        syslog(LOG_ERR,"matoml: listen error: %m");
-        fprintf(msgfd,"master <-> metaloggers module: can't listen on socket\n");
+        log(LOG_ERROR,"can't Listen on socket : %m");
         return -1;
     }
-    syslog(LOG_NOTICE,"matoml: listen on %s:%s",ListenHost,ListenPort);
-    fprintf(msgfd,"master <-> metaloggers module: listen on %s:%s\n",ListenHost,ListenPort);
+    syslog(LOG_INFO,"listen on %s:%s", host, port);
     return lsock;
 }
 
-
-
-int client_socket (csserventry *eptr) {
+int client_socket (char * host, char * port) {
     int status;
-    eptr->fwdsock=tcpsocket();
-    if (eptr->fwdsock<0) {
-        syslog(LOG_WARNING,"create socket, error: %m");
+    int lsock = tcpsocket();
+    if (lsock<0) {
+        log(LOG_ERROR, "can't create socket !!!");
         return -1;
     }
-    if (tcpnonblock(eptr->fwdsock)<0) {
-        syslog(LOG_WARNING,"set nonblock, error: %m");
-        tcpclose(eptr->fwdsock);
-        eptr->fwdsock=-1;
+    if (tcpnonblock(lsock)<0) {
+        log(LOG_ERROR, "set nonblock, error: %m");
+        tcpclose(lsock);
         return -1;
     }
-    status = tcpnumconnect(eptr->fwdsock,eptr->fwdip,eptr->fwdport);
+    status = tcpstrconnect(lsock, host, port);
     if (status<0) {
-        syslog(LOG_WARNING,"connect failed, error: %m");
-        tcpclose(eptr->fwdsock);
-        eptr->fwdsock=-1;
+        log(LOG_WARN, "connect failed, error: %m");
+        tcpclose(lsock);
         return -1;
     }
     if (status==0) { // connected immediately
-//      syslog(LOG_NOTICE,"connected immediately");
+        log(LOG_INFO,"connected immediately");
         tcpnodelay(eptr->fwdsock);
-        eptr->state=WRITEINIT;
     } else {
-//      gettimeofday(&(eptr->conninittime),NULL);
-//      syslog(LOG_NOTICE,"connecting ...");
-        eptr->state=CONNECTING;
-        eptr->connstart=main_utime();
+        syslog(LOG_INFO,"connecting ...");
     }
     return 0;
 }
- 
-
-
