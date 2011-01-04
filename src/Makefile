@@ -6,4 +6,5 @@ clean:
 
 #cscope
 cs:
-	cscope -R
+	cscope -R -b
+	ctags -R
