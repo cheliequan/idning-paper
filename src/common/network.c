@@ -316,10 +316,33 @@ int tcpaccept(int lsock) {
 	int sock;
 	sock=accept(lsock,(struct sockaddr *)NULL,0);
 	if (sock<0) {
+        fprintf(stderr, "accept error: %s\n", strerror(errno));
 		return -1;
 	}
 	return sock;
 }
+
+/*
+ * add by ning
+ * */
+int tcptoaccept(int sock, uint32_t msecto) {
+	uint32_t rcvd=0;
+	int i;
+	struct pollfd pfd;
+	pfd.fd = sock;
+	pfd.events = POLLIN;
+
+    if (poll(&pfd,1,msecto)<0) {
+        return -1;
+    }
+    if (pfd.revents & POLLIN) {
+        return tcpaccept(sock);
+    } else {
+        errno = ETIMEDOUT;
+        return -1;
+    }
+}
+
 
 int tcpgetpeer(int sock,uint32_t *ip,uint16_t *port) {
 	struct sockaddr_in sa;
@@ -385,7 +408,7 @@ int32_t tcpwrite(int sock,const void *buff,uint32_t leng) {
 }
 */
 
-int32_t tcpread(int sock,void *buff,uint32_t leng,uint32_t msecto) {
+int32_t tcptoread(int sock,void *buff,uint32_t leng,uint32_t msecto) {
 	uint32_t rcvd=0;
 	int i;
 	struct pollfd pfd;
@@ -410,7 +433,7 @@ int32_t tcpread(int sock,void *buff,uint32_t leng,uint32_t msecto) {
 	return rcvd;
 }
 
-int32_t tcpwrite(int sock,const void *buff,uint32_t leng,uint32_t msecto) {
+int32_t tcptowrite(int sock,const void *buff,uint32_t leng,uint32_t msecto) {
 	uint32_t sent=0;
 	int i;
 	struct pollfd pfd;

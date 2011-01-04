@@ -12,32 +12,35 @@ int main(){
     else if (pid == 0){ //child
         usleep(1);
         client();
-        
     } else{ //parent
         server();
-        sleep(3);
+        usleep(1);
     }
 }
 
 int server(){
     char buffer[1024];
     int ss = server_socket("127.0.0.1", "9991");
-    int ns = tcpaccept(ss);
+    if (ss < 0){
+        logging(LOG_ERROR, "socket error!");
+        return -1;
+    }
+    int ns = tcptoaccept(ss, 100000);
     if (ns < 0){
         logging(LOG_ERROR, "accept error!");
         return -1;
     }
     tcpnonblock(ns);
     tcpnodelay(ns);
-    int n = tcpread(ns, buffer, 10, 3000);
+    int n = tcptoread(ns, buffer, 10, 3000);
     printf("read ok %d !!\n", n);
-    printf("%s\n", buffer);
+    printf("read data: \n%s\n", buffer);
 }
 
 
 int client(){
     int cs = client_socket("127.0.0.1", "9991");
-    int n = tcpwrite(cs, "helloworl", 10, 1000);
+    int n = tcptowrite(cs, "helloworl", 10, 1000);
     printf("write ok %d \n", n);
 }
 
