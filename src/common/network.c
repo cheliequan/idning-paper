@@ -38,7 +38,7 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include "sockets.h"
+#include "network.h"
 #include "log.h"
 /* Acid's simple socket library - ver 2.0 */
 
@@ -507,20 +507,20 @@ int udpclose(int sock) {
 int server_socket(char * host, char * port){
     int lsock = tcpsocket();
     if (lsock<0) {
-        log(LOG_ERROR, "can't create socket !!!");
+        logging(LOG_ERROR, "can't create socket !!!");
         return -1;
     }
     tcpnonblock(lsock);
     tcpnodelay(lsock);
     tcpreuseaddr(lsock);
     if (tcpsetacceptfilter(lsock)<0) {
-        log(LOG_INFO,"can't set accept filter: %m"); //TODO: I do not know what this for
+        logging(LOG_INFO,"can't set accept filter: %m"); //TODO: I do not know what this for
     }
     if (tcpstrlisten(lsock, host ,port,100)<0) {
-        log(LOG_ERROR,"can't Listen on socket : %m");
+        logging(LOG_ERROR,"can't Listen on socket : %m");
         return -1;
     }
-    syslog(LOG_INFO,"listen on %s:%s", host, port);
+    logging(LOG_INFO,"listen on %s:%s", host, port);
     return lsock;
 }
 
@@ -528,25 +528,25 @@ int client_socket (char * host, char * port) {
     int status;
     int lsock = tcpsocket();
     if (lsock<0) {
-        log(LOG_ERROR, "can't create socket !!!");
+        logging(LOG_ERROR, "can't create socket !!!");
         return -1;
     }
     if (tcpnonblock(lsock)<0) {
-        log(LOG_ERROR, "set nonblock, error: %m");
+        logging(LOG_ERROR, "set nonblock, error: %m");
         tcpclose(lsock);
         return -1;
     }
     status = tcpstrconnect(lsock, host, port);
     if (status<0) {
-        log(LOG_WARN, "connect failed, error: %m");
+        logging(LOG_WARN, "connect failed, error: %m");
         tcpclose(lsock);
         return -1;
     }
     if (status==0) { // connected immediately
-        log(LOG_INFO,"connected immediately");
-        tcpnodelay(eptr->fwdsock);
+        logging(LOG_INFO,"connected immediately");
+        tcpnodelay(lsock);
     } else {
-        syslog(LOG_INFO,"connecting ...");
+        logging(LOG_INFO,"connecting ...");
     }
-    return 0;
+    return lsock;
 }

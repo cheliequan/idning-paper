@@ -1,5 +1,5 @@
 
-int server_socket(char * host, int port);
-int client_socket(char * host, int port);
+int server_socket(char * host, char * port);
+int client_socket(char * host, char * port);
 
 
