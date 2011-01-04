@@ -1,2 +1,16 @@
-2011-01-04
+--2011-01-04--
 今天弄懂了 auto tools的用法.
+但是我用了scons
+
+
+--2011-01-04--
+
+const int LOG_DEUBG = 1;
+const int LOG_INFO = 2;
+const int LOG_WARN = 3;
+const int LOG_ERROR = 4;
+用在switch里面会有:
+error: case label does not reduce to an integer constant
+
+所以，我用#define
+
