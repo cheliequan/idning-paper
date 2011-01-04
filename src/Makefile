@@ -1,2 +1,5 @@
 all:
-	./scons.py
+	scons -Q -f scons.py
+
+clean:
+	scons -f scons.py -c
