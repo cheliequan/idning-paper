@@ -1,28 +1,37 @@
 #!/usr/bin/scons -f
 #coding:utf-8
 
+#print BUILD_TARGETS
+#print COMMAND_LINE_TARGETS 
+
 import glob, os
-common = glob.glob('common/*.c')
-#print common
+common_src = glob.glob('common/*.c')
+osd_src = glob.glob('osd/*.c')
 
 tests = ['network_test', 'dlist_test']
 
-Library('common/common', common)
+test_out = [ 'test/%s.out'%i for i in tests]
+def test():
+    for i in test_out:
+        os.system(i)
 
-for t in tests:
-    target = 'test/%s.out'%t
-    src = 'test/%s.c'%t
-    print target, src
-    Program(target, [src], LIBS=['common'], LIBPATH=['common'], CPPPATH = ['common'], CCFLAGS='-D_DEBUG')
+def compile():
+    Library('common/common', common_src)
 
-#test_src = common + ['test/network_test.c']
+    for t in tests:
+        target = 'test/%s.out'%t
+        src = 'test/%s.c'%t
+        #print target, src
+        Program(target, [src], LIBS=['common'], LIBPATH=['common'], CPPPATH = ['common'], CCFLAGS='-D_DEBUG')
 
-osd_src = glob.glob('osd/*.c')
+    Program( 'osd/osd.out', osd_src, 
+        LIBS = ['common', 'event'], 
+        LIBPATH = ['common'], 
+        CPPPATH = ['common'], 
+        CCFLAGS='-D_DEBUG')
 
-Program(
-    'osd/osd.out', 
-    osd_src, 
-    LIBS = ['common', 'event'], 
-    LIBPATH = ['common'], 
-    CPPPATH = ['common'], 
-    CCFLAGS='-D_DEBUG')
+
+target = ARGUMENTS.get('ning_target', 'compile') #default target is compile!!! haha
+
+eval(target+'()')
+
