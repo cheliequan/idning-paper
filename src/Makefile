@@ -7,13 +7,13 @@
 #
 #
 
-all:
+all: cs
 	scons -Q -f scons.py
 
 c:
 	scons -f scons.py -c
 
-t:
+t: all
 	scons -Q -f scons.py ning_target=test
 
 
