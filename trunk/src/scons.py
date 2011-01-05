@@ -22,7 +22,7 @@ osd_src = glob.glob('osd/*.c')
 Program(
     'osd/osd.out', 
     osd_src, 
-    LIBS = ['common'], 
+    LIBS = ['common', 'event'], 
     LIBPATH = ['common'], 
     CPPPATH = ['common'], 
     CCFLAGS='-D_DEBUG')

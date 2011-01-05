@@ -20,7 +20,7 @@ static int puttime(char ** buf){
     curtime=tv.tv_sec;
 
     strftime(*buf,30,"%m-%d-%Y %T.", localtime(&curtime));
-    sprintf(*buf+20, "%ld ", tv.tv_usec);
+    sprintf(*buf+20, "%06ld ", tv.tv_usec);
     while(**buf)
         (*buf)++;
     return 0;
