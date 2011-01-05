@@ -10,9 +10,10 @@ osd_src = glob.glob('osd/*.c')
 
 tests = ['network_test', 'dlist_test']
 
-test_out = [ 'test/%s.out'%i for i in tests]
 def test():
+    test_out = glob.glob('test/*.out')
     for i in test_out:
+        print '.....', i
         os.system(i)
 
 def compile():
@@ -31,7 +32,7 @@ def compile():
         CCFLAGS='-D_DEBUG')
 
 
-target = ARGUMENTS.get('ning_target', 'compile') #default target is compile!!! haha
+target = ARGUMENTS.get('ning_target', 'compile') #default target is 'compile'!!! haha
 
 eval(target+'()')
 
