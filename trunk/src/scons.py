@@ -5,7 +5,7 @@ import glob, os
 common = glob.glob('common/*.c')
 #print common
 
-tests = ['network_test']
+tests = ['network_test', 'dlist_test']
 
 Library('common/common', common)
 
