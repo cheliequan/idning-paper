@@ -2,15 +2,15 @@
  * Copyright (C) Igor Sysoev
  * modified by ning @ 2011-01-05
  */
-
+#include <stddef.h>
 
 #ifndef _NGX_QUEUE_H_INCLUDED_
 #define _NGX_QUEUE_H_INCLUDED_
 
 
 typedef struct dlist_t {
-    dlist_t  *prev;
-    dlist_t  *next;
+    struct dlist_t  *prev;
+    struct dlist_t  *next;
 }dlist_t;
 
 
@@ -95,11 +95,6 @@ typedef struct dlist_t {
 
 #define dlist_data(q, type, link)                                         \
     (type *) ((u_char *) q - offsetof(type, link))
-
-
-dlist_t *dlist_middle(dlist_t *queue);
-void dlist_sort(dlist_t *queue,
-    ngx_int_t (*cmp)(const dlist_t *, const dlist_t *));
 
 
 #endif /* _NGX_QUEUE_H_INCLUDED_ */
