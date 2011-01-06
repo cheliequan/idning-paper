@@ -37,6 +37,8 @@ int server(){
     /*printf("read ok %d !!\n", n);*/
     /*printf("read data: \n%s\n", buffer);*/
     assert(strcmp("helloworl", buffer) == 0);
+    tcpclose(ns);
+    tcpclose(ss);
 }
 
 
@@ -44,6 +46,7 @@ int client(){
     int cs = client_socket("127.0.0.1", "9991");
     int n = tcptowrite(cs, "helloworl", 10, 1000);
     /*printf("write ok %d \n", n);*/
+    tcpclose(cs);
 }
 
 

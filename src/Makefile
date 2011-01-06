@@ -19,5 +19,5 @@ t: all
 
 #cscope
 cs:
-	cscope -R -b
+	cscope -I/usr/include -R -b
 	ctags -R
