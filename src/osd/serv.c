@@ -16,10 +16,11 @@ void sock_read(int fd, short event, void *arg){
     int len;
     printf("event is : %d\n", event);
     struct event *ev = arg;
-    if((len = recv(fd, buf, sizeof(buf)-1,0)) == -1)
-        send(fd, buf, strlen(buf)+1, 0);
-    printf("read len: %d\n", len);
-    event_add(ev, NULL);
+    if((len = recv(fd, buf, sizeof(buf)-1,0)) == 0){
+        tcpclose(fd);
+    }else{
+        event_add(ev, NULL);
+    }
 }
 
 static void sock_accept(int fd, short event, void *arg){
