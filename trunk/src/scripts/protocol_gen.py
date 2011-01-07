@@ -30,15 +30,15 @@ def unpack_method(name, fields):
     content += "}\n"
     return (header, content)
 
-protocol_h_templete_file = 'common/protocol.h'
-protocol_h_file = 'common/protocol.t.h'
-protocol_c_file = 'common/protocol.t.c'
+protocol_h_templete_file = 'common/protocol.input.h'
+protocol_h_file = 'common/protocol.h'
+protocol_c_file = 'common/protocol.c'
 protocol_c_test_file = 'test/protocol_test.t.c'
 
 protocol_c_file_header = """
 /*
 this file is auto generage by ./scripts/protocol_gen.py 
-use common/protocol.h as input.
+use common/protocol.input.h as input.
 do not modify it directly
 */
 #include "protocol.h"
@@ -48,7 +48,7 @@ do not modify it directly
 protocol_c_test_file_header = """
 /*
 this file is auto generage by ./scripts/protocol_gen.py 
-use common/protocol.h as input.
+use common/protocol.input.h as input.
 do not modify it directly
 */
 #include "test.h"
