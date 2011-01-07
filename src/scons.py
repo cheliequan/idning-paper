@@ -4,24 +4,37 @@
 #print BUILD_TARGETS
 #print COMMAND_LINE_TARGETS 
 
-import glob, os
+import glob, os, subprocess
 common_src = glob.glob('common/*.c')
 osd_src = glob.glob('osd/*.c')
 
-tests = ['network_test', 'dlist_test', 'protocol_test']
+test_c = glob.glob('test/*.c')
+tests = [s.replace('.c', '') for s in test_c]
+#tests = ['network_test', 'dlist_test', 'protocol_test']
+print tests
+
+def system(cmd):
+    from subprocess import Popen, PIPE
+    p = Popen(cmd, shell=True, bufsize = 102400, stdout=PIPE)
+    return p.wait()
 
 def test():
     test_out = glob.glob('test/*.out')
     for i in test_out:
+        i += ' 1 '
         print '.....', i
-        os.system(i)
+        if 0 == system(i):
+            print '.'
+        else:
+            return -1
+
 
 def compile():
     Library('common/common', common_src)
 
     for t in tests:
-        target = 'test/%s.out'%t
-        src = 'test/%s.c'%t
+        target = '%s.out'%t
+        src = '%s.c'%t
         #print target, src
         Program(target, [src], LIBS=['common'], LIBPATH=['common'], CPPPATH = ['common'], CCFLAGS='-D_DEBUG')
 
