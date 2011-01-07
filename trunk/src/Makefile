@@ -7,7 +7,7 @@
 #
 #
 
-all: cs protocol_gen
+all: protocol_gen cs
 	scons -Q -f scons.py
 
 protocol_gen: 
