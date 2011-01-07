@@ -18,3 +18,7 @@ error: case label does not reduce to an integer constant
 设计一个系统，从network, log基础库，
 到event库，
 再设计协议.
+
+--2011-01-07--
+要改变量名: 
+   protocol_c_test_file
