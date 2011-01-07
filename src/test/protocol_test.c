@@ -2,6 +2,7 @@
 
 int main(){
 
+    mc_mkdir_request_test();
 }
 int mc_mkdir_request_test(){
 
