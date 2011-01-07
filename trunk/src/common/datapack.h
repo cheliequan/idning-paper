@@ -20,6 +20,8 @@
 #define _DATAPACK_H_
 
 #include <inttypes.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* MFS data pack */
 
@@ -54,6 +56,7 @@ static inline void put8bit(uint8_t **ptr,uint8_t val) {
 	(*ptr)++;
 }
 
+
 static inline uint64_t get64bit(const uint8_t **ptr) {
 	uint64_t t64;
 	t64=((*ptr)[3]+256*((*ptr)[2]+256*((*ptr)[1]+256*(*ptr)[0])));
@@ -82,6 +85,16 @@ static inline uint8_t get8bit(const uint8_t **ptr) {
 	t8=(*ptr)[0];
 	(*ptr)++;
 	return t8;
+}
+
+static inline void putstr(uint8_t **ptr, uint32_t strlen, uint8_t * str) {
+	memcpy(*ptr, str, strlen);
+	(*ptr)+=strlen;
+}
+
+static inline void getstr(const uint8_t **ptr, uint32_t strlen, uint8_t ** str) {
+	*str = (uint8_t *)*ptr;
+	(*ptr)+=strlen;
 }
 
 #endif
