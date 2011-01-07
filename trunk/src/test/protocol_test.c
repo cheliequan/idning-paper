@@ -2,6 +2,9 @@
 
 int main(){
 
+}
+int mc_mkdir_request_test(){
+
     mc_mkdir_request req ;
     mc_mkdir_request req2 ;
     req.msgid = 1;
