@@ -15,7 +15,7 @@ def pack_method(name, fields):
             n = re.sub('uint8_t *\*', '', f).strip()
             content += '\tputstr(&data, s -> %slength, s -> %s);\n' % (n, n)
     content += "}\n"
-    return header+content
+    return (header, content)
 
 def unpack_method(name, fields):
     header = 'void %s_unpack(struct %s * s, const uint8_t * data, uint32_t len)' % (name, name)
@@ -28,8 +28,9 @@ def unpack_method(name, fields):
             n = re.sub('uint8_t *\*', '', f).strip()
             content += '\tgetstr(&data, s -> %slength, &(s -> %s));\n' % (n, n)
     content += "}\n"
-    return header+content
+    return (header, content)
 
+protocol_h_templete_file = 'common/protocol.h'
 protocol_h_file = 'common/protocol.t.h'
 protocol_c_file = 'common/protocol.t.c'
 protocol_c_test_file = 'test/protocol_test.t.c'
@@ -73,8 +74,13 @@ def deal_struct(name, fields):
 
     for f in fields:
         print '\t', f 
-    file_append(protocol_c_file, pack_method(name, fields))
-    file_append(protocol_c_file, unpack_method(name, fields))
+    (head, body) = pack_method(name, fields)
+    file_append(protocol_c_file, head+body)
+    file_append(protocol_h_file, head+';\n')
+
+    (head, body) = unpack_method(name, fields)
+    file_append(protocol_c_file, head+body)
+    file_append(protocol_h_file, head+';\n')
 
 def init(input_file):
     file_clean(protocol_h_file)
@@ -86,7 +92,7 @@ def init(input_file):
     file_append(protocol_c_file, protocol_c_file_header)
 
 def main():
-    input_file = open('common/protocol.h', 'rb').read()
+    input_file = open(protocol_h_templete_file, 'rb').read()
     init(input_file)
     structs = re.findall(r'typedef struct (.*){(.*?)}(\1)', input_file, re.DOTALL)## 
     for struct in structs:
