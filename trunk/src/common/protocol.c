@@ -1,36 +1,56 @@
+
+/*
+this file is auto generage by ./scripts/protocol_gen.py 
+use common/protocol.input.h as input.
+do not modify it directly
+*/
 #include "protocol.h"
 
-void mc_mkdir_request_pack(struct mc_mkdir_request * req, uint8_t * data, uint32_t len){
-    put32bit(&data, req -> msgid);
-    put32bit(&data, req -> version);
-    put32bit(&data, req -> operation);
-    put32bit(&data, req -> msglength);
-
-    put32bit(&data, req -> parent);
-    put32bit(&data, req -> namelength);
-    putstr(&data, req->namelength, req->name);
-    put32bit(&data, req -> mode);
-    put32bit(&data, req -> uid);
-    put32bit(&data, req -> gid);
+void mc_mkdir_request_pack(struct mc_mkdir_request * s, uint8_t * data, uint32_t len){
+	put32bit(&data, s -> msgid);
+	put32bit(&data, s -> version);
+	put32bit(&data, s -> operation);
+	put32bit(&data, s -> msglength);
+	put32bit(&data, s -> parent);
+	put32bit(&data, s -> namelength);
+	putstr(&data, s -> namelength, s -> name);
+	put32bit(&data, s -> mode);
+	put32bit(&data, s -> uid);
+	put32bit(&data, s -> gid);
 }
-
-void mc_mkdir_request_unpack(struct mc_mkdir_request * req, const uint8_t * data, uint32_t len){
-    req -> msgid = get32bit(&data);
-    req -> version = get32bit(&data);
-    req -> operation = get32bit(&data);
-    req -> msglength = get32bit(&data);
-
-    req -> parent = get32bit(&data);
-    req -> namelength = get32bit(&data);
-    getstr(&data, req->namelength, &(req->name));
-    req -> mode = get32bit(&data);
-    req -> uid = get32bit(&data);
-    req -> gid = get32bit(&data);
+void mc_mkdir_request_unpack(struct mc_mkdir_request * s, const uint8_t * data, uint32_t len){
+	s -> msgid = get32bit(&data);
+	s -> version = get32bit(&data);
+	s -> operation = get32bit(&data);
+	s -> msglength = get32bit(&data);
+	s -> parent = get32bit(&data);
+	s -> namelength = get32bit(&data);
+	getstr(&data, s -> namelength, &(s -> name));
+	s -> mode = get32bit(&data);
+	s -> uid = get32bit(&data);
+	s -> gid = get32bit(&data);
 }
-
-void oc_request_pack(struct oc_request * req, uint8_t * data, uint32_t len){
-
+void oc_request_pack(struct oc_request * s, uint8_t * data, uint32_t len){
+	put32bit(&data, s -> msgid);
+	put32bit(&data, s -> version);
+	put32bit(&data, s -> operation);
+	put32bit(&data, s -> msglength);
 }
-void oc_request_unpack(struct oc_request * req, uint8_t * data, uint32_t len){
-
+void oc_request_unpack(struct oc_request * s, const uint8_t * data, uint32_t len){
+	s -> msgid = get32bit(&data);
+	s -> version = get32bit(&data);
+	s -> operation = get32bit(&data);
+	s -> msglength = get32bit(&data);
+}
+void oc_response_pack(struct oc_response * s, uint8_t * data, uint32_t len){
+	put32bit(&data, s -> msgid);
+	put32bit(&data, s -> version);
+	put32bit(&data, s -> operation);
+	put32bit(&data, s -> msglength);
+}
+void oc_response_unpack(struct oc_response * s, const uint8_t * data, uint32_t len){
+	s -> msgid = get32bit(&data);
+	s -> version = get32bit(&data);
+	s -> operation = get32bit(&data);
+	s -> msglength = get32bit(&data);
 }
