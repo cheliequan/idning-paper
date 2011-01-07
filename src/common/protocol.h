@@ -26,7 +26,6 @@ typedef struct oc_request{
     uint32_t version;
     uint32_t operation;
     uint32_t msglength;
-    uint8_t* data;
     /*--*/
     void (*pack) (struct oc_request * req, uint8_t * data, uint32_t len) ;
     void (*unpack)(struct oc_request * req, uint8_t * data, uint32_t len);
@@ -40,10 +39,10 @@ typedef struct oc_response{
     uint32_t msglength;
 }oc_response;
 
-void oc_request_pack(struct oc_request * req, uint8_t * data, uint32_t len);
-void oc_request_unpack(struct oc_request * req, uint8_t * data, uint32_t len);
+//void oc_request_pack(struct oc_request * req, uint8_t * data, uint32_t len);
+//void oc_request_unpack(struct oc_request * req, uint8_t * data, uint32_t len);
 
-void mc_mkdir_request_pack(struct mc_mkdir_request * req, uint8_t * data, uint32_t len);
-void mc_mkdir_request_unpack(struct mc_mkdir_request * req, const uint8_t * data, uint32_t len);
+//void mc_mkdir_request_pack(struct mc_mkdir_request * req, uint8_t * data, uint32_t len);
+//void mc_mkdir_request_unpack(struct mc_mkdir_request * req, const uint8_t * data, uint32_t len);
 
 
