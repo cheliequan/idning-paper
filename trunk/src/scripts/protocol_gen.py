@@ -167,7 +167,5 @@ def main():
     (head, body) = test_main_method(struct_names)
     file_append(protocol_c_test_file, head+body)
 
-
-
 if __name__ == '__main__':
     main()
