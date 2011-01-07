@@ -46,3 +46,9 @@ typedef struct oc_response{
 //void mc_mkdir_request_unpack(struct mc_mkdir_request * req, const uint8_t * data, uint32_t len);
 
 
+void mc_mkdir_request_pack(struct mc_mkdir_request * s, uint8_t * data, uint32_t len);
+void mc_mkdir_request_unpack(struct mc_mkdir_request * s, const uint8_t * data, uint32_t len);
+void oc_request_pack(struct oc_request * s, uint8_t * data, uint32_t len);
+void oc_request_unpack(struct oc_request * s, const uint8_t * data, uint32_t len);
+void oc_response_pack(struct oc_response * s, uint8_t * data, uint32_t len);
+void oc_response_unpack(struct oc_response * s, const uint8_t * data, uint32_t len);
