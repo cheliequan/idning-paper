@@ -8,7 +8,7 @@ import glob, os
 common_src = glob.glob('common/*.c')
 osd_src = glob.glob('osd/*.c')
 
-tests = ['network_test', 'dlist_test']
+tests = ['network_test', 'dlist_test', 'protocol_test']
 
 def test():
     test_out = glob.glob('test/*.out')
