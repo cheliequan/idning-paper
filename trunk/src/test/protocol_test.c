@@ -13,7 +13,7 @@ int mc_mkdir_request_test(){
     req.msglength = 20;
 
     req.parent = 88;
-    req.namelenght = 3;
+    req.namelength = 3;
     req.name = "ab";
     req.mode = 87;
     req.uid = 502;
@@ -24,7 +24,7 @@ int mc_mkdir_request_test(){
     assert(req.msgid == req2.msgid);
     assert(req.version == req2.version);
     assert(req.msglength == req2.msglength);
-    assert(req.namelenght == req2.namelenght);
+    assert(req.namelength == req2.namelength);
     assert(req.gid == req2.gid);
     assert(strcmp(req.name, req2.name) == 0);
     
