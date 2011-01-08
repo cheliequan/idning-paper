@@ -16,6 +16,7 @@ class StringWriter:
 
 import re, random
 
+# gen pack method
 def pack_method(name, fields):
     header = 'void %s_pack(struct %s * s, uint8_t * data, uint32_t len)' % (name, name)
     content = '{\n'
@@ -27,6 +28,7 @@ def pack_method(name, fields):
     content += "}\n"
     return (header, content)
 
+# gen unpack method
 def unpack_method(name, fields):
     header = 'void %s_unpack(struct %s * s, const uint8_t * data, uint32_t len)' % (name, name)
     content = '{\n'
@@ -42,6 +44,7 @@ def unpack_method(name, fields):
 def random_int():
     return random.randint(2, 500) 
 
+# gen test method
 def test_method(name, fields):
     header = 'void %s_test()' % (name)
     content = StringWriter()
@@ -72,13 +75,14 @@ def test_main_method(struct_names):
     content.append('{')
     for name in struct_names:
         content.append1('%s_test();' % name) # mc_mkdir_request s1
+    content.append1("return 0;")
     content.append("}\n")
     return (header, str(content))
 
 protocol_h_templete_file = 'common/protocol.input.h'
 protocol_h_file = 'common/protocol.h'
 protocol_c_file = 'common/protocol.c'
-protocol_c_test_file = 'test/protocol_test.t.c'
+protocol_test_c_file = 'test/protocol_test.t.c'
 
 protocol_c_file_header = """
 /*
@@ -90,7 +94,7 @@ do not modify it directly
 
 """
 
-protocol_c_test_file_header = """
+protocol_test_c_file_header = """
 /*
 this file is auto generage by ./scripts/protocol_gen.py 
 use common/protocol.input.h as input.
@@ -131,7 +135,7 @@ def deal_struct(name, fields):
     file_append(protocol_h_file, '\n')
 
     (head, body) = test_method(name, fields)
-    file_append(protocol_c_test_file, head+body)
+    file_append(protocol_test_c_file, head+body)
 
 def parse_fields(fields):
     rst = []
@@ -147,11 +151,11 @@ def parse_fields(fields):
 def init(input_file):
     file_clean(protocol_h_file)
     file_clean(protocol_c_file)
-    file_clean(protocol_c_test_file)
+    file_clean(protocol_test_c_file)
 
     file_append(protocol_h_file, input_file)
     file_append(protocol_c_file, protocol_c_file_header)
-    file_append(protocol_c_test_file, protocol_c_test_file_header)
+    file_append(protocol_test_c_file, protocol_test_c_file_header)
 
 def main():
     input_file = open(protocol_h_templete_file, 'rb').read()
@@ -165,7 +169,10 @@ def main():
         deal_struct(name, fields)
     struct_names = [s[0] for s in structs]
     (head, body) = test_main_method(struct_names)
-    file_append(protocol_c_test_file, head+body)
+    file_append(protocol_test_c_file, head+body)
+    print 'generate ', protocol_h_file
+    print 'generate ', protocol_c_file
+    print 'generate ', protocol_test_c_file
 
 if __name__ == '__main__':
     main()

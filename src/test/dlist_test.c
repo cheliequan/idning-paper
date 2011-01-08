@@ -33,5 +33,6 @@ int main(){
         assert(p == entries+i);
         /*printf("print : %s\n", p->str);*/
     }
+    return 0;
 }
 
