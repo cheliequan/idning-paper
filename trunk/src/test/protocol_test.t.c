@@ -10,16 +10,16 @@ void mc_mkdir_request_test(){
 	mc_mkdir_request s1;
 	mc_mkdir_request s2;
 	uint8_t buffer [10000];
-	s1.msgid = 204;
-	s1.version = 354;
-	s1.operation = 188;
-	s1.msglength = 327;
-	s1.parent = 459;
-	s1.namelength = 155;
+	s1.msgid = 67;
+	s1.version = 90;
+	s1.operation = 285;
+	s1.msglength = 212;
+	s1.parent = 155;
+	s1.namelength = 398;
 	s1.name = randomstring;
-	s1.mode = 86;
-	s1.uid = 308;
-	s1.gid = 358;
+	s1.mode = 27;
+	s1.uid = 470;
+	s1.gid = 80;
 	mc_mkdir_request_pack(&s1, &buffer, 100);
 	mc_mkdir_request_unpack(&s2, &buffer, 100);
 	assert(s1.msgid == s2.msgid);
@@ -38,10 +38,10 @@ void oc_request_test(){
 	oc_request s1;
 	oc_request s2;
 	uint8_t buffer [10000];
-	s1.msgid = 236;
-	s1.version = 355;
-	s1.operation = 48;
-	s1.msglength = 335;
+	s1.msgid = 364;
+	s1.version = 469;
+	s1.operation = 32;
+	s1.msglength = 62;
 	oc_request_pack(&s1, &buffer, 100);
 	oc_request_unpack(&s2, &buffer, 100);
 	assert(s1.msgid == s2.msgid);
@@ -54,10 +54,10 @@ void oc_response_test(){
 	oc_response s1;
 	oc_response s2;
 	uint8_t buffer [10000];
-	s1.msgid = 405;
-	s1.version = 384;
-	s1.operation = 331;
-	s1.msglength = 295;
+	s1.msgid = 36;
+	s1.version = 201;
+	s1.operation = 463;
+	s1.msglength = 342;
 	oc_response_pack(&s1, &buffer, 100);
 	oc_response_unpack(&s2, &buffer, 100);
 	assert(s1.msgid == s2.msgid);
@@ -70,5 +70,6 @@ int main(){
 	mc_mkdir_request_test();
 	oc_request_test();
 	oc_response_test();
+	return 0;
 }
 

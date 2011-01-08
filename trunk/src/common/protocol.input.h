@@ -1,5 +1,13 @@
 #include "datapack.h"
 
+/*message header for all messages!*/
+typedef struct msg_header{
+    uint32_t msgid;
+    uint32_t version;
+    uint32_t operation;
+    uint32_t msglength;
+}msg_header;
+
 /*master<-client request*/
 typedef struct mc_mkdir_request{
     uint32_t msgid; /*abc*/
