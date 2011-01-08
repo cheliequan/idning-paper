@@ -21,4 +21,7 @@ error: case label does not reduce to an integer constant
 
 --2011-01-07--
 要改变量名: 
-   protocol_c_test_file
+   #TO DO: protocol_c_test_file
+
+--2011-01-07--
+打算用evhttp做一个osd的接口，方便.
