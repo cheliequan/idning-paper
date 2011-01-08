@@ -4,7 +4,7 @@
 #print BUILD_TARGETS
 #print COMMAND_LINE_TARGETS 
 
-import glob, os, subprocess
+import glob, os, subprocess, sys
 common_src = glob.glob('common/*.c')
 osd_src = glob.glob('osd/*.c')
 
@@ -21,12 +21,13 @@ def system(cmd):
 def test():
     test_out = glob.glob('test/*.out')
     for i in test_out:
-        i += ' 1 '
-        print '.....', i
+        #print '#####', i
         if 0 == system(i):
-            print '.'
+            sys.stdout.write('.')
         else:
+            print 'Test error on : ', i
             return -1
+    print '\nThank God, All Tests Are Passed!!!!!!'
 
 
 def compile():

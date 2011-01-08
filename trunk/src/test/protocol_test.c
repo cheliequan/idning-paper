@@ -1,9 +1,5 @@
 #include "test.h"
 
-int main(){
-
-    mc_mkdir_request_test();
-}
 int mc_mkdir_request_test(){
 
     mc_mkdir_request req ;
@@ -34,5 +30,11 @@ int mc_mkdir_request_test(){
 
     printf("req.name: %s\n", req.name);
     printf("req2.name: %s\n", req2.name);
+}
+
+int main(){
+
+    mc_mkdir_request_test();
+    return 0;
 }
 
