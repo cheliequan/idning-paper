@@ -25,3 +25,5 @@ error: case label does not reduce to an integer constant
 
 --2011-01-07--
 打算用evhttp做一个osd的接口，方便.
+发现libevent有一个不错的buffer类，也有event_rpcgen.py，都是等我写过了，才发现别人也写过，悲催哟.
+
