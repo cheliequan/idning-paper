@@ -5,6 +5,9 @@
 #include "network.h"
 #include "log.h"
 
+int client();
+int server();
+
 int main(){
     pid_t pid;
     if((pid = fork())<0){
@@ -17,6 +20,7 @@ int main(){
         server();
         usleep(1);
     }
+    return 0;
 }
 
 int server(){
@@ -33,20 +37,22 @@ int server(){
     }
     tcpnonblock(ns);
     tcpnodelay(ns);
-    int n = tcptoread(ns, buffer, 10, 3000);
+    tcptoread(ns, buffer, 10, 3000);
     /*printf("read ok %d !!\n", n);*/
     /*printf("read data: \n%s\n", buffer);*/
     assert(strcmp("helloworl", buffer) == 0);
     tcpclose(ns);
     tcpclose(ss);
+    return 0;
 }
 
 
 int client(){
     int cs = client_socket("127.0.0.1", "9991");
-    int n = tcptowrite(cs, "helloworl", 10, 1000);
+    tcptowrite(cs, "helloworl", 10, 1000);
     /*printf("write ok %d \n", n);*/
     tcpclose(cs);
+    return 0;
 }
 
 

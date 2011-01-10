@@ -11,7 +11,7 @@ int mc_mkdir_request_test(){
 
     req.parent = 88;
     req.namelength = 3;
-    req.name = "ab";
+    req.name = (uint8_t* )"ab";
     req.mode = 87;
     req.uid = 502;
     req.gid = 520;
@@ -23,13 +23,14 @@ int mc_mkdir_request_test(){
     assert(req.msglength == req2.msglength);
     assert(req.namelength == req2.namelength);
     assert(req.gid == req2.gid);
-    assert(strcmp(req.name, req2.name) == 0);
+    assert(strcmp((const char * )req.name, (const char *)req2.name) == 0);
     
     printf("req.msgid: %d\n", req.msgid);
     printf("req2.msgid: %d\n", req2.msgid);
 
     printf("req.name: %s\n", req.name);
     printf("req2.name: %s\n", req2.name);
+    return 0;
 }
 
 int main(){

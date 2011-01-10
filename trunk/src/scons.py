@@ -37,7 +37,7 @@ def compile():
         target = '%s.out'%t
         src = '%s.c'%t
         #print target, src
-        Program(target, [src], LIBS=['common'], LIBPATH=['common'], CPPPATH = ['common'], CCFLAGS='-D_DEBUG')
+        Program(target, [src], LIBS=['common'], LIBPATH=['common'], CPPPATH = ['common'], CCFLAGS='-Wall -D_DEBUG')
 
     Program( 'osd/osd.out', osd_src, 
         LIBS = ['common', 'event'], 
