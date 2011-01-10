@@ -4,8 +4,20 @@ this file is auto generage by ./scripts/protocol_gen.py
 use common/protocol.input.h as input.
 do not modify it directly
 */
-#include "protocol.h"
+#include "protocol.gen.h"
 
+void msg_header_pack(struct msg_header * s, uint8_t * data, uint32_t len){
+	put32bit(&data, s -> msgid);
+	put32bit(&data, s -> version);
+	put32bit(&data, s -> operation);
+	put32bit(&data, s -> msglength);
+}
+void msg_header_unpack(struct msg_header * s, const uint8_t * data, uint32_t len){
+	s -> msgid = get32bit(&data);
+	s -> version = get32bit(&data);
+	s -> operation = get32bit(&data);
+	s -> msglength = get32bit(&data);
+}
 void mc_mkdir_request_pack(struct mc_mkdir_request * s, uint8_t * data, uint32_t len){
 	put32bit(&data, s -> msgid);
 	put32bit(&data, s -> version);

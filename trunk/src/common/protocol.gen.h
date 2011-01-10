@@ -1,5 +1,13 @@
 #include "datapack.h"
 
+/*message header for all messages!*/
+typedef struct msg_header{
+    uint32_t msgid;
+    uint32_t version;
+    uint32_t operation;
+    uint32_t msglength;
+}msg_header;
+
 /*master<-client request*/
 typedef struct mc_mkdir_request{
     uint32_t msgid; /*abc*/
@@ -45,6 +53,9 @@ typedef struct oc_response{
 //void mc_mkdir_request_pack(struct mc_mkdir_request * req, uint8_t * data, uint32_t len);
 //void mc_mkdir_request_unpack(struct mc_mkdir_request * req, const uint8_t * data, uint32_t len);
 
+
+void msg_header_pack(struct msg_header * s, uint8_t * data, uint32_t len);
+void msg_header_unpack(struct msg_header * s, const uint8_t * data, uint32_t len);
 
 void mc_mkdir_request_pack(struct mc_mkdir_request * s, uint8_t * data, uint32_t len);
 void mc_mkdir_request_unpack(struct mc_mkdir_request * s, const uint8_t * data, uint32_t len);

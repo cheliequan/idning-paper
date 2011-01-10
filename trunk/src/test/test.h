@@ -5,5 +5,5 @@
 
 #include "network.h"
 #include "dlist.h"
-#include "protocol.h"
+#include "protocol.gen.h"
 #include "log.h"

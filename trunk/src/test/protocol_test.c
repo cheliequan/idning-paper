@@ -16,8 +16,8 @@ int mc_mkdir_request_test(){
     req.uid = 502;
     req.gid = 520;
     uint8_t buffer [10000];
-    mc_mkdir_request_pack(&req, &buffer, 100);
-    mc_mkdir_request_unpack(&req2, &buffer, 100);
+    mc_mkdir_request_pack(&req, buffer, 100);
+    mc_mkdir_request_unpack(&req2, buffer, 100);
     assert(req.msgid == req2.msgid);
     assert(req.version == req2.version);
     assert(req.msglength == req2.msglength);

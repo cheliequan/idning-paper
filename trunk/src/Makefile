@@ -10,7 +10,7 @@
 all: cs
 	scons -Q -f scons.py
 
-protocol_gen: 
+gen: 
 	./scripts/protocol_gen.py
 
 c:
