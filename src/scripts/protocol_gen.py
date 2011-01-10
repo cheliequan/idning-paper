@@ -57,7 +57,7 @@ def test_method(name, fields):
         if t == 'uint32_t':
             content.append1('s1.%s = %d;' % (n, random_int()) )
         elif t == 'uint8_t*':
-            content.append1('s1.name = randomstring;')
+            content.append1('s1.name = (uint8_t *)randomstring;')
     content.append1('%s_pack(&s1, buffer, 100);' % name)
     content.append1('%s_unpack(&s2, buffer, 100);' % name)
 
@@ -65,7 +65,7 @@ def test_method(name, fields):
         if t == 'uint32_t':
             content.append1('assert(s1.%s == s2.%s);' % (n, n))
         elif t == 'uint8_t*':
-            content.append1('assert(strncmp(s1.%s, s2.%s, s1.%slength) == 0);' % (n, n, n))
+            content.append1('assert(strncmp((const char *)s1.%s, (const char *)s2.%s, s1.%slength) == 0);' % (n, n, n))
     content.append("}\n")
     return (header, str(content))
 
