@@ -58,8 +58,8 @@ def test_method(name, fields):
             content.append1('s1.%s = %d;' % (n, random_int()) )
         elif t == 'uint8_t*':
             content.append1('s1.name = randomstring;')
-    content.append1('%s_pack(&s1, &buffer, 100);' % name)
-    content.append1('%s_unpack(&s2, &buffer, 100);' % name)
+    content.append1('%s_pack(&s1, buffer, 100);' % name)
+    content.append1('%s_unpack(&s2, buffer, 100);' % name)
 
     for t, n in fields:
         if t == 'uint32_t':
@@ -80,9 +80,9 @@ def test_main_method(struct_names):
     return (header, str(content))
 
 protocol_h_templete_file = 'common/protocol.input.h'
-protocol_h_file = 'common/protocol.h'
-protocol_c_file = 'common/protocol.c'
-protocol_test_c_file = 'test/protocol_test.t.c'
+protocol_h_file = 'common/protocol.gen.h'
+protocol_c_file = 'common/protocol.gen.c'
+protocol_test_c_file = 'test/protocol_test.gen.c'
 
 protocol_c_file_header = """
 /*
@@ -90,7 +90,7 @@ this file is auto generage by ./scripts/protocol_gen.py
 use common/protocol.input.h as input.
 do not modify it directly
 */
-#include "protocol.h"
+#include "protocol.gen.h"
 
 """
 
