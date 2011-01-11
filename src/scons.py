@@ -30,6 +30,11 @@ def test():
     print '\nThank God, All Tests Are Passed!!!!!!'
 
 
+LIBS = ['common', 'event']
+LIBPATH = ['common', '/usr/local/lib']
+CPPPATH = ['common', '/usr/local/include/']
+CCFLAGS='-D_DEBUG -Wall'
+
 def compile():
     Library('common/common', common_src)
 
@@ -37,13 +42,11 @@ def compile():
         target = '%s.out'%t
         src = '%s.c'%t
         #print target, src
-        Program(target, [src], LIBS=['common'], LIBPATH=['common'], CPPPATH = ['common'], CCFLAGS='-Wall -D_DEBUG')
+        #usr/local/include/ for libevent2
+        Program(target, [src], LIBS = LIBS, LIBPATH = LIBPATH, CPPPATH = CPPPATH, CCFLAGS = CCFLAGS)
+        #
 
-    Program( 'osd/osd.out', osd_src, 
-        LIBS = ['common', 'event'], 
-        LIBPATH = ['common'], 
-        CPPPATH = ['common'], 
-        CCFLAGS='-D_DEBUG')
+    Program( 'osd/osd.out', osd_src, LIBS = LIBS, LIBPATH = LIBPATH, CPPPATH = CPPPATH, CCFLAGS = CCFLAGS)
 
 
 target = ARGUMENTS.get('ning_target', 'compile') #default target is 'compile'!!! haha
