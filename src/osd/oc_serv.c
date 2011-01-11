@@ -1,16 +1,22 @@
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 
 #include <event.h>
 #include <evhttp.h>
 #include <evutil.h>
+
+
 
 #include "network.h"
 #include "log.h"
 
 void post_handler(struct evhttp_request *req, void * arg){
     struct evbuffer *input;
-    struct evbuffer *evb;
+    struct evbuffer *evb = evbuffer_new();
     logging(LOG_DEUBG, "%s: called\n", __func__);
 
     /* Expecting a PUT request */
@@ -20,11 +26,48 @@ void post_handler(struct evhttp_request *req, void * arg){
     }
     input = req->input_buffer;
     evbuffer_write(input, STDOUT_FILENO);
+
+    evbuffer_add(evb, "abc", 3);
+    evhttp_send_reply(req, HTTP_OK, "OK", evb);
+    evbuffer_free(evb);
 }
+
+void shutdown_handler(struct evhttp_request *req, void * arg){
+    logging(LOG_DEUBG, "%s: called\n", __func__);
+
+    if (evhttp_request_get_command(req) != EVHTTP_REQ_GET) {
+        fprintf(stdout, "FAILED (put type)\n");
+        exit(1);
+    }
+    exit(0);
+}
+void get_handler(struct evhttp_request *req, void * arg){
+    struct evbuffer *input;
+    struct evbuffer *evb = evbuffer_new();
+    logging(LOG_DEUBG, "%s: called\n", __func__);
+
+    if (evhttp_request_get_command(req) != EVHTTP_REQ_GET) {
+        fprintf(stdout, "FAILED (put type)\n");
+        exit(1);
+    }
+    input = req->input_buffer;
+    int fd = open("Makefile", O_RDONLY);
+    struct stat st;
+
+    if (fstat(fd, &st)<0) {
+        perror("fstat");
+    }
+
+    evbuffer_add_file(evb, fd, 0, st.st_size);
+
+    evhttp_send_reply(req, HTTP_OK, "OK", evb);
+    evbuffer_free(evb);
+}
+
 void gen_handler(struct evhttp_request *req, void * arg){
     struct evbuffer *evb = evbuffer_new();
-    evbuffer_add(evb, "abc", 3);
-    evhttp_send_reply(req, HTTP_OK, "evhttp is Running ...ning", evb);
+    evbuffer_add(evb, "...", 3);
+    evhttp_send_reply(req, HTTP_OK, "OK", evb);
     evbuffer_free(evb);
 }
 
@@ -40,6 +83,8 @@ int main(int argc, char **argv){
         printf("Start server at port  %d\n", port);
     }
     evhttp_set_cb(httpd, "/store", post_handler, NULL);
+    evhttp_set_cb(httpd, "/get", get_handler, NULL);
+    evhttp_set_cb(httpd, "/shutdown", shutdown_handler, NULL);
     evhttp_set_gencb(httpd, gen_handler, NULL);
     event_dispatch();
 
