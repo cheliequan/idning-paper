@@ -7,6 +7,7 @@
 import glob, os, subprocess, sys
 common_src = glob.glob('common/*.c')
 osd_src = glob.glob('osd/*.c')
+client_src = glob.glob('client/*.c')
 
 test_c = glob.glob('test/*.c')
 tests = [s.replace('.c', '') for s in test_c]
@@ -30,10 +31,10 @@ def test():
     print '\nThank God, All Tests Are Passed!!!!!!'
 
 
-LIBS = ['common', 'event']
-LIBPATH = ['common', '/usr/local/lib']
-CPPPATH = ['common', '/usr/local/include/']
-CCFLAGS='-D_DEBUG -Wall'
+LIBS = ['common', 'event', 'fuse']
+LIBPATH = ['common',  '/usr/local/lib', '/usr/lib'] #顺序很重要
+CPPPATH = ['common', '/usr/local/include/', '/usr/include/fuse']
+CCFLAGS='-D_DEBUG -Wall '
 
 def compile():
     Library('common/common', common_src)
@@ -47,6 +48,8 @@ def compile():
         #
 
     Program( 'osd/osd.out', osd_src, LIBS = LIBS, LIBPATH = LIBPATH, CPPPATH = CPPPATH, CCFLAGS = CCFLAGS)
+
+    Program( 'client/mount.out', client_src, LIBS = LIBS, LIBPATH = LIBPATH, CPPPATH = CPPPATH, CCFLAGS = CCFLAGS +' -D_FILE_OFFSET_BITS=64 ' )
 
 
 target = ARGUMENTS.get('ning_target', 'compile') #default target is 'compile'!!! haha
