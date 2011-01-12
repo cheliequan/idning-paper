@@ -39,6 +39,7 @@ void shutdown_handler(struct evhttp_request *req, void * arg){
     }
     exit(0);
 }
+
 void get_handler(struct evhttp_request *req, void * arg){
     struct evbuffer *input;
     struct evbuffer *evb = evbuffer_new();
