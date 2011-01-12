@@ -36,7 +36,7 @@ LIBS = ['common', 'event', 'fuse']
 LIBPATH = ['common',  '/usr/local/lib', '/usr/lib'] #顺序很重要
 
 CPPPATH = ['common', '/usr/local/include/', '/usr/include/fuse']
-CCFLAGS='-D_DEBUG -Wall '
+CCFLAGS='-D_DEBUG -Wall -g '
 
 def compile():
     Library('common/common', common_src)
