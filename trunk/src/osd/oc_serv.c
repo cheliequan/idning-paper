@@ -9,8 +9,6 @@
 #include <evhttp.h>
 #include <evutil.h>
 
-
-
 #include "network.h"
 #include "log.h"
 

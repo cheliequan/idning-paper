@@ -22,5 +22,5 @@ t: all
 
 #cscope
 cs:
-	cscope -I/usr/local/include/event2 -R -b
+	cscope -I/usr/local/include/ -R -b
 	ctags -R

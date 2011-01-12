@@ -7,6 +7,7 @@
 import glob, os, subprocess, sys
 common_src = glob.glob('common/*.c')
 osd_src = glob.glob('osd/*.c')
+mds_src = glob.glob('mds/*.c')
 client_src = glob.glob('client/*.c')
 
 test_c = glob.glob('test/*.c')
@@ -33,6 +34,7 @@ def test():
 
 LIBS = ['common', 'event', 'fuse']
 LIBPATH = ['common',  '/usr/local/lib', '/usr/lib'] #顺序很重要
+
 CPPPATH = ['common', '/usr/local/include/', '/usr/include/fuse']
 CCFLAGS='-D_DEBUG -Wall '
 
@@ -48,6 +50,7 @@ def compile():
         #
 
     Program( 'osd/osd.out', osd_src, LIBS = LIBS, LIBPATH = LIBPATH, CPPPATH = CPPPATH, CCFLAGS = CCFLAGS)
+    Program( 'mds/mds.out', mds_src, LIBS = LIBS, LIBPATH = LIBPATH, CPPPATH = CPPPATH, CCFLAGS = CCFLAGS)
 
     Program( 'client/mount.out', client_src, LIBS = LIBS, LIBPATH = LIBPATH, CPPPATH = CPPPATH, CCFLAGS = CCFLAGS +' -D_FILE_OFFSET_BITS=64 ' )
 
