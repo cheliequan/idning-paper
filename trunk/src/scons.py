@@ -1,16 +1,13 @@
 #!/usr/bin/scons -f
 #coding:utf-8
-
-#print BUILD_TARGETS
-#print COMMAND_LINE_TARGETS 
-
 import glob, os, subprocess, sys
+
 common_src = glob.glob('common/*.c')
 osd_src = glob.glob('osd/*.c')
 mds_src = glob.glob('mds/*.c')
 client_src = glob.glob('client/*.c')
 
-test_c = glob.glob('test/*.c')
+test_c = glob.glob('test/*test.c')
 tests = [s.replace('.c', '') for s in test_c]
 #tests = ['network_test', 'dlist_test', 'protocol_test']
 print tests
