@@ -27,6 +27,10 @@ def pack_method(name, fields):
             content.append1('put32bit(&p, s -> %s);' % n )
         elif t == 'uint8_t*':
             content.append1('putstr(&p, s -> %slength, s -> %s);' % (n, n) )
+    content.append1("s->msglength = p-data;")
+    content.append1("uint8_t *p2 = data + 12;")
+    content.append1("put32bit(&p2, s->msglength);")
+
     content.append1("return p-data;")
     content.append("}")
     return (header, str(content))
@@ -61,6 +65,22 @@ def tostring_method(name, fields):
     content.append("}")
     return (header, str(content))
 
+def new_method(name, fields):
+    header = '%s * %s_new()' % (name, name)
+    content = StringWriter()
+    content.append('{')
+    content.append1('%s * p = (%s * )malloc (sizeof(%s));' % (name, name, name))
+    content.append('''
+    if (p == NULL){
+        logging(LOG_ERROR, "TODO: Out of Memory");
+        exit(1);
+    }
+    ''')
+    msg_name = 'MSG_' + name.upper()
+    content.append1("p->operation = %s ;" % msg_name)
+    content.append1("return p;")
+    content.append("}")
+    return (header, str(content))
 
 def random_int():
     return random.randint(2, 500) 
@@ -167,6 +187,10 @@ def deal_struct(name, fields):
     file_append(protocol_c_file, head+body)
 
     (head, body) = tostring_method(name, fields)
+    file_append(protocol_h_file, head+';\n')
+    file_append(protocol_c_file, head+body)
+
+    (head, body) = new_method(name, fields)
     file_append(protocol_h_file, head+';\n')
     file_append(protocol_c_file, head+body)
 

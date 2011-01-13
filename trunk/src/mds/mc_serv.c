@@ -82,20 +82,40 @@ void accept_callback(evutil_socket_t listener, short event, void * ctx){
 }
 
 
-int mc_serv_got_msg(mc_serv_conn *conn, int type, uint8_t * readbuf, int readsize){
 
+/*ning:
+ * 异步回应，而不是同步的.
+ * 不是void mc_serv_mkdir(mc_serv_conn * conn, mc_mkdir_request * req, mc_mkdir_response * resp)
+ * */
+int mc_serv_mkdir(mc_serv_conn * conn, uint8_t * buf, int len){
+    logging(LOG_DEUBG, "MSG_MC_MKDIR_REQUEST");
+
+    mc_mkdir_request * req = mc_mkdir_request_new();
+    mc_mkdir_request_unpack(req, buf, len);
+    logging(LOG_DEUBG, mc_mkdir_request_tostring(req));
+
+    mc_mkdir_response * response = mc_mkdir_response_new();
+    response->msgid = 1;
+    response->version = 2;
+    response->msglength = 20;
+    /*mc_mkdir_request_pack(*/
+
+    return 0;
+
+}
+
+int mc_serv_got_msg(mc_serv_conn *conn, int type, uint8_t * readbuf, int len){
     logging(LOG_DEUBG, "mc_serv_got_msg");
     switch(type){
         case MSG_MSG_HEADER:
             logging(LOG_DEUBG, "MSG_MSG_HEADER");
             break;
         case MSG_MC_MKDIR_REQUEST:
-            logging(LOG_DEUBG, "MSG_MC_MKDIR_REQUEST");
+            mc_serv_mkdir(conn, readbuf, len);
             break;
     }
     return 0;
 }
-
 
 /* 这个函数基本上是 mfsmaster/matocsserv.c 中 matocsserv_read 的克隆.
  * */

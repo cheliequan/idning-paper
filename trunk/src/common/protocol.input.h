@@ -1,4 +1,5 @@
 #include "datapack.h"
+#include "log.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -29,6 +30,18 @@ typedef struct mc_mkdir_request{
     void (*pack)  (struct mc_mkdir_request * req, uint8_t * data, uint32_t len) ;
     void (*unpack)(struct mc_mkdir_request * req, uint8_t * data, uint32_t len);
 }mc_mkdir_request;
+
+/*master<-client request*/
+typedef struct mc_mkdir_response{
+    uint32_t msgid; /*abc*/
+    uint32_t version;
+    uint32_t operation;
+    uint32_t msglength;
+
+    uint32_t result;
+    uint32_t inode;
+
+}mc_mkdir_response;
 
 
 /*osd<-client request*/
