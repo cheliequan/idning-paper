@@ -13,20 +13,23 @@ class StringWriter:
     def __str__(self):
         return self.buf
 # end class StringWriter 
-
 import re, random
 
 # gen pack method
 def pack_method(name, fields):
-    header = 'void %s_pack(struct %s * s, uint8_t * data, uint32_t len)' % (name, name)
-    content = '{\n'
+    header = 'int %s_pack(struct %s * s, uint8_t * data, uint32_t len)' % (name, name)
+    content = StringWriter()
+    content.append('{')
+
+    content.append1('uint8_t * p = data;')
     for t, n in fields:
         if t == 'uint32_t':
-            content += '\tput32bit(&data, s -> %s);\n' % n
+            content.append1('put32bit(&p, s -> %s);' % n )
         elif t == 'uint8_t*':
-            content += '\tputstr(&data, s -> %slength, s -> %s);\n' % (n, n)
-    content += "}\n"
-    return (header, content)
+            content.append1('putstr(&p, s -> %slength, s -> %s);' % (n, n) )
+    content.append1("return p-data;")
+    content.append("}")
+    return (header, str(content))
 
 # gen unpack method
 def unpack_method(name, fields):
@@ -38,7 +41,25 @@ def unpack_method(name, fields):
         elif t == 'uint8_t*':
             content += '\tgetstr(&data, s -> %slength, &(s -> %s));\n' % (n, n)
     content += "}\n"
-    return (header, content)
+    return (header, str(content))
+
+def tostring_method(name, fields):
+    header = 'char* %s_tostring(struct %s * s)' % (name, name)
+    content = StringWriter()
+    content.append('{')
+    content.append1('char str[1024];')
+    content.append1('char * ptr = str;')
+    for t, n in fields:
+        if t == 'uint32_t':
+            content.append1(r'sprintf(ptr, "\t%s = %d\n",'+' "%s", s->%s);' % (n, n) )
+            content.append1('while (*ptr) ptr++;' )
+        elif t == 'uint8_t*':
+            content.append1(r'sprintf(ptr, "\t%s = %s\n",'+' "%s", s->%s);' % (n, n) )
+            content.append1('while (*ptr) ptr++;' )
+
+    content.append1("return str;")
+    content.append("}")
+    return (header, str(content))
 
 
 def random_int():
@@ -129,6 +150,10 @@ def deal_struct(name, fields):
     file_append(protocol_c_file, head+body)
 
     (head, body) = unpack_method(name, fields)
+    file_append(protocol_h_file, head+';\n')
+    file_append(protocol_c_file, head+body)
+
+    (head, body) = tostring_method(name, fields)
     file_append(protocol_h_file, head+';\n')
     file_append(protocol_c_file, head+body)
 
