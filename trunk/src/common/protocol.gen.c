@@ -21,7 +21,7 @@ void msg_header_unpack(struct msg_header * s, const uint8_t * data, uint32_t len
 	s -> msglength = get32bit(&data);
 }
 char* msg_header_tostring(struct msg_header * s){
-	char str[1024];
+	static char str[1024];
 	char * ptr = str;
 	sprintf(ptr, "\t%s = %d\n", "msgid", s->msgid);
 	while (*ptr) ptr++;
@@ -60,7 +60,7 @@ void mc_mkdir_request_unpack(struct mc_mkdir_request * s, const uint8_t * data, 
 	s -> gid = get32bit(&data);
 }
 char* mc_mkdir_request_tostring(struct mc_mkdir_request * s){
-	char str[1024];
+	static char str[1024];
 	char * ptr = str;
 	sprintf(ptr, "\t%s = %d\n", "msgid", s->msgid);
 	while (*ptr) ptr++;
@@ -99,7 +99,7 @@ void oc_request_unpack(struct oc_request * s, const uint8_t * data, uint32_t len
 	s -> msglength = get32bit(&data);
 }
 char* oc_request_tostring(struct oc_request * s){
-	char str[1024];
+	static char str[1024];
 	char * ptr = str;
 	sprintf(ptr, "\t%s = %d\n", "msgid", s->msgid);
 	while (*ptr) ptr++;
@@ -126,7 +126,7 @@ void oc_response_unpack(struct oc_response * s, const uint8_t * data, uint32_t l
 	s -> msglength = get32bit(&data);
 }
 char* oc_response_tostring(struct oc_response * s){
-	char str[1024];
+	static char str[1024];
 	char * ptr = str;
 	sprintf(ptr, "\t%s = %d\n", "msgid", s->msgid);
 	while (*ptr) ptr++;

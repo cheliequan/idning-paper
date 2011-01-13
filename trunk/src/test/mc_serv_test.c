@@ -11,7 +11,7 @@ struct mc_mkdir_request * create_mkdir_request(){
     mc_mkdir_request * req = (mc_mkdir_request * )malloc (sizeof(mc_mkdir_request));
     req->msgid = 1;
     req->version = 2;
-    req->operation = 3;
+    req->operation = MSG_MC_MKDIR_REQUEST;
     req->msglength = 20;
 
     req->parent = 88;

@@ -47,7 +47,7 @@ def tostring_method(name, fields):
     header = 'char* %s_tostring(struct %s * s)' % (name, name)
     content = StringWriter()
     content.append('{')
-    content.append1('char str[1024];')
+    content.append1('static char str[1024];')
     content.append1('char * ptr = str;')
     for t, n in fields:
         if t == 'uint32_t':
@@ -79,6 +79,9 @@ def test_method(name, fields):
             content.append1('s1.%s = %d;' % (n, random_int()) )
         elif t == 'uint8_t*':
             content.append1('s1.name = (uint8_t *)randomstring;')
+    msg_name = 'MSG_' + name.upper()
+    content.append1('s1.operation = %s;' % msg_name)
+    
     content.append1('%s_pack(&s1, buffer, 100);' % name)
     content.append1('%s_unpack(&s2, buffer, 100);' % name)
 
@@ -90,6 +93,7 @@ def test_method(name, fields):
     content.append("}\n")
     return (header, str(content))
 
+
 def test_main_method(struct_names):
     header = 'int main()'
     content = StringWriter()
@@ -99,6 +103,15 @@ def test_main_method(struct_names):
     content.append1("return 0;")
     content.append("}\n")
     return (header, str(content))
+
+def constant(struct_names):
+    content = StringWriter()
+    content.append('')
+    i = 100;
+    for name in struct_names:
+        content.append('#define MSG_%s %d'%(name.upper(), i))
+        i = i+1
+    return str(content)
 
 protocol_h_templete_file = 'common/protocol.input.h'
 protocol_h_file = 'common/protocol.gen.h'
@@ -192,9 +205,13 @@ def main():
         fields = fields.split('/*--')[0]
         #print fields
         deal_struct(name, fields)
+
     struct_names = [s[0] for s in structs]
     (head, body) = test_main_method(struct_names)
     file_append(protocol_test_c_file, head+body)
+    
+    file_append(protocol_h_file, constant(struct_names))
+    
     print 'generate ', protocol_h_file
     print 'generate ', protocol_c_file
     print 'generate ', protocol_test_c_file

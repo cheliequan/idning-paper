@@ -1,7 +1,7 @@
 #include "datapack.h"
+#include <string.h>
+#include <stdio.h>
 
-#define MC_MSG_NULL 100
-#define MC_MSG_MKDIR 102
 
 /*message header for all messages!*/
 typedef struct msg_header{
