@@ -86,11 +86,11 @@ int mc_serv_got_msg(mc_serv_conn *conn, int type, uint8_t * readbuf, int readsiz
 
     logging(LOG_DEUBG, "mc_serv_got_msg");
     switch(type){
-        case MC_MSG_NULL:
-            logging(LOG_DEUBG, "MC_MSG_NULL");
+        case MSG_MSG_HEADER:
+            logging(LOG_DEUBG, "MSG_MSG_HEADER");
             break;
-        case MC_MSG_MKDIR:
-            logging(LOG_DEUBG, "MC_MSG_MKDIR");
+        case MSG_MC_MKDIR_REQUEST:
+            logging(LOG_DEUBG, "MSG_MC_MKDIR_REQUEST");
             break;
     }
     return 0;

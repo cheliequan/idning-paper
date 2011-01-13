@@ -1,7 +1,7 @@
 #include "datapack.h"
+#include <string.h>
+#include <stdio.h>
 
-#define MC_MSG_NULL 100
-#define MC_MSG_MKDIR 102
 
 /*message header for all messages!*/
 typedef struct msg_header{
@@ -73,3 +73,8 @@ int oc_response_pack(struct oc_response * s, uint8_t * data, uint32_t len);
 void oc_response_unpack(struct oc_response * s, const uint8_t * data, uint32_t len);
 char* oc_response_tostring(struct oc_response * s);
 
+
+#define MSG_MSG_HEADER 100
+#define MSG_MC_MKDIR_REQUEST 101
+#define MSG_OC_REQUEST 102
+#define MSG_OC_RESPONSE 103
