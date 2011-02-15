@@ -1,0 +1,2 @@
+
+#define MAX_HDD_PER_MACHINE 100
