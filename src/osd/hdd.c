@@ -3,17 +3,70 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <dirent.h>
 
 #include <sys/statvfs.h>
+#include <sys/stat.h> 
 #include "hdd.h"
 #include "random.h"
 #include "log.h"
 
-static int test();
-hdd_space * hdd_roots[MAX_HDD_PER_MACHINE];
 
+#define HASHSIZE 32768
+
+
+static int test();
+static void hdd_init_dirs(hdd_space * hdd);
+hdd_space * hdd_roots[MAX_HDD_PER_MACHINE];
 int hdd_root_cnt = 0;
 
+
+typedef struct hdd_chunk{
+    char * path;// the path this chunk store at 
+    uint64_t chunkid;
+    size_t size;
+    struct hdd_chunk * next;
+}hdd_chunk;
+
+static hdd_chunk* chunk_hashtable[HASHSIZE];
+
+void chunk_hashtable_put(uint64_t chunkid, hdd_chunk * chunk){
+
+}
+void chunk_hashtable_get(uint64_t chunkid, hdd_chunk * chunk){
+
+}
+
+void hdd_scan_chunk(hdd_space *hdd){
+    DIR *dd;
+    struct dirent *de;
+
+    char fullpath[1024];
+    int i, plen;
+    strcpy(fullpath, hdd->path);
+    strcat(fullpath, "/00/");
+    plen = strlen(fullpath);
+
+    for (i=0 ; i<256 ; i++) {
+        fullpath[plen-3]="0123456789ABCDEF"[i>>4];
+        fullpath[plen-2]="0123456789ABCDEF"[i&15];
+        fullpath[plen]='\0';
+//      mkdir(fullpath,0755);
+        dd = opendir(fullpath);
+        if (dd==NULL) {
+            continue;
+        }
+        while ((de = readdir(dd)) != NULL) {
+            memcpy(fullpath+plen,de->d_name,17);
+
+            /*hdd_add_chunk(f,fullpath,namechunkid,nameversion);*/
+        }
+        closedir(dd);
+    }
+
+
+
+}
 // no locks - locked by caller
 inline void hdd_refresh_usage(hdd_space *hdd) {
     struct statvfs fsinfo;
@@ -66,9 +119,32 @@ void hdd_init(char * config_file){
         printf("leavefree : %"PRIu64"\n", hdd->leavefree);
 
         hdd_roots [hdd_root_cnt++] = hdd;
+        hdd_init_dirs(hdd);
     }
     fclose(fd);
     test();
+}
+
+static void hdd_init_dirs(hdd_space * hdd){
+    char fullpath[1024];
+    int i, plen;
+    strcpy(fullpath, hdd->path);
+    strcat(fullpath, "/00/");
+
+
+    struct stat sts;
+    if ((stat (fullpath, &sts)) != -1)
+    { //already exists
+        return;
+    }
+
+    plen = strlen(fullpath);
+
+    for (i=0 ; i<256 ; i++) {
+        fullpath[plen-3]="0123456789ABCDEF"[i>>4];
+        fullpath[plen-2]="0123456789ABCDEF"[i&15];
+        mkdir(fullpath,0755);
+    }
 }
 
 void calc_store_path(hdd_space * hdd, uint64_t chunkid, char * path){
@@ -82,7 +158,7 @@ void calc_store_path(hdd_space * hdd, uint64_t chunkid, char * path){
  * 输出为一个文件保存路径.
  * hdd_roots 按从大到小顺序排序，选择的时候，排在前面的hdd选择可能性大.
  * */
-int select_hdd(int chunksize){
+int select_hdd(){
     static int cnt = 0;
     if (cnt % 100 == 0){
         /*qsort();// */

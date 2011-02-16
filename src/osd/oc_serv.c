@@ -15,12 +15,10 @@
 #include "hdd.h"
 
 
-
-
 void post_handler(struct evhttp_request *req, void * arg){
     struct evbuffer *input;
     struct evbuffer *evb = evbuffer_new();
-    logging(LOG_DEUBG, "%s: called\n", __func__);
+    logging(LOG_DEUBG, "%s called\n", __func__);
 
     /* Expecting a PUT request */
     if (evhttp_request_get_command(req) != EVHTTP_REQ_POST) {
@@ -70,7 +68,38 @@ void get_handler(struct evhttp_request *req, void * arg){
 
 void gen_handler(struct evhttp_request *req, void * arg){
     struct evbuffer *evb = evbuffer_new();
+
+    const char *uri = evhttp_request_get_uri(req);
+    struct evhttp_uri *decoded_uri = NULL;
+    const char *path;
+    char *decoded_path;
+    
+
+    /* Decode the URI */
+    decoded_uri = evhttp_uri_parse(uri);
+    if (!decoded_uri) {
+        logging(LOG_DEUBG, "It's not a good URI. Sending BADREQUEST\n");
+        evhttp_send_error(req, HTTP_BADREQUEST, 0);
+        return;
+    }
+
+    /* Let's see what path the user asked for. */
+    path = evhttp_uri_get_path(decoded_uri);
+    if (!path) path = "/";
+
+    /* We need to decode it, to see what path the user really wanted. */
+    decoded_path = evhttp_uridecode(path, 0, NULL);
+
+    uint64_t chunkid;
+    char * slash = strchr(path+1, '/');
+    *slash = '\0';
+    const char * op = path + 1; 
+
+    sscanf(slash+1, "%"SCNx64, &chunkid);
+    logging(LOG_DEUBG, "%s, %"PRIx64, op, chunkid);
+
     evbuffer_add(evb, "...", 3);
+    evbuffer_add_printf(evb, "%s, %"PRIx64, op, chunkid);
     evhttp_send_reply(req, HTTP_OK, "OK", evb);
     evbuffer_free(evb);
 }
@@ -88,8 +117,8 @@ int main(int argc, char **argv){
     }else{
         printf("Start server at port  %d\n", port);
     }
-    evhttp_set_cb(httpd, "/store", post_handler, NULL);
-    evhttp_set_cb(httpd, "/get", get_handler, NULL);
+    evhttp_set_cb(httpd, "/_store", post_handler, NULL);
+    evhttp_set_cb(httpd, "/_get", get_handler, NULL);
     evhttp_set_cb(httpd, "/shutdown", shutdown_handler, NULL);
     evhttp_set_gencb(httpd, gen_handler, NULL);
     event_dispatch();

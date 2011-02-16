@@ -18,4 +18,4 @@ void hdd_init(char * config_file);
 
 void calc_store_path(hdd_space * hdd, uint64_t chunkid, char * path);
 
-int select_hdd(int chunksize);
+int select_hdd();
