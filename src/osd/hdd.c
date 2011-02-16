@@ -13,29 +13,76 @@
 
 
 #define HASHSIZE 32768
+#define HASHFUNC(x) x%32768
 
 
-static int test();
-static void hdd_init_dirs(hdd_space * hdd);
 hdd_space * hdd_roots[MAX_HDD_PER_MACHINE];
-int hdd_root_cnt = 0;
+int hdd_cnt= 0;
 
-
-typedef struct hdd_chunk{
-    char * path;// the path this chunk store at 
-    uint64_t chunkid;
-    size_t size;
-    struct hdd_chunk * next;
-}hdd_chunk;
+void hdd_init_dirs(hdd_space * hdd);
+//int test();
 
 static hdd_chunk* chunk_hashtable[HASHSIZE];
 
-void chunk_hashtable_put(uint64_t chunkid, hdd_chunk * chunk){
-
+hdd_chunk * new_hdd_chunk(){
+    hdd_chunk * chunk = (hdd_chunk *)malloc(sizeof(hdd_chunk));
+    memset(chunk, 0, sizeof(hdd_chunk));
+    return chunk;
 }
-void chunk_hashtable_get(uint64_t chunkid, hdd_chunk * chunk){
 
+hdd_chunk * chunk_hashtable_put(uint64_t chunkid, char * path, size_t size){
+    hdd_chunk * chunk;
+    int id = HASHFUNC(chunkid);
+    chunk = new_hdd_chunk();
+    chunk -> path = path;
+    chunk -> chunkid = chunkid;
+    chunk -> size = size;
+    chunk -> next = chunk_hashtable[id];
+    chunk_hashtable[id] = chunk;
+    return chunk;
 }
+
+hdd_chunk * chunk_hashtable_get(uint64_t chunkid){
+    hdd_chunk * chunk;
+    int id = HASHFUNC(chunkid);
+    for (chunk = chunk_hashtable[id]; chunk ; chunk = chunk->next){
+        if (chunkid == chunk -> chunkid)
+            return chunk;
+    }
+    return NULL;
+}
+
+void hdd_calc_store_path(hdd_space * hdd, uint64_t chunkid, char * path){
+    printf("%s\n", hdd->path);
+    printf("%s/%02"PRIX64"/%016"PRIX64, hdd->path, chunkid >> 48, chunkid);
+    sprintf(path, "%s/%02"PRIX64"/%016"PRIX64, hdd->path, chunkid >> 48, chunkid);
+    logging(LOG_INFO, "storepath: %s", path);
+}
+
+/*
+ * 输入chunksize,
+ * 输出为一个文件保存路径.
+ * hdd_roots 按从大到小顺序排序，选择的时候，排在前面的hdd选择可能性大.
+ * */
+int select_hdd(){
+    static int cnt = 0;
+    if (cnt % 100 == 0){
+        /*qsort();// */
+        //TODO
+        return 0;
+    }
+    int id = rand_exp(hdd_cnt);
+    return id;
+}
+/* create a chunk 
+ * */
+hdd_chunk * hdd_create_chunk(uint64_t chunkid, size_t size){
+    hdd_space * hdd = hdd_roots[select_hdd()];
+    char * path = malloc(strlen(hdd->path) + 30);
+    hdd_calc_store_path(hdd, chunkid, path);
+    return chunk_hashtable_put(chunkid, path, size);
+}
+
 
 void hdd_scan_chunk(hdd_space *hdd){
     DIR *dd;
@@ -118,14 +165,14 @@ void hdd_init(char * config_file){
         printf("totalspace : %"PRIu64"\n", hdd->totalspace);
         printf("leavefree : %"PRIu64"\n", hdd->leavefree);
 
-        hdd_roots [hdd_root_cnt++] = hdd;
+        hdd_roots [hdd_cnt++] = hdd;
         hdd_init_dirs(hdd);
     }
     fclose(fd);
-    test();
+    //test();
 }
 
-static void hdd_init_dirs(hdd_space * hdd){
+void hdd_init_dirs(hdd_space * hdd){
     char fullpath[1024];
     int i, plen;
     strcpy(fullpath, hdd->path);
@@ -147,32 +194,12 @@ static void hdd_init_dirs(hdd_space * hdd){
     }
 }
 
-void calc_store_path(hdd_space * hdd, uint64_t chunkid, char * path){
-    printf("%s", hdd->path);
-    printf("%s/%02"PRIX64"/%016"PRIX64, hdd->path, chunkid >> 48, chunkid);
-    sprintf(path, "%s/%02"PRIX64"/%016"PRIX64, hdd->path, chunkid >> 48, chunkid);
-}
-
-/*
- * 输入chunksize,
- * 输出为一个文件保存路径.
- * hdd_roots 按从大到小顺序排序，选择的时候，排在前面的hdd选择可能性大.
- * */
-int select_hdd(){
-    static int cnt = 0;
-    if (cnt % 100 == 0){
-        /*qsort();// */
-        //TODO
-    }
-    int id = rand_exp(hdd_root_cnt);
-    return id;
-}
 
 
-static int test(){
-    char path[1024];
-    calc_store_path(hdd_roots[0], 0xfff, path);
-    logging(LOG_DEUBG, "%s", path);
-    return 0;
-}
+/*int test(){*/
+    /*char path[1024];*/
+    /*calc_store_path(hdd_roots[0], 0xfff, path);*/
+    /*logging(LOG_DEUBG, "%s", path);*/
+    /*return 0;*/
+/*}*/
 

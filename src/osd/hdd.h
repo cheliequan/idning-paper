@@ -10,12 +10,20 @@ typedef struct hdd_space{
     /*uint64_t chunkcount;*/
 }hdd_space;
 
+typedef struct hdd_chunk{
+    char * path;// the path this chunk store at 
+    uint64_t chunkid;
+    size_t size;
+    struct hdd_chunk * next;
+}hdd_chunk;
+
 //void hdd_get_space(hdd_space * space);
 void hdd_refresh_usage(hdd_space *hdd);
 
 void hdd_init(char * config_file);
 
 
-void calc_store_path(hdd_space * hdd, uint64_t chunkid, char * path);
-
 int select_hdd();
+
+hdd_chunk * chunk_hashtable_get(uint64_t chunkid);
+hdd_chunk * hdd_create_chunk(uint64_t chunkid, size_t size);
