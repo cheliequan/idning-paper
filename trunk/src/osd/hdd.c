@@ -53,8 +53,6 @@ hdd_chunk * chunk_hashtable_get(uint64_t chunkid){
 }
 
 void hdd_calc_store_path(hdd_space * hdd, uint64_t chunkid, char * path){
-    printf("%s\n", hdd->path);
-    printf("%s/%02"PRIX64"/%016"PRIX64, hdd->path, chunkid >> 48, chunkid);
     sprintf(path, "%s/%02"PRIX64"/%016"PRIX64, hdd->path, chunkid >> 48, chunkid);
     logging(LOG_INFO, "storepath: %s", path);
 }
