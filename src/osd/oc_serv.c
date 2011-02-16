@@ -12,58 +12,8 @@
 #include "oc_serv.h"
 #include "network.h"
 #include "log.h"
+#include "hdd.h"
 
-typedef sturct hdd{
-    char * path;
-    uint64_t avail;
-    uint64_t total;
-
-
-
-} hdd;
-(char *) hdd_roots[MAX_HDD_PER_MACHINE];
-int hdd_root_cnt = 0;
-
-//read config file etc/hdd.conf to config hdd roots , the result is in hdd_roots.
-void hdd_init(char * config_file){
-    FILE * fd;
-    char * linebuff[1000];
-    fd = fopen(config_file, "r");
-    if (fd == NULL){
-        return 0;
-    }
-    while (fgets(linebuff, 999, fd) != NULL){
-        if (linbuff[0] == '#')
-            continue;
-        linebuff[999] = 0;
-        char * start = linebuff;
-        while(isspace(*start))
-            start++;
-        char * end = linebuff + strlen(linebuff);
-        while(isspace(*end))
-            *end-- = '\0';
-        hdd_roots [hdd_root_cnt++] = strdup(start);
-    }
-    fclose(fd);
-}
-
-
-// no locks - locked by caller
-static inline void hdd_refresh_usage(folder *f) {
-    struct statvfs fsinfo;
-
-    if (statvfs(f->path,&fsinfo)<0) {
-        f->avail = 0ULL;
-        f->total = 0ULL;
-    }
-    f->avail = (uint64_t)(fsinfo.f_frsize)*(uint64_t)(fsinfo.f_bavail);
-    f->total = (uint64_t)(fsinfo.f_frsize)*(uint64_t)(fsinfo.f_blocks);
-    if (f->avail < f->leavefree) {
-        f->avail = 0ULL;
-    } else {
-        f->avail -= f->leavefree;
-    }
-}
 
 
 
@@ -126,6 +76,8 @@ void gen_handler(struct evhttp_request *req, void * arg){
 }
 
 int main(int argc, char **argv){
+    hdd_init("etc/hdd.conf");
+
     struct evhttp * httpd;
     int port = 6006;
     event_init();
