@@ -66,6 +66,62 @@ void get_handler(struct evhttp_request *req, void * arg){
     evbuffer_free(evb);
 }
 
+void write_chunk(uint64_t chunkid, struct evhttp_request *req){
+    struct evbuffer *input;
+    struct evbuffer *evb = evbuffer_new();
+    logging(LOG_DEUBG, "%s called\n", __func__);
+
+    /* Expecting a POST request */
+    if (evhttp_request_get_command(req) != EVHTTP_REQ_POST) {
+        fprintf(stdout, "FAILED (put type)\n");
+        exit(1);
+    }
+    input = req->input_buffer;
+    hdd_chunk * chunk = hdd_create_chunk(chunkid, 0);//TODO
+
+    int fd = open(chunk -> path, O_WRONLY|O_CREAT, 0755);
+    if (-1 == fd) {
+        logging(LOG_ERROR, "file open error <%s>", chunk->path);
+        
+        exit(1);
+    }
+
+    //struct stat st;
+
+    /*if (fstat(fd, &st)<0) {*/
+        /*perror("file not exist or access deny");*/
+    /*}*/
+
+    evbuffer_write(input, fd);
+    close(fd);
+
+    evbuffer_add(evb, "abc", 3);
+    evhttp_send_reply(req, HTTP_OK, "OK", evb);
+    evbuffer_free(evb);
+
+}
+
+void read_chunk(uint64_t chunkid, struct evhttp_request *req){
+    struct evbuffer *evb = evbuffer_new();
+    logging(LOG_DEUBG, "%s: called\n", __func__);
+
+    hdd_chunk * chunk = chunk_hashtable_get(chunkid);
+    
+    int fd = open(chunk -> path, O_RDONLY);
+    struct stat st;
+
+    if (fstat(fd, &st)<0) {
+        perror("file not exist or access deny");
+    }
+
+    evbuffer_add_file(evb, fd, 0, st.st_size);
+
+    evhttp_send_reply(req, HTTP_OK, "OK", evb);
+    evbuffer_free(evb);
+}
+
+
+
 void gen_handler(struct evhttp_request *req, void * arg){
     struct evbuffer *evb = evbuffer_new();
 
@@ -94,14 +150,19 @@ void gen_handler(struct evhttp_request *req, void * arg){
     char * slash = strchr(path+1, '/');
     *slash = '\0';
     const char * op = path + 1; 
-
     sscanf(slash+1, "%"SCNx64, &chunkid);
     logging(LOG_DEUBG, "%s, %"PRIx64, op, chunkid);
 
-    evbuffer_add(evb, "...", 3);
-    evbuffer_add_printf(evb, "%s, %"PRIx64, op, chunkid);
-    evhttp_send_reply(req, HTTP_OK, "OK", evb);
-    evbuffer_free(evb);
+    if (strcmp(op, "put") == 0){
+        write_chunk(chunkid, req);
+    }else if (strcmp(op, "get") == 0){
+        read_chunk(chunkid, req);
+    }else {
+        evbuffer_add(evb, "...", 3);
+        evbuffer_add_printf(evb, "%s, %"PRIx64, op, chunkid);
+        evhttp_send_reply(req, HTTP_OK, "OK", evb);
+        evbuffer_free(evb);
+    }
 }
 
 int main(int argc, char **argv){
