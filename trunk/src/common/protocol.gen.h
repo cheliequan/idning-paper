@@ -66,7 +66,7 @@ typedef struct oc_response{
 }oc_response;
 
 typedef struct machine{
-    uint64_t uuid;
+    uint32_t uuid;
     uint32_t iplength;
     uint8_t* ip;
     uint32_t port;

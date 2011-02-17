@@ -7,7 +7,7 @@
 #
 #
 
-all: cs gen
+all: cs 
 	scons -Q -f scons.py
 
 gen: 
