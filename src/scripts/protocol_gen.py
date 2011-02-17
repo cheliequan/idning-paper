@@ -10,6 +10,8 @@ class StringWriter:
         self.buf = self.buf + s + '\n'
     def append1(self, s):
         self.buf = self.buf + '\t' + s + '\n'
+    def append2(self, s):
+        self.buf = self.buf + '\t\t' + s + '\n'
     def __str__(self):
         return self.buf
 # end class StringWriter 
@@ -27,9 +29,21 @@ def pack_method(name, fields):
             content.append1('put32bit(&p, s -> %s);' % n )
         elif t == 'uint8_t*':
             content.append1('putstr(&p, s -> %slength, s -> %s);' % (n, n) )
-    content.append1("s->msglength = p-data;")
-    content.append1("uint8_t *p2 = data + 12;")
-    content.append1("put32bit(&p2, s->msglength);")
+        elif t == '/*arr*/': #TODO
+            (cls, arr) = n.split('*'); #class, arr_name= ...
+            cls = cls.strip()
+            arr = arr.strip()
+            content.append1('int i;')
+            content.append1('for(i=0; i<s->%slength; i++){' % (arr))
+            content.append1('   int plen = %s_pack(s->%s+i, p, 0);' % (cls, arr))
+            content.append1('   p += plen;' )
+            content.append1('}')
+
+    names = [i[1] for i in fields]
+    if names.count('msglength') >=1 :
+        content.append1("s->msglength = p-data;")
+        content.append1("uint8_t *p2 = data + 12;")
+        content.append1("put32bit(&p2, s->msglength);")
 
     content.append1("return p-data;")
     content.append("}")
@@ -37,21 +51,38 @@ def pack_method(name, fields):
 
 # gen unpack method
 def unpack_method(name, fields):
-    header = 'void %s_unpack(struct %s * s, const uint8_t * data, uint32_t len)' % (name, name)
-    content = '{\n'
+    header = 'int %s_unpack(struct %s * s, const uint8_t * data, uint32_t len)' % (name, name)
+    content = StringWriter()
+    content.append('{')
+    content.append1('const uint8_t* orig = data;')
+
     for t, n in fields:
         if t == 'uint32_t':
-            content += '\ts -> %s = get32bit(&data);\n' % n
+            content.append1('s -> %s = get32bit(&data);' % n)
         elif t == 'uint8_t*':
-            content += '\tgetstr(&data, s -> %slength, &(s -> %s));\n' % (n, n)
-    content += "}\n"
+            content.append1('getstr(&data, s -> %slength, &(s -> %s));' % (n, n))
+
+        elif t == '/*arr*/': #TODO
+            (cls, arr) = n.split('*'); #class, arr_name= ...
+            cls = cls.strip()
+            arr = arr.strip()
+
+            content.append1('int i;')
+            content.append1('for(i=0; i<s->%slength; i++){' % (arr))
+        
+            content.append1('   %s * p = (%s *) malloc (sizeof(%s) * s->%slength);' % (cls, cls, cls, arr))
+            content.append1('   int plen = %s_unpack(s->%s+i, data, 0);' % (cls, arr))
+            content.append1('   data += plen;' )
+            content.append1('}')
+    content.append1("return data-orig;")
+    content.append("}")
     return (header, str(content))
 
 def tostring_method(name, fields):
     header = 'char* %s_tostring(struct %s * s)' % (name, name)
     content = StringWriter()
     content.append('{')
-    content.append1('static char str[1024];')
+    content.append1('static char str[10240];')
     content.append1('char * ptr = str;')
     for t, n in fields:
         if t == 'uint32_t':
@@ -77,7 +108,10 @@ def new_method(name, fields):
     }
     ''')
     msg_name = 'MSG_' + name.upper()
-    content.append1("p->operation = %s ;" % msg_name)
+
+    names = [i[1] for i in fields]
+    if names.count('operation') >=1 :
+        content.append1("p->operation = %s ;" % msg_name)
     content.append1("return p;")
     content.append("}")
     return (header, str(content))
@@ -170,7 +204,8 @@ def file_append(fname, statement):
 
 def deal_struct(name, fields):
     print 'struct', name
-    fields = re.sub('/\*.*?\*/', '', fields) #del comments
+    #fields = re.sub('/\*.*?\*/', '', fields) #del comments
+    fields = re.sub('//.*\n', '', fields) #del comments
 
     fields = fields.split(';')
     fields = [f.strip() for f in fields]
@@ -200,11 +235,17 @@ def deal_struct(name, fields):
     file_append(protocol_test_c_file, head+body)
 
 def parse_fields(fields):
+    print fields
     rst = []
     for f in fields:
         if re.search('uint32_t', f):
             n = re.sub('uint32_t', '', f).strip()
             rst.append(('uint32_t', n))
+
+        elif re.search(r'/\*arr\*/', f):
+            n = re.sub(r'/\*arr\*/', '', f).strip()
+            rst.append(('/*arr*/', n))
+
         elif re.search('uint8_t *\*', f):
             n = re.sub('uint8_t *\*', '', f).strip()
             rst.append(('uint8_t*', n))
@@ -222,6 +263,7 @@ def init(input_file):
 def main():
     input_file = open(protocol_h_templete_file, 'rb').read()
     init(input_file)
+    input_file = input_file.split("/*below_is_auto_generated*/")[0]
     structs = re.findall(r'typedef struct (.*){(.*?)}(\1)', input_file, re.DOTALL)## 
     for struct in structs:
         name = struct[0]

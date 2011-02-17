@@ -178,8 +178,8 @@ int main(int argc, char **argv){
     }else{
         printf("Start server at port  %d\n", port);
     }
-    evhttp_set_cb(httpd, "/_put", post_handler, NULL);
-    evhttp_set_cb(httpd, "/_get", get_handler, NULL);
+    /*evhttp_set_cb(httpd, "/_put", post_handler, NULL);*/
+    /*evhttp_set_cb(httpd, "/_get", get_handler, NULL);*/
     evhttp_set_cb(httpd, "/shutdown", shutdown_handler, NULL);
     evhttp_set_gencb(httpd, gen_handler, NULL);
     event_dispatch();
