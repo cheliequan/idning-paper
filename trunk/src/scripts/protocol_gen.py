@@ -70,7 +70,6 @@ def unpack_method(name, fields):
             content.append1('int i;')
             content.append1('s->%s = (%s *) malloc (sizeof(%s) * s->%slength);' % (arr, cls, cls, arr))
             content.append1('for(i=0; i<s->%slength; i++){' % (arr))
-        
             content.append1('   int plen = %s_unpack(s->%s+i, data, 0);' % (cls, arr))
             content.append1('   data += plen;' )
             content.append1('}')
