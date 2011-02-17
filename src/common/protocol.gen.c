@@ -255,6 +255,7 @@ oc_response * oc_response_new(){
 }
 int machine_pack(struct machine * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
+	put32bit(&p, s -> uuid);
 	put32bit(&p, s -> iplength);
 	putstr(&p, s -> iplength, s -> ip);
 	put32bit(&p, s -> port);
@@ -263,6 +264,7 @@ int machine_pack(struct machine * s, uint8_t * data, uint32_t len){
 }
 int machine_unpack(struct machine * s, const uint8_t * data, uint32_t len){
 	const uint8_t* orig = data;
+	s -> uuid = get32bit(&data);
 	s -> iplength = get32bit(&data);
 	getstr(&data, s -> iplength, &(s -> ip));
 	s -> port = get32bit(&data);
@@ -272,6 +274,8 @@ int machine_unpack(struct machine * s, const uint8_t * data, uint32_t len){
 char* machine_tostring(struct machine * s){
 	static char str[10240];
 	char * ptr = str;
+	sprintf(ptr, "\t%s = %d\n", "uuid", s->uuid);
+	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "iplength", s->iplength);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %s\n", "ip", s->ip);
@@ -360,8 +364,8 @@ int pong_unpack(struct pong * s, const uint8_t * data, uint32_t len){
 	s -> msglength = get32bit(&data);
 	s -> machine_arrlength = get32bit(&data);
 	int i;
+	s->machine_arr = (machine *) malloc (sizeof(machine) * s->machine_arrlength);
 	for(i=0; i<s->machine_arrlength; i++){
-	   machine * p = (machine *) malloc (sizeof(machine) * s->machine_arrlength);
 	   int plen = machine_unpack(s->machine_arr+i, data, 0);
 	   data += plen;
 	}

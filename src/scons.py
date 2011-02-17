@@ -38,7 +38,7 @@ CPPPATH = ['common', '/usr/local/include/', '/usr/include/fuse']
 CCFLAGS='-D_DEBUG -Wall -g '
 
 def compile():
-    Library('common/common', common_src)
+    Library('common/common', common_src, CPPPATH = CPPPATH, CCFLAGS = CCFLAGS)
 
     for t in tests:
         target = '%s.out'%t
