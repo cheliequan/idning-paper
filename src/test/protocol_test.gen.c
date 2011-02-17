@@ -10,40 +10,40 @@ void msg_header_test(){
 	msg_header s1;
 	msg_header s2;
 	uint8_t buffer [10000];
-	s1.msgid = 262;
-	s1.version = 51;
-	s1.operation = 471;
-	s1.msglength = 163;
+	s1.msglength = 110;
+	s1.msgid = 48;
+	s1.version = 445;
+	s1.operation = 366;
 	s1.operation = MSG_MSG_HEADER;
 	msg_header_pack(&s1, buffer, 100);
 	msg_header_unpack(&s2, buffer, 100);
+	assert(s1.msglength == s2.msglength);
 	assert(s1.msgid == s2.msgid);
 	assert(s1.version == s2.version);
 	assert(s1.operation == s2.operation);
-	assert(s1.msglength == s2.msglength);
 }
 
 void mc_mkdir_request_test(){
 	mc_mkdir_request s1;
 	mc_mkdir_request s2;
 	uint8_t buffer [10000];
-	s1.msgid = 444;
-	s1.version = 486;
-	s1.operation = 398;
-	s1.msglength = 466;
-	s1.parent = 69;
-	s1.namelength = 344;
+	s1.msglength = 341;
+	s1.msgid = 137;
+	s1.version = 491;
+	s1.operation = 351;
+	s1.parent = 335;
+	s1.namelength = 69;
 	s1.name = (uint8_t *)randomstring;
-	s1.mode = 282;
-	s1.uid = 459;
-	s1.gid = 408;
+	s1.mode = 91;
+	s1.uid = 111;
+	s1.gid = 173;
 	s1.operation = MSG_MC_MKDIR_REQUEST;
 	mc_mkdir_request_pack(&s1, buffer, 100);
 	mc_mkdir_request_unpack(&s2, buffer, 100);
+	assert(s1.msglength == s2.msglength);
 	assert(s1.msgid == s2.msgid);
 	assert(s1.version == s2.version);
 	assert(s1.operation == s2.operation);
-	assert(s1.msglength == s2.msglength);
 	assert(s1.parent == s2.parent);
 	assert(s1.namelength == s2.namelength);
 	assert(strncmp((const char *)s1.name, (const char *)s2.name, s1.namelength) == 0);
@@ -56,19 +56,19 @@ void mc_mkdir_response_test(){
 	mc_mkdir_response s1;
 	mc_mkdir_response s2;
 	uint8_t buffer [10000];
-	s1.msgid = 217;
-	s1.version = 222;
-	s1.operation = 305;
-	s1.msglength = 256;
-	s1.result = 447;
-	s1.inode = 172;
+	s1.msglength = 416;
+	s1.msgid = 385;
+	s1.version = 427;
+	s1.operation = 7;
+	s1.result = 112;
+	s1.inode = 240;
 	s1.operation = MSG_MC_MKDIR_RESPONSE;
 	mc_mkdir_response_pack(&s1, buffer, 100);
 	mc_mkdir_response_unpack(&s2, buffer, 100);
+	assert(s1.msglength == s2.msglength);
 	assert(s1.msgid == s2.msgid);
 	assert(s1.version == s2.version);
 	assert(s1.operation == s2.operation);
-	assert(s1.msglength == s2.msglength);
 	assert(s1.result == s2.result);
 	assert(s1.inode == s2.inode);
 }
@@ -77,45 +77,45 @@ void oc_request_test(){
 	oc_request s1;
 	oc_request s2;
 	uint8_t buffer [10000];
-	s1.msgid = 83;
-	s1.version = 344;
-	s1.operation = 468;
-	s1.msglength = 401;
+	s1.msglength = 80;
+	s1.msgid = 429;
+	s1.version = 456;
+	s1.operation = 224;
 	s1.operation = MSG_OC_REQUEST;
 	oc_request_pack(&s1, buffer, 100);
 	oc_request_unpack(&s2, buffer, 100);
+	assert(s1.msglength == s2.msglength);
 	assert(s1.msgid == s2.msgid);
 	assert(s1.version == s2.version);
 	assert(s1.operation == s2.operation);
-	assert(s1.msglength == s2.msglength);
 }
 
 void oc_response_test(){
 	oc_response s1;
 	oc_response s2;
 	uint8_t buffer [10000];
-	s1.msgid = 494;
-	s1.version = 232;
-	s1.operation = 377;
-	s1.msglength = 337;
+	s1.msglength = 459;
+	s1.msgid = 236;
+	s1.version = 429;
+	s1.operation = 215;
 	s1.operation = MSG_OC_RESPONSE;
 	oc_response_pack(&s1, buffer, 100);
 	oc_response_unpack(&s2, buffer, 100);
+	assert(s1.msglength == s2.msglength);
 	assert(s1.msgid == s2.msgid);
 	assert(s1.version == s2.version);
 	assert(s1.operation == s2.operation);
-	assert(s1.msglength == s2.msglength);
 }
 
 void machine_test(){
 	machine s1;
 	machine s2;
 	uint8_t buffer [10000];
-	s1.uuid = 278;
-	s1.iplength = 112;
+	s1.uuid = 244;
+	s1.iplength = 134;
 	s1.name = (uint8_t *)randomstring;
-	s1.port = 226;
-	s1.type = 59;
+	s1.port = 65;
+	s1.type = 150;
 	s1.operation = MSG_MACHINE;
 	machine_pack(&s1, buffer, 100);
 	machine_unpack(&s2, buffer, 100);
@@ -130,35 +130,35 @@ void ping_test(){
 	ping s1;
 	ping s2;
 	uint8_t buffer [10000];
-	s1.msgid = 173;
-	s1.version = 140;
-	s1.operation = 41;
-	s1.msglength = 121;
+	s1.msglength = 349;
+	s1.msgid = 472;
+	s1.version = 456;
+	s1.operation = 485;
 	s1.operation = MSG_PING;
 	ping_pack(&s1, buffer, 100);
 	ping_unpack(&s2, buffer, 100);
+	assert(s1.msglength == s2.msglength);
 	assert(s1.msgid == s2.msgid);
 	assert(s1.version == s2.version);
 	assert(s1.operation == s2.operation);
-	assert(s1.msglength == s2.msglength);
 }
 
 void pong_test(){
 	pong s1;
 	pong s2;
 	uint8_t buffer [10000];
-	s1.msgid = 212;
-	s1.version = 244;
-	s1.operation = 498;
-	s1.msglength = 79;
-	s1.machine_arrlength = 472;
+	s1.msglength = 399;
+	s1.msgid = 224;
+	s1.version = 11;
+	s1.operation = 150;
+	s1.machine_arrlength = 265;
 	s1.operation = MSG_PONG;
 	pong_pack(&s1, buffer, 100);
 	pong_unpack(&s2, buffer, 100);
+	assert(s1.msglength == s2.msglength);
 	assert(s1.msgid == s2.msgid);
 	assert(s1.version == s2.version);
 	assert(s1.operation == s2.operation);
-	assert(s1.msglength == s2.msglength);
 	assert(s1.machine_arrlength == s2.machine_arrlength);
 }
 

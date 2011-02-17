@@ -1,4 +1,4 @@
-#include "datapack.h"
+#include "datapack2.h"
 #include "log.h"
 #include <string.h>
 #include <stdio.h>
@@ -8,18 +8,18 @@
 
 /*message header for all messages!*/
 typedef struct msg_header{
+    uint32_t msglength;
     uint32_t msgid;
     uint32_t version;
     uint32_t operation;
-    uint32_t msglength;
 }msg_header;
 
 /*master<-client request*/
 typedef struct mc_mkdir_request{
+    uint32_t msglength;
     uint32_t msgid; //abc
     uint32_t version;
     uint32_t operation;
-    uint32_t msglength;
 
     uint32_t parent;
     uint32_t namelength;
@@ -35,10 +35,10 @@ typedef struct mc_mkdir_request{
 
 /*master<-client request*/
 typedef struct mc_mkdir_response{
+    uint32_t msglength;
     uint32_t msgid; // 
     uint32_t version;
     uint32_t operation;
-    uint32_t msglength;
 
     uint32_t result;
     uint32_t inode;
@@ -48,10 +48,10 @@ typedef struct mc_mkdir_response{
 
 /*osd<-client request*/
 typedef struct oc_request{
+    uint32_t msglength;
     uint32_t msgid;
     uint32_t version;
     uint32_t operation;
-    uint32_t msglength;
     /*--*/
     void (*pack) (struct oc_request * req, uint8_t * data, uint32_t len) ;
     void (*unpack)(struct oc_request * req, uint8_t * data, uint32_t len);
@@ -59,10 +59,10 @@ typedef struct oc_request{
 
 /*osd<-client response*/
 typedef struct oc_response{
+    uint32_t msglength;
     uint32_t msgid;
     uint32_t version;
     uint32_t operation;
-    uint32_t msglength;
 }oc_response;
 
 typedef struct machine{
@@ -75,18 +75,18 @@ typedef struct machine{
 
 /*operation = MSG_PING*/
 typedef struct ping{
+    uint32_t msglength;
     uint32_t msgid;
     uint32_t version;
     uint32_t operation;
-    uint32_t msglength;
 }ping;
 
 /*operation = MSG_PONG*/
 typedef struct pong{
+    uint32_t msglength;
     uint32_t msgid;
     uint32_t version;
     uint32_t operation;
-    uint32_t msglength;
 
     uint32_t machine_arrlength;
     /*arr*/ machine* machine_arr;

@@ -22,8 +22,12 @@ def pack_method(name, fields):
     header = 'int %s_pack(struct %s * s, uint8_t * data, uint32_t len)' % (name, name)
     content = StringWriter()
     content.append('{')
+    has_msglength = [i[1] for i in fields] .count('msglength') >=1
+
 
     content.append1('uint8_t * p = data;')
+    if has_msglength:
+        content.append1("s->msglength = 88888888;") # big enouth
     for t, n in fields:
         if t == 'uint32_t':
             content.append1('put32bit(&p, s -> %s);' % n )
@@ -39,11 +43,10 @@ def pack_method(name, fields):
             content.append1('   p += plen;' )
             content.append1('}')
 
-    names = [i[1] for i in fields]
-    if names.count('msglength') >=1 :
+    if has_msglength:
         content.append1("s->msglength = p-data;")
-        content.append1("uint8_t *p2 = data + 12;")
-        content.append1("put32bit(&p2, s->msglength);")
+        content.append1("uint8_t *p2 = data ;")
+        content.append1("put32bit_width(&p2, s->msglength, 8);")
 
     content.append1("return p-data;")
     content.append("}")

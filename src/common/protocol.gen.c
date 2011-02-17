@@ -8,33 +8,34 @@ do not modify it directly
 
 int msg_header_pack(struct msg_header * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
+	s->msglength = 88888888;
+	put32bit(&p, s -> msglength);
 	put32bit(&p, s -> msgid);
 	put32bit(&p, s -> version);
 	put32bit(&p, s -> operation);
-	put32bit(&p, s -> msglength);
 	s->msglength = p-data;
-	uint8_t *p2 = data + 12;
-	put32bit(&p2, s->msglength);
+	uint8_t *p2 = data ;
+	put32bit_width(&p2, s->msglength, 8);
 	return p-data;
 }
 int msg_header_unpack(struct msg_header * s, const uint8_t * data, uint32_t len){
 	const uint8_t* orig = data;
+	s -> msglength = get32bit(&data);
 	s -> msgid = get32bit(&data);
 	s -> version = get32bit(&data);
 	s -> operation = get32bit(&data);
-	s -> msglength = get32bit(&data);
 	return data-orig;
 }
 char* msg_header_tostring(struct msg_header * s){
 	static char str[10240];
 	char * ptr = str;
+	sprintf(ptr, "\t%s = %d\n", "msglength", s->msglength);
+	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "msgid", s->msgid);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "version", s->version);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "operation", s->operation);
-	while (*ptr) ptr++;
-	sprintf(ptr, "\t%s = %d\n", "msglength", s->msglength);
 	while (*ptr) ptr++;
 	return str;
 }
@@ -51,10 +52,11 @@ msg_header * msg_header_new(){
 }
 int mc_mkdir_request_pack(struct mc_mkdir_request * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
+	s->msglength = 88888888;
+	put32bit(&p, s -> msglength);
 	put32bit(&p, s -> msgid);
 	put32bit(&p, s -> version);
 	put32bit(&p, s -> operation);
-	put32bit(&p, s -> msglength);
 	put32bit(&p, s -> parent);
 	put32bit(&p, s -> namelength);
 	putstr(&p, s -> namelength, s -> name);
@@ -62,16 +64,16 @@ int mc_mkdir_request_pack(struct mc_mkdir_request * s, uint8_t * data, uint32_t 
 	put32bit(&p, s -> uid);
 	put32bit(&p, s -> gid);
 	s->msglength = p-data;
-	uint8_t *p2 = data + 12;
-	put32bit(&p2, s->msglength);
+	uint8_t *p2 = data ;
+	put32bit_width(&p2, s->msglength, 8);
 	return p-data;
 }
 int mc_mkdir_request_unpack(struct mc_mkdir_request * s, const uint8_t * data, uint32_t len){
 	const uint8_t* orig = data;
+	s -> msglength = get32bit(&data);
 	s -> msgid = get32bit(&data);
 	s -> version = get32bit(&data);
 	s -> operation = get32bit(&data);
-	s -> msglength = get32bit(&data);
 	s -> parent = get32bit(&data);
 	s -> namelength = get32bit(&data);
 	getstr(&data, s -> namelength, &(s -> name));
@@ -83,13 +85,13 @@ int mc_mkdir_request_unpack(struct mc_mkdir_request * s, const uint8_t * data, u
 char* mc_mkdir_request_tostring(struct mc_mkdir_request * s){
 	static char str[10240];
 	char * ptr = str;
+	sprintf(ptr, "\t%s = %d\n", "msglength", s->msglength);
+	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "msgid", s->msgid);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "version", s->version);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "operation", s->operation);
-	while (*ptr) ptr++;
-	sprintf(ptr, "\t%s = %d\n", "msglength", s->msglength);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "parent", s->parent);
 	while (*ptr) ptr++;
@@ -118,23 +120,24 @@ mc_mkdir_request * mc_mkdir_request_new(){
 }
 int mc_mkdir_response_pack(struct mc_mkdir_response * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
+	s->msglength = 88888888;
+	put32bit(&p, s -> msglength);
 	put32bit(&p, s -> msgid);
 	put32bit(&p, s -> version);
 	put32bit(&p, s -> operation);
-	put32bit(&p, s -> msglength);
 	put32bit(&p, s -> result);
 	put32bit(&p, s -> inode);
 	s->msglength = p-data;
-	uint8_t *p2 = data + 12;
-	put32bit(&p2, s->msglength);
+	uint8_t *p2 = data ;
+	put32bit_width(&p2, s->msglength, 8);
 	return p-data;
 }
 int mc_mkdir_response_unpack(struct mc_mkdir_response * s, const uint8_t * data, uint32_t len){
 	const uint8_t* orig = data;
+	s -> msglength = get32bit(&data);
 	s -> msgid = get32bit(&data);
 	s -> version = get32bit(&data);
 	s -> operation = get32bit(&data);
-	s -> msglength = get32bit(&data);
 	s -> result = get32bit(&data);
 	s -> inode = get32bit(&data);
 	return data-orig;
@@ -142,13 +145,13 @@ int mc_mkdir_response_unpack(struct mc_mkdir_response * s, const uint8_t * data,
 char* mc_mkdir_response_tostring(struct mc_mkdir_response * s){
 	static char str[10240];
 	char * ptr = str;
+	sprintf(ptr, "\t%s = %d\n", "msglength", s->msglength);
+	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "msgid", s->msgid);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "version", s->version);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "operation", s->operation);
-	while (*ptr) ptr++;
-	sprintf(ptr, "\t%s = %d\n", "msglength", s->msglength);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "result", s->result);
 	while (*ptr) ptr++;
@@ -169,33 +172,34 @@ mc_mkdir_response * mc_mkdir_response_new(){
 }
 int oc_request_pack(struct oc_request * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
+	s->msglength = 88888888;
+	put32bit(&p, s -> msglength);
 	put32bit(&p, s -> msgid);
 	put32bit(&p, s -> version);
 	put32bit(&p, s -> operation);
-	put32bit(&p, s -> msglength);
 	s->msglength = p-data;
-	uint8_t *p2 = data + 12;
-	put32bit(&p2, s->msglength);
+	uint8_t *p2 = data ;
+	put32bit_width(&p2, s->msglength, 8);
 	return p-data;
 }
 int oc_request_unpack(struct oc_request * s, const uint8_t * data, uint32_t len){
 	const uint8_t* orig = data;
+	s -> msglength = get32bit(&data);
 	s -> msgid = get32bit(&data);
 	s -> version = get32bit(&data);
 	s -> operation = get32bit(&data);
-	s -> msglength = get32bit(&data);
 	return data-orig;
 }
 char* oc_request_tostring(struct oc_request * s){
 	static char str[10240];
 	char * ptr = str;
+	sprintf(ptr, "\t%s = %d\n", "msglength", s->msglength);
+	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "msgid", s->msgid);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "version", s->version);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "operation", s->operation);
-	while (*ptr) ptr++;
-	sprintf(ptr, "\t%s = %d\n", "msglength", s->msglength);
 	while (*ptr) ptr++;
 	return str;
 }
@@ -212,33 +216,34 @@ oc_request * oc_request_new(){
 }
 int oc_response_pack(struct oc_response * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
+	s->msglength = 88888888;
+	put32bit(&p, s -> msglength);
 	put32bit(&p, s -> msgid);
 	put32bit(&p, s -> version);
 	put32bit(&p, s -> operation);
-	put32bit(&p, s -> msglength);
 	s->msglength = p-data;
-	uint8_t *p2 = data + 12;
-	put32bit(&p2, s->msglength);
+	uint8_t *p2 = data ;
+	put32bit_width(&p2, s->msglength, 8);
 	return p-data;
 }
 int oc_response_unpack(struct oc_response * s, const uint8_t * data, uint32_t len){
 	const uint8_t* orig = data;
+	s -> msglength = get32bit(&data);
 	s -> msgid = get32bit(&data);
 	s -> version = get32bit(&data);
 	s -> operation = get32bit(&data);
-	s -> msglength = get32bit(&data);
 	return data-orig;
 }
 char* oc_response_tostring(struct oc_response * s){
 	static char str[10240];
 	char * ptr = str;
+	sprintf(ptr, "\t%s = %d\n", "msglength", s->msglength);
+	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "msgid", s->msgid);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "version", s->version);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "operation", s->operation);
-	while (*ptr) ptr++;
-	sprintf(ptr, "\t%s = %d\n", "msglength", s->msglength);
 	while (*ptr) ptr++;
 	return str;
 }
@@ -298,33 +303,34 @@ machine * machine_new(){
 }
 int ping_pack(struct ping * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
+	s->msglength = 88888888;
+	put32bit(&p, s -> msglength);
 	put32bit(&p, s -> msgid);
 	put32bit(&p, s -> version);
 	put32bit(&p, s -> operation);
-	put32bit(&p, s -> msglength);
 	s->msglength = p-data;
-	uint8_t *p2 = data + 12;
-	put32bit(&p2, s->msglength);
+	uint8_t *p2 = data ;
+	put32bit_width(&p2, s->msglength, 8);
 	return p-data;
 }
 int ping_unpack(struct ping * s, const uint8_t * data, uint32_t len){
 	const uint8_t* orig = data;
+	s -> msglength = get32bit(&data);
 	s -> msgid = get32bit(&data);
 	s -> version = get32bit(&data);
 	s -> operation = get32bit(&data);
-	s -> msglength = get32bit(&data);
 	return data-orig;
 }
 char* ping_tostring(struct ping * s){
 	static char str[10240];
 	char * ptr = str;
+	sprintf(ptr, "\t%s = %d\n", "msglength", s->msglength);
+	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "msgid", s->msgid);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "version", s->version);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "operation", s->operation);
-	while (*ptr) ptr++;
-	sprintf(ptr, "\t%s = %d\n", "msglength", s->msglength);
 	while (*ptr) ptr++;
 	return str;
 }
@@ -341,10 +347,11 @@ ping * ping_new(){
 }
 int pong_pack(struct pong * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
+	s->msglength = 88888888;
+	put32bit(&p, s -> msglength);
 	put32bit(&p, s -> msgid);
 	put32bit(&p, s -> version);
 	put32bit(&p, s -> operation);
-	put32bit(&p, s -> msglength);
 	put32bit(&p, s -> machine_arrlength);
 	int i;
 	for(i=0; i<s->machine_arrlength; i++){
@@ -352,16 +359,18 @@ int pong_pack(struct pong * s, uint8_t * data, uint32_t len){
 	   p += plen;
 	}
 	s->msglength = p-data;
-	uint8_t *p2 = data + 12;
-	put32bit(&p2, s->msglength);
+	uint8_t *p2 = data ;
+    printf("tt:%s\n", data);
+	put32bit_width(&p2, s->msglength, 8);
+    printf("tt:%s\n", data);
 	return p-data;
 }
 int pong_unpack(struct pong * s, const uint8_t * data, uint32_t len){
 	const uint8_t* orig = data;
+	s -> msglength = get32bit(&data);
 	s -> msgid = get32bit(&data);
 	s -> version = get32bit(&data);
 	s -> operation = get32bit(&data);
-	s -> msglength = get32bit(&data);
 	s -> machine_arrlength = get32bit(&data);
 	int i;
 	s->machine_arr = (machine *) malloc (sizeof(machine) * s->machine_arrlength);
@@ -374,13 +383,13 @@ int pong_unpack(struct pong * s, const uint8_t * data, uint32_t len){
 char* pong_tostring(struct pong * s){
 	static char str[10240];
 	char * ptr = str;
+	sprintf(ptr, "\t%s = %d\n", "msglength", s->msglength);
+	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "msgid", s->msgid);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "version", s->version);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "operation", s->operation);
-	while (*ptr) ptr++;
-	sprintf(ptr, "\t%s = %d\n", "msglength", s->msglength);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "machine_arrlength", s->machine_arrlength);
 	while (*ptr) ptr++;
