@@ -97,4 +97,27 @@ static inline void getstr(const uint8_t **ptr, uint32_t strlen, uint8_t ** str) 
 	(*ptr)+=strlen;
 }
 
+#ifndef _EVENT_HAVE_STRSEP
+/* strsep replacement for platforms that lack it.  Only works if
+ * del is one character long. */
+static inline char * strsep2(char **s, const char *del)
+{
+    char *d, *tok;
+    if (!s || !*s)
+        return NULL;
+    tok = *s;
+    d = strstr(tok, del);
+    if (d) {
+        *d = '\0';
+        *s = d + 1;
+    } else
+        *s = NULL;
+    return tok;
+}
 #endif
+
+
+
+#endif
+
+

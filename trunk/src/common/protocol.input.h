@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 
+// //commnet is free in this file 
+// /* */ commment has special mean
 
 /*message header for all messages!*/
 typedef struct msg_header{
@@ -14,7 +16,7 @@ typedef struct msg_header{
 
 /*master<-client request*/
 typedef struct mc_mkdir_request{
-    uint32_t msgid; /*abc*/
+    uint32_t msgid; //abc
     uint32_t version;
     uint32_t operation;
     uint32_t msglength;
@@ -33,7 +35,7 @@ typedef struct mc_mkdir_request{
 
 /*master<-client request*/
 typedef struct mc_mkdir_response{
-    uint32_t msgid; /*abc*/
+    uint32_t msgid; // 
     uint32_t version;
     uint32_t operation;
     uint32_t msglength;
@@ -63,10 +65,40 @@ typedef struct oc_response{
     uint32_t msglength;
 }oc_response;
 
+typedef struct machine{
+    uint64_t uuid;
+    uint32_t iplength;
+    uint8_t* ip;
+    uint32_t port;
+    uint32_t type;
+}machine;
+
+/*operation = MSG_PING*/
+typedef struct ping{
+    uint32_t msgid;
+    uint32_t version;
+    uint32_t operation;
+    uint32_t msglength;
+}ping;
+
+/*operation = MSG_PONG*/
+typedef struct pong{
+    uint32_t msgid;
+    uint32_t version;
+    uint32_t operation;
+    uint32_t msglength;
+
+    uint32_t machine_arrlength;
+    /*arr*/ machine* machine_arr;
+}pong;
+
 //void oc_request_pack(struct oc_request * req, uint8_t * data, uint32_t len);
 //void oc_request_unpack(struct oc_request * req, uint8_t * data, uint32_t len);
 
 //void mc_mkdir_request_pack(struct mc_mkdir_request * req, uint8_t * data, uint32_t len);
 //void mc_mkdir_request_unpack(struct mc_mkdir_request * req, const uint8_t * data, uint32_t len);
+
+/*below_is_auto_generated*/
+
 
 
