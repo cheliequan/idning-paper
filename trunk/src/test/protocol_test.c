@@ -11,30 +11,29 @@ void pong_test(){
 	pong s1;
 	pong s2;
 	uint8_t buffer [10000];
-	s1.msgid = 179;
-	s1.version = 236;
-	s1.operation = 133;
-	s1.msglength = 104;
-	s1.machine_arrlength = 3;
+	s1.msgid = 1;
+	s1.version = 2;
 	s1.operation = MSG_PONG;
+	s1.msglength = 4;
+	s1.machine_arrlength = 3;
 
 
     s1.machine_arr = (machine *)malloc(3* sizeof(machine));
  
 	s1.machine_arr[0].uuid = 8;
-	s1.machine_arr[0].iplength = 8;
+	s1.machine_arr[0].iplength = 7;
 	s1.machine_arr[0].ip = "1.1.1.1";
 	s1.machine_arr[0].port = 8888;
 	s1.machine_arr[0].type = 0;
 
 	s1.machine_arr[1].uuid = 8;
-	s1.machine_arr[1].iplength = 8;
+	s1.machine_arr[1].iplength = 7;
 	s1.machine_arr[1].ip = "2.2.2.2";
 	s1.machine_arr[1].port = 8888;
 	s1.machine_arr[1].type = 0;
 
 	s1.machine_arr[2].uuid = 8;
-	s1.machine_arr[2].iplength = 8;
+	s1.machine_arr[2].iplength = 7;
 	s1.machine_arr[2].ip = "3.3.3.3";
 	s1.machine_arr[2].port = 8888;
 	s1.machine_arr[2].type = 0;
@@ -50,6 +49,7 @@ void pong_test(){
 
 	pong_unpack(&s2, buffer, 100);
 
+    fprintf(stderr, "%d %d\n", s1.msgid, s2.msgid);
 	assert(s1.msgid == s2.msgid);
 	assert(s1.version == s2.version);
 	assert(s1.operation == s2.operation);
