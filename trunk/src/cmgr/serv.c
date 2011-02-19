@@ -12,8 +12,18 @@
 #include "network.h"
 #include "log.h"
 #include "dlist.h"
-#include "datapack.h"
+#include "protocol.gen.h"
 
+
+#define MAX_MAINE_CNT 256
+
+static machine machines [MAX_MAINE_CNT];
+static int machine_cnt = 0;
+static uint64_t cluster_version = 0;
+
+static pong *  pong_p ;
+static uint8_t pong_buffer [MAX_MAINE_CNT*32+256];
+static uint32_t pong_buffer_len;
 
 void shutdown_handler(struct evhttp_request *req, void * arg){
     logging(LOG_DEUBG, "%s: called\n", __func__);
@@ -32,56 +42,92 @@ void ping_handler(struct evhttp_request *req, void * arg){
         exit(1);
     }
     char * line = evbuffer_readline(req->input_buffer);
+    ping * ping = ping_new();
+    //ping_unpack(ping, line, 0);
+
+    free(line);
+    
+    struct evbuffer *evb = evbuffer_new();
+    evbuffer_add_printf(evb, "%s", pong_buffer);
+    evhttp_send_reply(req, HTTP_OK, "OK", evb);
+    evbuffer_free(evb);
 }
 
 
 
-typedef struct cluster_machine{
-    uint64_t uuid;
-    char * ip;
-    int port;
-    char type;
+/*typedef struct cluster_machine{*/
+    /*uint64_t uuid;*/
+    /*char * ip;*/
+    /*int port;*/
+    /*char type;*/
 
-    struct cluster_machine * next;
-    struct cluster_machine * prev;
-}cluster_machine;
+    /*struct cluster_machine * next;*/
+    /*struct cluster_machine * prev;*/
+/*}cluster_machine;*/
+/*cluster_machine * cluster_machine_new(){*/
+    /*cluster_machine * m = (cluster_machine * )malloc(sizeof(cluster_machine));*/
+    /*memset(m, 0, sizeof(cluster_machine));*/
+/*}*/
 
 #define CLUSTER_MACHINE_TYPE_MDS 1
 #define CLUSTER_MACHINE_TYPE_OSD 2
 #define CLUSTER_MACHINE_TYPE_CLIENT 3
 
-cluster_machine cluster_head_v;
-cluster_machine * cluster_head = & cluster_head_v;
+/*cluster_machine cluster_head_v;*/
+/*cluster_machine * cluster_head = & cluster_head_v;*/
 
-cluster_machine * cluster_machine_new(){
-    cluster_machine * m = (cluster_machine * )malloc(sizeof(cluster_machine));
-    memset(m, 0, sizeof(cluster_machine));
-}
+/*cluster_machine * osd_ring[256]; // */
+/*cluster_machine * mds_ring[16];// */
+/*
+ * ring[0] = 0
+ * ring[1] = 1
+ * ring[2] = 2
+ * ring[3] = 0
+ * ring[4] = 1
+ * ring[5] = 2
+ * ring[6] = 0
+ * ring[7] = 1
+ * ring[8] = 2
+ * ring[9] = 0
+ * ring[10] = 1
+ * ring[11] = 2
+ * ring[12] = 0
+ * ring[13] = 1
+ * ring[14] = 2
+ * ring[15] = 0
+ *
+ * */
 
-static uint64_t cluster_version = 0;
+
+
 
 void cluster_init(){
-    dlist_init(cluster_head);
+    pong_p = pong_new();
+    pong_p -> machine_arrlength = machine_cnt;
+    pong_p -> machine_arr = machines;
+    cluster_dump();
 }
 
 void cluster_add(char * ip, int port, char type){
-    cluster_machine *m = cluster_machine_new();
-    m -> ip = ip;
-    m -> port = port;
-    m -> type = type;
-    dlist_insert_tail(cluster_head, m);
+    /*cluster_machine *m = cluster_machine_new();*/
+    /*m -> ip = ip;*/
+    /*m -> port = port;*/
+    /*m -> type = type;*/
+    /*dlist_insert_tail(cluster_head, m);*/
+    cluster_version ++ ;
+    cluster_dump();
 }
 
 void cluster_remove(char * ip, int port){
     /*dlist_insert_tail(head, entries+i );*/
-}
 
-void cluster_map(){
-
+    cluster_version ++ ;
+    cluster_dump();
 }
 
 void cluster_dump(){
-
+    int cnt = pong_pack(pong_p, pong_buffer, 0);
+    pong_buffer[cnt] = 0;
 }
 
 
@@ -129,7 +175,6 @@ void gen_handler(struct evhttp_request *req, void * arg){
 }
 
 int main(int argc, char **argv){
-
     struct evhttp * httpd;
     int port = 6006;
     event_init();
@@ -141,7 +186,11 @@ int main(int argc, char **argv){
         printf("Start server at port  %d\n", port);
     }
     evhttp_set_cb(httpd, "/shutdown", shutdown_handler, NULL);
+    evhttp_set_cb(httpd, "/ping", ping_handler, NULL);
     evhttp_set_gencb(httpd, gen_handler, NULL);
+
+    cluster_init();
+
     event_dispatch();
 
     evhttp_free(httpd);

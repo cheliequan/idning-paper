@@ -417,16 +417,22 @@ int32_t tcptoread(int sock,void *buff,uint32_t leng,uint32_t msecto) {
 	while (rcvd<leng) {
 		pfd.revents = 0;
 		if (poll(&pfd,1,msecto)<0) {
+            perror("ning: tcptoread error:");
 			return -1;
 		}
 		if (pfd.revents & POLLIN) {
 			i = read(sock,((uint8_t*)buff)+rcvd,leng-rcvd);
-			if (i<=0) {
+            printf("read return in tcptoread(): %d \n", i);
+			if (i==0) { // ning :TODO: this is not the same as code in mfs ,可能原来的代码针对的是长连接，不会有eof，i==0的时候实际上是eof
+				return rcvd;
+			}
+			if (i<0) { // ning :TODO: this is not the same as code in mfs
 				return i;
 			}
 			rcvd+=i;
 		} else {
 			errno = ETIMEDOUT;
+            perror("ning: tcptoread error:");
 			return -1;
 		}
 	}
@@ -442,6 +448,7 @@ int32_t tcptowrite(int sock,const void *buff,uint32_t leng,uint32_t msecto) {
 	while (sent<leng) {
 		pfd.revents = 0;
 		if (poll(&pfd,1,msecto)<0) {
+            perror("ning: tcptowrite error:");
 			return -1;
 		}
 		if (pfd.revents & POLLOUT) {
@@ -452,6 +459,7 @@ int32_t tcptowrite(int sock,const void *buff,uint32_t leng,uint32_t msecto) {
 			sent+=i;
 		} else {
 			errno = ETIMEDOUT;
+            perror("ning: tcptowrite error:");
 			return -1;
 		}
 	}

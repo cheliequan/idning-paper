@@ -308,6 +308,9 @@ int ping_pack(struct ping * s, uint8_t * data, uint32_t len){
 	put32bit(&p, s -> msgid);
 	put32bit(&p, s -> version);
 	put32bit(&p, s -> operation);
+	put32bit(&p, s -> self_iplength);
+	putstr(&p, s -> self_iplength, s -> self_ip);
+	put32bit(&p, s -> self_port);
 	s->msglength = p-data;
 	uint8_t *p2 = data ;
 	put32bit_width(&p2, s->msglength, 8);
@@ -319,6 +322,9 @@ int ping_unpack(struct ping * s, const uint8_t * data, uint32_t len){
 	s -> msgid = get32bit(&data);
 	s -> version = get32bit(&data);
 	s -> operation = get32bit(&data);
+	s -> self_iplength = get32bit(&data);
+	getstr(&data, s -> self_iplength, &(s -> self_ip));
+	s -> self_port = get32bit(&data);
 	return data-orig;
 }
 char* ping_tostring(struct ping * s){
@@ -331,6 +337,12 @@ char* ping_tostring(struct ping * s){
 	sprintf(ptr, "\t%s = %d\n", "version", s->version);
 	while (*ptr) ptr++;
 	sprintf(ptr, "\t%s = %d\n", "operation", s->operation);
+	while (*ptr) ptr++;
+	sprintf(ptr, "\t%s = %d\n", "self_iplength", s->self_iplength);
+	while (*ptr) ptr++;
+	sprintf(ptr, "\t%s = %s\n", "self_ip", s->self_ip);
+	while (*ptr) ptr++;
+	sprintf(ptr, "\t%s = %d\n", "self_port", s->self_port);
 	while (*ptr) ptr++;
 	return str;
 }
@@ -360,9 +372,7 @@ int pong_pack(struct pong * s, uint8_t * data, uint32_t len){
 	}
 	s->msglength = p-data;
 	uint8_t *p2 = data ;
-    printf("tt:%s\n", data);
 	put32bit_width(&p2, s->msglength, 8);
-    printf("tt:%s\n", data);
 	return p-data;
 }
 int pong_unpack(struct pong * s, const uint8_t * data, uint32_t len){
