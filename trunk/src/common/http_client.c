@@ -24,6 +24,7 @@ struct evbuffer * http_get(char * ip, int port, char * path){
     int readed = 0;
 
     struct evbuffer *evb = evbuffer_new();
+    /*evbuffer_read(evb, cs, 30);*/
 
     while ((readed = tcptoread(cs, response_buffer, 1024*8, 30000)) > 0){
         printf("readed len: %d \n", readed);

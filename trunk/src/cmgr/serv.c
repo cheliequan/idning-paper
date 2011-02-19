@@ -13,6 +13,8 @@
 #include "log.h"
 #include "dlist.h"
 #include "protocol.gen.h"
+#include "http_client.h"
+#include "serv.h"
 
 
 #define MAX_MAINE_CNT 256
@@ -24,6 +26,22 @@ static uint64_t cluster_version = 0;
 static pong *  pong_p ;
 static uint8_t pong_buffer [MAX_MAINE_CNT*32+256];
 static uint32_t pong_buffer_len;
+
+static machine this_machine = {
+    0, 
+    9,
+    "127.0.0.1",
+    9527,
+    CLUSTER_MACHINE_TYPE_MGR,
+};
+
+int do_ping(machine * m){
+    struct evbuffer * evb = http_get(m->ip, m->port, "/ping");
+
+}
+
+static char serv_ip[] = "127.0.0.1";
+static int serv_port = "9527";
 
 void shutdown_handler(struct evhttp_request *req, void * arg){
     logging(LOG_DEUBG, "%s: called\n", __func__);
@@ -69,9 +87,6 @@ void ping_handler(struct evhttp_request *req, void * arg){
     /*memset(m, 0, sizeof(cluster_machine));*/
 /*}*/
 
-#define CLUSTER_MACHINE_TYPE_MDS 1
-#define CLUSTER_MACHINE_TYPE_OSD 2
-#define CLUSTER_MACHINE_TYPE_CLIENT 3
 
 /*cluster_machine cluster_head_v;*/
 /*cluster_machine * cluster_head = & cluster_head_v;*/
@@ -176,7 +191,7 @@ void gen_handler(struct evhttp_request *req, void * arg){
 
 int main(int argc, char **argv){
     struct evhttp * httpd;
-    int port = 6006;
+    int port = 9527;
     event_init();
     httpd = evhttp_start("0.0.0.0", port);
     if( httpd == NULL){
