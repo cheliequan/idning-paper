@@ -79,6 +79,10 @@ typedef struct ping{
     uint32_t msgid;
     uint32_t version;
     uint32_t operation;
+
+    uint32_t self_iplength; //self listen ip & port
+    uint8_t* self_ip;
+    uint32_t self_port;
 }ping;
 
 /*operation = MSG_PONG*/
