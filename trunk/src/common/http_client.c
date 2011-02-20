@@ -5,20 +5,41 @@
 /*#include <evhttp.h>*/
 
 
-static struct evbuffer * http_req(char * ip, int port, char * verb, char * path, char * data);
+http_response * http_response_new(int status_code, struct evbuffer * headers, struct evbuffer * body){
+    http_response * r = (http_response *)malloc(sizeof(http_response));
+    r -> status_code = status_code;
+    r -> headers = headers;
+    r -> body = body;
+    return r;
+};
+void http_response_free(http_response * r){
+    evbuffer_free(r -> headers);
+    evbuffer_free(r -> body);
+    free(r);
+}
 
-struct evbuffer * http_get(char * ip, int port, char * path){
+
+static struct http_response * http_req(char * ip, int port, char * verb, char * path, char * data);
+
+struct http_response * http_get(char * ip, int port, char * path){
     return http_req(ip, port, "GET", path, "");
 }
-struct evbuffer * http_post(char * ip, int port, char * path, char * data){
+struct http_response * http_post(char * ip, int port, char * path, char * data){
     return http_req(ip, port, "POST", path, data);
 }
 
+static int parse_response_status_code(struct evbuffer * evb){
+    char * line = evbuffer_readline(evb);
+    int code;
+    sscanf(line, "HTTP/%*d.%*d %d", & code);
+    free(line);
+    return code;
+}
 /*
  *
     should use evbuffer_free(evb); to free this evbuffer
  * */
-static struct evbuffer * http_req(char * ip, int port, char * verb, char * path, char * data){
+static struct http_response * http_req(char * ip, int port, char * verb, char * path, char * data){
 
     char port_str[6];
     sprintf(port_str, "%d", port);
@@ -29,7 +50,7 @@ static struct evbuffer * http_req(char * ip, int port, char * verb, char * path,
 
     sprintf(request_buffer, "%s %s HTTP/1.0\r\n\r\n%s", verb, path, data);
     //sprintf(request_buffer, "GET %s HTTP/1.0\r\nUser-Agent: curl/7.19.7 (i486-pc-linux-gnu) libcurl/7.19.7 OpenSSL/0.9.8k zlib/1.2.3.3 libidn/1.15\r\n\r\n", path);
-    printf(request_buffer);
+    printf("%s", request_buffer);
 
     int rst = tcptowrite(cs, request_buffer, strlen(request_buffer) , 30000);
     printf("tcptowrite rst: %d", rst);
@@ -42,11 +63,14 @@ static struct evbuffer * http_req(char * ip, int port, char * verb, char * path,
         printf("readed len: %d \n", readed);
         evbuffer_add(evb, response_buffer, readed);
     }
-    printf("readed out of where is : %d \n", readed);
+
     struct evbuffer_ptr evbptr = evbuffer_search(evb, "\r\n\r\n", 4, NULL);
-    evbuffer_drain(evb, evbptr.pos);
+
+    struct evbuffer *headers = evbuffer_new();
+    evbuffer_remove_buffer(evb, headers, evbptr.pos);
+    /*evbuffer_drain(evb, evbptr.pos);*/
     tcpclose(cs);
-    return evb;
-    return 0;
+    int code = parse_response_status_code(headers);
+    return http_response_new(code, headers, evb);
 }
 

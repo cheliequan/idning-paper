@@ -21,6 +21,7 @@
 
 #include <inttypes.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 /* MFS data pack */
@@ -72,7 +73,7 @@ static inline uint64_t get64bit(const uint8_t **ptr) {
 static inline uint32_t get32bit(const uint8_t **ptr) {
 	uint32_t t32;
     sscanf(*ptr, "%u,", &t32);
-    printf("get32bit: %s = %d\n", *ptr, t32);
+    fprintf(stderr, "get32bit: %s = %d\n", *ptr, t32);
     (*ptr) = strchr(*ptr, ',') + 1;
 	return t32;
 }

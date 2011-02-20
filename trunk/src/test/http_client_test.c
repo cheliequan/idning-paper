@@ -11,14 +11,23 @@
 
 
 int main(){
-    //http://www.baidu.com/search/error.html
-    struct evbuffer * evb = http_get("220.181.111.85", 80, "/");  // xiaonei.com/home
     char*  p;
-    while( p = evbuffer_readline(evb))
+    //http://www.baidu.com/search/error.html
+    http_response * response = http_get("220.181.111.85", 80, "/");  // xiaonei.com/home
+    printf("%d\n", response -> status_code);
+
+    while( p = evbuffer_readline(response->headers)){
         printf("%s\n", p);
+        free(p);
+    }
+
+    while( p = evbuffer_readline(response->body)){
+        printf("%s\n", p);
+        free(p);
+    }
 
 
-    evbuffer_free(evb);
+    http_response_free(response);
 
 }
 
