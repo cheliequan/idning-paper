@@ -62,6 +62,8 @@ int mc_mkdir_request_pack(struct mc_mkdir_request * s, uint8_t * data, uint32_t 
 	put32bit(&p, s -> operation);
 	put32bit(&p, s -> parent);
 	put32bit(&p, s -> namelength);
+	if (s->namelength <= 0)
+	   s->namelength = strlen(s->name);
 	putstr(&p, s -> namelength, s -> name);
 	put32bit(&p, s -> mode);
 	put32bit(&p, s -> uid);
@@ -279,6 +281,8 @@ int machine_pack(struct machine * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
 	put32bit(&p, s -> uuid);
 	put32bit(&p, s -> iplength);
+	if (s->iplength <= 0)
+	   s->iplength = strlen(s->ip);
 	putstr(&p, s -> iplength, s -> ip);
 	put32bit(&p, s -> port);
 	put32bit(&p, s -> type);
@@ -331,6 +335,8 @@ int ping_pack(struct ping * s, uint8_t * data, uint32_t len){
 	put32bit(&p, s -> version);
 	put32bit(&p, s -> operation);
 	put32bit(&p, s -> self_iplength);
+	if (s->self_iplength <= 0)
+	   s->self_iplength = strlen(s->self_ip);
 	putstr(&p, s -> self_iplength, s -> self_ip);
 	put32bit(&p, s -> self_port);
 	s->msglength = p-data;
