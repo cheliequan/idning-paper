@@ -45,6 +45,8 @@ int do_ping(machine * m){
     ping_pack(msg_ping, buffer, 0);
 
     struct http_response * response = http_post(m->ip, m->port, "/ping", buffer);
+    //TODO: here, unpack
+
 }
 
 //void post_handler(struct evhttp_request *req, void * arg){
