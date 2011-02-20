@@ -17,14 +17,14 @@
 #include "serv.h"
 
 
-#define MAX_MAINE_CNT 256
+#define MAX_MACHINE_CNT 256
 
-static machine machines [MAX_MAINE_CNT];
+static machine machines [MAX_MACHINE_CNT];
 static int machine_cnt = 0;
 static uint64_t cluster_version = 0;
 
 static pong *  pong_p ;
-static uint8_t pong_buffer [MAX_MAINE_CNT*32+256];
+static uint8_t pong_buffer [MAX_MACHINE_CNT*32+256];
 static uint32_t pong_buffer_len;
 
 static machine this_machine = {
@@ -35,17 +35,6 @@ static machine this_machine = {
     CLUSTER_MACHINE_TYPE_MGR,
 };
 
-int do_ping(machine * m){
-    char buffer[256];
-    ping * msg_ping = ping_new(); //TODO: cache this
-    msg_ping -> self_iplength = this_machine.iplength;
-    msg_ping -> self_ip = this_machine.ip;
-    msg_ping -> self_port = this_machine.port;
-
-    ping_pack(&msg_ping, buffer, 0);
-
-    struct http_response * response = http_post(m->ip, m->port, "/ping", buffer);
-}
 
 static char serv_ip[] = "127.0.0.1";
 static int serv_port = "9527";
@@ -67,26 +56,23 @@ void ping_handler(struct evhttp_request *req, void * arg){
         exit(1);
     }
     int buffer_len = evbuffer_get_length(req->input_buffer);
-    fprintf(stderr, "buffer_len : %d", buffer_len);
+    logging(LOG_DEUBG, "buffer_len : %d", buffer_len);
 
     char * line = alloca(buffer_len+1) ;//on heap
-    /*char * line = evbuffer_readline(req->input_buffer);*/
     evbuffer_copyout(req->input_buffer, line, buffer_len);
     line [buffer_len] = '\0';
-    fprintf(stderr, "Received ------------ : %s", line);
-    /*machine * m = machine_new();*/
-    /*machine_unpack(m, line, 0);*/
+    logging(LOG_DEUBG, "Received ------------ : %s", line);
 
     ping * ping = ping_new();
     ping_unpack(ping, line, 0);
+    cluster_add(ping->self_ip, ping->self_port);
 
-    /*free(line);*/
-    
     struct evbuffer *evb = evbuffer_new();
-    evbuffer_add_printf(evb, "%s", pong_buffer);
+    evbuffer_add_printf(evb, "%s\n", pong_buffer); // this "\n" is important for evbuffer_readline at http_client
     evhttp_send_reply(req, HTTP_OK, "OK", evb);
     evbuffer_free(evb);
 }
+
 
 
 
@@ -135,12 +121,22 @@ void ping_handler(struct evhttp_request *req, void * arg){
 
 void cluster_init(){
     pong_p = pong_new();
-    pong_p -> machine_arrlength = machine_cnt;
-    pong_p -> machine_arr = machines;
     cluster_dump();
 }
 
 void cluster_add(char * ip, int port, char type){
+    logging(LOG_DEUBG, "%s: called\n", __func__);
+    int i;
+    for(i=0; i < machine_cnt; i++){
+        if (machines[i].port == port && (0 == strcmp(machines[i].ip, ip)) ) //already in array
+            return;
+    }
+    machines[machine_cnt].ip = ip;
+    machines[machine_cnt].port = port;
+    machines[machine_cnt].type = type;
+    machine_cnt ++;
+    logging(LOG_DEUBG, "current machine_cnt : %d", machine_cnt);
+
     /*cluster_machine *m = cluster_machine_new();*/
     /*m -> ip = ip;*/
     /*m -> port = port;*/
@@ -158,6 +154,9 @@ void cluster_remove(char * ip, int port){
 }
 
 void cluster_dump(){
+    pong_p -> machine_arrlength = machine_cnt;
+    pong_p -> machine_arr = machines;
+
     int cnt = pong_pack(pong_p, pong_buffer, 0);
     pong_buffer[cnt] = 0;
 }
