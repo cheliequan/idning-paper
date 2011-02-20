@@ -99,11 +99,12 @@ static inline void putstr(uint8_t **ptr, uint32_t strlen, uint8_t * str) {
 	(*ptr)+=1;
 }
 //TODO: ptr should be const uint8_t ** ptr;
-static inline void getstr(uint8_t **ptr, uint32_t strlen, uint8_t ** str) {
-	*str = (uint8_t *)*ptr;
+static inline char * getstr(uint8_t **ptr, uint32_t strlen) {
+	char * str = (uint8_t *)*ptr;
 	(*ptr)+=strlen;
     (**ptr) = '\0';
     (*ptr)+=1;
+    return str;
 }
 
 #ifndef _EVENT_HAVE_STRSEP

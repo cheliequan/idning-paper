@@ -115,41 +115,49 @@ int msg_header_pack(struct msg_header * s, uint8_t * data, uint32_t len);
 int msg_header_unpack(struct msg_header * s, const uint8_t * data, uint32_t len);
 char* msg_header_tostring(struct msg_header * s);
 msg_header * msg_header_new();
+void msg_header_free(msg_header * s);
 
 int mc_mkdir_request_pack(struct mc_mkdir_request * s, uint8_t * data, uint32_t len);
 int mc_mkdir_request_unpack(struct mc_mkdir_request * s, const uint8_t * data, uint32_t len);
 char* mc_mkdir_request_tostring(struct mc_mkdir_request * s);
 mc_mkdir_request * mc_mkdir_request_new();
+void mc_mkdir_request_free(mc_mkdir_request * s);
 
 int mc_mkdir_response_pack(struct mc_mkdir_response * s, uint8_t * data, uint32_t len);
 int mc_mkdir_response_unpack(struct mc_mkdir_response * s, const uint8_t * data, uint32_t len);
 char* mc_mkdir_response_tostring(struct mc_mkdir_response * s);
 mc_mkdir_response * mc_mkdir_response_new();
+void mc_mkdir_response_free(mc_mkdir_response * s);
 
 int oc_request_pack(struct oc_request * s, uint8_t * data, uint32_t len);
 int oc_request_unpack(struct oc_request * s, const uint8_t * data, uint32_t len);
 char* oc_request_tostring(struct oc_request * s);
 oc_request * oc_request_new();
+void oc_request_free(oc_request * s);
 
 int oc_response_pack(struct oc_response * s, uint8_t * data, uint32_t len);
 int oc_response_unpack(struct oc_response * s, const uint8_t * data, uint32_t len);
 char* oc_response_tostring(struct oc_response * s);
 oc_response * oc_response_new();
+void oc_response_free(oc_response * s);
 
 int machine_pack(struct machine * s, uint8_t * data, uint32_t len);
 int machine_unpack(struct machine * s, const uint8_t * data, uint32_t len);
 char* machine_tostring(struct machine * s);
 machine * machine_new();
+void machine_free(machine * s);
 
 int ping_pack(struct ping * s, uint8_t * data, uint32_t len);
 int ping_unpack(struct ping * s, const uint8_t * data, uint32_t len);
 char* ping_tostring(struct ping * s);
 ping * ping_new();
+void ping_free(ping * s);
 
 int pong_pack(struct pong * s, uint8_t * data, uint32_t len);
 int pong_unpack(struct pong * s, const uint8_t * data, uint32_t len);
 char* pong_tostring(struct pong * s);
 pong * pong_new();
+void pong_free(pong * s);
 
 
 #define MSG_MSG_HEADER 100

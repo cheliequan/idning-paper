@@ -50,6 +50,9 @@ msg_header * msg_header_new(){
 	p->operation = MSG_MSG_HEADER ;
 	return p;
 }
+void msg_header_free(msg_header * s){
+	free(s);
+}
 int mc_mkdir_request_pack(struct mc_mkdir_request * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
 	s->msglength = 88888888;
@@ -76,7 +79,8 @@ int mc_mkdir_request_unpack(struct mc_mkdir_request * s, const uint8_t * data, u
 	s -> operation = get32bit(&data);
 	s -> parent = get32bit(&data);
 	s -> namelength = get32bit(&data);
-	getstr(&data, s -> namelength, &(s -> name));
+	char * tmp = getstr(&data, s -> namelength);
+	s -> name = strdup(tmp); 
 	s -> mode = get32bit(&data);
 	s -> uid = get32bit(&data);
 	s -> gid = get32bit(&data);
@@ -117,6 +121,10 @@ mc_mkdir_request * mc_mkdir_request_new(){
     
 	p->operation = MSG_MC_MKDIR_REQUEST ;
 	return p;
+}
+void mc_mkdir_request_free(mc_mkdir_request * s){
+	free( s -> name);
+	free(s);
 }
 int mc_mkdir_response_pack(struct mc_mkdir_response * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
@@ -170,6 +178,9 @@ mc_mkdir_response * mc_mkdir_response_new(){
 	p->operation = MSG_MC_MKDIR_RESPONSE ;
 	return p;
 }
+void mc_mkdir_response_free(mc_mkdir_response * s){
+	free(s);
+}
 int oc_request_pack(struct oc_request * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
 	s->msglength = 88888888;
@@ -213,6 +224,9 @@ oc_request * oc_request_new(){
     
 	p->operation = MSG_OC_REQUEST ;
 	return p;
+}
+void oc_request_free(oc_request * s){
+	free(s);
 }
 int oc_response_pack(struct oc_response * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
@@ -258,6 +272,9 @@ oc_response * oc_response_new(){
 	p->operation = MSG_OC_RESPONSE ;
 	return p;
 }
+void oc_response_free(oc_response * s){
+	free(s);
+}
 int machine_pack(struct machine * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
 	put32bit(&p, s -> uuid);
@@ -271,7 +288,8 @@ int machine_unpack(struct machine * s, const uint8_t * data, uint32_t len){
 	const uint8_t* orig = data;
 	s -> uuid = get32bit(&data);
 	s -> iplength = get32bit(&data);
-	getstr(&data, s -> iplength, &(s -> ip));
+	char * tmp = getstr(&data, s -> iplength);
+	s -> ip = strdup(tmp); 
 	s -> port = get32bit(&data);
 	s -> type = get32bit(&data);
 	return data-orig;
@@ -301,6 +319,10 @@ machine * machine_new(){
     
 	return p;
 }
+void machine_free(machine * s){
+	free( s -> ip);
+	free(s);
+}
 int ping_pack(struct ping * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
 	s->msglength = 88888888;
@@ -323,7 +345,8 @@ int ping_unpack(struct ping * s, const uint8_t * data, uint32_t len){
 	s -> version = get32bit(&data);
 	s -> operation = get32bit(&data);
 	s -> self_iplength = get32bit(&data);
-	getstr(&data, s -> self_iplength, &(s -> self_ip));
+	char * tmp = getstr(&data, s -> self_iplength);
+	s -> self_ip = strdup(tmp); 
 	s -> self_port = get32bit(&data);
 	return data-orig;
 }
@@ -356,6 +379,10 @@ ping * ping_new(){
     
 	p->operation = MSG_PING ;
 	return p;
+}
+void ping_free(ping * s){
+	free( s -> self_ip);
+	free(s);
 }
 int pong_pack(struct pong * s, uint8_t * data, uint32_t len){
 	uint8_t * p = data;
@@ -415,4 +442,8 @@ pong * pong_new(){
     
 	p->operation = MSG_PONG ;
 	return p;
+}
+void pong_free(pong * s){
+	free( s -> machine_arr);
+	free(s);
 }

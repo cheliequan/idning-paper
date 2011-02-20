@@ -63,7 +63,8 @@ def unpack_method(name, fields):
         if t == 'uint32_t':
             content.append1('s -> %s = get32bit(&data);' % n)
         elif t == 'uint8_t*':
-            content.append1('getstr(&data, s -> %slength, &(s -> %s));' % (n, n))
+            content.append1('char * tmp = getstr(&data, s -> %slength);' % (n))
+            content.append1('s -> %s = strdup(tmp); ' % ( n))
 
         elif t == '/*arr*/': #TODO
             (cls, arr) = n.split('*'); #class, arr_name= ...
@@ -115,6 +116,24 @@ def new_method(name, fields):
     if names.count('operation') >=1 :
         content.append1("p->operation = %s ;" % msg_name)
     content.append1("return p;")
+    content.append("}")
+    return (header, str(content))
+
+def free_method(name, fields):
+    header = 'void %s_free(%s * s)' % (name, name)
+    content = StringWriter()
+    content.append('{')
+
+    for t, n in fields:
+        if t == 'uint8_t*':
+            content.append1('free( s -> %s);' % (n) )
+        elif t == '/*arr*/': #TODO
+            (cls, arr) = n.split('*'); #class, arr_name= ...
+            cls = cls.strip()
+            arr = arr.strip()
+            content.append1('free( s -> %s);' % (arr) )
+    content.append1('free(s);')
+
     content.append("}")
     return (header, str(content))
 
@@ -228,6 +247,10 @@ def deal_struct(name, fields):
     file_append(protocol_c_file, head+body)
 
     (head, body) = new_method(name, fields)
+    file_append(protocol_h_file, head+';\n')
+    file_append(protocol_c_file, head+body)
+
+    (head, body) = free_method(name, fields)
     file_append(protocol_h_file, head+';\n')
     file_append(protocol_c_file, head+body)
 
