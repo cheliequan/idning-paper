@@ -36,8 +36,15 @@ static machine this_machine = {
 };
 
 int do_ping(machine * m){
-    struct evbuffer * evb = http_get(m->ip, m->port, "/ping");
+    char buffer[256];
+    ping * msg_ping = ping_new(); //TODO: cache this
+    msg_ping -> self_iplength = this_machine.iplength;
+    msg_ping -> self_ip = this_machine.ip;
+    msg_ping -> self_port = this_machine.port;
 
+    ping_pack(&msg_ping, buffer, 0);
+
+    struct http_response * response = http_post(m->ip, m->port, "/ping", buffer);
 }
 
 static char serv_ip[] = "127.0.0.1";
@@ -59,11 +66,21 @@ void ping_handler(struct evhttp_request *req, void * arg){
         logging(LOG_INFO, "Request is not POST");
         exit(1);
     }
-    char * line = evbuffer_readline(req->input_buffer);
-    ping * ping = ping_new();
-    //ping_unpack(ping, line, 0);
+    int buffer_len = evbuffer_get_length(req->input_buffer);
+    fprintf(stderr, "buffer_len : %d", buffer_len);
 
-    free(line);
+    char * line = alloca(buffer_len+1) ;//on heap
+    /*char * line = evbuffer_readline(req->input_buffer);*/
+    evbuffer_copyout(req->input_buffer, line, buffer_len);
+    line [buffer_len] = '\0';
+    fprintf(stderr, "Received ------------ : %s", line);
+    /*machine * m = machine_new();*/
+    /*machine_unpack(m, line, 0);*/
+
+    ping * ping = ping_new();
+    ping_unpack(ping, line, 0);
+
+    /*free(line);*/
     
     struct evbuffer *evb = evbuffer_new();
     evbuffer_add_printf(evb, "%s", pong_buffer);

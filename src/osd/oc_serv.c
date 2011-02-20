@@ -13,7 +13,39 @@
 #include "network.h"
 #include "log.h"
 #include "hdd.h"
+#include "http_client.h"
+#include "protocol.gen.h"
 
+static machine this_machine = {
+    0, 
+    9,
+    "127.0.0.1",
+    9528,
+    CLUSTER_MACHINE_TYPE_OSD,
+};
+
+static machine mgr_machine = {
+    0, 
+    9,
+    "127.0.0.1",
+    9527,
+    CLUSTER_MACHINE_TYPE_MGR,
+};
+//curl http://localhost:9527/ping -d"      41,15684944,0,106,9,127.0.0.1,9528,"
+int do_ping(machine * m){
+    char buffer[2560];
+    ping * msg_ping = ping_new(); //TODO: cache this
+    
+    printf("this_machine.iplength: %d", this_machine.iplength);
+    msg_ping -> self_iplength = this_machine.iplength;
+    msg_ping -> self_ip = this_machine.ip;
+    msg_ping -> self_port = this_machine.port;
+    printf("msg_ping -> iplength: %d", msg_ping -> self_iplength );
+
+    ping_pack(msg_ping, buffer, 0);
+
+    struct http_response * response = http_post(m->ip, m->port, "/ping", buffer);
+}
 
 //void post_handler(struct evhttp_request *req, void * arg){
 //    struct evbuffer *input;
@@ -167,6 +199,7 @@ void gen_handler(struct evhttp_request *req, void * arg){
 
 int main(int argc, char **argv){
     hdd_init("etc/hdd.conf");
+    do_ping(&mgr_machine);
 
     struct evhttp * httpd;
     int port = 6006;

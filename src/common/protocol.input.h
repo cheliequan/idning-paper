@@ -73,6 +73,11 @@ typedef struct machine{
     uint32_t type;
 }machine;
 
+#define CLUSTER_MACHINE_TYPE_MGR 0
+#define CLUSTER_MACHINE_TYPE_MDS 1
+#define CLUSTER_MACHINE_TYPE_OSD 2
+#define CLUSTER_MACHINE_TYPE_CLIENT 3
+
 /*operation = MSG_PING*/
 typedef struct ping{
     uint32_t msglength;
