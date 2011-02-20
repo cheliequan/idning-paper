@@ -48,7 +48,7 @@ static struct http_response * http_req(char * ip, int port, char * verb, char * 
     char * request_buffer = alloca(100 + strlen(path)); // in stack do not need free
     char response_buffer[1024*8];
 
-    sprintf(request_buffer, "%s %s HTTP/1.0\r\n%s\r\n\r\n", verb, path, data);
+    sprintf(request_buffer, "%s %s HTTP/1.0\r\nContent-Length: %d\r\n\r\n%s\r\n\r\n", verb, path, strlen(data), data);
     //sprintf(request_buffer, "GET %s HTTP/1.0\r\nUser-Agent: curl/7.19.7 (i486-pc-linux-gnu) libcurl/7.19.7 OpenSSL/0.9.8k zlib/1.2.3.3 libidn/1.15\r\n\r\n", path);
     fprintf(stderr, "%s", request_buffer);
 
