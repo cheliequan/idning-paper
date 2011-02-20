@@ -32,6 +32,8 @@ def pack_method(name, fields):
         if t == 'uint32_t':
             content.append1('put32bit(&p, s -> %s);' % n )
         elif t == 'uint8_t*':
+            content.append1('if (s->%slength <= 0)' % (n) )
+            content.append1('   s->%slength = strlen(s->%s);' %(n, n) )
             content.append1('putstr(&p, s -> %slength, s -> %s);' % (n, n) )
         elif t == '/*arr*/': #TODO
             (cls, arr) = n.split('*'); #class, arr_name= ...
