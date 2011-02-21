@@ -25,27 +25,6 @@ static void ping_cb(struct evrpc_status *status,
     EVTAG_GET(pong, version, &v);
     printf("get version is : %d \n", v);
 
-
-    /*if (status->error != EVRPC_STATUS_ERR_NONE)*/
-        /*goto done;*/
-
-    /*if (EVTAG_GET(kill, weapon, &weapon) == -1) {*/
-        /*fprintf(stderr, "get weapon\n");*/
-        /*goto done;*/
-    /*}*/
-    /*if (EVTAG_GET(kill, action, &action) == -1) {*/
-        /*fprintf(stderr, "get action\n");*/
-        /*goto done;*/
-    /*}*/
-
-    /*if (strcmp(weapon, "dagger"))*/
-        /*goto done;*/
-
-    /*if (strcmp(action, "wave around like an idiot"))*/
-        /*goto done;*/
-
-    /*test_ok += 1;*/
-
 done:
     event_loopexit(NULL);
 }
@@ -80,13 +59,7 @@ rpc_basic_client(void)
     int rst = EVRPC_MAKE_REQUEST(rpc_ping, pool, ping , pong,  ping_cb, NULL);
     fprintf(stderr, "rst: %d\n", rst);
 
-
-
-//////////////////
-
-
     event_dispatch();
-
 }
 
 int main(){
