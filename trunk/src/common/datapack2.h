@@ -39,26 +39,26 @@ static inline void put64bit(uint8_t **ptr,uint64_t val) {
 }
 
 static inline void put32bit(uint8_t **ptr,uint32_t val) {
-    printf("put32bit: %x : %d\n", *ptr, val);
-    (*ptr) += sprintf(*ptr, "%u,", val); //由于 msglength 要后来写入，所以这里要定长.
+    printf("put32bit: %p : %d\n", *ptr, val);
+    (*ptr) += sprintf((char *)*ptr, "%u,", val); //由于 msglength 要后来写入，所以这里要定长.
 }
 static inline void put32bit_width(uint8_t **ptr, uint32_t val, uint32_t w) {
-    printf("put32bit_width: %x : %d\n", *ptr, val);
-    uint8_t s[100];
+    printf("put32bit_width: %p : %d\n", *ptr, val);
+    char s[100];
     sprintf(s, "%*u,", w, val); //由于 msglength 要后来写入，所以这里要定长.
     memcpy(*ptr, s, w);
 }
 
-static inline void put16bit(uint8_t **ptr,uint16_t val) {
-	(*ptr)[0]=((val)>>8)&0xFF;
-	(*ptr)[1]=(val)&0xFF;
-	(*ptr)+=2;
-}
+//static inline void put16bit(uint8_t **ptr,uint16_t val) {
+	//(*ptr)[0]=((val)>>8)&0xFF;
+	//(*ptr)[1]=(val)&0xFF;
+	//(*ptr)+=2;
+//}
 
-static inline void put8bit(uint8_t **ptr,uint8_t val) {
-	(*ptr)[0]=(val)&0xFF;
-	(*ptr)++;
-}
+//static inline void put8bit(uint8_t **ptr,uint8_t val) {
+	//(*ptr)[0]=(val)&0xFF;
+	//(*ptr)++;
+//}
 
 
 static inline uint64_t get64bit(const uint8_t **ptr) {
@@ -72,25 +72,25 @@ static inline uint64_t get64bit(const uint8_t **ptr) {
 
 static inline uint32_t get32bit(const uint8_t **ptr) {
 	uint32_t t32;
-    sscanf(*ptr, "%u,", &t32);
+    sscanf((char *)*ptr, "%u,", &t32);
     fprintf(stderr, "get32bit: %s = %d\n", *ptr, t32);
-    (*ptr) = strchr(*ptr, ',') + 1;
+    (*ptr) = (uint8_t *)strchr((char *)*ptr, ',') + 1;
 	return t32;
 }
 
-static inline uint16_t get16bit(const uint8_t **ptr) {
-	uint32_t t16;
-	t16=(*ptr)[1]+256*(*ptr)[0];
-	(*ptr)+=2;
-	return t16;
-}
+//static inline uint16_t get16bit(const uint8_t **ptr) {
+	//uint32_t t16;
+	//t16=(*ptr)[1]+256*(*ptr)[0];
+	//(*ptr)+=2;
+	//return t16;
+//}
 
-static inline uint8_t get8bit(const uint8_t **ptr) {
-	uint32_t t8;
-	t8=(*ptr)[0];
-	(*ptr)++;
-	return t8;
-}
+//static inline uint8_t get8bit(const uint8_t **ptr) {
+	//uint32_t t8;
+	//t8=(*ptr)[0];
+	//(*ptr)++;
+	//return t8;
+//}
 
 static inline void putstr(uint8_t **ptr, uint32_t strlen, uint8_t * str) {
 	memcpy(*ptr, str, strlen);
@@ -99,12 +99,12 @@ static inline void putstr(uint8_t **ptr, uint32_t strlen, uint8_t * str) {
 	(*ptr)+=1;
 }
 //TODO: ptr should be const uint8_t ** ptr;
-static inline char * getstr(uint8_t **ptr, uint32_t strlen) {
-	char * str = (uint8_t *)*ptr;
-	(*ptr)+=strlen;
-    (**ptr) = '\0';
-    (*ptr)+=1;
-    return str;
+static inline uint8_t * getstr(const uint8_t **ptr, uint32_t strlen) {
+    uint8_t * s = malloc(strlen+1);
+    memcpy(s, *ptr, strlen);
+    s[strlen] = '\0';
+	(*ptr)+=(strlen+1);
+    return s;
 }
 
 #ifndef _EVENT_HAVE_STRSEP

@@ -62,5 +62,6 @@ int logging(int level, char * fmt, ...){
     vsnprintf(buf, sizeof(stmp) -30 , fmt, ap);
     va_end(ap);
     printf("%s\n", stmp);
+    return 0;
 }
 

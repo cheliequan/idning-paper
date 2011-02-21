@@ -63,7 +63,7 @@ int mc_mkdir_request_pack(struct mc_mkdir_request * s, uint8_t * data, uint32_t 
 	put32bit(&p, s -> parent);
 	put32bit(&p, s -> namelength);
 	if (s->namelength <= 0)
-	   s->namelength = strlen(s->name);
+	   s->namelength = strlen((char *)s->name);
 	putstr(&p, s -> namelength, s -> name);
 	put32bit(&p, s -> mode);
 	put32bit(&p, s -> uid);
@@ -81,8 +81,7 @@ int mc_mkdir_request_unpack(struct mc_mkdir_request * s, const uint8_t * data, u
 	s -> operation = get32bit(&data);
 	s -> parent = get32bit(&data);
 	s -> namelength = get32bit(&data);
-	char * tmp = getstr(&data, s -> namelength);
-	s -> name = strdup(tmp); 
+	s -> name = getstr(&data, s -> namelength);
 	s -> mode = get32bit(&data);
 	s -> uid = get32bit(&data);
 	s -> gid = get32bit(&data);
@@ -282,7 +281,7 @@ int machine_pack(struct machine * s, uint8_t * data, uint32_t len){
 	put32bit(&p, s -> uuid);
 	put32bit(&p, s -> iplength);
 	if (s->iplength <= 0)
-	   s->iplength = strlen(s->ip);
+	   s->iplength = strlen((char *)s->ip);
 	putstr(&p, s -> iplength, s -> ip);
 	put32bit(&p, s -> port);
 	put32bit(&p, s -> type);
@@ -292,8 +291,7 @@ int machine_unpack(struct machine * s, const uint8_t * data, uint32_t len){
 	const uint8_t* orig = data;
 	s -> uuid = get32bit(&data);
 	s -> iplength = get32bit(&data);
-	char * tmp = getstr(&data, s -> iplength);
-	s -> ip = strdup(tmp); 
+	s -> ip = getstr(&data, s -> iplength);
 	s -> port = get32bit(&data);
 	s -> type = get32bit(&data);
 	return data-orig;
@@ -336,7 +334,7 @@ int ping_pack(struct ping * s, uint8_t * data, uint32_t len){
 	put32bit(&p, s -> operation);
 	put32bit(&p, s -> self_iplength);
 	if (s->self_iplength <= 0)
-	   s->self_iplength = strlen(s->self_ip);
+	   s->self_iplength = strlen((char *)s->self_ip);
 	putstr(&p, s -> self_iplength, s -> self_ip);
 	put32bit(&p, s -> self_port);
 	s->msglength = p-data;
@@ -351,8 +349,7 @@ int ping_unpack(struct ping * s, const uint8_t * data, uint32_t len){
 	s -> version = get32bit(&data);
 	s -> operation = get32bit(&data);
 	s -> self_iplength = get32bit(&data);
-	char * tmp = getstr(&data, s -> self_iplength);
-	s -> self_ip = strdup(tmp); 
+	s -> self_ip = getstr(&data, s -> self_iplength);
 	s -> self_port = get32bit(&data);
 	return data-orig;
 }
