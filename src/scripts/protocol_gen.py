@@ -33,7 +33,7 @@ def pack_method(name, fields):
             content.append1('put32bit(&p, s -> %s);' % n )
         elif t == 'uint8_t*':
             content.append1('if (s->%slength <= 0)' % (n) )
-            content.append1('   s->%slength = strlen(s->%s);' %(n, n) )
+            content.append1('   s->%slength = strlen((char *)s->%s);' %(n, n) )
             content.append1('putstr(&p, s -> %slength, s -> %s);' % (n, n) )
         elif t == '/*arr*/': #TODO
             (cls, arr) = n.split('*'); #class, arr_name= ...
@@ -65,8 +65,7 @@ def unpack_method(name, fields):
         if t == 'uint32_t':
             content.append1('s -> %s = get32bit(&data);' % n)
         elif t == 'uint8_t*':
-            content.append1('char * tmp = getstr(&data, s -> %slength);' % (n))
-            content.append1('s -> %s = strdup(tmp); ' % ( n))
+            content.append1('s -> %s = getstr(&data, s -> %slength);' % (n, n))
 
         elif t == '/*arr*/': #TODO
             (cls, arr) = n.split('*'); #class, arr_name= ...

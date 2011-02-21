@@ -49,17 +49,16 @@ int do_ping(machine * this, machine * m){
     char * p;
     printf("%d\n", response -> status_code);
 
-    while( p = evbuffer_readline(response->headers)){
+    while( (p = evbuffer_readline(response->headers)) ){
         printf("%s\n", p);
         free(p);
     }
 
-    while( p = evbuffer_readline(response->body)){
+    while( ( p = evbuffer_readline(response->body))){
         printf("%s\n", p);
         free(p);
     }
-
-
+    return 0;
 }
 
 //void post_handler(struct evhttp_request *req, void * arg){

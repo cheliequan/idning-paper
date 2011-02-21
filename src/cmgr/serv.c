@@ -30,14 +30,23 @@ static uint32_t pong_buffer_len;
 static machine this_machine = {
     0, 
     9,
-    "127.0.0.1",
+    (uint8_t *)"127.0.0.1",
     9527,
     CLUSTER_MACHINE_TYPE_MGR,
 };
 
+void cluster_init();
+void cluster_add(char * ip, int port, char type);
+
+void cluster_remove(char * ip, int port);
+
+void cluster_dump();
+
+
+
 
 static char serv_ip[] = "127.0.0.1";
-static int serv_port = "9527";
+static int serv_port = 9527;
 
 void shutdown_handler(struct evhttp_request *req, void * arg){
     logging(LOG_DEUBG, "%s: called\n", __func__);
@@ -64,8 +73,8 @@ void ping_handler(struct evhttp_request *req, void * arg){
     logging(LOG_DEUBG, "Received ------------ : %s", line);
 
     ping * ping = ping_new();
-    ping_unpack(ping, line, 0);
-    cluster_add(ping->self_ip, ping->self_port);
+    ping_unpack(ping, (uint8_t* )line, 0);
+    cluster_add((char *)ping->self_ip, ping->self_port, 0);
 
     struct evbuffer *evb = evbuffer_new();
     evbuffer_add_printf(evb, "%s\n", pong_buffer); // this "\n" is important for evbuffer_readline at http_client
@@ -128,10 +137,10 @@ void cluster_add(char * ip, int port, char type){
     logging(LOG_DEUBG, "%s: called\n", __func__);
     int i;
     for(i=0; i < machine_cnt; i++){
-        if (machines[i].port == port && (0 == strcmp(machines[i].ip, ip)) ) //already in array
+        if (machines[i].port == port && (0 == strcmp((char *)machines[i].ip, ip)) ) //already in array
             return;
     }
-    machines[machine_cnt].ip = ip;
+    machines[machine_cnt].ip = (uint8_t *)ip;
     machines[machine_cnt].port = port;
     machines[machine_cnt].type = type;
     machine_cnt ++;
@@ -157,13 +166,14 @@ void cluster_dump(){
     pong_p -> machine_arrlength = machine_cnt;
     pong_p -> machine_arr = machines;
 
-    int cnt = pong_pack(pong_p, pong_buffer, 0);
-    pong_buffer[cnt] = 0;
+    pong_buffer_len = pong_pack(pong_p, pong_buffer, 0);
+
+    pong_buffer[pong_buffer_len] = 0;
 }
 
 
 void gen_handler(struct evhttp_request *req, void * arg){
-    struct evbuffer *evb = evbuffer_new();
+    /*struct evbuffer *evb = evbuffer_new();*/
 
     const char *uri = evhttp_request_get_uri(req);
     struct evhttp_uri *decoded_uri = NULL;

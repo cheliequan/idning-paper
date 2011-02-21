@@ -1,0 +1,19 @@
+struct ping {
+	int64 version = 1;
+	string ip = 2;
+	int port = 3; 
+}
+
+struct machine {
+    int64 uuid = 1 ;
+    string ip = 2;
+    int port = 3;
+    int type = 4;
+}
+
+
+struct pong {
+	int64 version = 1;
+    array struct[machine] machines = 2;
+}
+

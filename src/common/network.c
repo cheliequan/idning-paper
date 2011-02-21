@@ -326,8 +326,6 @@ int tcpaccept(int lsock) {
  * add by ning
  * */
 int tcptoaccept(int sock, uint32_t msecto) {
-	uint32_t rcvd=0;
-	int i;
 	struct pollfd pfd;
 	pfd.fd = sock;
 	pfd.events = POLLIN;

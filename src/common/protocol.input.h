@@ -101,11 +101,10 @@ typedef struct pong{
     /*arr*/ machine* machine_arr;
 }pong;
 
-//void oc_request_pack(struct oc_request * req, uint8_t * data, uint32_t len);
-//void oc_request_unpack(struct oc_request * req, uint8_t * data, uint32_t len);
-
-//void mc_mkdir_request_pack(struct mc_mkdir_request * req, uint8_t * data, uint32_t len);
-//void mc_mkdir_request_unpack(struct mc_mkdir_request * req, const uint8_t * data, uint32_t len);
+struct rpc_ping{
+    ping;
+    pong;
+}
 
 /*below_is_auto_generated*/
 
