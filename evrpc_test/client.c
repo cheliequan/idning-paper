@@ -1,6 +1,7 @@
 #include <event.h>
 #include <evhttp.h>
 #include "test.gen.h"
+#include "common.h"
 
 EVRPC_HEADER(rpc_ping, ping, pong)
 EVRPC_GENERATE(rpc_ping, ping, pong)
@@ -23,7 +24,12 @@ static void ping_cb(struct evrpc_status *status,
     fprintf(stderr, "%s: called\n", __func__);
     int v;
     EVTAG_GET(pong, version, &v);
+
     printf("get version is : %d \n", v);
+    struct machine * m;
+    EVTAG_ARRAY_GET(pong, machines, 0, &m);
+    
+    printf("m->ip : %d \n", EV_GET(m, port));
 
 done:
     event_loopexit(NULL);

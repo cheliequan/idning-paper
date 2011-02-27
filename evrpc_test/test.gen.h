@@ -121,6 +121,7 @@ int machine_type_get(struct machine *, ev_uint32_t *);
 enum pong_ {
   PONG_VERSION=1,
   PONG_XX=2,
+  PONG_MACHINES=3,
   PONG_MAX_TAGS
 };
 
@@ -130,6 +131,9 @@ struct pong_access_ {
   int (*version_get)(struct pong *, ev_uint32_t *);
   int (*xx_assign)(struct pong *, const ev_uint32_t);
   int (*xx_get)(struct pong *, ev_uint32_t *);
+  int (*machines_assign)(struct pong *, int, const struct machine*);
+  int (*machines_get)(struct pong *, int, struct machine* *);
+  struct machine*  (*machines_add)(struct pong *msg);
 };
 
 struct pong {
@@ -137,9 +141,13 @@ struct pong {
 
   ev_uint32_t version_data;
   ev_uint32_t xx_data;
+  struct machine* *machines_data;
+  int machines_length;
+  int machines_num_allocated;
 
   ev_uint8_t version_set;
   ev_uint8_t xx_set;
+  ev_uint8_t machines_set;
 };
 
 struct pong *pong_new(void);
@@ -157,6 +165,9 @@ int pong_version_assign(struct pong *, const ev_uint32_t);
 int pong_version_get(struct pong *, ev_uint32_t *);
 int pong_xx_assign(struct pong *, const ev_uint32_t);
 int pong_xx_get(struct pong *, ev_uint32_t *);
+int pong_machines_assign(struct pong *, int, const struct machine*);
+int pong_machines_get(struct pong *, int, struct machine* *);
+struct machine*  pong_machines_add(struct pong *msg);
 /* --- pong done --- */
 
 #endif  /* _TEST_RPC_ */

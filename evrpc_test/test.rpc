@@ -1,7 +1,7 @@
 struct ping {
 	int version = 1;
-	string ip = 2;
-	int port = 3; 
+	string self_ip = 2;
+	int self_port = 3; 
 }
 
 struct machine {
@@ -15,5 +15,7 @@ struct machine {
 struct pong {
 	int version = 1;
 	int xx = 2;
+    array struct[machine] machines = 3;
+    
 }
 

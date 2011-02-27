@@ -5,6 +5,11 @@
 EVRPC_HEADER(rpc_ping, ping, pong)
 EVRPC_GENERATE(rpc_ping, ping, pong)
 
+#define MAX_MACHINE_CNT 256
+
+static struct machine machines [MAX_MACHINE_CNT];
+static int machine_cnt = 0;
+static uint64_t cluster_version = 0;
 
 static void
 ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
@@ -18,10 +23,14 @@ ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
         (msg->member##_data)
 
     int ping_version = EV_GET(ping, version);
+    cluster_add((char *)ping->self_ip, ping->self_port, 0);
 
 
     EVTAG_ASSIGN(pong, version, ping_version+1);
     EVTAG_ASSIGN(pong, xx, 8);
+    /*EVTAG_ASSIGN(pong, machines, 8, machines);*/
+    pong_machines_assign(pong, 8, machines);
+
     EVRPC_REQUEST_DONE(rpc);
 }
 
