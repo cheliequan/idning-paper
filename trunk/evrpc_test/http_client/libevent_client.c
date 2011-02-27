@@ -23,10 +23,9 @@ struct evhttp_uri {
     char *fragment; /* fragment or NULL */
 };
 
-struct download_context
+struct request_context
 {
 	struct evhttp_uri *uri;
-	struct event_base *base;
 	struct evhttp_connection *cn;
 	struct evhttp_request *req;
 
@@ -38,12 +37,12 @@ static
 void download_callback(struct evhttp_request *req, void *arg);
 
 static
-int download_renew_request(struct download_context *ctx);
+int download_renew_request(struct request_context *ctx);
 
 static
 void download_callback(struct evhttp_request *req, void *arg)
 {
-	struct download_context *ctx = (struct download_context *)arg;
+	struct request_context *ctx = (struct request_context *)arg;
 	struct evhttp_uri *new_uri = NULL;
 	const char *new_location = NULL;
 
@@ -56,7 +55,7 @@ void download_callback(struct evhttp_request *req, void *arg)
 		 * Response is received. No futher handling is required.
 		 * Finish
 		 */
-		event_base_loopexit(ctx->base, 0);
+		event_loopexit( 0);
 		break;
 
 	case HTTP_MOVEPERM:
@@ -77,7 +76,7 @@ void download_callback(struct evhttp_request *req, void *arg)
 
 	default:
 		/* FAILURE */
-		event_base_loopexit(ctx->base, 0);
+		event_loopexit(0);
 		return;
 	}
 
@@ -87,19 +86,15 @@ void download_callback(struct evhttp_request *req, void *arg)
 	ctx->ok = 1;
 }
 
-struct download_context *context_new(const char *url)
+struct request_context *context_new(const char *url)
 {
-	struct download_context *ctx = 0;
+	struct request_context *ctx = 0;
 	ctx = calloc(1, sizeof(*ctx));
 	if (!ctx)
 		return 0;
 
 	ctx->uri = evhttp_uri_parse(url);
 	if (!ctx->uri)
-		return 0;
-
-	ctx->base = event_base_new();
-	if (!ctx->base)
 		return 0;
 
 	ctx->buffer = evbuffer_new();
@@ -109,10 +104,9 @@ struct download_context *context_new(const char *url)
 	return ctx;
 }
 
-void context_free(struct download_context *ctx)
+void context_free(struct request_context *ctx)
 {
 	evhttp_connection_free(ctx->cn);
-	event_base_free(ctx->base);
 
 	if (ctx->buffer)
 		evbuffer_free(ctx->buffer);
@@ -122,14 +116,13 @@ void context_free(struct download_context *ctx)
 }
 
 static
-int download_renew_request(struct download_context *ctx)
+int download_renew_request(struct request_context *ctx)
 {
 	/* free connections & request */
 	if (ctx->cn)
 		evhttp_connection_free(ctx->cn);
 
-	ctx->cn = evhttp_connection_base_new(
-		ctx->base, NULL, 
+	ctx->cn = evhttp_connection_new(
 		ctx->uri->host,
 		ctx->uri->port > 0 ? ctx->uri->port : 80);
 
@@ -143,16 +136,16 @@ int download_renew_request(struct download_context *ctx)
 	return 0;
 }
 
-struct evbuffer *download_url(const char *url)
+struct evbuffer *do_get(const char *url)
 {
 	/* setup request, connection etc */
 
-	struct download_context *ctx = context_new(url);
+	struct request_context *ctx = context_new(url);
 	if (!ctx)
 		return 0;
 
 	/* do all of the job */
-	event_base_dispatch(ctx->base);
+	event_dispatch();
 
 	struct evbuffer *retval = 0;
 	if (ctx->ok)
@@ -174,7 +167,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	struct evbuffer *data = download_url(argv[1]);
+    event_init();
+	struct evbuffer *data = do_get(argv[1]);
 
 	printf("got %d bytes\n", data ? evbuffer_get_length(data) : -1);
 
