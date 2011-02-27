@@ -131,7 +131,7 @@ int download_renew_request(struct download_context *ctx)
 	ctx->cn = evhttp_connection_base_new(
 		ctx->base, NULL, 
 		ctx->uri->host,
-		ctx->uri->port ? ctx->uri->port : 80);
+		ctx->uri->port > 0 ? ctx->uri->port : 80);
 
 	ctx->req = evhttp_request_new(download_callback, ctx);
 

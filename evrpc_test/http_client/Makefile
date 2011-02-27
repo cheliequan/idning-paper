@@ -5,7 +5,7 @@ all:
 	find . >> cscope.files
 	cscope  -i cscope.files -R -b
 
-	gcc -o client libevent_client.c -I/usr/local/include  -L/usr/local/lib -levent 
+	gcc -o client libevent_client.c -I/usr/local/include  -L/usr/local/lib -levent  -g
 
 c: clean
 clean:
