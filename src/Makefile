@@ -11,7 +11,8 @@ all: cs
 	scons -Q -f scons.py
 
 gen: 
-	./scripts/protocol_gen.py
+	#./scripts/protocol_gen.py
+	./scripts/event_rpcgen.py common/protocol.rpc
 
 c:
 	scons -f scons.py -c

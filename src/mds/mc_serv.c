@@ -1,179 +1,145 @@
-
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <fcntl.h>
-
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <fcntl.h>
-
-#undef _EVENT_DISABLE_MM_REPLACEMENT
 #include <event.h>
-
-#include <assert.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-
+#include <evhttp.h>
 #include "protocol.gen.h"
-#include "log.h"
-#include "network.h"
 
-#define HEADER_SIZE (sizeof(msg_header))
+EVRPC_HEADER(rpc_ping, ping, pong)
+EVRPC_GENERATE(rpc_ping, ping, pong)
 
-void read_callback(struct bufferevent * bev, void * ctx);
-void write_callback(struct bufferevent * bev, void * ctx);
+#define MAX_MACHINE_CNT 256
 
-//mc_serv_conn.state;
-enum {KILL, HEADER, DATA};
+static struct machine machines [MAX_MACHINE_CNT];
+static int machine_cnt = 0;
+static uint64_t cluster_version = 0;
 
-typedef struct mc_serv_conn{
-    uint8_t state; 
-    uint32_t bytesleft;
-    void * readbuf;
-    void * readstart;
-    void * msg;
-    struct event_base * base;
-    msg_header header;
+void cluster_init();
+void cluster_add(char * ip, int port, char type);
+void cluster_remove(char * ip, int port);
+void cluster_dump();
 
-}mc_serv_conn;
 
-void error_callback(struct bufferevent *bev, short error, void *ctx)
+static void
+ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
 {
-    if (error & BEV_EVENT_EOF) {
-        /* connection has been closed, do any clean up here */
-        /* ... */
-    } else if (error & BEV_EVENT_ERROR) {
-        /* check errno to see what error occurred */
-        /* ... */
-    } else if (error & BEV_EVENT_TIMEOUT) {
-        /* must be a timeout event handle, handle it */
-        /* ... */
+    fprintf(stderr, "%s: called\n", __func__);
+
+    struct ping * ping = rpc->request;
+    struct pong * pong = rpc->reply;
+
+#define EV_GET(msg, member) \
+        (msg->member)
+
+    int ping_version = ping->version;
+    
+
+
+    fprintf(stderr, "ping->self_ip :%s\n", ping->self_ip);
+    fprintf(stderr, "ping->self_port :%d\n", ping->self_port);
+    cluster_add((char *)ping->self_ip, ping->self_port, 0);
+    fprintf(stderr, "machine_cnt:%d\n", machine_cnt);
+    
+    EVTAG_ASSIGN(pong, version, ping_version+1);
+    EVTAG_ASSIGN(pong, xx, 8);
+    /*EVTAG_ASSIGN(pong, machines, 8, machines);*/
+
+    int i;
+    for(i=0; i < machine_cnt; i++){
+        struct machine * m = EVTAG_ARRAY_ADD(pong, machines);  // alloc space for machines
+        printf("before assign m->ip  : %s   m[i].ip: %s\n", m->ip, machines[i].ip);
+        pong_machines_assign(pong, i, machines+i);
+        printf("after assign m->ip  : %s   m[i].ip: %s\n", m->ip, machines[i].ip);
     }
-    bufferevent_free(bev);
+    EVRPC_REQUEST_DONE(rpc);
 }
 
-void accept_callback(evutil_socket_t listener, short event, void * ctx){
-    struct event_base * base = (struct event_base * ) ctx;
+static void
+rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
+{
+    struct evhttp *http = NULL;
+    struct evrpc_base *base = NULL;
 
-    struct sockaddr sa;
-    uint32_t salen = sizeof(sa);
-    int fd = accept(listener, &sa, &salen);
-    if (fd < 0){
-        perror("error on accept");
-        return ;
-    }else if (fd > FD_SETSIZE){
-        close(fd);
-        return;
-    }
+    int port = 9527;
+    http = evhttp_start("0.0.0.0", port);
 
-    logging(LOG_INFO, "accept!");
-    struct mc_serv_conn * conn = (mc_serv_conn *) malloc(sizeof(struct mc_serv_conn));
-    conn->bytesleft = HEADER_SIZE;
-    conn->readbuf = malloc(HEADER_SIZE);
-    conn->state = HEADER;
-    struct bufferevent * bev;
-    evutil_make_socket_nonblocking(fd);
-    bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE);
-    bufferevent_setcb(bev, read_callback, NULL, error_callback, conn);
-    bufferevent_enable(bev, EV_READ);
-}
+    base = evrpc_init(http);
 
+    EVRPC_REGISTER(base, rpc_ping, ping, pong, ping_handler, NULL);
 
-
-/*ning:
- * 异步回应，而不是同步的.
- * 不是void mc_serv_mkdir(mc_serv_conn * conn, mc_mkdir_request * req, mc_mkdir_response * resp)
- * */
-int mc_serv_mkdir(mc_serv_conn * conn, uint8_t * buf, int len){
-    logging(LOG_DEUBG, "MSG_MC_MKDIR_REQUEST");
-
-    mc_mkdir_request * req = mc_mkdir_request_new();
-    mc_mkdir_request_unpack(req, buf, len);
-    logging(LOG_DEUBG, mc_mkdir_request_tostring(req));
-
-    mc_mkdir_response * response = mc_mkdir_response_new();
-    response->msgid = 1;
-    response->version = 2;
-    response->msglength = 20;
-    /*mc_mkdir_request_pack(*/
-
-    return 0;
+    *phttp = http;
+    *pport = port;
+    *pbase = base;
 
 }
 
-int mc_serv_got_msg(mc_serv_conn *conn, int type, uint8_t * readbuf, int len){
-    logging(LOG_DEUBG, "mc_serv_got_msg");
-    switch(type){
-        case MSG_MSG_HEADER:
-            logging(LOG_DEUBG, "MSG_MSG_HEADER");
-            break;
-        case MSG_MC_MKDIR_REQUEST:
-            mc_serv_mkdir(conn, readbuf, len);
-            break;
-    }
-    return 0;
+int main()
+{
+    ev_uint16_t port;
+    struct evhttp *http = NULL;
+    struct evrpc_base *base = NULL;
+    struct evrpc_pool *pool = NULL;
+
+    event_init();
+    rpc_setup(&http, &port, &base);
+    event_dispatch();
 }
 
-/* 这个函数基本上是 mfsmaster/matocsserv.c 中 matocsserv_read 的克隆.
- * */
-void read_callback(struct bufferevent * bev, void * ctx){
-    logging(LOG_DEUBG, "read_callback called!");
-    struct evbuffer * in = bufferevent_get_input(bev);
-    mc_serv_conn * conn = (mc_serv_conn *) ctx;
-
-    if (evbuffer_get_length(in) < conn-> bytesleft){
-        logging(LOG_DEUBG, "evbuffer_get_length(in) < conn-> bytesleft, %d < %d",
-                evbuffer_get_length(in) , conn-> bytesleft);
-        return;//还没有读够
+void cluster_printf(char * hint){
+    char tmp[36000];
+    char * p = tmp;
+    int i;
+    for (i=0; i< machine_cnt; i++){
+        sprintf(p, "%s:%d\n", machines[i].ip, machines[i].port);
+        while(*p)
+            p++;
     }
+    printf(" %s clusters: \n----------------------------------------------\n%s\n---------------------------------------\n", hint, tmp);
+}
 
-    if(conn->state == HEADER){
-        bufferevent_read(bev, conn->readbuf, HEADER_SIZE);
-        msg_header_unpack(&(conn->header), conn->readbuf, HEADER_SIZE);
-        printf("header.msglength : %d\n", conn->header.msglength);
-        conn->readbuf = realloc(conn->readbuf, conn->header.msglength);
-        if (conn->readbuf == NULL){
-            logging(LOG_ERROR, "TODO: % s Out of Memory");
-            conn->state = KILL;
+void cluster_init(){
+    //pong_p = pong_new();
+    cluster_dump();
+}
+
+void cluster_add(char * ip, int port, char type){
+    //logging(LOG_DEUBG, "%s: called\n", __func__);
+    cluster_printf("before cluster_add");
+    int i;
+    for(i=0; i < machine_cnt; i++){
+        if (machines[i].port == port && (0 == strcmp((char *)machines[i].ip, ip)) ) //already in array
             return;
-        }
-        conn->state = DATA;
-        logging(LOG_DEUBG, "state change to DATA");
-        conn->bytesleft = conn->header.msglength - HEADER_SIZE;
-        conn->readstart = conn->readbuf + HEADER_SIZE;
     }
-    if (evbuffer_get_length(in) < conn-> bytesleft){
-        logging(LOG_DEUBG, "evbuffer_get_length(in) < conn-> bytesleft, %d < %d",
-                evbuffer_get_length(in) , conn-> bytesleft);
-        return;//还没有读够
-    }
-    //TODO: 这应该会有问题.
-    if (conn->state == DATA){
-        logging(LOG_DEUBG, "read in DATA state");
-        bufferevent_read(bev, conn->readstart, conn->bytesleft);
-        mc_serv_got_msg(conn, conn->header.operation, conn->readbuf, conn->header.msglength);
-    }
+    fprintf(stderr, "add machine %s:%d @ %d\n", ip, port, machine_cnt);
+    
+    machines[machine_cnt].ip = strdup(ip);
+    machines[machine_cnt].port = port;
+    machines[machine_cnt].type = type;
+    machine_cnt ++;
+    cluster_printf("after cluster_add");
+    //logging(LOG_DEUBG, "current machine_cnt : %d", machine_cnt);
+
+    /*cluster_machine *m = cluster_machine_new();*/
+    /*m -> ip = ip;*/
+    /*m -> port = port;*/
+    /*m -> type = type;*/
+    /*dlist_insert_tail(cluster_head, m);*/
+    cluster_version ++ ;
+    cluster_dump();
 }
 
-int main(){
-    struct event * listener_event;
-    struct event_base * base;
-    base = event_base_new();
+void cluster_remove(char * ip, int port){
+    /*dlist_insert_tail(head, entries+i );*/
 
-    if (!base)
-        return -1;
-    int listener = server_socket("127.0.0.1", "9991");
-    if (listener < 0){
-        logging(LOG_ERROR, "socket error!");
-        return -1;
-    }
-    /*bufferevent_setwatermark(base, EV_READ, 0, 0);*/
-    evutil_make_socket_nonblocking(listener);
-    listener_event = event_new(base, listener, EV_READ|EV_PERSIST, accept_callback, (void*)base);
-    event_add(listener_event, NULL);
-    event_base_dispatch(base);
-    return 0;
+    cluster_version ++ ;
+    cluster_dump();
 }
+
+void cluster_dump(){
+    /*pong_p -> machine_arrlength = machine_cnt;*/
+    /*pong_p -> machine_arr = machines;*/
+
+    /*pong_buffer_len = pong_pack(pong_p, pong_buffer, 0);*/
+
+    /*pong_buffer[pong_buffer_len] = 0;*/
+}
+
+
+
