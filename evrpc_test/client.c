@@ -89,9 +89,9 @@ void doit(){
 
 }
 
-int main(){
-    event_init();
-    rpc_basic_client();
-    doit();
-}
+/*int main(){*/
+    /*event_init();*/
+    /*rpc_basic_client();*/
+    /*doit();*/
+/*}*/
 
