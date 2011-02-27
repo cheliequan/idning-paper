@@ -16,50 +16,50 @@
 #include "http_client.h"
 #include "protocol.gen.h"
 
-static machine this_machine = {
-    0, 
-    9,
-    "127.0.0.1",
-    9528,
-    CLUSTER_MACHINE_TYPE_OSD,
-};
+/*static machine this_machine = {*/
+    /*0, */
+    /*9,*/
+    /*"127.0.0.1",*/
+    /*9528,*/
+    /*CLUSTER_MACHINE_TYPE_OSD,*/
+/*};*/
 
-static machine mgr_machine = {
-    0, 
-    9,
-    "127.0.0.1",
-    9527,
-    CLUSTER_MACHINE_TYPE_MGR,
-};
-//curl http://localhost:9527/ping -d"      41,15684944,0,106,9,127.0.0.1,9528,"
-int do_ping(machine * this, machine * m){
-    char buffer[2560];
-    ping * msg_ping = ping_new(); //TODO: cache this
+/*static machine mgr_machine = {*/
+    /*0, */
+    /*9,*/
+    /*"127.0.0.1",*/
+    /*9527,*/
+    /*CLUSTER_MACHINE_TYPE_MGR,*/
+/*};*/
+/*//curl http://localhost:9527/ping -d"      41,15684944,0,106,9,127.0.0.1,9528,"*/
+/*int do_ping(machine * this, machine * m){*/
+    /*char buffer[2560];*/
+    /*ping * msg_ping = ping_new(); //TODO: cache this*/
     
-    msg_ping -> self_iplength = this->iplength;
-    msg_ping -> self_ip = this->ip;
-    msg_ping -> self_port = this->port;
+    /*msg_ping -> self_iplength = this->iplength;*/
+    /*msg_ping -> self_ip = this->ip;*/
+    /*msg_ping -> self_port = this->port;*/
 
-    ping_pack(msg_ping, buffer, 0);
+    /*ping_pack(msg_ping, buffer, 0);*/
 
-    struct http_response * response = http_post(m->ip, m->port, "/ping", buffer);
-    //TODO: here, unpack
-    //
-    //
-    char * p;
-    printf("%d\n", response -> status_code);
+    /*struct http_response * response = http_post(m->ip, m->port, "/ping", buffer);*/
+    /*//TODO: here, unpack*/
+    /*//*/
+    /*//*/
+    /*char * p;*/
+    /*printf("%d\n", response -> status_code);*/
 
-    while( (p = evbuffer_readline(response->headers)) ){
-        printf("%s\n", p);
-        free(p);
-    }
+    /*while( (p = evbuffer_readline(response->headers)) ){*/
+        /*printf("%s\n", p);*/
+        /*free(p);*/
+    /*}*/
 
-    while( ( p = evbuffer_readline(response->body))){
-        printf("%s\n", p);
-        free(p);
-    }
-    return 0;
-}
+    /*while( ( p = evbuffer_readline(response->body))){*/
+        /*printf("%s\n", p);*/
+        /*free(p);*/
+    /*}*/
+    /*return 0;*/
+/*}*/
 
 //void post_handler(struct evhttp_request *req, void * arg){
 //    struct evbuffer *input;
@@ -213,7 +213,7 @@ void gen_handler(struct evhttp_request *req, void * arg){
 
 int main(int argc, char **argv){
     hdd_init("etc/hdd.conf");
-    do_ping(&this_machine, &mgr_machine);
+    /*do_ping(&this_machine, &mgr_machine);*/
 
     struct evhttp * httpd;
     int port = 6006;
