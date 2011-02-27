@@ -419,7 +419,7 @@ class Entry:
         return mapping
 
     def GetVarName(self, var):
-        return '%(var)s->%(name)s_data' % self.GetTranslation({ 'var' : var })
+        return '%(var)s->%(name)s' % self.GetTranslation({ 'var' : var })
 
     def GetVarLen(self, var):
         return 'sizeof(%s)' % self._ctype
@@ -440,7 +440,7 @@ class Entry:
             '{',
             '  if (msg->%(name)s_set != 1)',
             '    return (-1);',
-            '  *value = msg->%(name)s_data;',
+            '  *value = msg->%(name)s;',
             '  return (0);',
             '}' )
         code = '\n'.join(code)
@@ -464,7 +464,7 @@ class Entry:
                  ' const %(ctype)s value)',
                  '{',
                  '  msg->%(name)s_set = 1;',
-                 '  msg->%(name)s_data = value;',
+                 '  msg->%(name)s = value;',
                  '  return (0);',
                  '}' ]
         code = '\n'.join(code)
@@ -523,7 +523,7 @@ class EntryBytes(Entry):
         return code
 
     def Declaration(self):
-        dcl  = ['ev_uint8_t %s_data[%s];' % (self._name, self._length)]
+        dcl  = ['ev_uint8_t %s[%s];' % (self._name, self._length)]
 
         return dcl
 
@@ -536,7 +536,7 @@ class EntryBytes(Entry):
                  '{',
                  '  if (msg->%s_set != 1)' % name,
                  '    return (-1);',
-                 '  *value = msg->%s_data;' % name,
+                 '  *value = msg->%s;' % name,
                  '  return (0);',
                  '}' ]
         return code
@@ -549,7 +549,7 @@ class EntryBytes(Entry):
             self._struct.Name(), self._ctype),
                  '{',
                  '  msg->%s_set = 1;' % name,
-                 '  memcpy(msg->%s_data, value, %s);' % (
+                 '  memcpy(msg->%s, value, %s);' % (
             name, self._length),
                  '  return (0);',
                  '}' ]
@@ -576,13 +576,13 @@ class EntryBytes(Entry):
 
     def CodeClear(self, structname):
         code = [ '%s->%s_set = 0;' % (structname, self.Name()),
-                 'memset(%s->%s_data, 0, sizeof(%s->%s_data));' % (
+                 'memset(%s->%s, 0, sizeof(%s->%s));' % (
             structname, self._name, structname, self._name)]
 
         return code
 
     def CodeInitialize(self, name):
-        code  = ['memset(%s->%s_data, 0, sizeof(%s->%s_data));' % (
+        code  = ['memset(%s->%s, 0, sizeof(%s->%s));' % (
             name, self._name, name, self._name)]
         return code
 
@@ -642,12 +642,12 @@ class EntryInt(Entry):
         return code
 
     def Declaration(self):
-        dcl  = ['%s %s_data;' % (self._ctype, self._name)]
+        dcl  = ['%s %s;' % (self._ctype, self._name)]
 
         return dcl
 
     def CodeInitialize(self, name):
-        code = ['%s->%s_data = 0;' % (name, self._name)]
+        code = ['%s->%s = 0;' % (name, self._name)]
         return code
 
 class EntryString(Entry):
@@ -706,9 +706,9 @@ class EntryString(Entry):
 %(parent_name)s_%(name)s_assign(struct %(parent_name)s *msg,
     const %(ctype)s value)
 {
-  if (msg->%(name)s_data != NULL)
-    free(msg->%(name)s_data);
-  if ((msg->%(name)s_data = strdup(value)) == NULL)
+  if (msg->%(name)s != NULL)
+    free(msg->%(name)s);
+  if ((msg->%(name)s = strdup(value)) == NULL)
     return (-1);
   msg->%(name)s_set = 1;
   return (0);
@@ -735,8 +735,8 @@ class EntryString(Entry):
 
     def CodeClear(self, structname):
         code = [ 'if (%s->%s_set == 1) {' % (structname, self.Name()),
-                 '  free(%s->%s_data);' % (structname, self.Name()),
-                 '  %s->%s_data = NULL;' % (structname, self.Name()),
+                 '  free(%s->%s);' % (structname, self.Name()),
+                 '  %s->%s = NULL;' % (structname, self.Name()),
                  '  %s->%s_set = 0;' % (structname, self.Name()),
                  '}'
                  ]
@@ -744,17 +744,17 @@ class EntryString(Entry):
         return code
 
     def CodeInitialize(self, name):
-        code  = ['%s->%s_data = NULL;' % (name, self._name)]
+        code  = ['%s->%s = NULL;' % (name, self._name)]
         return code
 
     def CodeFree(self, name):
-        code  = ['if (%s->%s_data != NULL)' % (name, self._name),
-                 '    free (%s->%s_data);' % (name, self._name)]
+        code  = ['if (%s->%s != NULL)' % (name, self._name),
+                 '    free (%s->%s);' % (name, self._name)]
 
         return code
 
     def Declaration(self):
-        dcl  = ['char *%s_data;' % self._name]
+        dcl  = ['char *%s;' % self._name]
 
         return dcl
 
@@ -824,12 +824,12 @@ class EntryStruct(Entry):
             self._struct.Name(), self._ctype),
                  '{',
                  '  if (msg->%s_set != 1) {' % name,
-                 '    msg->%s_data = %s_new();' % (name, self._refname),
-                 '    if (msg->%s_data == NULL)' % name,
+                 '    msg->%s = %s_new();' % (name, self._refname),
+                 '    if (msg->%s == NULL)' % name,
                  '      return (-1);',
                  '    msg->%s_set = 1;' % name,
                  '  }',
-                 '  *value = msg->%s_data;' % name,
+                 '  *value = msg->%s;' % name,
                  '  return (0);',
                  '}' ]
         return code
@@ -842,11 +842,11 @@ class EntryStruct(Entry):
 {
    struct evbuffer *tmp = NULL;
    if (msg->%(name)s_set) {
-     %(refname)s_clear(msg->%(name)s_data);
+     %(refname)s_clear(msg->%(name)s);
      msg->%(name)s_set = 0;
    } else {
-     msg->%(name)s_data = %(refname)s_new();
-     if (msg->%(name)s_data == NULL) {
+     msg->%(name)s = %(refname)s_new();
+     if (msg->%(name)s == NULL) {
        event_warn("%%s: %(refname)s_new()", __func__);
        goto error;
      }
@@ -856,7 +856,7 @@ class EntryStruct(Entry):
      goto error;
    }
    %(refname)s_marshal(tmp, value);
-   if (%(refname)s_unmarshal(msg->%(name)s_data, tmp) == -1) {
+   if (%(refname)s_unmarshal(msg->%(name)s, tmp) == -1) {
      event_warnx("%%s: %(refname)s_unmarshal", __func__);
      goto error;
    }
@@ -866,9 +866,9 @@ class EntryStruct(Entry):
  error:
    if (tmp != NULL)
      evbuffer_free(tmp);
-   if (msg->%(name)s_data != NULL) {
-     %(refname)s_free(msg->%(name)s_data);
-     msg->%(name)s_data = NULL;
+   if (msg->%(name)s != NULL) {
+     %(refname)s_free(msg->%(name)s);
+     msg->%(name)s = NULL;
    }
    return (-1);
 }""" % self.GetTranslation()
@@ -906,9 +906,9 @@ class EntryStruct(Entry):
 
     def CodeClear(self, structname):
         code = [ 'if (%s->%s_set == 1) {' % (structname, self.Name()),
-                 '  %s_free(%s->%s_data);' % (
+                 '  %s_free(%s->%s);' % (
             self._refname, structname, self.Name()),
-                 '  %s->%s_data = NULL;' % (structname, self.Name()),
+                 '  %s->%s = NULL;' % (structname, self.Name()),
                  '  %s->%s_set = 0;' % (structname, self.Name()),
                  '}'
                  ]
@@ -916,18 +916,18 @@ class EntryStruct(Entry):
         return code
 
     def CodeInitialize(self, name):
-        code  = ['%s->%s_data = NULL;' % (name, self._name)]
+        code  = ['%s->%s = NULL;' % (name, self._name)]
         return code
 
     def CodeFree(self, name):
-        code  = ['if (%s->%s_data != NULL)' % (name, self._name),
-                 '    %s_free(%s->%s_data);' % (
+        code  = ['if (%s->%s != NULL)' % (name, self._name),
+                 '    %s_free(%s->%s);' % (
             self._refname, name, self._name)]
 
         return code
 
     def Declaration(self):
-        dcl  = ['%s %s_data;' % (self._ctype, self._name)]
+        dcl  = ['%s %s;' % (self._ctype, self._name)]
 
         return dcl
 
@@ -966,14 +966,14 @@ class EntryVarBytes(Entry):
             self._struct.Name(), name,
             self._struct.Name(), self._ctype),
                  '{',
-                 '  if (msg->%s_data != NULL)' % name,
-                 '    free (msg->%s_data);' % name,
-                 '  msg->%s_data = malloc(len);' % name,
-                 '  if (msg->%s_data == NULL)' % name,
+                 '  if (msg->%s != NULL)' % name,
+                 '    free (msg->%s);' % name,
+                 '  msg->%s = malloc(len);' % name,
+                 '  if (msg->%s == NULL)' % name,
                  '    return (-1);',
                  '  msg->%s_set = 1;' % name,
                  '  msg->%s_length = len;' % name,
-                 '  memcpy(msg->%s_data, value, len);' % name,
+                 '  memcpy(msg->%s, value, len);' % name,
                  '  return (0);',
                  '}' ]
         return code
@@ -987,7 +987,7 @@ class EntryVarBytes(Entry):
                  '{',
                  '  if (msg->%s_set != 1)' % name,
                  '    return (-1);',
-                 '  *value = msg->%s_data;' % name,
+                 '  *value = msg->%s;' % name,
                  '  *plen = msg->%s_length;' % name,
                  '  return (0);',
                  '}' ]
@@ -1021,8 +1021,8 @@ class EntryVarBytes(Entry):
 
     def CodeClear(self, structname):
         code = [ 'if (%s->%s_set == 1) {' % (structname, self.Name()),
-                 '  free (%s->%s_data);' % (structname, self.Name()),
-                 '  %s->%s_data = NULL;' % (structname, self.Name()),
+                 '  free (%s->%s);' % (structname, self.Name()),
+                 '  %s->%s = NULL;' % (structname, self.Name()),
                  '  %s->%s_length = 0;' % (structname, self.Name()),
                  '  %s->%s_set = 0;' % (structname, self.Name()),
                  '}'
@@ -1031,18 +1031,18 @@ class EntryVarBytes(Entry):
         return code
 
     def CodeInitialize(self, name):
-        code  = ['%s->%s_data = NULL;' % (name, self._name),
+        code  = ['%s->%s = NULL;' % (name, self._name),
                  '%s->%s_length = 0;' % (name, self._name) ]
         return code
 
     def CodeFree(self, name):
-        code  = ['if (%s->%s_data != NULL)' % (name, self._name),
-                 '    free(%s->%s_data);' % (name, self._name)]
+        code  = ['if (%s->%s != NULL)' % (name, self._name),
+                 '    free(%s->%s);' % (name, self._name)]
 
         return code
 
     def Declaration(self):
-        dcl  = ['ev_uint8_t *%s_data;' % self._name,
+        dcl  = ['ev_uint8_t *%s;' % self._name,
                 'ev_uint32_t %s_length;' % self._name]
 
         return dcl
@@ -1061,7 +1061,7 @@ class EntryArray(Entry):
 
         # provide a new function for accessing the variable name
         def GetVarName(var_name):
-            return '%(var)s->%(name)s_data[%(index)s]' % \
+            return '%(var)s->%(name)s[%(index)s]' % \
                    self._entry.GetTranslation({'var' : var_name,
                                                'index' : self._index})
         self._entry.GetVarName = GetVarName
@@ -1101,7 +1101,7 @@ class EntryArray(Entry):
 {
   if (!msg->%(name)s_set || offset < 0 || offset >= msg->%(name)s_length)
     return (-1);
-  *value = msg->%(name)s_data[offset];
+  *value = msg->%(name)s[offset];
   return (0);
 }""" % self.GetTranslation()
 
@@ -1119,7 +1119,7 @@ class EntryArray(Entry):
         code = TranslateList(code, self.GetTranslation())
 
         codearrayassign = self._entry.CodeArrayAssign(
-            'msg->%(name)s_data[off]' % self.GetTranslation(), 'value')
+            'msg->%(name)s[off]' % self.GetTranslation(), 'value')
         code += map(lambda x: '    ' + x, codearrayassign)
 
         code += TranslateList([
@@ -1131,7 +1131,7 @@ class EntryArray(Entry):
 
     def CodeAdd(self):
         codearrayadd = self._entry.CodeArrayAdd(
-            'msg->%(name)s_data[msg->%(name)s_length - 1]' % self.GetTranslation(),
+            'msg->%(name)s[msg->%(name)s_length - 1]' % self.GetTranslation(),
             'value')
         code = [
             'static int',
@@ -1139,13 +1139,13 @@ class EntryArray(Entry):
             'struct %(parent_name)s *msg)',
             '{',
             '  int tobe_allocated = msg->%(name)s_num_allocated;',
-            '  %(ctype)s* new_data = NULL;',
+            '  %(ctype)s* new_d_ata = NULL;',
             '  tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;',
-            '  new_data = (%(ctype)s*) realloc(msg->%(name)s_data,',
+            '  new_d_ata = (%(ctype)s*) realloc(msg->%(name)s,',
             '      tobe_allocated * sizeof(%(ctype)s));',
-            '  if (new_data == NULL)',
+            '  if (new_d_ata == NULL)',
             '    return -1;',
-            '  msg->%(name)s_data = new_data;',
+            '  msg->%(name)s = new_d_ata;',
             '  msg->%(name)s_num_allocated = tobe_allocated;',
             '  return 0;'
             '}',
@@ -1165,7 +1165,7 @@ class EntryArray(Entry):
 
         code += TranslateList([
             '  msg->%(name)s_set = 1;',
-            '  return %(optreference)s(msg->%(name)s_data['
+            '  return %(optreference)s(msg->%(name)s['
             'msg->%(name)s_length - 1]);',
             'error:',
             '  --msg->%(name)s_length;',
@@ -1241,7 +1241,7 @@ class EntryArray(Entry):
     def CodeClear(self, structname):
         translate = self.GetTranslation({ 'structname' : structname })
         codearrayfree = self._entry.CodeArrayFree(
-            '%(structname)s->%(name)s_data[i]' % self.GetTranslation(
+            '%(structname)s->%(name)s[i]' % self.GetTranslation(
             { 'structname' : structname } ))
 
         code = [ 'if (%(structname)s->%(name)s_set == 1) {' ]
@@ -1259,8 +1259,8 @@ class EntryArray(Entry):
                 '  }' ]
 
         code += TranslateList([
-                 '  free(%(structname)s->%(name)s_data);',
-                 '  %(structname)s->%(name)s_data = NULL;',
+                 '  free(%(structname)s->%(name)s);',
+                 '  %(structname)s->%(name)s = NULL;',
                  '  %(structname)s->%(name)s_set = 0;',
                  '  %(structname)s->%(name)s_length = 0;',
                  '  %(structname)s->%(name)s_num_allocated = 0;',
@@ -1270,7 +1270,7 @@ class EntryArray(Entry):
         return code
 
     def CodeInitialize(self, name):
-        code  = ['%s->%s_data = NULL;' % (name, self._name),
+        code  = ['%s->%s = NULL;' % (name, self._name),
                  '%s->%s_length = 0;' % (name, self._name),
                  '%s->%s_num_allocated = 0;' % (name, self._name)]
         return code
@@ -1279,13 +1279,13 @@ class EntryArray(Entry):
         code = self.CodeClear(structname);
 
         code += TranslateList([
-            'free(%(structname)s->%(name)s_data);' ],
+            'free(%(structname)s->%(name)s);' ],
                               self.GetTranslation({'structname' : structname }))
 
         return code
 
     def Declaration(self):
-        dcl  = ['%s *%s_data;' % (self._ctype, self._name),
+        dcl  = ['%s *%s;' % (self._ctype, self._name),
                 'int %s_length;' % self._name,
                 'int %s_num_allocated;' % self._name ]
 

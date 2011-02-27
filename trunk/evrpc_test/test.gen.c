@@ -29,10 +29,10 @@ void event_warnx(const char *fmt, ...);
 static struct ping_access_ __ping_base = {
   ping_version_assign,
   ping_version_get,
-  ping_ip_assign,
-  ping_ip_get,
-  ping_port_assign,
-  ping_port_get,
+  ping_self_ip_assign,
+  ping_self_ip_get,
+  ping_self_port_assign,
+  ping_self_port_get,
 };
 
 struct ping *
@@ -51,14 +51,14 @@ ping_new_with_arg(void *unused)
   }
   tmp->base = &__ping_base;
 
-  tmp->version_data = 0;
+  tmp->version = 0;
   tmp->version_set = 0;
 
-  tmp->ip_data = NULL;
-  tmp->ip_set = 0;
+  tmp->self_ip = NULL;
+  tmp->self_ip_set = 0;
 
-  tmp->port_data = 0;
-  tmp->port_set = 0;
+  tmp->self_port = 0;
+  tmp->self_port_set = 0;
 
   return (tmp);
 }
@@ -70,27 +70,27 @@ int
 ping_version_assign(struct ping *msg, const ev_uint32_t value)
 {
   msg->version_set = 1;
-  msg->version_data = value;
+  msg->version = value;
   return (0);
 }
 
 int
-ping_ip_assign(struct ping *msg,
+ping_self_ip_assign(struct ping *msg,
     const char * value)
 {
-  if (msg->ip_data != NULL)
-    free(msg->ip_data);
-  if ((msg->ip_data = strdup(value)) == NULL)
+  if (msg->self_ip != NULL)
+    free(msg->self_ip);
+  if ((msg->self_ip = strdup(value)) == NULL)
     return (-1);
-  msg->ip_set = 1;
+  msg->self_ip_set = 1;
   return (0);
 }
 
 int
-ping_port_assign(struct ping *msg, const ev_uint32_t value)
+ping_self_port_assign(struct ping *msg, const ev_uint32_t value)
 {
-  msg->port_set = 1;
-  msg->port_data = value;
+  msg->self_port_set = 1;
+  msg->self_port = value;
   return (0);
 }
 
@@ -99,25 +99,25 @@ ping_version_get(struct ping *msg, ev_uint32_t *value)
 {
   if (msg->version_set != 1)
     return (-1);
-  *value = msg->version_data;
+  *value = msg->version;
   return (0);
 }
 
 int
-ping_ip_get(struct ping *msg, char * *value)
+ping_self_ip_get(struct ping *msg, char * *value)
 {
-  if (msg->ip_set != 1)
+  if (msg->self_ip_set != 1)
     return (-1);
-  *value = msg->ip_data;
+  *value = msg->self_ip;
   return (0);
 }
 
 int
-ping_port_get(struct ping *msg, ev_uint32_t *value)
+ping_self_port_get(struct ping *msg, ev_uint32_t *value)
 {
-  if (msg->port_set != 1)
+  if (msg->self_port_set != 1)
     return (-1);
-  *value = msg->port_data;
+  *value = msg->self_port;
   return (0);
 }
 
@@ -125,27 +125,27 @@ void
 ping_clear(struct ping *tmp)
 {
   tmp->version_set = 0;
-  if (tmp->ip_set == 1) {
-    free(tmp->ip_data);
-    tmp->ip_data = NULL;
-    tmp->ip_set = 0;
+  if (tmp->self_ip_set == 1) {
+    free(tmp->self_ip);
+    tmp->self_ip = NULL;
+    tmp->self_ip_set = 0;
   }
-  tmp->port_set = 0;
+  tmp->self_port_set = 0;
 }
 
 void
 ping_free(struct ping *tmp)
 {
-  if (tmp->ip_data != NULL)
-      free (tmp->ip_data);
+  if (tmp->self_ip != NULL)
+      free (tmp->self_ip);
   free(tmp);
 }
 
 void
 ping_marshal(struct evbuffer *evbuf, const struct ping *tmp){
-  evtag_marshal_int(evbuf, PING_VERSION, tmp->version_data);
-  evtag_marshal_string(evbuf, PING_IP, tmp->ip_data);
-  evtag_marshal_int(evbuf, PING_PORT, tmp->port_data);
+  evtag_marshal_int(evbuf, PING_VERSION, tmp->version);
+  evtag_marshal_string(evbuf, PING_SELF_IP, tmp->self_ip);
+  evtag_marshal_int(evbuf, PING_SELF_PORT, tmp->self_port);
 }
 
 int
@@ -161,33 +161,33 @@ ping_unmarshal(struct ping *tmp,  struct evbuffer *evbuf)
 
         if (tmp->version_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, PING_VERSION, &tmp->version_data) == -1) {
+        if (evtag_unmarshal_int(evbuf, PING_VERSION, &tmp->version) == -1) {
           event_warnx("%s: failed to unmarshal version", __func__);
           return (-1);
         }
         tmp->version_set = 1;
         break;
 
-      case PING_IP:
+      case PING_SELF_IP:
 
-        if (tmp->ip_set)
+        if (tmp->self_ip_set)
           return (-1);
-        if (evtag_unmarshal_string(evbuf, PING_IP, &tmp->ip_data) == -1) {
-          event_warnx("%s: failed to unmarshal ip", __func__);
+        if (evtag_unmarshal_string(evbuf, PING_SELF_IP, &tmp->self_ip) == -1) {
+          event_warnx("%s: failed to unmarshal self_ip", __func__);
           return (-1);
         }
-        tmp->ip_set = 1;
+        tmp->self_ip_set = 1;
         break;
 
-      case PING_PORT:
+      case PING_SELF_PORT:
 
-        if (tmp->port_set)
+        if (tmp->self_port_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, PING_PORT, &tmp->port_data) == -1) {
-          event_warnx("%s: failed to unmarshal port", __func__);
+        if (evtag_unmarshal_int(evbuf, PING_SELF_PORT, &tmp->self_port) == -1) {
+          event_warnx("%s: failed to unmarshal self_port", __func__);
           return (-1);
         }
-        tmp->port_set = 1;
+        tmp->self_port_set = 1;
         break;
 
       default:
@@ -205,9 +205,9 @@ ping_complete(struct ping *msg)
 {
   if (!msg->version_set)
     return (-1);
-  if (!msg->ip_set)
+  if (!msg->self_ip_set)
     return (-1);
-  if (!msg->port_set)
+  if (!msg->self_port_set)
     return (-1);
   return (0);
 }
@@ -274,16 +274,16 @@ machine_new_with_arg(void *unused)
   }
   tmp->base = &__machine_base;
 
-  tmp->uuid_data = 0;
+  tmp->uuid = 0;
   tmp->uuid_set = 0;
 
-  tmp->ip_data = NULL;
+  tmp->ip = NULL;
   tmp->ip_set = 0;
 
-  tmp->port_data = 0;
+  tmp->port = 0;
   tmp->port_set = 0;
 
-  tmp->type_data = 0;
+  tmp->type = 0;
   tmp->type_set = 0;
 
   return (tmp);
@@ -297,7 +297,7 @@ int
 machine_uuid_assign(struct machine *msg, const ev_uint32_t value)
 {
   msg->uuid_set = 1;
-  msg->uuid_data = value;
+  msg->uuid = value;
   return (0);
 }
 
@@ -305,9 +305,9 @@ int
 machine_ip_assign(struct machine *msg,
     const char * value)
 {
-  if (msg->ip_data != NULL)
-    free(msg->ip_data);
-  if ((msg->ip_data = strdup(value)) == NULL)
+  if (msg->ip != NULL)
+    free(msg->ip);
+  if ((msg->ip = strdup(value)) == NULL)
     return (-1);
   msg->ip_set = 1;
   return (0);
@@ -317,7 +317,7 @@ int
 machine_port_assign(struct machine *msg, const ev_uint32_t value)
 {
   msg->port_set = 1;
-  msg->port_data = value;
+  msg->port = value;
   return (0);
 }
 
@@ -325,7 +325,7 @@ int
 machine_type_assign(struct machine *msg, const ev_uint32_t value)
 {
   msg->type_set = 1;
-  msg->type_data = value;
+  msg->type = value;
   return (0);
 }
 
@@ -334,7 +334,7 @@ machine_uuid_get(struct machine *msg, ev_uint32_t *value)
 {
   if (msg->uuid_set != 1)
     return (-1);
-  *value = msg->uuid_data;
+  *value = msg->uuid;
   return (0);
 }
 
@@ -343,7 +343,7 @@ machine_ip_get(struct machine *msg, char * *value)
 {
   if (msg->ip_set != 1)
     return (-1);
-  *value = msg->ip_data;
+  *value = msg->ip;
   return (0);
 }
 
@@ -352,7 +352,7 @@ machine_port_get(struct machine *msg, ev_uint32_t *value)
 {
   if (msg->port_set != 1)
     return (-1);
-  *value = msg->port_data;
+  *value = msg->port;
   return (0);
 }
 
@@ -361,7 +361,7 @@ machine_type_get(struct machine *msg, ev_uint32_t *value)
 {
   if (msg->type_set != 1)
     return (-1);
-  *value = msg->type_data;
+  *value = msg->type;
   return (0);
 }
 
@@ -370,8 +370,8 @@ machine_clear(struct machine *tmp)
 {
   tmp->uuid_set = 0;
   if (tmp->ip_set == 1) {
-    free(tmp->ip_data);
-    tmp->ip_data = NULL;
+    free(tmp->ip);
+    tmp->ip = NULL;
     tmp->ip_set = 0;
   }
   tmp->port_set = 0;
@@ -381,17 +381,17 @@ machine_clear(struct machine *tmp)
 void
 machine_free(struct machine *tmp)
 {
-  if (tmp->ip_data != NULL)
-      free (tmp->ip_data);
+  if (tmp->ip != NULL)
+      free (tmp->ip);
   free(tmp);
 }
 
 void
 machine_marshal(struct evbuffer *evbuf, const struct machine *tmp){
-  evtag_marshal_int(evbuf, MACHINE_UUID, tmp->uuid_data);
-  evtag_marshal_string(evbuf, MACHINE_IP, tmp->ip_data);
-  evtag_marshal_int(evbuf, MACHINE_PORT, tmp->port_data);
-  evtag_marshal_int(evbuf, MACHINE_TYPE, tmp->type_data);
+  evtag_marshal_int(evbuf, MACHINE_UUID, tmp->uuid);
+  evtag_marshal_string(evbuf, MACHINE_IP, tmp->ip);
+  evtag_marshal_int(evbuf, MACHINE_PORT, tmp->port);
+  evtag_marshal_int(evbuf, MACHINE_TYPE, tmp->type);
 }
 
 int
@@ -407,7 +407,7 @@ machine_unmarshal(struct machine *tmp,  struct evbuffer *evbuf)
 
         if (tmp->uuid_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, MACHINE_UUID, &tmp->uuid_data) == -1) {
+        if (evtag_unmarshal_int(evbuf, MACHINE_UUID, &tmp->uuid) == -1) {
           event_warnx("%s: failed to unmarshal uuid", __func__);
           return (-1);
         }
@@ -418,7 +418,7 @@ machine_unmarshal(struct machine *tmp,  struct evbuffer *evbuf)
 
         if (tmp->ip_set)
           return (-1);
-        if (evtag_unmarshal_string(evbuf, MACHINE_IP, &tmp->ip_data) == -1) {
+        if (evtag_unmarshal_string(evbuf, MACHINE_IP, &tmp->ip) == -1) {
           event_warnx("%s: failed to unmarshal ip", __func__);
           return (-1);
         }
@@ -429,7 +429,7 @@ machine_unmarshal(struct machine *tmp,  struct evbuffer *evbuf)
 
         if (tmp->port_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, MACHINE_PORT, &tmp->port_data) == -1) {
+        if (evtag_unmarshal_int(evbuf, MACHINE_PORT, &tmp->port) == -1) {
           event_warnx("%s: failed to unmarshal port", __func__);
           return (-1);
         }
@@ -440,7 +440,7 @@ machine_unmarshal(struct machine *tmp,  struct evbuffer *evbuf)
 
         if (tmp->type_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, MACHINE_TYPE, &tmp->type_data) == -1) {
+        if (evtag_unmarshal_int(evbuf, MACHINE_TYPE, &tmp->type) == -1) {
           event_warnx("%s: failed to unmarshal type", __func__);
           return (-1);
         }
@@ -532,13 +532,13 @@ pong_new_with_arg(void *unused)
   }
   tmp->base = &__pong_base;
 
-  tmp->version_data = 0;
+  tmp->version = 0;
   tmp->version_set = 0;
 
-  tmp->xx_data = 0;
+  tmp->xx = 0;
   tmp->xx_set = 0;
 
-  tmp->machines_data = NULL;
+  tmp->machines = NULL;
   tmp->machines_length = 0;
   tmp->machines_num_allocated = 0;
   tmp->machines_set = 0;
@@ -552,13 +552,13 @@ static int
 pong_machines_expand_to_hold_more(struct pong *msg)
 {
   int tobe_allocated = msg->machines_num_allocated;
-  struct machine** new_data = NULL;
+  struct machine** new_d_ata = NULL;
   tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
-  new_data = (struct machine**) realloc(msg->machines_data,
+  new_d_ata = (struct machine**) realloc(msg->machines,
       tobe_allocated * sizeof(struct machine*));
-  if (new_data == NULL)
+  if (new_d_ata == NULL)
     return -1;
-  msg->machines_data = new_data;
+  msg->machines = new_d_ata;
   msg->machines_num_allocated = tobe_allocated;
   return 0;}
 
@@ -569,11 +569,11 @@ pong_machines_add(struct pong *msg)
     if (pong_machines_expand_to_hold_more(msg)<0)
       goto error;
   }
-  msg->machines_data[msg->machines_length - 1] = machine_new();
-  if (msg->machines_data[msg->machines_length - 1] == NULL)
+  msg->machines[msg->machines_length - 1] = machine_new();
+  if (msg->machines[msg->machines_length - 1] == NULL)
     goto error;
   msg->machines_set = 1;
-  return (msg->machines_data[msg->machines_length - 1]);
+  return (msg->machines[msg->machines_length - 1]);
 error:
   --msg->machines_length;
   return (NULL);
@@ -583,7 +583,7 @@ int
 pong_version_assign(struct pong *msg, const ev_uint32_t value)
 {
   msg->version_set = 1;
-  msg->version_data = value;
+  msg->version = value;
   return (0);
 }
 
@@ -591,7 +591,7 @@ int
 pong_xx_assign(struct pong *msg, const ev_uint32_t value)
 {
   msg->xx_set = 1;
-  msg->xx_data = value;
+  msg->xx = value;
   return (0);
 }
 
@@ -605,14 +605,14 @@ pong_machines_assign(struct pong *msg, int off,
   {
     int had_error = 0;
     struct evbuffer *tmp = NULL;
-    machine_clear(msg->machines_data[off]);
+    machine_clear(msg->machines[off]);
     if ((tmp = evbuffer_new()) == NULL) {
       event_warn("%s: evbuffer_new()", __func__);
       had_error = 1;
       goto done;
     }
     machine_marshal(tmp, value);
-    if (machine_unmarshal(msg->machines_data[off], tmp) == -1) {
+    if (machine_unmarshal(msg->machines[off], tmp) == -1) {
       event_warnx("%s: machine_unmarshal", __func__);
       had_error = 1;
       goto done;
@@ -620,7 +620,7 @@ pong_machines_assign(struct pong *msg, int off,
     done:if (tmp != NULL)
       evbuffer_free(tmp);
     if (had_error) {
-      machine_clear(msg->machines_data[off]);
+      machine_clear(msg->machines[off]);
       return (-1);
     }
   }
@@ -632,7 +632,7 @@ pong_version_get(struct pong *msg, ev_uint32_t *value)
 {
   if (msg->version_set != 1)
     return (-1);
-  *value = msg->version_data;
+  *value = msg->version;
   return (0);
 }
 
@@ -641,7 +641,7 @@ pong_xx_get(struct pong *msg, ev_uint32_t *value)
 {
   if (msg->xx_set != 1)
     return (-1);
-  *value = msg->xx_data;
+  *value = msg->xx;
   return (0);
 }
 
@@ -651,7 +651,7 @@ pong_machines_get(struct pong *msg, int offset,
 {
   if (!msg->machines_set || offset < 0 || offset >= msg->machines_length)
     return (-1);
-  *value = msg->machines_data[offset];
+  *value = msg->machines[offset];
   return (0);
 }
 
@@ -663,10 +663,10 @@ pong_clear(struct pong *tmp)
   if (tmp->machines_set == 1) {
     int i;
     for (i = 0; i < tmp->machines_length; ++i) {
-      machine_free(tmp->machines_data[i]);
+      machine_free(tmp->machines[i]);
     }
-    free(tmp->machines_data);
-    tmp->machines_data = NULL;
+    free(tmp->machines);
+    tmp->machines = NULL;
     tmp->machines_set = 0;
     tmp->machines_length = 0;
     tmp->machines_num_allocated = 0;
@@ -679,27 +679,27 @@ pong_free(struct pong *tmp)
   if (tmp->machines_set == 1) {
     int i;
     for (i = 0; i < tmp->machines_length; ++i) {
-      machine_free(tmp->machines_data[i]);
+      machine_free(tmp->machines[i]);
     }
-    free(tmp->machines_data);
-    tmp->machines_data = NULL;
+    free(tmp->machines);
+    tmp->machines = NULL;
     tmp->machines_set = 0;
     tmp->machines_length = 0;
     tmp->machines_num_allocated = 0;
   }
-  free(tmp->machines_data);
+  free(tmp->machines);
   free(tmp);
 }
 
 void
 pong_marshal(struct evbuffer *evbuf, const struct pong *tmp){
-  evtag_marshal_int(evbuf, PONG_VERSION, tmp->version_data);
-  evtag_marshal_int(evbuf, PONG_XX, tmp->xx_data);
+  evtag_marshal_int(evbuf, PONG_VERSION, tmp->version);
+  evtag_marshal_int(evbuf, PONG_XX, tmp->xx);
   if (tmp->machines_set) {
     {
       int i;
       for (i = 0; i < tmp->machines_length; ++i) {
-    evtag_marshal_machine(evbuf, PONG_MACHINES, tmp->machines_data[i]);
+    evtag_marshal_machine(evbuf, PONG_MACHINES, tmp->machines[i]);
       }
     }
   }
@@ -718,7 +718,7 @@ pong_unmarshal(struct pong *tmp,  struct evbuffer *evbuf)
 
         if (tmp->version_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, PONG_VERSION, &tmp->version_data) == -1) {
+        if (evtag_unmarshal_int(evbuf, PONG_VERSION, &tmp->version) == -1) {
           event_warnx("%s: failed to unmarshal version", __func__);
           return (-1);
         }
@@ -729,7 +729,7 @@ pong_unmarshal(struct pong *tmp,  struct evbuffer *evbuf)
 
         if (tmp->xx_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, PONG_XX, &tmp->xx_data) == -1) {
+        if (evtag_unmarshal_int(evbuf, PONG_XX, &tmp->xx) == -1) {
           event_warnx("%s: failed to unmarshal xx", __func__);
           return (-1);
         }
@@ -743,10 +743,10 @@ pong_unmarshal(struct pong *tmp,  struct evbuffer *evbuf)
           puts("HEY NOW");
           return (-1);
         }
-        tmp->machines_data[tmp->machines_length] = machine_new();
-        if (tmp->machines_data[tmp->machines_length] == NULL)
+        tmp->machines[tmp->machines_length] = machine_new();
+        if (tmp->machines[tmp->machines_length] == NULL)
           return (-1);
-        if (evtag_unmarshal_machine(evbuf, PONG_MACHINES, tmp->machines_data[tmp->machines_length]) == -1) {
+        if (evtag_unmarshal_machine(evbuf, PONG_MACHINES, tmp->machines[tmp->machines_length]) == -1) {
           event_warnx("%s: failed to unmarshal machines", __func__);
           return (-1);
         }
@@ -774,7 +774,7 @@ pong_complete(struct pong *msg)
   {
     int i;
     for (i = 0; i < msg->machines_length; ++i) {
-      if (msg->machines_set && machine_complete(msg->machines_data[i]) == -1)
+      if (msg->machines_set && machine_complete(msg->machines[i]) == -1)
         return (-1);
     }
   }
