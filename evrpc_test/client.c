@@ -1,5 +1,6 @@
 #include <event.h>
 #include <evhttp.h>
+#include <stdlib.h>
 #include "test.gen.h"
 #include "common.h"
 
@@ -26,16 +27,24 @@ static void ping_cb(struct evrpc_status *status,
     EVTAG_GET(pong, version, &v);
 
     printf("get version is : %d \n", v);
-    struct machine * m;
-    EVTAG_ARRAY_GET(pong, machines, 0, &m);
-    
-    printf("m->ip : %d \n", EV_GET(m, port));
+    int cnt = EVTAG_ARRAY_LEN(pong, machines);
+    int i;
+    for (i=0; i< cnt; i++){
+        struct machine * m;
+        EVTAG_ARRAY_GET(pong, machines, 0, &m);
+        printf("machine %d: \n", i);
+        
+        printf("m->port : %d \n", m->port);
+        printf("m->ip : %s \n", m->ip);
+    }
+
 
 done:
     event_loopexit(NULL);
 }
 
 
+struct evrpc_pool *pool = NULL;
 
 static void
 rpc_basic_client(void)
@@ -44,13 +53,12 @@ rpc_basic_client(void)
     struct evhttp *http = NULL;
     struct evrpc_base *base = NULL;
 
-    struct evrpc_pool *pool = NULL;
 
     /* set up the basic message */
     struct ping * ping = ping_new();
     EVTAG_ASSIGN(ping, version, 7);
-    EVTAG_ASSIGN(ping, ip, "127.0.0.1");
-    EVTAG_ASSIGN(ping, port, 8080);
+    EVTAG_ASSIGN(ping, self_ip, "127.0.0.2");
+    EVTAG_ASSIGN(ping, self_port, 8080);
     struct pong * pong =  pong_new();
 
     struct evhttp_connection *evcon;
@@ -68,7 +76,22 @@ rpc_basic_client(void)
     event_dispatch();
 }
 
+void doit(){
+    struct ping * ping = ping_new();
+    EVTAG_ASSIGN(ping, version, 7);
+    EVTAG_ASSIGN(ping, self_ip, "127.0.0.2");
+    EVTAG_ASSIGN(ping, self_port, 8080);
+    struct pong * pong =  pong_new();
+
+
+    int rst = EVRPC_MAKE_REQUEST(rpc_ping, pool, ping , pong,  ping_cb, NULL);
+    event_dispatch();
+
+}
+
 int main(){
     event_init();
     rpc_basic_client();
+    doit();
 }
+

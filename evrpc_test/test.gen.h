@@ -15,8 +15,8 @@ struct pong;
 /* Tag definition for ping */
 enum ping_ {
   PING_VERSION=1,
-  PING_IP=2,
-  PING_PORT=3,
+  PING_SELF_IP=2,
+  PING_SELF_PORT=3,
   PING_MAX_TAGS
 };
 
@@ -24,22 +24,22 @@ enum ping_ {
 struct ping_access_ {
   int (*version_assign)(struct ping *, const ev_uint32_t);
   int (*version_get)(struct ping *, ev_uint32_t *);
-  int (*ip_assign)(struct ping *, const char *);
-  int (*ip_get)(struct ping *, char * *);
-  int (*port_assign)(struct ping *, const ev_uint32_t);
-  int (*port_get)(struct ping *, ev_uint32_t *);
+  int (*self_ip_assign)(struct ping *, const char *);
+  int (*self_ip_get)(struct ping *, char * *);
+  int (*self_port_assign)(struct ping *, const ev_uint32_t);
+  int (*self_port_get)(struct ping *, ev_uint32_t *);
 };
 
 struct ping {
   struct ping_access_ *base;
 
-  ev_uint32_t version_data;
-  char *ip_data;
-  ev_uint32_t port_data;
+  ev_uint32_t version;
+  char *self_ip;
+  ev_uint32_t self_port;
 
   ev_uint8_t version_set;
-  ev_uint8_t ip_set;
-  ev_uint8_t port_set;
+  ev_uint8_t self_ip_set;
+  ev_uint8_t self_port_set;
 };
 
 struct ping *ping_new(void);
@@ -55,10 +55,10 @@ int evtag_unmarshal_ping(struct evbuffer *, ev_uint32_t,
     struct ping *);
 int ping_version_assign(struct ping *, const ev_uint32_t);
 int ping_version_get(struct ping *, ev_uint32_t *);
-int ping_ip_assign(struct ping *, const char *);
-int ping_ip_get(struct ping *, char * *);
-int ping_port_assign(struct ping *, const ev_uint32_t);
-int ping_port_get(struct ping *, ev_uint32_t *);
+int ping_self_ip_assign(struct ping *, const char *);
+int ping_self_ip_get(struct ping *, char * *);
+int ping_self_port_assign(struct ping *, const ev_uint32_t);
+int ping_self_port_get(struct ping *, ev_uint32_t *);
 /* --- ping done --- */
 
 /* Tag definition for machine */
@@ -85,10 +85,10 @@ struct machine_access_ {
 struct machine {
   struct machine_access_ *base;
 
-  ev_uint32_t uuid_data;
-  char *ip_data;
-  ev_uint32_t port_data;
-  ev_uint32_t type_data;
+  ev_uint32_t uuid;
+  char *ip;
+  ev_uint32_t port;
+  ev_uint32_t type;
 
   ev_uint8_t uuid_set;
   ev_uint8_t ip_set;
@@ -139,9 +139,9 @@ struct pong_access_ {
 struct pong {
   struct pong_access_ *base;
 
-  ev_uint32_t version_data;
-  ev_uint32_t xx_data;
-  struct machine* *machines_data;
+  ev_uint32_t version;
+  ev_uint32_t xx;
+  struct machine* *machines;
   int machines_length;
   int machines_num_allocated;
 
