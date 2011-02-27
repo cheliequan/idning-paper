@@ -130,6 +130,10 @@ static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 	(void) fi;
 
 	assert(ino == 2);
+    http_get("localhost:6006/get/2");
+
+
+
 	reply_buf_limited(req, hello_str, strlen(hello_str), off, size);
 }
 
