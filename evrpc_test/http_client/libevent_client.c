@@ -30,6 +30,9 @@ struct request_context
 	struct evhttp_request *req;
 
 	struct evbuffer *buffer;
+
+    int method;
+	struct evbuffer *postdata_buffer;
 	int ok;
 };
 
@@ -45,9 +48,6 @@ void download_callback(struct evhttp_request *req, void *arg)
 	struct request_context *ctx = (struct request_context *)arg;
 	struct evhttp_uri *new_uri = NULL;
 	const char *new_location = NULL;
-
-	/* response is ready */
-
 	switch(req->response_code)
 	{
 	case HTTP_OK:
@@ -122,28 +122,28 @@ int download_renew_request(struct request_context *ctx)
 	if (ctx->cn)
 		evhttp_connection_free(ctx->cn);
 
-	ctx->cn = evhttp_connection_new(
-		ctx->uri->host,
-		ctx->uri->port > 0 ? ctx->uri->port : 80);
+	ctx->cn = evhttp_connection_new( ctx->uri->host, ctx->uri->port > 0 ? ctx->uri->port : 80);
 
 	ctx->req = evhttp_request_new(download_callback, ctx);
-
-	evhttp_make_request(ctx->cn, ctx->req, EVHTTP_REQ_GET,
-		ctx->uri->query ? ctx->uri->query : "/");
-
+    
+    if (ctx->method == EVHTTP_REQ_POST){
+        ctx->req->output_buffer = ctx->postdata_buffer;
+        evhttp_make_request(ctx->cn, ctx->req, EVHTTP_REQ_POST,
+            ctx->uri->query ? ctx->uri->query : "/");
+    }else{
+        evhttp_make_request(ctx->cn, ctx->req, EVHTTP_REQ_GET,
+            ctx->uri->query ? ctx->uri->query : "/");
+    }
 	evhttp_add_header(ctx->req->output_headers,
                             "Host", ctx->uri->host);
 	return 0;
 }
 
-struct evbuffer *do_get(const char *url)
+struct evbuffer *do_request(const char *url, int verb, struct evbuffer * data)
 {
-	/* setup request, connection etc */
-
 	struct request_context *ctx = context_new(url);
-	if (!ctx)
-		return 0;
-
+    ctx -> method = verb;
+    ctx -> postdata_buffer = data;
 	/* do all of the job */
 	event_dispatch();
 
@@ -157,6 +157,14 @@ struct evbuffer *do_get(const char *url)
 	context_free(ctx);
 
 	return retval;
+}
+
+struct evbuffer *do_get(const char *url){
+    return do_request(url, EVHTTP_REQ_GET, NULL);
+}
+
+struct evbuffer *do_post(const char *url, struct evbuffer * postdata){
+    return do_request(url, EVHTTP_REQ_POST, postdata);
 }
 
 int main(int argc, char *argv[])
