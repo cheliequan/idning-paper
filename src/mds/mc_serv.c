@@ -1,9 +1,8 @@
 #include <event.h>
 #include <evhttp.h>
 #include "protocol.gen.h"
+#include "protocol.h"
 
-EVRPC_HEADER(rpc_ping, ping, pong)
-EVRPC_GENERATE(rpc_ping, ping, pong)
 
 #define MAX_MACHINE_CNT 256
 

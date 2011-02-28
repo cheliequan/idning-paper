@@ -9,6 +9,8 @@
 #include <unistd.h>
 #include <assert.h>
 
+#include <http_client.h>
+
 static const char *hello_str = "Hello World!\n";
 static const char *hello_name = "hello";
 
@@ -130,12 +132,20 @@ static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 	(void) fi;
 
 	assert(ino == 2);
-    http_get("localhost:6006/get/2");
 
+    http_response * response = http_get("http://10.100.1.76/");
+    int len = evbuffer_get_length(response->body);
+    uint8_t * buf = alloca(len);
+    evbuffer_copyout(response->body, buf, len);
 
+    fuse_reply_buf(req, buf+off, size);
 
-	reply_buf_limited(req, hello_str, strlen(hello_str), off, size);
+	//reply_buf_limited(req, hello_str, strlen(hello_str), off, size);
+	/*reply_buf_limited(req, hello_str, 1, off, size);*/
 }
+
+
+
 
 static struct fuse_lowlevel_ops hello_ll_oper = {
 	.lookup		= hello_ll_lookup,
@@ -145,8 +155,11 @@ static struct fuse_lowlevel_ops hello_ll_oper = {
 	.read		= hello_ll_read,
 };
 
+void get();
 int main(int argc, char *argv[])
 {
+    event_init();
+    get();
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 	struct fuse_chan *ch;
 	char *mountpoint;
@@ -172,4 +185,15 @@ int main(int argc, char *argv[])
 	fuse_opt_free_args(&args);
 
 	return err ? 1 : 0;
+}
+
+void get(){
+    /*http_response * response = http_get("http://10.100.1.76:6006/get/2");*/
+    http_response * response = http_get("http://10.100.1.76/");
+    char * p;
+    while(( p = evbuffer_readline(response->body))){
+        printf("%s\n", p);
+        free(p);
+    }
+
 }

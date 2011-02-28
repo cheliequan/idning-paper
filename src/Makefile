@@ -20,8 +20,14 @@ c:
 t: all
 	scons -Q -f scons.py ning_target=test
 
-
 #cscope
 cs:
-	cscope -I/usr/local/include/ -R -b
-	ctags -R
+	echo "" > /tmp/cscope.files
+	find /home/ning/idning-source/c/libevent-2.0.10-stable/  -name "*.h" >> /tmp/cscope.files
+	find /home/ning/idning-source/c/libevent-2.0.10-stable/  -name "*.c" >> /tmp/cscope.files
+	find . -name "*.c" >> /tmp/cscope.files
+	find . -name "*.h" >> /tmp/cscope.files
+	cscope  -i /tmp/cscope.files -R -b
+	#
+	ctags -L /tmp/cscope.files -R
+	#######################################################################################
