@@ -24,7 +24,7 @@ struct file_stat {
 }
 
 struct stat_request {
-    array int inode_arr = 1;
+    array int ino_arr = 1;
 }
 
 struct stat_response {

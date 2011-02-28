@@ -34,15 +34,27 @@ static void stat_cb(struct evrpc_status *status,
     fprintf(stderr, "%s: called\n", __func__);
     int i;
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
+    fprintf(stderr, "msg->stat_arr_set : %d\n", response->stat_arr_set);
+    fprintf(stderr, "msg->: %d\n", response->stat_arr[0] -> inode);
+    fprintf(stderr, "msg->: %d\n", response->stat_arr[0] -> size);
+
     for (i=0; i< cnt; i++){
-        fprintf(stderr, "i : %d\n", i);
-        /*struct file_stat * s;*/
-        /*EVTAG_ARRAY_GET(pong, machines, 0, &m);*/
+        struct file_stat * stat = file_stat_new();
+        fprintf(stderr, "stat_arr[%d].ino : %d\n", i, stat->inode);
+        fprintf(stderr, "stat_arr[%d].size: %d\n", i, stat->size);
+
+        if (0 != EVTAG_ARRAY_GET(response, stat_arr, i, &stat))
+            fprintf(stderr, "something error on EVTAG_ARRAY_GET");
+
+        fprintf(stderr, "stat_arr[%d].ino : %d\n", i, stat->inode);
+        fprintf(stderr, "stat_arr[%d].size: %d\n", i, stat->size);
         /*printf("machine %d: \n", i);*/
         
         /*printf("m->port : %d \n", m->port);*/
         /*printf("m->ip : %s \n", m->ip);*/
     }
+
+
 
     event_loopexit(NULL);
 }
@@ -55,8 +67,8 @@ int stat_send_request(int * ino_arr, int len, struct file_stat * stat_arr)
     struct stat_response * response = stat_response_new();
     int i;
     for(i=0; i<len; i++){
-        int * t = EVTAG_ARRAY_ADD(response, stat_arr);
-        *t = ino_arr[i];
+        int * t = EVTAG_ARRAY_ADD_VALUE(req, ino_arr, ino_arr[i]);
+        fprintf(stderr, "add value: %d", ino_arr[i]);
     }
 
     int rst = EVRPC_MAKE_REQUEST(rpc_stat, pool, req, response,  stat_cb, NULL);
@@ -68,8 +80,15 @@ int stat_send_request(int * ino_arr, int len, struct file_stat * stat_arr)
     if (cnt!=len)
         return -1;
     for (i=0; i< len; i++){
-        EVTAG_ARRAY_GET(response, stat_arr, i, stat_arr + i);
-        fprintf(stderr, "stat_arr[%d].size: ", i, stat_arr[i].size);
+        struct file_stat * stat = stat_arr +i;
+        EVTAG_ARRAY_GET(response, stat_arr, i, &stat);
+        fprintf(stderr, "stat_arr[%d].ino : %d\n", i, stat->inode);
+        fprintf(stderr, "stat_arr[%d].size: %d\n", i, stat->size);
+
+        fprintf(stderr, "stat_arr+i: %p", stat_arr+i);
+        fprintf(stderr, "stat : %p", stat);
+
+        fprintf(stderr, "stat_arr[%d].size: %d\n", i, stat_arr[i].size);
         /*printf("machine %d: \n", i);*/
         
         /*printf("m->port : %d \n", m->port);*/
@@ -103,7 +122,8 @@ void mds_conn_init(){
 
     pool = evrpc_pool_new(NULL); 
 
-    evcon = evhttp_connection_new("127.0.0.1", port);
+    /*evcon = evhttp_connection_new("127.0.0.1", port);*/
+    evcon = evhttp_connection_new("192.168.1.102", port);
     fprintf(stderr, "evcon : %p\n", evcon);
 
     evrpc_pool_add_connection(pool, evcon);
