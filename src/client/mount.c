@@ -10,28 +10,52 @@
 #include <assert.h>
 
 #include <http_client.h>
+#include "mds_conn.h"
+
 
 static const char *hello_str = "Hello World!\n";
 static const char *hello_name = "hello";
 
+static void test(){
+    int arr[1] ;
+    struct file_stat stat_arr[1];
+    arr[0] = 2;
+    stat_send_request(arr, 1, stat_arr);
+}
+
 static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
 {
-	stbuf->st_ino = ino;
-	switch (ino) {
-	case 1:
-		stbuf->st_mode = S_IFDIR | 0755;
-		stbuf->st_nlink = 2;
-		break;
 
-	case 2:
-		stbuf->st_mode = S_IFREG | 0444;
-		stbuf->st_nlink = 1;
-		stbuf->st_size = strlen(hello_str);
-		break;
+    
+    int arr[1] ;
+    struct file_stat stat_arr[1];
+    arr[0] = ino;
 
-	default:
-		return -1;
-	}
+
+
+    stbuf->st_ino = ino;
+    switch (ino) {
+    case 1:
+        stbuf->st_mode = S_IFDIR | 0755;
+        stbuf->st_nlink = 2;
+        break;
+
+    case 2:
+        stbuf->st_mode = S_IFREG | 0444;
+        stbuf->st_nlink = 1;
+        stbuf->st_size = strlen(hello_str);
+
+        stat_send_request(arr, 1, stat_arr);
+
+        stbuf->st_size = stat_arr[0].size;
+        stbuf->st_mode = S_IFREG | 0444;
+        stbuf->st_nlink = 1;
+
+        break;
+
+    default:
+        return -1;
+    }
 	return 0;
 }
 
@@ -144,9 +168,6 @@ static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 	/*reply_buf_limited(req, hello_str, 1, off, size);*/
 }
 
-
-
-
 static struct fuse_lowlevel_ops hello_ll_oper = {
 	.lookup		= hello_ll_lookup,
 	.getattr	= hello_ll_getattr,
@@ -155,11 +176,12 @@ static struct fuse_lowlevel_ops hello_ll_oper = {
 	.read		= hello_ll_read,
 };
 
-void get();
 int main(int argc, char *argv[])
 {
-    event_init();
-    get();
+    mds_conn_init();
+    ping_send_request();
+    test();
+
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 	struct fuse_chan *ch;
 	char *mountpoint;
@@ -187,13 +209,3 @@ int main(int argc, char *argv[])
 	return err ? 1 : 0;
 }
 
-void get(){
-    /*http_response * response = http_get("http://10.100.1.76:6006/get/2");*/
-    http_response * response = http_get("http://10.100.1.76/");
-    char * p;
-    while(( p = evbuffer_readline(response->body))){
-        printf("%s\n", p);
-        free(p);
-    }
-
-}
