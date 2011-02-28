@@ -28,4 +28,5 @@ int select_hdd();
 hdd_chunk * chunk_hashtable_get(uint64_t chunkid);
 hdd_chunk * hdd_create_chunk(uint64_t chunkid, size_t size);
 hdd_chunk * hdd_md5_chunk(uint64_t chunkid);
+void hdd_chunk_printf(hdd_chunk * chunk);
 

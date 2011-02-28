@@ -9,6 +9,7 @@
 #include <evhttp.h>
 #include <evutil.h>
 #include <event2/buffer.h>
+#include <unistd.h>
 
 #include <errno.h>
 #include <stdlib.h>
@@ -181,8 +182,9 @@ struct http_response *http_request(const char *url, int verb, struct evbuffer * 
 
     context_free(ctx);
 
+    struct evbuffer * header = evbuffer_new();
 
-    return http_response_new(200, NULL, body);
+    return http_response_new(200, header, body);
 }
 
 struct http_response *http_get(const char *url){

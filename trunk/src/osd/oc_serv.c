@@ -152,6 +152,7 @@ void read_chunk(uint64_t chunkid, struct evhttp_request *req){
     logging(LOG_DEUBG, "%s: called\n", __func__);
 
     hdd_chunk * chunk = chunk_hashtable_get(chunkid);
+    hdd_chunk_printf(chunk);
     
     int fd = open(chunk -> path, O_RDONLY);
     struct stat st;

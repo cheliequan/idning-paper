@@ -21,7 +21,7 @@
 void test_get(){
     char*  p;
     //http://www.baidu.com/search/error.html
-    http_response * response = http_get("http://220.181.111.85/");  // xiaonei.com/home
+    http_response * response = http_get("http://10.100.1.76/");  // xiaonei.com/home
     printf("%d\n", response -> status_code);
 
     while(( p = evbuffer_readline(response->headers))){
