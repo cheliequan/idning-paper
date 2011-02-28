@@ -217,25 +217,25 @@ int file_stat_size_get(struct file_stat *, ev_uint32_t *);
 
 /* Tag definition for stat_request */
 enum stat_request_ {
-  STAT_REQUEST_INODE_ARR=1,
+  STAT_REQUEST_INO_ARR=1,
   STAT_REQUEST_MAX_TAGS
 };
 
 /* Structure declaration for stat_request */
 struct stat_request_access_ {
-  int (*inode_arr_assign)(struct stat_request *, int, const ev_uint32_t);
-  int (*inode_arr_get)(struct stat_request *, int, ev_uint32_t *);
-  ev_uint32_t * (*inode_arr_add)(struct stat_request *msg, const ev_uint32_t value);
+  int (*ino_arr_assign)(struct stat_request *, int, const ev_uint32_t);
+  int (*ino_arr_get)(struct stat_request *, int, ev_uint32_t *);
+  ev_uint32_t * (*ino_arr_add)(struct stat_request *msg, const ev_uint32_t value);
 };
 
 struct stat_request {
   struct stat_request_access_ *base;
 
-  ev_uint32_t *inode_arr;
-  int inode_arr_length;
-  int inode_arr_num_allocated;
+  ev_uint32_t *ino_arr;
+  int ino_arr_length;
+  int ino_arr_num_allocated;
 
-  ev_uint8_t inode_arr_set;
+  ev_uint8_t ino_arr_set;
 };
 
 struct stat_request *stat_request_new(void);
@@ -249,9 +249,9 @@ void evtag_marshal_stat_request(struct evbuffer *, ev_uint32_t,
     const struct stat_request *);
 int evtag_unmarshal_stat_request(struct evbuffer *, ev_uint32_t,
     struct stat_request *);
-int stat_request_inode_arr_assign(struct stat_request *, int, const ev_uint32_t);
-int stat_request_inode_arr_get(struct stat_request *, int, ev_uint32_t *);
-ev_uint32_t * stat_request_inode_arr_add(struct stat_request *msg, const ev_uint32_t value);
+int stat_request_ino_arr_assign(struct stat_request *, int, const ev_uint32_t);
+int stat_request_ino_arr_get(struct stat_request *, int, ev_uint32_t *);
+ev_uint32_t * stat_request_ino_arr_add(struct stat_request *msg, const ev_uint32_t value);
 /* --- stat_request done --- */
 
 /* Tag definition for stat_response */

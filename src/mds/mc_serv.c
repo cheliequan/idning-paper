@@ -26,17 +26,19 @@ stat_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
     struct stat_request *request = rpc->request;
     struct stat_response *response = rpc->reply;
 
-    int cnt = EVTAG_ARRAY_LEN(request, inode_arr);
+    int cnt = EVTAG_ARRAY_LEN(request, ino_arr);
     int i;
     for (i=0; i< cnt; i++){
         int inode; 
-        EVTAG_ARRAY_GET(request, inode_arr, i, &inode);
+        EVTAG_ARRAY_GET(request, ino_arr, i, &inode);
         fprintf(stderr, "inode %d: \n", inode);
 
         struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
         fs_stat(inode, t);
         EVTAG_ASSIGN(t, inode, t-> inode); // 不然它不认..
         EVTAG_ASSIGN(t, size , t-> size); // 不然它不认..
+        fprintf(stderr, "file size: %d: \n", t-> size);
+        
     }
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -82,7 +84,8 @@ rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
     struct evrpc_base *base = NULL;
 
     int port = 9527;
-    http = evhttp_start("0.0.0.0", port);
+    /*http = evhttp_start("0.0.0.0", port);*/
+    http = evhttp_start("192.168.1.102", port);
     if (!http){
         perror("can't start server!");
         exit(-1);

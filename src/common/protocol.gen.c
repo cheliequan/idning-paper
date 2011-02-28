@@ -990,9 +990,9 @@ evtag_marshal_file_stat(struct evbuffer *evbuf, ev_uint32_t tag, const struct fi
  */
 
 static struct stat_request_access_ __stat_request_base = {
-  stat_request_inode_arr_assign,
-  stat_request_inode_arr_get,
-  stat_request_inode_arr_add,
+  stat_request_ino_arr_assign,
+  stat_request_ino_arr_get,
+  stat_request_ino_arr_add,
 };
 
 struct stat_request *
@@ -1011,99 +1011,99 @@ stat_request_new_with_arg(void *unused)
   }
   tmp->base = &__stat_request_base;
 
-  tmp->inode_arr = NULL;
-  tmp->inode_arr_length = 0;
-  tmp->inode_arr_num_allocated = 0;
-  tmp->inode_arr_set = 0;
+  tmp->ino_arr = NULL;
+  tmp->ino_arr_length = 0;
+  tmp->ino_arr_num_allocated = 0;
+  tmp->ino_arr_set = 0;
 
   return (tmp);
 }
 
 static int
-stat_request_inode_arr_expand_to_hold_more(struct stat_request *msg)
+stat_request_ino_arr_expand_to_hold_more(struct stat_request *msg)
 {
-  int tobe_allocated = msg->inode_arr_num_allocated;
+  int tobe_allocated = msg->ino_arr_num_allocated;
   ev_uint32_t* new_d_ata = NULL;
   tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
-  new_d_ata = (ev_uint32_t*) realloc(msg->inode_arr,
+  new_d_ata = (ev_uint32_t*) realloc(msg->ino_arr,
       tobe_allocated * sizeof(ev_uint32_t));
   if (new_d_ata == NULL)
     return -1;
-  msg->inode_arr = new_d_ata;
-  msg->inode_arr_num_allocated = tobe_allocated;
+  msg->ino_arr = new_d_ata;
+  msg->ino_arr_num_allocated = tobe_allocated;
   return 0;}
 
 ev_uint32_t *
-stat_request_inode_arr_add(struct stat_request *msg, const ev_uint32_t value)
+stat_request_ino_arr_add(struct stat_request *msg, const ev_uint32_t value)
 {
-  if (++msg->inode_arr_length >= msg->inode_arr_num_allocated) {
-    if (stat_request_inode_arr_expand_to_hold_more(msg)<0)
+  if (++msg->ino_arr_length >= msg->ino_arr_num_allocated) {
+    if (stat_request_ino_arr_expand_to_hold_more(msg)<0)
       goto error;
   }
-  msg->inode_arr[msg->inode_arr_length - 1] = value;
-  msg->inode_arr_set = 1;
-  return &(msg->inode_arr[msg->inode_arr_length - 1]);
+  msg->ino_arr[msg->ino_arr_length - 1] = value;
+  msg->ino_arr_set = 1;
+  return &(msg->ino_arr[msg->ino_arr_length - 1]);
 error:
-  --msg->inode_arr_length;
+  --msg->ino_arr_length;
   return (NULL);
 }
 
 int
-stat_request_inode_arr_assign(struct stat_request *msg, int off,
+stat_request_ino_arr_assign(struct stat_request *msg, int off,
     const ev_uint32_t value)
 {
-  if (!msg->inode_arr_set || off < 0 || off >= msg->inode_arr_length)
+  if (!msg->ino_arr_set || off < 0 || off >= msg->ino_arr_length)
     return (-1);
 
   {
-    msg->inode_arr[off] = value;
+    msg->ino_arr[off] = value;
   }
   return (0);
 }
 
 int
-stat_request_inode_arr_get(struct stat_request *msg, int offset,
+stat_request_ino_arr_get(struct stat_request *msg, int offset,
     ev_uint32_t *value)
 {
-  if (!msg->inode_arr_set || offset < 0 || offset >= msg->inode_arr_length)
+  if (!msg->ino_arr_set || offset < 0 || offset >= msg->ino_arr_length)
     return (-1);
-  *value = msg->inode_arr[offset];
+  *value = msg->ino_arr[offset];
   return (0);
 }
 
 void
 stat_request_clear(struct stat_request *tmp)
 {
-  if (tmp->inode_arr_set == 1) {
-    free(tmp->inode_arr);
-    tmp->inode_arr = NULL;
-    tmp->inode_arr_set = 0;
-    tmp->inode_arr_length = 0;
-    tmp->inode_arr_num_allocated = 0;
+  if (tmp->ino_arr_set == 1) {
+    free(tmp->ino_arr);
+    tmp->ino_arr = NULL;
+    tmp->ino_arr_set = 0;
+    tmp->ino_arr_length = 0;
+    tmp->ino_arr_num_allocated = 0;
   }
 }
 
 void
 stat_request_free(struct stat_request *tmp)
 {
-  if (tmp->inode_arr_set == 1) {
-    free(tmp->inode_arr);
-    tmp->inode_arr = NULL;
-    tmp->inode_arr_set = 0;
-    tmp->inode_arr_length = 0;
-    tmp->inode_arr_num_allocated = 0;
+  if (tmp->ino_arr_set == 1) {
+    free(tmp->ino_arr);
+    tmp->ino_arr = NULL;
+    tmp->ino_arr_set = 0;
+    tmp->ino_arr_length = 0;
+    tmp->ino_arr_num_allocated = 0;
   }
-  free(tmp->inode_arr);
+  free(tmp->ino_arr);
   free(tmp);
 }
 
 void
 stat_request_marshal(struct evbuffer *evbuf, const struct stat_request *tmp){
-  if (tmp->inode_arr_set) {
+  if (tmp->ino_arr_set) {
     {
       int i;
-      for (i = 0; i < tmp->inode_arr_length; ++i) {
-    evtag_marshal_int(evbuf, STAT_REQUEST_INODE_ARR, tmp->inode_arr[i]);
+      for (i = 0; i < tmp->ino_arr_length; ++i) {
+    evtag_marshal_int(evbuf, STAT_REQUEST_INO_ARR, tmp->ino_arr[i]);
       }
     }
   }
@@ -1118,19 +1118,19 @@ stat_request_unmarshal(struct stat_request *tmp,  struct evbuffer *evbuf)
       return (-1);
     switch (tag) {
 
-      case STAT_REQUEST_INODE_ARR:
+      case STAT_REQUEST_INO_ARR:
 
-        if (tmp->inode_arr_length >= tmp->inode_arr_num_allocated &&
-            stat_request_inode_arr_expand_to_hold_more(tmp) < 0) {
+        if (tmp->ino_arr_length >= tmp->ino_arr_num_allocated &&
+            stat_request_ino_arr_expand_to_hold_more(tmp) < 0) {
           puts("HEY NOW");
           return (-1);
         }
-        if (evtag_unmarshal_int(evbuf, STAT_REQUEST_INODE_ARR, &tmp->inode_arr[tmp->inode_arr_length]) == -1) {
-          event_warnx("%s: failed to unmarshal inode_arr", __func__);
+        if (evtag_unmarshal_int(evbuf, STAT_REQUEST_INO_ARR, &tmp->ino_arr[tmp->ino_arr_length]) == -1) {
+          event_warnx("%s: failed to unmarshal ino_arr", __func__);
           return (-1);
         }
-        ++tmp->inode_arr_length;
-        tmp->inode_arr_set = 1;
+        ++tmp->ino_arr_length;
+        tmp->ino_arr_set = 1;
         break;
 
       default:
