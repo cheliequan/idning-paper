@@ -88,7 +88,8 @@ int stat_send_request(int * ino_arr, int len, struct file_stat * stat_arr)
         fprintf(stderr, "stat_arr+i: %p", stat_arr+i);
         fprintf(stderr, "stat : %p", stat);
 
-        fprintf(stderr, "stat_arr[%d].size: %d\n", i, stat_arr[i].size);
+        stat_arr[i].size = stat-> size;
+        stat_arr[i].inode = stat-> inode;
         /*printf("machine %d: \n", i);*/
         
         /*printf("m->port : %d \n", m->port);*/
