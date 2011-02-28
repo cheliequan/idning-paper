@@ -16,6 +16,17 @@ struct pong {
 	int version = 1;
 	int xx = 2;
     array struct[machine] machines = 3;
-    
 }
 
+struct file_stat {
+    int   inode   = 1;
+    int     size    = 2;
+}
+
+struct stat_request {
+    array int inode_arr = 1;
+}
+
+struct stat_response {
+    array struct[file_stat] stat_arr = 1;
+}

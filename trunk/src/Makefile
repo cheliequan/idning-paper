@@ -9,6 +9,7 @@
 
 all: cs 
 	scons -Q -f scons.py
+g : gen
 
 gen: 
 	#./scripts/protocol_gen.py

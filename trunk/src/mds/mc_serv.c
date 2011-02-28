@@ -1,7 +1,11 @@
 #include <event.h>
 #include <evhttp.h>
+#include <string.h>
+
 #include "protocol.gen.h"
 #include "protocol.h"
+#include "fs.h"
+
 
 
 #define MAX_MACHINE_CNT 256
@@ -15,6 +19,27 @@ void cluster_add(char * ip, int port, char type);
 void cluster_remove(char * ip, int port);
 void cluster_dump();
 
+static void
+stat_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
+{
+    fprintf(stderr, "%s: called\n", __func__);
+    struct stat_request *request = rpc->request;
+    struct stat_response *response = rpc->reply;
+
+    int cnt = EVTAG_ARRAY_LEN(request, inode_arr);
+    int i;
+    for (i=0; i< cnt; i++){
+        int inode; 
+        EVTAG_ARRAY_GET(request, inode_arr, i, &inode);
+        fprintf(stderr, "inode %d: \n", inode);
+
+        struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
+        fs_stat(inode, t);
+        EVTAG_ASSIGN(t, inode, t-> inode); // 不然它不认..
+        EVTAG_ASSIGN(t, size , t-> size); // 不然它不认..
+    }
+    EVRPC_REQUEST_DONE(rpc);
+}
 
 static void
 ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
@@ -58,10 +83,16 @@ rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
 
     int port = 9527;
     http = evhttp_start("0.0.0.0", port);
+    if (!http){
+        perror("can't start server!");
+        exit(-1);
+    }
+
 
     base = evrpc_init(http);
 
     EVRPC_REGISTER(base, rpc_ping, ping, pong, ping_handler, NULL);
+    EVRPC_REGISTER(base, rpc_stat, stat_request, stat_response, stat_handler, NULL);
 
     *phttp = http;
     *pport = port;
@@ -74,11 +105,11 @@ int main()
     ev_uint16_t port;
     struct evhttp *http = NULL;
     struct evrpc_base *base = NULL;
-    struct evrpc_pool *pool = NULL;
 
     event_init();
     rpc_setup(&http, &port, &base);
     event_dispatch();
+    return 0;
 }
 
 void cluster_printf(char * hint){
