@@ -65,11 +65,6 @@ static fsnode *root;
 static fsnode* nodehash[NODEHASHSIZE];
 static uint64_t version;
 
-fsnode* fsnode_hash_insert(fsnode * n) ;
-fsnode* fsnode_hash_find(uint32_t ino) ;
-
-fsnode* fsnode_hash_remove(fsnode * p) ;
-
 
 fsnode* fsnode_new() ;
 

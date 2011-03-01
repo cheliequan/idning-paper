@@ -35,8 +35,9 @@ stat_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
 
         struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
         fs_stat(inode, t);
-        EVTAG_ASSIGN(t, inode, t-> inode); // 不然它不认..
+        EVTAG_ASSIGN(t, ino, t-> ino); // 不然它不认..
         EVTAG_ASSIGN(t, size , t-> size); // 不然它不认..
+        fprintf(stderr, "ino %d: \n", t->ino);
         fprintf(stderr, "file size: %d: \n", t-> size);
         
     }

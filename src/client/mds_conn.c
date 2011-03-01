@@ -34,19 +34,21 @@ static void stat_cb(struct evrpc_status *status,
     fprintf(stderr, "%s: called\n", __func__);
     int i;
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
+    if (cnt == 0)
+        return;
     fprintf(stderr, "msg->stat_arr_set : %d\n", response->stat_arr_set);
-    fprintf(stderr, "msg->: %d\n", response->stat_arr[0] -> inode);
+    fprintf(stderr, "msg->: %d\n", response->stat_arr[0] -> ino);
     fprintf(stderr, "msg->: %d\n", response->stat_arr[0] -> size);
 
     for (i=0; i< cnt; i++){
         struct file_stat * stat = file_stat_new();
-        fprintf(stderr, "stat_arr[%d].ino : %d\n", i, stat->inode);
+        fprintf(stderr, "stat_arr[%d].ino : %d\n", i, stat->ino);
         fprintf(stderr, "stat_arr[%d].size: %d\n", i, stat->size);
 
         if (0 != EVTAG_ARRAY_GET(response, stat_arr, i, &stat))
             fprintf(stderr, "something error on EVTAG_ARRAY_GET");
 
-        fprintf(stderr, "stat_arr[%d].ino : %d\n", i, stat->inode);
+        fprintf(stderr, "stat_arr[%d].ino : %d\n", i, stat->ino);
         fprintf(stderr, "stat_arr[%d].size: %d\n", i, stat->size);
         /*printf("machine %d: \n", i);*/
         
@@ -82,14 +84,14 @@ int stat_send_request(int * ino_arr, int len, struct file_stat * stat_arr)
     for (i=0; i< len; i++){
         struct file_stat * stat = stat_arr +i;
         EVTAG_ARRAY_GET(response, stat_arr, i, &stat);
-        fprintf(stderr, "stat_arr[%d].ino : %d\n", i, stat->inode);
+        fprintf(stderr, "stat_arr[%d].ino : %d\n", i, stat->ino);
         fprintf(stderr, "stat_arr[%d].size: %d\n", i, stat->size);
 
         fprintf(stderr, "stat_arr+i: %p", stat_arr+i);
         fprintf(stderr, "stat : %p", stat);
 
         stat_arr[i].size = stat-> size;
-        stat_arr[i].inode = stat-> inode;
+        stat_arr[i].ino = stat-> ino;
         /*printf("machine %d: \n", i);*/
         
         /*printf("m->port : %d \n", m->port);*/

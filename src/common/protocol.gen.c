@@ -817,10 +817,14 @@ evtag_marshal_pong(struct evbuffer *evbuf, ev_uint32_t tag, const struct pong *m
  */
 
 static struct file_stat_access_ __file_stat_base = {
-  file_stat_inode_assign,
-  file_stat_inode_get,
+  file_stat_ino_assign,
+  file_stat_ino_get,
   file_stat_size_assign,
   file_stat_size_get,
+  file_stat_type_assign,
+  file_stat_type_get,
+  file_stat_name_assign,
+  file_stat_name_get,
 };
 
 struct file_stat *
@@ -839,22 +843,30 @@ file_stat_new_with_arg(void *unused)
   }
   tmp->base = &__file_stat_base;
 
-  tmp->inode = 0;
-  tmp->inode_set = 0;
+  tmp->ino = 0;
+  tmp->ino_set = 0;
 
   tmp->size = 0;
   tmp->size_set = 0;
+
+  tmp->type = 0;
+  tmp->type_set = 0;
+
+  tmp->name = NULL;
+  tmp->name_set = 0;
 
   return (tmp);
 }
 
 
 
+
+
 int
-file_stat_inode_assign(struct file_stat *msg, const ev_uint32_t value)
+file_stat_ino_assign(struct file_stat *msg, const ev_uint32_t value)
 {
-  msg->inode_set = 1;
-  msg->inode = value;
+  msg->ino_set = 1;
+  msg->ino = value;
   return (0);
 }
 
@@ -867,11 +879,31 @@ file_stat_size_assign(struct file_stat *msg, const ev_uint32_t value)
 }
 
 int
-file_stat_inode_get(struct file_stat *msg, ev_uint32_t *value)
+file_stat_type_assign(struct file_stat *msg, const ev_uint32_t value)
 {
-  if (msg->inode_set != 1)
+  msg->type_set = 1;
+  msg->type = value;
+  return (0);
+}
+
+int
+file_stat_name_assign(struct file_stat *msg,
+    const char * value)
+{
+  if (msg->name != NULL)
+    free(msg->name);
+  if ((msg->name = strdup(value)) == NULL)
     return (-1);
-  *value = msg->inode;
+  msg->name_set = 1;
+  return (0);
+}
+
+int
+file_stat_ino_get(struct file_stat *msg, ev_uint32_t *value)
+{
+  if (msg->ino_set != 1)
+    return (-1);
+  *value = msg->ino;
   return (0);
 }
 
@@ -884,23 +916,55 @@ file_stat_size_get(struct file_stat *msg, ev_uint32_t *value)
   return (0);
 }
 
+int
+file_stat_type_get(struct file_stat *msg, ev_uint32_t *value)
+{
+  if (msg->type_set != 1)
+    return (-1);
+  *value = msg->type;
+  return (0);
+}
+
+int
+file_stat_name_get(struct file_stat *msg, char * *value)
+{
+  if (msg->name_set != 1)
+    return (-1);
+  *value = msg->name;
+  return (0);
+}
+
 void
 file_stat_clear(struct file_stat *tmp)
 {
-  tmp->inode_set = 0;
+  tmp->ino_set = 0;
   tmp->size_set = 0;
+  tmp->type_set = 0;
+  if (tmp->name_set == 1) {
+    free(tmp->name);
+    tmp->name = NULL;
+    tmp->name_set = 0;
+  }
 }
 
 void
 file_stat_free(struct file_stat *tmp)
 {
+  if (tmp->name != NULL)
+      free (tmp->name);
   free(tmp);
 }
 
 void
 file_stat_marshal(struct evbuffer *evbuf, const struct file_stat *tmp){
-  evtag_marshal_int(evbuf, FILE_STAT_INODE, tmp->inode);
+  evtag_marshal_int(evbuf, FILE_STAT_INO, tmp->ino);
   evtag_marshal_int(evbuf, FILE_STAT_SIZE, tmp->size);
+  if (tmp->type_set) {
+    evtag_marshal_int(evbuf, FILE_STAT_TYPE, tmp->type);
+  }
+  if (tmp->name_set) {
+    evtag_marshal_string(evbuf, FILE_STAT_NAME, tmp->name);
+  }
 }
 
 int
@@ -912,15 +976,15 @@ file_stat_unmarshal(struct file_stat *tmp,  struct evbuffer *evbuf)
       return (-1);
     switch (tag) {
 
-      case FILE_STAT_INODE:
+      case FILE_STAT_INO:
 
-        if (tmp->inode_set)
+        if (tmp->ino_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, FILE_STAT_INODE, &tmp->inode) == -1) {
-          event_warnx("%s: failed to unmarshal inode", __func__);
+        if (evtag_unmarshal_int(evbuf, FILE_STAT_INO, &tmp->ino) == -1) {
+          event_warnx("%s: failed to unmarshal ino", __func__);
           return (-1);
         }
-        tmp->inode_set = 1;
+        tmp->ino_set = 1;
         break;
 
       case FILE_STAT_SIZE:
@@ -932,6 +996,28 @@ file_stat_unmarshal(struct file_stat *tmp,  struct evbuffer *evbuf)
           return (-1);
         }
         tmp->size_set = 1;
+        break;
+
+      case FILE_STAT_TYPE:
+
+        if (tmp->type_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, FILE_STAT_TYPE, &tmp->type) == -1) {
+          event_warnx("%s: failed to unmarshal type", __func__);
+          return (-1);
+        }
+        tmp->type_set = 1;
+        break;
+
+      case FILE_STAT_NAME:
+
+        if (tmp->name_set)
+          return (-1);
+        if (evtag_unmarshal_string(evbuf, FILE_STAT_NAME, &tmp->name) == -1) {
+          event_warnx("%s: failed to unmarshal name", __func__);
+          return (-1);
+        }
+        tmp->name_set = 1;
         break;
 
       default:
@@ -947,7 +1033,7 @@ file_stat_unmarshal(struct file_stat *tmp,  struct evbuffer *evbuf)
 int
 file_stat_complete(struct file_stat *msg)
 {
-  if (!msg->inode_set)
+  if (!msg->ino_set)
     return (-1);
   if (!msg->size_set)
     return (-1);
