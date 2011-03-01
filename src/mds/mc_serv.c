@@ -103,6 +103,7 @@ rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
 
 int main()
 {
+    fs_init();
     ev_uint16_t port;
     struct evhttp *http = NULL;
     struct evrpc_base *base = NULL;
