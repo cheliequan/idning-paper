@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "protocol.gen.h"
 #include "protocol.h"
+/*#include "fs.h"*/
 
 
 static void ping_cb(struct evrpc_status *status,
@@ -50,14 +51,7 @@ static void stat_cb(struct evrpc_status *status,
 
         fprintf(stderr, "stat_arr[%d].ino : %d\n", i, stat->ino);
         fprintf(stderr, "stat_arr[%d].size: %d\n", i, stat->size);
-        /*printf("machine %d: \n", i);*/
-        
-        /*printf("m->port : %d \n", m->port);*/
-        /*printf("m->ip : %s \n", m->ip);*/
     }
-
-
-
     event_loopexit(NULL);
 }
 
@@ -92,12 +86,36 @@ int stat_send_request(int * ino_arr, int len, struct file_stat * stat_arr)
 
         stat_arr[i].size = stat-> size;
         stat_arr[i].ino = stat-> ino;
-        /*printf("machine %d: \n", i);*/
-        
-        /*printf("m->port : %d \n", m->port);*/
-        /*printf("m->ip : %s \n", m->ip);*/
     }
     return 0;
+}
+
+
+//seams same as stat_send_request
+int ls_send_request(int ino, struct file_stat * stat_arr)
+{
+    struct ls_request * req = ls_request_new();
+    struct ls_response * response = ls_response_new();
+
+    EVTAG_ARRAY_ADD_VALUE(req, ino_arr, ino);
+
+    int rst = EVRPC_MAKE_REQUEST(rpc_ls, pool, req, response,  NULL, NULL);
+    event_dispatch();
+
+    int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
+    fprintf(stderr, "after dispatch cnt: %d\n", cnt);
+    /*struct file_stat ** arr = malloc(cnt*sizeof(struct file_stat *));*/
+
+    int i;
+    struct file_stat * stat = file_stat_new();
+    for (i=0; i< cnt; i++){
+        EVTAG_ARRAY_GET(response, stat_arr, i, &stat);
+        stat_arr[i].size = stat-> size;
+        stat_arr[i].ino = stat-> ino;
+        stat_arr[i].name = strdup(stat-> name);
+        stat_arr[i].type = strdup(stat-> type);
+    }
+    return cnt;
 }
 
 int ping_send_request(void)
