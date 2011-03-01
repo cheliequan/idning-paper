@@ -123,8 +123,8 @@ void mds_conn_init(){
 
     pool = evrpc_pool_new(NULL); 
 
-    /*evcon = evhttp_connection_new("127.0.0.1", port);*/
-    evcon = evhttp_connection_new("192.168.1.102", port);
+    evcon = evhttp_connection_new("127.0.0.1", port);
+    /*evcon = evhttp_connection_new("192.168.1.102", port);*/
     fprintf(stderr, "evcon : %p\n", evcon);
 
     evrpc_pool_add_connection(pool, evcon);

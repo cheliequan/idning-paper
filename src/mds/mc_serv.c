@@ -84,8 +84,8 @@ rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
     struct evrpc_base *base = NULL;
 
     int port = 9527;
-    /*http = evhttp_start("0.0.0.0", port);*/
-    http = evhttp_start("192.168.1.102", port);
+    http = evhttp_start("0.0.0.0", port);
+    /*http = evhttp_start("192.168.1.102", port);*/
     if (!http){
         perror("can't start server!");
         exit(-1);
