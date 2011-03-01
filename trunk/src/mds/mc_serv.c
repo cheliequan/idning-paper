@@ -91,7 +91,6 @@ rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
         exit(-1);
     }
 
-
     base = evrpc_init(http);
 
     EVRPC_REGISTER(base, rpc_ping, ping, pong, ping_handler, NULL);
@@ -100,7 +99,6 @@ rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
     *phttp = http;
     *pport = port;
     *pbase = base;
-
 }
 
 int main()
