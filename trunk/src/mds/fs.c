@@ -116,7 +116,7 @@ int fs_init(){
 
 int fs_stat(int ino, struct file_stat * st){
     fsnode *n = fsnode_hash_find(ino);
-    st->inode = ino;
+    st->ino = ino;
     st->size = n-> data.fdata.length;
     return 0;
 }

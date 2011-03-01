@@ -175,27 +175,37 @@ struct machine*  pong_machines_add(struct pong *msg);
 
 /* Tag definition for file_stat */
 enum file_stat_ {
-  FILE_STAT_INODE=1,
+  FILE_STAT_INO=1,
   FILE_STAT_SIZE=2,
+  FILE_STAT_TYPE=3,
+  FILE_STAT_NAME=4,
   FILE_STAT_MAX_TAGS
 };
 
 /* Structure declaration for file_stat */
 struct file_stat_access_ {
-  int (*inode_assign)(struct file_stat *, const ev_uint32_t);
-  int (*inode_get)(struct file_stat *, ev_uint32_t *);
+  int (*ino_assign)(struct file_stat *, const ev_uint32_t);
+  int (*ino_get)(struct file_stat *, ev_uint32_t *);
   int (*size_assign)(struct file_stat *, const ev_uint32_t);
   int (*size_get)(struct file_stat *, ev_uint32_t *);
+  int (*type_assign)(struct file_stat *, const ev_uint32_t);
+  int (*type_get)(struct file_stat *, ev_uint32_t *);
+  int (*name_assign)(struct file_stat *, const char *);
+  int (*name_get)(struct file_stat *, char * *);
 };
 
 struct file_stat {
   struct file_stat_access_ *base;
 
-  ev_uint32_t inode;
+  ev_uint32_t ino;
   ev_uint32_t size;
+  ev_uint32_t type;
+  char *name;
 
-  ev_uint8_t inode_set;
+  ev_uint8_t ino_set;
   ev_uint8_t size_set;
+  ev_uint8_t type_set;
+  ev_uint8_t name_set;
 };
 
 struct file_stat *file_stat_new(void);
@@ -209,10 +219,14 @@ void evtag_marshal_file_stat(struct evbuffer *, ev_uint32_t,
     const struct file_stat *);
 int evtag_unmarshal_file_stat(struct evbuffer *, ev_uint32_t,
     struct file_stat *);
-int file_stat_inode_assign(struct file_stat *, const ev_uint32_t);
-int file_stat_inode_get(struct file_stat *, ev_uint32_t *);
+int file_stat_ino_assign(struct file_stat *, const ev_uint32_t);
+int file_stat_ino_get(struct file_stat *, ev_uint32_t *);
 int file_stat_size_assign(struct file_stat *, const ev_uint32_t);
 int file_stat_size_get(struct file_stat *, ev_uint32_t *);
+int file_stat_type_assign(struct file_stat *, const ev_uint32_t);
+int file_stat_type_get(struct file_stat *, ev_uint32_t *);
+int file_stat_name_assign(struct file_stat *, const char *);
+int file_stat_name_get(struct file_stat *, char * *);
 /* --- file_stat done --- */
 
 /* Tag definition for stat_request */
