@@ -44,6 +44,32 @@ stat_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
     EVRPC_REQUEST_DONE(rpc);
 }
 
+
+
+static void
+ls_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
+{
+    fprintf(stderr, "%s: called\n", __func__);
+    struct stat_request *request = rpc->request;
+    struct stat_response *response = rpc->reply;
+
+    int cnt = EVTAG_ARRAY_LEN(request, ino_arr);
+    int ino; 
+    EVTAG_ARRAY_GET(request, ino_arr, 0, &ino);
+    fsnode * n = fs_ls(ino);
+
+    fsnode * p;
+    dlist_t * head = &(n -> tree_dlist);
+    dlist_t * pl;
+    for (pl = head->next; pl!=head; pl=pl->next){
+        p = dlist_data(pl, fsnode, tree_dlist);
+        struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
+        EVTAG_ASSIGN(t, ino, p-> ino); // 不然它不认..
+        EVTAG_ASSIGN(t, size , p-> data.fdata.length); // 不然它不认..
+    }
+    EVRPC_REQUEST_DONE(rpc);
+}
+
 static void
 ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
 {
@@ -96,6 +122,7 @@ rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
 
     EVRPC_REGISTER(base, rpc_ping, ping, pong, ping_handler, NULL);
     EVRPC_REGISTER(base, rpc_stat, stat_request, stat_response, stat_handler, NULL);
+    EVRPC_REGISTER(base, rpc_ls, ls_request, ls_response, ls_handler, NULL);
 
     *phttp = http;
     *pport = port;

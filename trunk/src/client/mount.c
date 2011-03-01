@@ -120,18 +120,22 @@ static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
 {
 	(void) fi;
 
-	if (ino != 1)
-		fuse_reply_err(req, ENOTDIR);
-	else {
-		struct dirbuf b;
+    int arr[1] ;
+    arr[0] = ino;
+    struct file_stat stat_arr[100]; //TODO: 100...
+    int cnt = ls_send_request(arr, 1, &stat_arr);
+    int i;
+    struct dirbuf b;
+    memset(&b, 0, sizeof(b));
+    dirbuf_add(req, &b, ".", 1);
+    dirbuf_add(req, &b, "..", 1);
+    for(i=0; i<cnt; i++){
+        memset(&b, 0, sizeof(b));
+		dirbuf_add(req, &b, stat_arr[i].name, stat_arr[i].ino);
+    }
 
-		memset(&b, 0, sizeof(b));
-		dirbuf_add(req, &b, ".", 1);
-		dirbuf_add(req, &b, "..", 1);
-		dirbuf_add(req, &b, hello_name, 2);
-		reply_buf_limited(req, b.p, b.size, off, size);
-		free(b.p);
-	}
+    reply_buf_limited(req, b.p, b.size, off, size);
+    free(b.p);
 }
 
 static void hello_ll_open(fuse_req_t req, fuse_ino_t ino,

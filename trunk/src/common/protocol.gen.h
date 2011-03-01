@@ -14,6 +14,8 @@ struct pong;
 struct file_stat;
 struct stat_request;
 struct stat_response;
+struct ls_request;
+struct ls_response;
 
 /* Tag definition for ping */
 enum ping_ {
@@ -306,5 +308,83 @@ int stat_response_stat_arr_assign(struct stat_response *, int, const struct file
 int stat_response_stat_arr_get(struct stat_response *, int, struct file_stat* *);
 struct file_stat*  stat_response_stat_arr_add(struct stat_response *msg);
 /* --- stat_response done --- */
+
+/* Tag definition for ls_request */
+enum ls_request_ {
+  LS_REQUEST_INO_ARR=1,
+  LS_REQUEST_MAX_TAGS
+};
+
+/* Structure declaration for ls_request */
+struct ls_request_access_ {
+  int (*ino_arr_assign)(struct ls_request *, int, const ev_uint32_t);
+  int (*ino_arr_get)(struct ls_request *, int, ev_uint32_t *);
+  ev_uint32_t * (*ino_arr_add)(struct ls_request *msg, const ev_uint32_t value);
+};
+
+struct ls_request {
+  struct ls_request_access_ *base;
+
+  ev_uint32_t *ino_arr;
+  int ino_arr_length;
+  int ino_arr_num_allocated;
+
+  ev_uint8_t ino_arr_set;
+};
+
+struct ls_request *ls_request_new(void);
+struct ls_request *ls_request_new_with_arg(void *);
+void ls_request_free(struct ls_request *);
+void ls_request_clear(struct ls_request *);
+void ls_request_marshal(struct evbuffer *, const struct ls_request *);
+int ls_request_unmarshal(struct ls_request *, struct evbuffer *);
+int ls_request_complete(struct ls_request *);
+void evtag_marshal_ls_request(struct evbuffer *, ev_uint32_t,
+    const struct ls_request *);
+int evtag_unmarshal_ls_request(struct evbuffer *, ev_uint32_t,
+    struct ls_request *);
+int ls_request_ino_arr_assign(struct ls_request *, int, const ev_uint32_t);
+int ls_request_ino_arr_get(struct ls_request *, int, ev_uint32_t *);
+ev_uint32_t * ls_request_ino_arr_add(struct ls_request *msg, const ev_uint32_t value);
+/* --- ls_request done --- */
+
+/* Tag definition for ls_response */
+enum ls_response_ {
+  LS_RESPONSE_STAT_ARR=1,
+  LS_RESPONSE_MAX_TAGS
+};
+
+/* Structure declaration for ls_response */
+struct ls_response_access_ {
+  int (*stat_arr_assign)(struct ls_response *, int, const struct file_stat*);
+  int (*stat_arr_get)(struct ls_response *, int, struct file_stat* *);
+  struct file_stat*  (*stat_arr_add)(struct ls_response *msg);
+};
+
+struct ls_response {
+  struct ls_response_access_ *base;
+
+  struct file_stat* *stat_arr;
+  int stat_arr_length;
+  int stat_arr_num_allocated;
+
+  ev_uint8_t stat_arr_set;
+};
+
+struct ls_response *ls_response_new(void);
+struct ls_response *ls_response_new_with_arg(void *);
+void ls_response_free(struct ls_response *);
+void ls_response_clear(struct ls_response *);
+void ls_response_marshal(struct evbuffer *, const struct ls_response *);
+int ls_response_unmarshal(struct ls_response *, struct evbuffer *);
+int ls_response_complete(struct ls_response *);
+void evtag_marshal_ls_response(struct evbuffer *, ev_uint32_t,
+    const struct ls_response *);
+int evtag_unmarshal_ls_response(struct evbuffer *, ev_uint32_t,
+    struct ls_response *);
+int ls_response_stat_arr_assign(struct ls_response *, int, const struct file_stat*);
+int ls_response_stat_arr_get(struct ls_response *, int, struct file_stat* *);
+struct file_stat*  ls_response_stat_arr_add(struct ls_response *msg);
+/* --- ls_response done --- */
 
 #endif  /* _COMMON_PROTOCOL_RPC_ */

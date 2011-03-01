@@ -1,34 +1,42 @@
 struct ping {
-	int version = 1;
-	string self_ip = 2;
-	int self_port = 3; 
+	int version                         = 1;
+	string self_ip                      = 2;
+	int self_port                       = 3; 
 }
 
 struct machine {
-    int uuid = 1 ;
-    string ip = 2;
-    int port = 3;
-    int type = 4;
+    int uuid                            = 1 ;
+    string ip                           = 2;
+    int port                            = 3;
+    int type                            = 4;
 }
 
 
 struct pong {
-	int version = 1;
-	int xx = 2;
-    array struct[machine] machines = 3;
+	int version                         = 1;
+	int xx                              = 2;
+    array struct[machine] machines      = 3;
 }
 
 struct file_stat {
-    int   ino           = 1;
-    int   size          = 2;
-    optional int   type          = 3;
-    optional string name = 4;
+    int   ino                           = 1;
+    int   size                          = 2;
+    optional int   type                 = 3;
+    optional string name                = 4;
 }
 
 struct stat_request {
-    array int ino_arr = 1;
+    array int ino_arr                   = 1;
 }
 
 struct stat_response {
-    array struct[file_stat] stat_arr = 1;
+    array struct[file_stat] stat_arr    = 1;
+}
+
+struct ls_request {
+    array int ino_arr                   = 1;
+}
+
+struct ls_response {
+    array struct[file_stat] stat_arr    = 1;
 }

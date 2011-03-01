@@ -79,7 +79,7 @@ inline fsnode* fsnode_new() {
 
 int fs_init(){
     root = fsnode_new();
-    root -> ino = 0;
+    root -> ino = 1;
     
     dlist_t * p = &( root->tree_dlist );
     fsnode * r = dlist_data(p, fsnode, tree_dlist);
@@ -87,11 +87,11 @@ int fs_init(){
     fprintf(stderr, "r : %p \n", r);
     fsnode_hash_insert(r);
 
-    fsnode * n = fsnode_hash_find(0);
+    fsnode * n = fsnode_hash_find(1);
     fprintf(stderr, "n : %p \n", n);
 
     fsnode_hash_remove(n);
-    n = fsnode_hash_find(0);
+    n = fsnode_hash_find(1);
     fprintf(stderr, "n : %p \n", n);
 
 
@@ -119,4 +119,11 @@ int fs_stat(int ino, struct file_stat * st){
     st->ino = ino;
     st->size = n-> data.fdata.length;
     return 0;
+}
+//返回的是children链表上的一个元素，链表中所有元素为兄弟.
+fsnode * fs_ls(int ino){
+    fsnode *n = fsnode_hash_find(ino);
+    /*if (n->type != TYPE_DIRECTORY)*/
+        /*return NULL;*/
+    return n->data.ddata.children;
 }
