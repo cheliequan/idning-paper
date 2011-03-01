@@ -1,7 +1,10 @@
 /*
 the source code is mainly from mfs/mfsmaster/filesystem.c
 */
+#include <stdio.h>
 #include "protocol.gen.h"
+#include "dlist.h"
+
 
 typedef struct _fsnode {
     uint32_t ino;   //4
@@ -13,15 +16,10 @@ typedef struct _fsnode {
     uint32_t uid;
     uint32_t gid;
     struct _fsnode * parent;
-    struct _tree_list{
-        struct _fsnode *next; 
-        struct _fsnode *prev; 
-    }tree_list;
-    struct _hash_list{
-        struct _fsnode *next; 
-        struct _fsnode *prev; 
-    }hash_list;
 
+    struct dlist_t tree_dlist; //在parent->children构成的链表中，用于从ls操作.
+    struct dlist_t hash_dlist; //在hash[]构成的链表中，用于根据id 找文件. lookup操作
+    
     union _data {
         struct _ddata {             // type==TYPE_DIRECTORY
             struct _fsnode * children;
@@ -64,21 +62,13 @@ static fsnode *root;
 static fsnode* nodehash[NODEHASHSIZE];
 static uint64_t version;
 
-//static inline fsnode* fsnodes_hash_find(uint32_t id) {
-    //fsnode *p;
-    //uint32_t nodepos = NODEHASHPOS(id);
-    //for (p=nodehash[nodepos]; p ; p=p->next ) {
-        //if (p->id == id) {
-            //return p;
-        //}
-    //}
-    //return NULL;
-//}
+fsnode* fsnode_hash_insert(fsnode * n) ;
+fsnode* fsnode_hash_find(uint32_t ino) ;
 
-//static inline fsnode* fsnode_new() {
-    //fsnode *p = (fsnode*)malloc(sizeof(fsnode));
-    //return p;
-//}
+fsnode* fsnode_hash_remove(fsnode * p) ;
+
+
+fsnode* fsnode_new() ;
 
 //static inline fsnode* fsnode_create(uint32_t ts,fsnode* parent,uint16_t nleng,const uint8_t *name,uint8_t type,uint16_t mode,uint32_t uid,uint32_t gid) {
 //}
@@ -246,3 +236,7 @@ int fs_set_goal();
 int fs_init();
 int fs_load();
 int fs_store();
+
+
+
+
