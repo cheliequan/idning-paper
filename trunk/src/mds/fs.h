@@ -17,7 +17,10 @@ typedef struct _fsnode {
     uint32_t gid;
     struct _fsnode * parent;
 
-    struct dlist_t tree_dlist; //在parent->children构成的链表中，用于从ls操作.
+    uint16_t nlen;
+    uint8_t * name;
+
+    struct dlist_t tree_dlist; //在parent->children构成的链表 实际上是同父的众节点之间的兄弟关系，用于ls操作. 
     struct dlist_t hash_dlist; //在hash[]构成的链表中，用于根据id 找文件. lookup操作
     
     union _data {
