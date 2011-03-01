@@ -25,13 +25,9 @@ static void test(){
 
 static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
 {
-
-    
     int arr[1] ;
     struct file_stat stat_arr[1];
     arr[0] = ino;
-
-
 
     stbuf->st_ino = ino;
     switch (ino) {
@@ -39,7 +35,6 @@ static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
         stbuf->st_mode = S_IFDIR | 0755;
         stbuf->st_nlink = 2;
         break;
-
     case 2:
         stbuf->st_mode = S_IFREG | 0444;
         stbuf->st_nlink = 1;
@@ -142,9 +137,7 @@ static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
 static void hello_ll_open(fuse_req_t req, fuse_ino_t ino,
 			  struct fuse_file_info *fi)
 {
-	if (ino != 2)
-		fuse_reply_err(req, EISDIR);
-	else if ((fi->flags & 3) != O_RDONLY)
+	if ((fi->flags & 3) != O_RDONLY)
 		fuse_reply_err(req, EACCES);
 	else
 		fuse_reply_open(req, fi);
