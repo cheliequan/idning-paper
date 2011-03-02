@@ -1,6 +1,8 @@
 #include <event.h>
 #include <evhttp.h>
 #include <stdlib.h>
+#include <string.h>
+
 #include "protocol.gen.h"
 #include "protocol.h"
 /*#include "fs.h"*/
@@ -55,6 +57,11 @@ static void stat_cb(struct evrpc_status *status,
     event_loopexit(NULL);
 }
 
+static void ls_cb(struct evrpc_status *status,
+    struct ls_request *request , struct ls_response * response , void *arg){
+    event_loopexit(NULL);
+}
+
 struct evrpc_pool *pool = NULL;
 
 int stat_send_request(int * ino_arr, int len, struct file_stat * stat_arr)
@@ -63,7 +70,7 @@ int stat_send_request(int * ino_arr, int len, struct file_stat * stat_arr)
     struct stat_response * response = stat_response_new();
     int i;
     for(i=0; i<len; i++){
-        int * t = EVTAG_ARRAY_ADD_VALUE(req, ino_arr, ino_arr[i]);
+        EVTAG_ARRAY_ADD_VALUE(req, ino_arr, ino_arr[i]);
         fprintf(stderr, "add value: %d", ino_arr[i]);
     }
 
@@ -99,7 +106,7 @@ int ls_send_request(int ino, struct file_stat * stat_arr)
 
     EVTAG_ARRAY_ADD_VALUE(req, ino_arr, ino);
 
-    int rst = EVRPC_MAKE_REQUEST(rpc_ls, pool, req, response,  NULL, NULL);
+    EVRPC_MAKE_REQUEST(rpc_ls, pool, req, response,  ls_cb, NULL);
     event_dispatch();
 
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
@@ -113,7 +120,7 @@ int ls_send_request(int ino, struct file_stat * stat_arr)
         stat_arr[i].size = stat-> size;
         stat_arr[i].ino = stat-> ino;
         stat_arr[i].name = strdup(stat-> name);
-        stat_arr[i].type = strdup(stat-> type);
+        stat_arr[i].type = stat-> type;
     }
     return cnt;
 }
@@ -133,6 +140,7 @@ int ping_send_request(void)
     int v;
     EVTAG_GET(pong, version, &v);
     fprintf(stderr, "after event_dispatch: version is : %d\n", v);
+    return 0;
 }
 
 

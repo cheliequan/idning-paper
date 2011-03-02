@@ -120,10 +120,8 @@ static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
 {
 	(void) fi;
 
-    int arr[1] ;
-    arr[0] = ino;
     struct file_stat stat_arr[100]; //TODO: 100...
-    int cnt = ls_send_request(arr, 1, &stat_arr);
+    int cnt = ls_send_request(ino, &stat_arr);
     int i;
     struct dirbuf b;
     memset(&b, 0, sizeof(b));

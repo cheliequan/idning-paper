@@ -69,6 +69,7 @@ inline fsnode* fsnode_hash_find(uint32_t ino) {
 inline fsnode* fsnode_hash_remove(fsnode * p) {
     dlist_t * pl = & (p->hash_dlist);
     dlist_remove(pl);
+    return 0;
 }
 
 
@@ -82,18 +83,10 @@ int fs_init(){
     root -> ino = 1;
     
     dlist_t * p = &( root->tree_dlist );
-    fsnode * r = dlist_data(p, fsnode, tree_dlist);
-    fprintf(stderr, "root : %p \n", root);
-    fprintf(stderr, "r : %p \n", r);
-    fsnode_hash_insert(r);
+    fsnode_hash_insert(root);
 
     fsnode * n = fsnode_hash_find(1);
     fprintf(stderr, "n : %p \n", n);
-
-    fsnode_hash_remove(n);
-    n = fsnode_hash_find(1);
-    fprintf(stderr, "n : %p \n", n);
-
 
     fsnode * node2 = fsnode_new();
     fprintf(stderr, "node2 : %p \n", node2);
@@ -103,15 +96,14 @@ int fs_init(){
     node2 -> nlen = strlen(node2->name);
     node2 -> parent = root;
     node2 -> data.fdata.length = 10;
+
     fsnode_hash_insert(node2);
     fsnode_tree_insert(root, node2);
 
     fsnode * node3 = fsnode_tree_find(root, 2);
     fprintf(stderr, "node3 : %p \n", node3);
-    fsnode_tree_remove(node3);
 
-    node3 = fsnode_tree_find(root, 2);
-    fprintf(stderr, "after remove from tree _ node3 : %p \n", node3);
+    return 0;
 }
 
 int fs_stat(int ino, struct file_stat * st){
