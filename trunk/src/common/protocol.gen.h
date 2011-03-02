@@ -16,6 +16,12 @@ struct stat_request;
 struct stat_response;
 struct ls_request;
 struct ls_response;
+struct create_request;
+struct create_response;
+struct rm_request;
+struct rm_response;
+struct statfs_request;
+struct statfs_response;
 
 /* Tag definition for ping */
 enum ping_ {
@@ -386,5 +392,247 @@ int ls_response_stat_arr_assign(struct ls_response *, int, const struct file_sta
 int ls_response_stat_arr_get(struct ls_response *, int, struct file_stat* *);
 struct file_stat*  ls_response_stat_arr_add(struct ls_response *msg);
 /* --- ls_response done --- */
+
+/* Tag definition for create_request */
+enum create_request_ {
+  CREATE_REQUEST_PARENT_INO=1,
+  CREATE_REQUEST_NAME=2,
+  CREATE_REQUEST_MODE=3,
+  CREATE_REQUEST_TYPE=4,
+  CREATE_REQUEST_MAX_TAGS
+};
+
+/* Structure declaration for create_request */
+struct create_request_access_ {
+  int (*parent_ino_assign)(struct create_request *, const ev_uint32_t);
+  int (*parent_ino_get)(struct create_request *, ev_uint32_t *);
+  int (*name_assign)(struct create_request *, const char *);
+  int (*name_get)(struct create_request *, char * *);
+  int (*mode_assign)(struct create_request *, const ev_uint32_t);
+  int (*mode_get)(struct create_request *, ev_uint32_t *);
+  int (*type_assign)(struct create_request *, const ev_uint32_t);
+  int (*type_get)(struct create_request *, ev_uint32_t *);
+};
+
+struct create_request {
+  struct create_request_access_ *base;
+
+  ev_uint32_t parent_ino;
+  char *name;
+  ev_uint32_t mode;
+  ev_uint32_t type;
+
+  ev_uint8_t parent_ino_set;
+  ev_uint8_t name_set;
+  ev_uint8_t mode_set;
+  ev_uint8_t type_set;
+};
+
+struct create_request *create_request_new(void);
+struct create_request *create_request_new_with_arg(void *);
+void create_request_free(struct create_request *);
+void create_request_clear(struct create_request *);
+void create_request_marshal(struct evbuffer *, const struct create_request *);
+int create_request_unmarshal(struct create_request *, struct evbuffer *);
+int create_request_complete(struct create_request *);
+void evtag_marshal_create_request(struct evbuffer *, ev_uint32_t,
+    const struct create_request *);
+int evtag_unmarshal_create_request(struct evbuffer *, ev_uint32_t,
+    struct create_request *);
+int create_request_parent_ino_assign(struct create_request *, const ev_uint32_t);
+int create_request_parent_ino_get(struct create_request *, ev_uint32_t *);
+int create_request_name_assign(struct create_request *, const char *);
+int create_request_name_get(struct create_request *, char * *);
+int create_request_mode_assign(struct create_request *, const ev_uint32_t);
+int create_request_mode_get(struct create_request *, ev_uint32_t *);
+int create_request_type_assign(struct create_request *, const ev_uint32_t);
+int create_request_type_get(struct create_request *, ev_uint32_t *);
+/* --- create_request done --- */
+
+/* Tag definition for create_response */
+enum create_response_ {
+  CREATE_RESPONSE_STAT_ARR=1,
+  CREATE_RESPONSE_MAX_TAGS
+};
+
+/* Structure declaration for create_response */
+struct create_response_access_ {
+  int (*stat_arr_assign)(struct create_response *, int, const struct file_stat*);
+  int (*stat_arr_get)(struct create_response *, int, struct file_stat* *);
+  struct file_stat*  (*stat_arr_add)(struct create_response *msg);
+};
+
+struct create_response {
+  struct create_response_access_ *base;
+
+  struct file_stat* *stat_arr;
+  int stat_arr_length;
+  int stat_arr_num_allocated;
+
+  ev_uint8_t stat_arr_set;
+};
+
+struct create_response *create_response_new(void);
+struct create_response *create_response_new_with_arg(void *);
+void create_response_free(struct create_response *);
+void create_response_clear(struct create_response *);
+void create_response_marshal(struct evbuffer *, const struct create_response *);
+int create_response_unmarshal(struct create_response *, struct evbuffer *);
+int create_response_complete(struct create_response *);
+void evtag_marshal_create_response(struct evbuffer *, ev_uint32_t,
+    const struct create_response *);
+int evtag_unmarshal_create_response(struct evbuffer *, ev_uint32_t,
+    struct create_response *);
+int create_response_stat_arr_assign(struct create_response *, int, const struct file_stat*);
+int create_response_stat_arr_get(struct create_response *, int, struct file_stat* *);
+struct file_stat*  create_response_stat_arr_add(struct create_response *msg);
+/* --- create_response done --- */
+
+/* Tag definition for rm_request */
+enum rm_request_ {
+  RM_REQUEST_INO=1,
+  RM_REQUEST_TYPE=2,
+  RM_REQUEST_MAX_TAGS
+};
+
+/* Structure declaration for rm_request */
+struct rm_request_access_ {
+  int (*ino_assign)(struct rm_request *, const ev_uint32_t);
+  int (*ino_get)(struct rm_request *, ev_uint32_t *);
+  int (*type_assign)(struct rm_request *, const ev_uint32_t);
+  int (*type_get)(struct rm_request *, ev_uint32_t *);
+};
+
+struct rm_request {
+  struct rm_request_access_ *base;
+
+  ev_uint32_t ino;
+  ev_uint32_t type;
+
+  ev_uint8_t ino_set;
+  ev_uint8_t type_set;
+};
+
+struct rm_request *rm_request_new(void);
+struct rm_request *rm_request_new_with_arg(void *);
+void rm_request_free(struct rm_request *);
+void rm_request_clear(struct rm_request *);
+void rm_request_marshal(struct evbuffer *, const struct rm_request *);
+int rm_request_unmarshal(struct rm_request *, struct evbuffer *);
+int rm_request_complete(struct rm_request *);
+void evtag_marshal_rm_request(struct evbuffer *, ev_uint32_t,
+    const struct rm_request *);
+int evtag_unmarshal_rm_request(struct evbuffer *, ev_uint32_t,
+    struct rm_request *);
+int rm_request_ino_assign(struct rm_request *, const ev_uint32_t);
+int rm_request_ino_get(struct rm_request *, ev_uint32_t *);
+int rm_request_type_assign(struct rm_request *, const ev_uint32_t);
+int rm_request_type_get(struct rm_request *, ev_uint32_t *);
+/* --- rm_request done --- */
+
+/* Tag definition for rm_response */
+enum rm_response_ {
+  RM_RESPONSE_INO=1,
+  RM_RESPONSE_MAX_TAGS
+};
+
+/* Structure declaration for rm_response */
+struct rm_response_access_ {
+  int (*ino_assign)(struct rm_response *, const ev_uint32_t);
+  int (*ino_get)(struct rm_response *, ev_uint32_t *);
+};
+
+struct rm_response {
+  struct rm_response_access_ *base;
+
+  ev_uint32_t ino;
+
+  ev_uint8_t ino_set;
+};
+
+struct rm_response *rm_response_new(void);
+struct rm_response *rm_response_new_with_arg(void *);
+void rm_response_free(struct rm_response *);
+void rm_response_clear(struct rm_response *);
+void rm_response_marshal(struct evbuffer *, const struct rm_response *);
+int rm_response_unmarshal(struct rm_response *, struct evbuffer *);
+int rm_response_complete(struct rm_response *);
+void evtag_marshal_rm_response(struct evbuffer *, ev_uint32_t,
+    const struct rm_response *);
+int evtag_unmarshal_rm_response(struct evbuffer *, ev_uint32_t,
+    struct rm_response *);
+int rm_response_ino_assign(struct rm_response *, const ev_uint32_t);
+int rm_response_ino_get(struct rm_response *, ev_uint32_t *);
+/* --- rm_response done --- */
+
+/* Tag definition for statfs_request */
+enum statfs_request_ {
+  STATFS_REQUEST_X=1,
+  STATFS_REQUEST_MAX_TAGS
+};
+
+/* Structure declaration for statfs_request */
+struct statfs_request_access_ {
+  int (*x_assign)(struct statfs_request *, const ev_uint32_t);
+  int (*x_get)(struct statfs_request *, ev_uint32_t *);
+};
+
+struct statfs_request {
+  struct statfs_request_access_ *base;
+
+  ev_uint32_t x;
+
+  ev_uint8_t x_set;
+};
+
+struct statfs_request *statfs_request_new(void);
+struct statfs_request *statfs_request_new_with_arg(void *);
+void statfs_request_free(struct statfs_request *);
+void statfs_request_clear(struct statfs_request *);
+void statfs_request_marshal(struct evbuffer *, const struct statfs_request *);
+int statfs_request_unmarshal(struct statfs_request *, struct evbuffer *);
+int statfs_request_complete(struct statfs_request *);
+void evtag_marshal_statfs_request(struct evbuffer *, ev_uint32_t,
+    const struct statfs_request *);
+int evtag_unmarshal_statfs_request(struct evbuffer *, ev_uint32_t,
+    struct statfs_request *);
+int statfs_request_x_assign(struct statfs_request *, const ev_uint32_t);
+int statfs_request_x_get(struct statfs_request *, ev_uint32_t *);
+/* --- statfs_request done --- */
+
+/* Tag definition for statfs_response */
+enum statfs_response_ {
+  STATFS_RESPONSE_X=1,
+  STATFS_RESPONSE_MAX_TAGS
+};
+
+/* Structure declaration for statfs_response */
+struct statfs_response_access_ {
+  int (*x_assign)(struct statfs_response *, const ev_uint32_t);
+  int (*x_get)(struct statfs_response *, ev_uint32_t *);
+};
+
+struct statfs_response {
+  struct statfs_response_access_ *base;
+
+  ev_uint32_t x;
+
+  ev_uint8_t x_set;
+};
+
+struct statfs_response *statfs_response_new(void);
+struct statfs_response *statfs_response_new_with_arg(void *);
+void statfs_response_free(struct statfs_response *);
+void statfs_response_clear(struct statfs_response *);
+void statfs_response_marshal(struct evbuffer *, const struct statfs_response *);
+int statfs_response_unmarshal(struct statfs_response *, struct evbuffer *);
+int statfs_response_complete(struct statfs_response *);
+void evtag_marshal_statfs_response(struct evbuffer *, ev_uint32_t,
+    const struct statfs_response *);
+int evtag_unmarshal_statfs_response(struct evbuffer *, ev_uint32_t,
+    struct statfs_response *);
+int statfs_response_x_assign(struct statfs_response *, const ev_uint32_t);
+int statfs_response_x_get(struct statfs_response *, ev_uint32_t *);
+/* --- statfs_response done --- */
 
 #endif  /* _COMMON_PROTOCOL_RPC_ */
