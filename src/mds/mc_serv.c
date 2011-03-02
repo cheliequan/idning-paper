@@ -65,7 +65,8 @@ ls_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
         p = dlist_data(pl, fsnode, tree_dlist);
         struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
         EVTAG_ASSIGN(t, ino, p-> ino); // 不然它不认..
-        EVTAG_ASSIGN(t, size , p-> data.fdata.length); // 不然它不认..
+        EVTAG_ASSIGN(t, size, p-> data.fdata.length); // 不然它不认..
+        EVTAG_ASSIGN(t, name, p-> name); // 不然它不认..
     }
     EVRPC_REQUEST_DONE(rpc);
 }
