@@ -38,6 +38,7 @@ static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
     case 2:
         stbuf->st_mode = S_IFREG | 0444;
         stbuf->st_nlink = 1;
+
         stbuf->st_size = strlen(hello_str);
 
         stat_send_request(arr, 1, stat_arr);
@@ -127,10 +128,12 @@ static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     memset(&b, 0, sizeof(b));
     dirbuf_add(req, &b, ".", 1);
     dirbuf_add(req, &b, "..", 1);
-    for(i=0; i<cnt; i++){
-        memset(&b, 0, sizeof(b));
-		dirbuf_add(req, &b, stat_arr[i].name, stat_arr[i].ino);
-    }
+    dirbuf_add(req, &b, "xxxxxx", 3);
+    /*for(i=0; i<cnt; i++){*/
+        /*fprintf(stderr, "stat[%d].name: %s", i, stat_arr[i].name);*/
+        /*fprintf(stderr, "stat[%d].ino : %d", i, stat_arr[i].ino);*/
+		/*dirbuf_add(req, &b, stat_arr[i].name, stat_arr[i].ino);*/
+    /*}*/
 
     reply_buf_limited(req, b.p, b.size, off, size);
     free(b.p);
