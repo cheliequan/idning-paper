@@ -25,11 +25,15 @@ static void test(){
 
 static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
 {
+    fprintf(stderr, "%s:%s: called\n", __FILE__, __func__);
     int arr[1] ;
     struct file_stat stat_arr[1];
     arr[0] = ino;
 
     stbuf->st_ino = ino;
+    stbuf->st_uid = 0;
+    stbuf->st_gid = 0;
+
     switch (ino) {
     case 1:
         stbuf->st_mode = S_IFDIR | 0755;
@@ -58,6 +62,7 @@ static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
 static void hello_ll_getattr(fuse_req_t req, fuse_ino_t ino,
 			     struct fuse_file_info *fi)
 {
+    fprintf(stderr, "%s:%s: called\n", __FILE__, __func__);
 	struct stat stbuf;
 
 	(void) fi;
@@ -71,19 +76,16 @@ static void hello_ll_getattr(fuse_req_t req, fuse_ino_t ino,
 
 static void hello_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
 {
+    fprintf(stderr, "%s:%s: called\n", __FILE__, __func__);
 	struct fuse_entry_param e;
 
-	if (parent != 1 || strcmp(name, hello_name) != 0)
-		fuse_reply_err(req, ENOENT);
-	else {
-		memset(&e, 0, sizeof(e));
-		e.ino = 2;
-		e.attr_timeout = 1.0;
-		e.entry_timeout = 1.0;
-		hello_stat(e.ino, &e.attr);
+    memset(&e, 0, sizeof(e));
+    e.ino = 2;
+    e.attr_timeout = 1.0;
+    e.entry_timeout = 1.0;
+    hello_stat(e.ino, &e.attr);
 
-		fuse_reply_entry(req, &e);
-	}
+    fuse_reply_entry(req, &e);
 }
 
 struct dirbuf {
@@ -119,6 +121,7 @@ static int reply_buf_limited(fuse_req_t req, const char *buf, size_t bufsize,
 static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
 			     off_t off, struct fuse_file_info *fi)
 {
+    fprintf(stderr, "%s:%s: called\n", __FILE__, __func__);
 	(void) fi;
 
     struct file_stat stat_arr[100]; //TODO: 100...
@@ -142,6 +145,7 @@ static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
 static void hello_ll_open(fuse_req_t req, fuse_ino_t ino,
 			  struct fuse_file_info *fi)
 {
+    fprintf(stderr, "%s:%s: called\n", __FILE__, __func__);
 	if ((fi->flags & 3) != O_RDONLY)
 		fuse_reply_err(req, EACCES);
 	else
@@ -151,6 +155,7 @@ static void hello_ll_open(fuse_req_t req, fuse_ino_t ino,
 static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 			  off_t off, struct fuse_file_info *fi)
 {
+    fprintf(stderr, "%s:%s: called\n", __FILE__, __func__);
 	(void) fi;
 
 	assert(ino == 2);
