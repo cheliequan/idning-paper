@@ -6,9 +6,9 @@
 # m cs
 #
 #
-
 all: cs 
 	scons -Q -f scons.py
+
 g : gen
 
 gen: 
