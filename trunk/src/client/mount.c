@@ -17,7 +17,7 @@
 static const char *hello_name = "hello";
 
 static void test(){
-    int arr[1] ;
+    fuse_ino_t arr[1] ;
     struct file_stat stat_arr[1];
     arr[0] = 2;
     stat_send_request(arr, 1, stat_arr);
@@ -26,8 +26,8 @@ static void test(){
 static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
 {
     DBG();
-    fprintf(stderr, "hello_stat(%d)\n", ino);
-    int arr[1] ;
+    fprintf(stderr, "hello_stat(%d)\n", (int)ino);
+    fuse_ino_t arr[1] ;
     struct file_stat stat_arr[1];
     arr[0] = ino;
 
@@ -66,7 +66,7 @@ static void hello_ll_getattr(fuse_req_t req, fuse_ino_t ino,
 static void hello_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
 {
     DBG();
-    fprintf(stderr, "hello_ll_lookup: %d, %s", parent, name);
+    fprintf(stderr, "hello_ll_lookup: %ld, %s", parent, name);
 	struct fuse_entry_param e;
     memset(&e, 0, sizeof(e));
 
@@ -75,7 +75,7 @@ static void hello_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
     e.ino = stat -> ino;
     e.attr_timeout = 1.0;
     e.entry_timeout = 1.0;
-    fprintf(stderr, "--------------------- hello_ll_lookup find inode : %d \n", e.ino);
+    fprintf(stderr, "--------------------- hello_ll_lookup find inode : %ld \n", e.ino);
 
     if (e.ino){ // exists
         hello_stat(e.ino, &e.attr);
@@ -153,14 +153,14 @@ static void hello_ll_open(fuse_req_t req, fuse_ino_t ino,
 			  struct fuse_file_info *fi)
 {
     DBG();
-    fprintf(stderr, "hello_ll_open : ino:  %d\n", ino);
+    fprintf(stderr, "hello_ll_open : ino:  %ld\n", ino);
 
 	/*if ((fi->flags & 3) != O_RDONLY)*/
 		/*fuse_reply_err(req, EACCES);*/
 	/*else*/
 		/*fuse_reply_open(req, fi);*/
 
-    /*fi->fh = (unsigned long)ino; //TODO: this is tmp*/
+    fi->fh = ino; //TODO: this is tmp
     /*fi->direct_io = 1;*/
     /*fi->keep_cache=1;*/
 
@@ -175,17 +175,23 @@ static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 	(void) fi;
 
 	assert(ino == 2);
-    char url[256] = "http://10.100.1.76/";
-    sprintf(url, "http://10.100.1.76:6006/get/%d", ino);
+    /*char url[256] = "http://10.100.1.76/";*/
+    /*sprintf(url, "http://10.100.1.76:6006/get/%d", ino);*/
+
+    char url[256] = "http://127.0.0.1/";
+    sprintf(url, "http://127.0.0.1:6006/get/%ld", ino);
     fprintf(stderr, "http_get: %s \n", url);
     //
     http_response * response = http_get(url);
-    int len = evbuffer_get_length(response->body);
-    uint8_t * buf = alloca(len);
-    evbuffer_copyout(response->body, buf, len);
+    if (response){
+        int len = evbuffer_get_length(response->body);
+        uint8_t * buf = alloca(len);
+        evbuffer_copyout(response->body, buf, len);
 
-    fuse_reply_buf(req, buf+off, size);
-
+        fuse_reply_buf(req, buf+off, size);
+    }else{
+        //TODO: this is  no replay ,will hold
+    }
 }
 
 /* 
@@ -237,7 +243,7 @@ void my_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, o
     /*TODO : evbuffer_add_reference();*/
 
     char url[256];
-    sprintf(url, "http://10.100.1.76:6006/put/%d", ino);
+    sprintf(url, "http://127.0.0.1:6006/put/%ld", ino);
 
     http_response * response = http_post(url, evb);
     int len = evbuffer_get_length(response->body);

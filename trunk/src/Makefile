@@ -26,6 +26,9 @@ cs:
 	echo "" > /tmp/cscope.files
 	find /home/ning/idning-source/c/libevent-2.0.10-stable/  -name "*.h" >> /tmp/cscope.files
 	find /home/ning/idning-source/c/libevent-2.0.10-stable/  -name "*.c" >> /tmp/cscope.files
+	find /home/ning/idning-source/c/fuse-2.8.5 -name "*.c" >> /tmp/cscope.files
+	find /home/ning/idning-source/c/fuse-2.8.5 -name "*.h" >> /tmp/cscope.files
+	#
 	find . -name "*.c" >> /tmp/cscope.files
 	find . -name "*.h" >> /tmp/cscope.files
 	cscope  -i /tmp/cscope.files -R -b
