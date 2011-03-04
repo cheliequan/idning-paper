@@ -10,6 +10,7 @@
 #include <evutil.h>
 #include <event2/buffer.h>
 #include <unistd.h>
+#include <assert.h>
 
 #include <errno.h>
 #include <stdlib.h>
@@ -112,7 +113,7 @@ void download_callback(struct evhttp_request *req, void *arg)
     ctx->ok = 1;
 }
 
-struct request_context *context_new(const char *url)
+struct request_context *context_new (const char *url, int verb, struct evbuffer * data) 
 {
     struct request_context *ctx = 0;
     ctx = calloc(1, sizeof(*ctx));
@@ -120,6 +121,11 @@ struct request_context *context_new(const char *url)
         return 0;
 
     ctx->uri = evhttp_uri_parse(url);
+    ctx -> method = verb;
+    ctx -> postdata_buffer = data;
+
+    fprintf(stderr, "DEBUG: url-> path : %s \n",ctx->uri->path );
+    fprintf(stderr, "DEBUG: url-> method : %s \n",ctx->uri->path );
     if (!ctx->uri)
         return 0;
 
@@ -153,13 +159,17 @@ int download_renew_request(struct request_context *ctx)
     ctx->req = evhttp_request_new(download_callback, ctx);
     
     if (ctx->method == EVHTTP_REQ_POST){
+        fprintf(stderr, "EVHTTP_REQ_POST\n");
         ctx->req->output_buffer = ctx->postdata_buffer;
-        evhttp_make_request(ctx->cn, ctx->req, EVHTTP_REQ_POST,
-            ctx->uri->query ? ctx->uri->query : "/");
-    }else{
-        evhttp_make_request(ctx->cn, ctx->req, EVHTTP_REQ_GET,
-            ctx->uri->query ? ctx->uri->query : "/");
+        evhttp_make_request(ctx->cn, ctx->req, EVHTTP_REQ_POST, ctx->uri->path ? ctx->uri->path : "/");
+    }else if (ctx->method == EVHTTP_REQ_GET){
+        fprintf(stderr, "EVHTTP_REQ_GET\n");
+        
+        evhttp_make_request(ctx->cn, ctx->req, EVHTTP_REQ_GET, ctx->uri->path ? ctx->uri->path : "/");
+    }else {
+        assert(0);
     }
+
     evhttp_add_header(ctx->req->output_headers,
                             "Host", ctx->uri->host);
     return 0;
@@ -167,10 +177,10 @@ int download_renew_request(struct request_context *ctx)
 
 struct http_response *http_request(const char *url, int verb, struct evbuffer * data)
 {
-    struct request_context *ctx = context_new(url);
-    ctx -> method = verb;
-    ctx -> postdata_buffer = data;
+    fprintf(stderr, "http_request: %s, %d\n",url, verb );
+    struct request_context *ctx = context_new(url, verb, data);
     /* do all of the job */
+    fprintf(stderr, "http_request: method : %d\n", ctx->method);
     event_dispatch();
 
     struct evbuffer *body = 0;

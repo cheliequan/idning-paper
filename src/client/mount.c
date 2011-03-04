@@ -161,8 +161,11 @@ static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 	(void) fi;
 
 	assert(ino == 2);
-
-    http_response * response = http_get("http://10.100.1.76/");
+    char url[256] = "http://10.100.1.76/";
+    sprintf(url, "http://10.100.1.76:6006/get/%d", ino);
+    fprintf(stderr, "http_get: %s \n", url);
+    //
+    http_response * response = http_get(url);
     int len = evbuffer_get_length(response->body);
     uint8_t * buf = alloca(len);
     evbuffer_copyout(response->body, buf, len);
@@ -214,6 +217,17 @@ void my_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, o
         /*return;*/
     /*}*/
     /*err = write_data(fileinfo->data,off,size,(const uint8_t*)buf);*/
+    struct evbuffer *  evb = evbuffer_new();
+    evbuffer_add(evb, buf+off, size);
+
+    /*TODO : evbuffer_add_reference();*/
+
+    char url[256];
+    sprintf(url, "http://10.100.1.76:6006/put/%d", ino);
+
+    http_response * response = http_post(url, evb);
+    int len = evbuffer_get_length(response->body);
+
     if (err!=0) {
         fuse_reply_err(req,err);
     } else {
