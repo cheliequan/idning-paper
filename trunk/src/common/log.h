@@ -6,3 +6,5 @@
 
 
 int logging(int level, char * fmt, ...);
+
+#define DBG() (fprintf(stderr, "%s:%s: called\n", __FILE__, __func__))
