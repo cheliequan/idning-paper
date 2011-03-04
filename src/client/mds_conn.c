@@ -2,6 +2,8 @@
 #include <evhttp.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fuse_lowlevel.h>
+
 
 #include "protocol.gen.h"
 #include "protocol.h"
@@ -76,7 +78,7 @@ static void lookup_cb(struct evrpc_status *status, struct lookup_request *reques
 }
 
 
-int stat_send_request(int * ino_arr, int len, struct file_stat * stat_arr)
+int stat_send_request(fuse_ino_t * ino_arr, int len, struct file_stat * stat_arr)
 {
     DBG();
     struct stat_request * req = stat_request_new();
@@ -86,7 +88,7 @@ int stat_send_request(int * ino_arr, int len, struct file_stat * stat_arr)
         EVTAG_ARRAY_ADD_VALUE(req, ino_arr, ino_arr[i]);
     }
 
-    int rst = EVRPC_MAKE_REQUEST(rpc_stat, pool, req, response,  stat_cb, NULL);
+    EVRPC_MAKE_REQUEST(rpc_stat, pool, req, response,  stat_cb, NULL);
     event_dispatch();
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
     if (cnt!=len)
@@ -102,7 +104,7 @@ int stat_send_request(int * ino_arr, int len, struct file_stat * stat_arr)
 
 
 //seams same as stat_send_request
-int ls_send_request(int ino, struct file_stat * stat_arr)
+int ls_send_request(fuse_ino_t ino, struct file_stat * stat_arr)
 {
     DBG();
     struct ls_request * req = ls_request_new();
@@ -112,8 +114,6 @@ int ls_send_request(int ino, struct file_stat * stat_arr)
 
     EVRPC_MAKE_REQUEST(rpc_ls, pool, req, response,  ls_cb, NULL);
     event_dispatch();
-
-    EVTAG_ARRAY_LEN(response, stat_arr);
 
     int i;
     struct file_stat * stat = file_stat_new();
@@ -128,7 +128,7 @@ int ls_send_request(int ino, struct file_stat * stat_arr)
     return cnt;
 }
 
-int mknod_send_request(int parent_ino, char * name, int type, int mode, struct file_stat *o_stat )
+int mknod_send_request(fuse_ino_t parent_ino, char * name, int type, int mode, struct file_stat *o_stat )
 {
     DBG();
     struct mknod_request * req = mknod_request_new();
@@ -154,7 +154,7 @@ int mknod_send_request(int parent_ino, char * name, int type, int mode, struct f
 
 
 
-int lookup_send_request(int parent_ino, char * name , struct file_stat *o_stat )
+int lookup_send_request(fuse_ino_t parent_ino, const char * name , struct file_stat *o_stat )
 {
     DBG();
     struct lookup_request* req = lookup_request_new();

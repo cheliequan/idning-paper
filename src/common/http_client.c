@@ -1,4 +1,5 @@
 #include "http_client.h"
+#include "log.h"
 
 /*
  * Requires uri parsing helpers from:
@@ -184,17 +185,19 @@ struct http_response *http_request(const char *url, int verb, struct evbuffer * 
     event_dispatch();
 
     struct evbuffer *body = 0;
+    int response_code = ctx->req->response_code;
+
     if (ctx->ok)
     {
         body = ctx->buffer;
         ctx->buffer = 0;
+        context_free(ctx);
+        struct evbuffer * header = evbuffer_new();
+        return http_response_new(200, header, body);
+    }else{
+        logging(LOG_INFO, "http_request error %d : %s ", response_code, url );
+        return NULL;
     }
-
-    context_free(ctx);
-
-    struct evbuffer * header = evbuffer_new();
-
-    return http_response_new(200, header, body);
 }
 
 struct http_response *http_get(const char *url){
