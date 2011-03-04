@@ -11,9 +11,9 @@
 
 #include <http_client.h>
 #include "mds_conn.h"
+#include "log.h"
 
 
-static const char *hello_str = "Hello World!\n";
 static const char *hello_name = "hello";
 
 static void test(){
@@ -25,7 +25,8 @@ static void test(){
 
 static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
 {
-    fprintf(stderr, "%s:%s: called\n", __FILE__, __func__);
+    DBG();
+    fprintf(stderr, "hello_stat(%d)\n", ino);
     int arr[1] ;
     struct file_stat stat_arr[1];
     arr[0] = ino;
@@ -36,23 +37,17 @@ static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
 
     switch (ino) {
     case 1:
-        stbuf->st_mode = S_IFDIR | 0755;
+        /*stbuf->st_mode = S_IFDIR | 0755;*/
+        stbuf->st_mode = S_IFDIR | 0777;
         stbuf->st_nlink = 2;
         break;
     case 2:
-        stbuf->st_mode = S_IFREG | 0444;
-        stbuf->st_nlink = 1;
-
-        stbuf->st_size = strlen(hello_str);
 
         stat_send_request(arr, 1, stat_arr);
-
         stbuf->st_size = stat_arr[0].size;
-        stbuf->st_mode = S_IFREG | 0444;
+        stbuf->st_mode = S_IFREG | 0777;
         stbuf->st_nlink = 1;
-
         break;
-
     default:
         return -1;
     }
@@ -62,7 +57,7 @@ static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
 static void hello_ll_getattr(fuse_req_t req, fuse_ino_t ino,
 			     struct fuse_file_info *fi)
 {
-    fprintf(stderr, "%s:%s: called\n", __FILE__, __func__);
+    DBG();
 	struct stat stbuf;
 
 	(void) fi;
@@ -76,7 +71,7 @@ static void hello_ll_getattr(fuse_req_t req, fuse_ino_t ino,
 
 static void hello_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
 {
-    fprintf(stderr, "%s:%s: called\n", __FILE__, __func__);
+    DBG();
 	struct fuse_entry_param e;
 
     memset(&e, 0, sizeof(e));
@@ -121,7 +116,7 @@ static int reply_buf_limited(fuse_req_t req, const char *buf, size_t bufsize,
 static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
 			     off_t off, struct fuse_file_info *fi)
 {
-    fprintf(stderr, "%s:%s: called\n", __FILE__, __func__);
+    DBG();
 	(void) fi;
 
     struct file_stat stat_arr[100]; //TODO: 100...
@@ -131,12 +126,12 @@ static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     memset(&b, 0, sizeof(b));
     dirbuf_add(req, &b, ".", 1);
     dirbuf_add(req, &b, "..", 1);
-    dirbuf_add(req, &b, "xxxxxx", 3);
-    /*for(i=0; i<cnt; i++){*/
-        /*fprintf(stderr, "stat[%d].name: %s", i, stat_arr[i].name);*/
-        /*fprintf(stderr, "stat[%d].ino : %d", i, stat_arr[i].ino);*/
-		/*dirbuf_add(req, &b, stat_arr[i].name, stat_arr[i].ino);*/
-    /*}*/
+    /*dirbuf_add(req, &b, "xxxxxx", 3);*/
+    for(i=0; i<cnt; i++){
+        fprintf(stderr, "stat[%d].name: %s", i, stat_arr[i].name);
+        fprintf(stderr, "stat[%d].ino : %d", i, stat_arr[i].ino);
+        dirbuf_add(req, &b, stat_arr[i].name, stat_arr[i].ino);
+    }
 
     reply_buf_limited(req, b.p, b.size, off, size);
     free(b.p);
@@ -145,17 +140,24 @@ static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
 static void hello_ll_open(fuse_req_t req, fuse_ino_t ino,
 			  struct fuse_file_info *fi)
 {
-    fprintf(stderr, "%s:%s: called\n", __FILE__, __func__);
-	if ((fi->flags & 3) != O_RDONLY)
-		fuse_reply_err(req, EACCES);
-	else
-		fuse_reply_open(req, fi);
+    DBG();
+	/*if ((fi->flags & 3) != O_RDONLY)*/
+		/*fuse_reply_err(req, EACCES);*/
+	/*else*/
+		/*fuse_reply_open(req, fi);*/
+
+    /*fi->fh = (unsigned long)ino; //TODO: this is tmp*/
+    /*fi->direct_io = 1;*/
+    /*fi->keep_cache=1;*/
+
+
+    fuse_reply_open(req, fi);
 }
 
 static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 			  off_t off, struct fuse_file_info *fi)
 {
-    fprintf(stderr, "%s:%s: called\n", __FILE__, __func__);
+    DBG();
 	(void) fi;
 
 	assert(ino == 2);
@@ -167,9 +169,65 @@ static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 
     fuse_reply_buf(req, buf+off, size);
 
-	//reply_buf_limited(req, hello_str, strlen(hello_str), off, size);
-	/*reply_buf_limited(req, hello_str, 1, off, size);*/
 }
+
+/* 
+实现了write 函数后.
+不能write, 
+报如下错：
+unique: 21, opcode: SETATTR (4), nodeid: 2, insize: 128
+   unique: 21, error: -38 (Function not implemented), outsize: 16
+unique: 22, opcode: FORGET (2), nodeid: 2, insize: 48
+
+网上有人说：
+The attributes of a filesystem element are set by the filesystem itself. You can only define any attributes of a filesystem element when you open() it. For example, a file can be opened read-only. Once it is open, this status can only be gotten, and not set. The exceptions would be the chown()/chmod() operations, which have their own specific handlers.
+Fuse is a very cool thing.
+--- rod.
+
+*/
+/*
+*/
+void my_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf, int to_set, struct fuse_file_info *fi) {
+    DBG();
+    struct stat stbuf;
+    uint64_t maxfleng;
+    uint8_t attr[35];
+    int status;
+    const struct fuse_ctx *ctx;
+    uint8_t setmask = 0;
+
+
+	if (hello_stat(ino, &stbuf) == -1)
+		fuse_reply_err(req, ENOENT);
+	else
+		fuse_reply_attr(req, &stbuf, 1.0);
+
+    /*fuse_reply_attr(req, &o_stbuf, (mfs_attr_get_mattr(attr)&MATTR_NOACACHE)?0.0:attr_cache_timeout);*/
+}
+
+
+void my_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi) {
+    DBG();
+    int err = 0;
+    /*if (off>=MAX_FILE_SIZE || off+size>=MAX_FILE_SIZE) {*/
+        /*fuse_reply_err(req, EFBIG);*/
+        /*return;*/
+    /*}*/
+    /*err = write_data(fileinfo->data,off,size,(const uint8_t*)buf);*/
+    if (err!=0) {
+        fuse_reply_err(req,err);
+    } else {
+        fuse_reply_write(req,size);
+    }
+}
+
+
+void my_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
+    int err = 0;
+    fuse_reply_err(req,err);
+}
+
+
 
 static struct fuse_lowlevel_ops hello_ll_oper = {
 	.lookup		= hello_ll_lookup,
@@ -177,6 +235,9 @@ static struct fuse_lowlevel_ops hello_ll_oper = {
 	.readdir	= hello_ll_readdir,
 	.open		= hello_ll_open,
 	.read		= hello_ll_read,
+	.write      = my_ll_write,
+	.setattr    = my_ll_setattr,
+	.flush      = my_ll_flush,
 };
 
 int main(int argc, char *argv[])

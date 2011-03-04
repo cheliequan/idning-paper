@@ -3,4 +3,4 @@ echo
 echo $D
 echo 
 mkdir $D
-client/mount.out $D
+client/mount.out $D -d

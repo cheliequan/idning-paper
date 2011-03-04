@@ -5,14 +5,15 @@
 
 #include "protocol.gen.h"
 #include "protocol.h"
-/*#include "fs.h"*/
+#include "log.h"
 
+struct evrpc_pool *pool = NULL;
 
 static void ping_cb(struct evrpc_status *status,
     struct ping *ping , struct pong * pong, void *arg)
 {
 
-    fprintf(stderr, "%s: called\n", __func__);
+    DBG();
     int v;
     EVTAG_GET(pong, version, &v);
 
@@ -34,7 +35,7 @@ static void ping_cb(struct evrpc_status *status,
 static void stat_cb(struct evrpc_status *status,
     struct stat_request *request , struct stat_response * response , void *arg)
 {
-    fprintf(stderr, "%s: called\n", __func__);
+    DBG();
     int i;
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
     if (cnt == 0)
@@ -60,15 +61,14 @@ static void stat_cb(struct evrpc_status *status,
 static void ls_cb(struct evrpc_status *status,
     struct ls_request *request , struct ls_response * response , void *arg){
 
-    fprintf(stderr, "%s: called\n", __func__);
+    DBG();
     event_loopexit(NULL);
 }
 
-struct evrpc_pool *pool = NULL;
 
 int stat_send_request(int * ino_arr, int len, struct file_stat * stat_arr)
 {
-    fprintf(stderr, "%s: called\n", __func__);
+    DBG();
     struct stat_request * req = stat_request_new();
     struct stat_response * response = stat_response_new();
     int i;
@@ -104,7 +104,7 @@ int stat_send_request(int * ino_arr, int len, struct file_stat * stat_arr)
 //seams same as stat_send_request
 int ls_send_request(int ino, struct file_stat * stat_arr)
 {
-    fprintf(stderr, "%s: called\n", __func__);
+    DBG();
     struct ls_request * req = ls_request_new();
     struct ls_response * response = ls_response_new();
 
@@ -131,7 +131,7 @@ int ls_send_request(int ino, struct file_stat * stat_arr)
 
 int ping_send_request(void)
 {
-    fprintf(stderr, "%s: called\n", __func__);
+    DBG();
     struct ping * ping = ping_new();
     EVTAG_ASSIGN(ping, version, 7);
     EVTAG_ASSIGN(ping, self_ip, "127.0.0.2");
@@ -150,7 +150,7 @@ int ping_send_request(void)
 
 
 void mds_conn_init(){
-    fprintf(stderr, "%s: called\n", __func__);
+    DBG();
     event_init();
     ev_uint16_t port = 9527;
     struct evhttp_connection *evcon;
