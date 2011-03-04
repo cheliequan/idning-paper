@@ -62,6 +62,7 @@ ls_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
     dlist_t * head = &(n -> tree_dlist);
     dlist_t * pl;
     for (pl = head->next; pl!=head; pl=pl->next){
+
         p = dlist_data(pl, fsnode, tree_dlist);
         struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
         EVTAG_ASSIGN(t, ino, p-> ino); // 不然它不认..
@@ -105,6 +106,46 @@ ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
     EVRPC_REQUEST_DONE(rpc);
 }
 
+
+
+static void mknod_handler(EVRPC_STRUCT(rpc_mknod)* rpc, void *arg)
+{
+    fprintf(stderr, "%s: called\n", __func__);
+
+    struct mknod_request *request = rpc->request;
+    struct mknod_response *response = rpc->reply;
+    fsnode * n = fs_mknod(request -> parent_ino, request->name, request->type, request->mode);
+    struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
+    EVTAG_ASSIGN(t, ino, n-> ino); // 不然它不认..
+    EVTAG_ASSIGN(t, size, n-> data.fdata.length); // 不然它不认..
+    EVTAG_ASSIGN(t, name, n-> name); // 不然它不认..
+
+    EVRPC_REQUEST_DONE(rpc);
+}
+
+static void lookup_handler(EVRPC_STRUCT(rpc_lookup)* rpc, void *arg)
+{
+    fprintf(stderr, "%s: called\n", __func__);
+
+    struct lookup_request *request = rpc->request;
+    struct lookup_response *response = rpc->reply;
+
+    fsnode * n = fs_lookup(request -> parent_ino, request->name);
+    struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
+    if (NULL == n){
+        EVTAG_ASSIGN(t, ino, 0); // 不然它不认..
+        EVTAG_ASSIGN(t, size, 0); // 不然它不认..
+        EVTAG_ASSIGN(t, name, "" ); // 不然它不认..
+    }else{
+        fprintf(stderr, " fs_lookup : ino: %d \n", n->ino);
+        EVTAG_ASSIGN(t, ino, n-> ino); // 不然它不认..
+        EVTAG_ASSIGN(t, size, n-> data.fdata.length); // 不然它不认..
+        EVTAG_ASSIGN(t, name, n-> name); // 不然它不认..
+    }
+
+    EVRPC_REQUEST_DONE(rpc);
+}
+
 static void
 rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
 {
@@ -124,6 +165,8 @@ rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
     EVRPC_REGISTER(base, rpc_ping, ping, pong, ping_handler, NULL);
     EVRPC_REGISTER(base, rpc_stat, stat_request, stat_response, stat_handler, NULL);
     EVRPC_REGISTER(base, rpc_ls, ls_request, ls_response, ls_handler, NULL);
+    EVRPC_REGISTER(base, rpc_mknod, mknod_request, mknod_response, mknod_handler, NULL);
+    EVRPC_REGISTER(base, rpc_lookup, lookup_request, lookup_response, lookup_handler, NULL);
 
     *phttp = http;
     *pport = port;

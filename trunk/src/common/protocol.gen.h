@@ -16,8 +16,10 @@ struct stat_request;
 struct stat_response;
 struct ls_request;
 struct ls_response;
-struct create_request;
-struct create_response;
+struct mknod_request;
+struct mknod_response;
+struct lookup_request;
+struct lookup_response;
 struct rm_request;
 struct rm_response;
 struct statfs_request;
@@ -393,77 +395,77 @@ int ls_response_stat_arr_get(struct ls_response *, int, struct file_stat* *);
 struct file_stat*  ls_response_stat_arr_add(struct ls_response *msg);
 /* --- ls_response done --- */
 
-/* Tag definition for create_request */
-enum create_request_ {
-  CREATE_REQUEST_PARENT_INO=1,
-  CREATE_REQUEST_NAME=2,
-  CREATE_REQUEST_MODE=3,
-  CREATE_REQUEST_TYPE=4,
-  CREATE_REQUEST_MAX_TAGS
+/* Tag definition for mknod_request */
+enum mknod_request_ {
+  MKNOD_REQUEST_PARENT_INO=1,
+  MKNOD_REQUEST_NAME=2,
+  MKNOD_REQUEST_TYPE=3,
+  MKNOD_REQUEST_MODE=4,
+  MKNOD_REQUEST_MAX_TAGS
 };
 
-/* Structure declaration for create_request */
-struct create_request_access_ {
-  int (*parent_ino_assign)(struct create_request *, const ev_uint32_t);
-  int (*parent_ino_get)(struct create_request *, ev_uint32_t *);
-  int (*name_assign)(struct create_request *, const char *);
-  int (*name_get)(struct create_request *, char * *);
-  int (*mode_assign)(struct create_request *, const ev_uint32_t);
-  int (*mode_get)(struct create_request *, ev_uint32_t *);
-  int (*type_assign)(struct create_request *, const ev_uint32_t);
-  int (*type_get)(struct create_request *, ev_uint32_t *);
+/* Structure declaration for mknod_request */
+struct mknod_request_access_ {
+  int (*parent_ino_assign)(struct mknod_request *, const ev_uint32_t);
+  int (*parent_ino_get)(struct mknod_request *, ev_uint32_t *);
+  int (*name_assign)(struct mknod_request *, const char *);
+  int (*name_get)(struct mknod_request *, char * *);
+  int (*type_assign)(struct mknod_request *, const ev_uint32_t);
+  int (*type_get)(struct mknod_request *, ev_uint32_t *);
+  int (*mode_assign)(struct mknod_request *, const ev_uint32_t);
+  int (*mode_get)(struct mknod_request *, ev_uint32_t *);
 };
 
-struct create_request {
-  struct create_request_access_ *base;
+struct mknod_request {
+  struct mknod_request_access_ *base;
 
   ev_uint32_t parent_ino;
   char *name;
-  ev_uint32_t mode;
   ev_uint32_t type;
+  ev_uint32_t mode;
 
   ev_uint8_t parent_ino_set;
   ev_uint8_t name_set;
-  ev_uint8_t mode_set;
   ev_uint8_t type_set;
+  ev_uint8_t mode_set;
 };
 
-struct create_request *create_request_new(void);
-struct create_request *create_request_new_with_arg(void *);
-void create_request_free(struct create_request *);
-void create_request_clear(struct create_request *);
-void create_request_marshal(struct evbuffer *, const struct create_request *);
-int create_request_unmarshal(struct create_request *, struct evbuffer *);
-int create_request_complete(struct create_request *);
-void evtag_marshal_create_request(struct evbuffer *, ev_uint32_t,
-    const struct create_request *);
-int evtag_unmarshal_create_request(struct evbuffer *, ev_uint32_t,
-    struct create_request *);
-int create_request_parent_ino_assign(struct create_request *, const ev_uint32_t);
-int create_request_parent_ino_get(struct create_request *, ev_uint32_t *);
-int create_request_name_assign(struct create_request *, const char *);
-int create_request_name_get(struct create_request *, char * *);
-int create_request_mode_assign(struct create_request *, const ev_uint32_t);
-int create_request_mode_get(struct create_request *, ev_uint32_t *);
-int create_request_type_assign(struct create_request *, const ev_uint32_t);
-int create_request_type_get(struct create_request *, ev_uint32_t *);
-/* --- create_request done --- */
+struct mknod_request *mknod_request_new(void);
+struct mknod_request *mknod_request_new_with_arg(void *);
+void mknod_request_free(struct mknod_request *);
+void mknod_request_clear(struct mknod_request *);
+void mknod_request_marshal(struct evbuffer *, const struct mknod_request *);
+int mknod_request_unmarshal(struct mknod_request *, struct evbuffer *);
+int mknod_request_complete(struct mknod_request *);
+void evtag_marshal_mknod_request(struct evbuffer *, ev_uint32_t,
+    const struct mknod_request *);
+int evtag_unmarshal_mknod_request(struct evbuffer *, ev_uint32_t,
+    struct mknod_request *);
+int mknod_request_parent_ino_assign(struct mknod_request *, const ev_uint32_t);
+int mknod_request_parent_ino_get(struct mknod_request *, ev_uint32_t *);
+int mknod_request_name_assign(struct mknod_request *, const char *);
+int mknod_request_name_get(struct mknod_request *, char * *);
+int mknod_request_type_assign(struct mknod_request *, const ev_uint32_t);
+int mknod_request_type_get(struct mknod_request *, ev_uint32_t *);
+int mknod_request_mode_assign(struct mknod_request *, const ev_uint32_t);
+int mknod_request_mode_get(struct mknod_request *, ev_uint32_t *);
+/* --- mknod_request done --- */
 
-/* Tag definition for create_response */
-enum create_response_ {
-  CREATE_RESPONSE_STAT_ARR=1,
-  CREATE_RESPONSE_MAX_TAGS
+/* Tag definition for mknod_response */
+enum mknod_response_ {
+  MKNOD_RESPONSE_STAT_ARR=1,
+  MKNOD_RESPONSE_MAX_TAGS
 };
 
-/* Structure declaration for create_response */
-struct create_response_access_ {
-  int (*stat_arr_assign)(struct create_response *, int, const struct file_stat*);
-  int (*stat_arr_get)(struct create_response *, int, struct file_stat* *);
-  struct file_stat*  (*stat_arr_add)(struct create_response *msg);
+/* Structure declaration for mknod_response */
+struct mknod_response_access_ {
+  int (*stat_arr_assign)(struct mknod_response *, int, const struct file_stat*);
+  int (*stat_arr_get)(struct mknod_response *, int, struct file_stat* *);
+  struct file_stat*  (*stat_arr_add)(struct mknod_response *msg);
 };
 
-struct create_response {
-  struct create_response_access_ *base;
+struct mknod_response {
+  struct mknod_response_access_ *base;
 
   struct file_stat* *stat_arr;
   int stat_arr_length;
@@ -472,21 +474,102 @@ struct create_response {
   ev_uint8_t stat_arr_set;
 };
 
-struct create_response *create_response_new(void);
-struct create_response *create_response_new_with_arg(void *);
-void create_response_free(struct create_response *);
-void create_response_clear(struct create_response *);
-void create_response_marshal(struct evbuffer *, const struct create_response *);
-int create_response_unmarshal(struct create_response *, struct evbuffer *);
-int create_response_complete(struct create_response *);
-void evtag_marshal_create_response(struct evbuffer *, ev_uint32_t,
-    const struct create_response *);
-int evtag_unmarshal_create_response(struct evbuffer *, ev_uint32_t,
-    struct create_response *);
-int create_response_stat_arr_assign(struct create_response *, int, const struct file_stat*);
-int create_response_stat_arr_get(struct create_response *, int, struct file_stat* *);
-struct file_stat*  create_response_stat_arr_add(struct create_response *msg);
-/* --- create_response done --- */
+struct mknod_response *mknod_response_new(void);
+struct mknod_response *mknod_response_new_with_arg(void *);
+void mknod_response_free(struct mknod_response *);
+void mknod_response_clear(struct mknod_response *);
+void mknod_response_marshal(struct evbuffer *, const struct mknod_response *);
+int mknod_response_unmarshal(struct mknod_response *, struct evbuffer *);
+int mknod_response_complete(struct mknod_response *);
+void evtag_marshal_mknod_response(struct evbuffer *, ev_uint32_t,
+    const struct mknod_response *);
+int evtag_unmarshal_mknod_response(struct evbuffer *, ev_uint32_t,
+    struct mknod_response *);
+int mknod_response_stat_arr_assign(struct mknod_response *, int, const struct file_stat*);
+int mknod_response_stat_arr_get(struct mknod_response *, int, struct file_stat* *);
+struct file_stat*  mknod_response_stat_arr_add(struct mknod_response *msg);
+/* --- mknod_response done --- */
+
+/* Tag definition for lookup_request */
+enum lookup_request_ {
+  LOOKUP_REQUEST_PARENT_INO=1,
+  LOOKUP_REQUEST_NAME=2,
+  LOOKUP_REQUEST_MAX_TAGS
+};
+
+/* Structure declaration for lookup_request */
+struct lookup_request_access_ {
+  int (*parent_ino_assign)(struct lookup_request *, const ev_uint32_t);
+  int (*parent_ino_get)(struct lookup_request *, ev_uint32_t *);
+  int (*name_assign)(struct lookup_request *, const char *);
+  int (*name_get)(struct lookup_request *, char * *);
+};
+
+struct lookup_request {
+  struct lookup_request_access_ *base;
+
+  ev_uint32_t parent_ino;
+  char *name;
+
+  ev_uint8_t parent_ino_set;
+  ev_uint8_t name_set;
+};
+
+struct lookup_request *lookup_request_new(void);
+struct lookup_request *lookup_request_new_with_arg(void *);
+void lookup_request_free(struct lookup_request *);
+void lookup_request_clear(struct lookup_request *);
+void lookup_request_marshal(struct evbuffer *, const struct lookup_request *);
+int lookup_request_unmarshal(struct lookup_request *, struct evbuffer *);
+int lookup_request_complete(struct lookup_request *);
+void evtag_marshal_lookup_request(struct evbuffer *, ev_uint32_t,
+    const struct lookup_request *);
+int evtag_unmarshal_lookup_request(struct evbuffer *, ev_uint32_t,
+    struct lookup_request *);
+int lookup_request_parent_ino_assign(struct lookup_request *, const ev_uint32_t);
+int lookup_request_parent_ino_get(struct lookup_request *, ev_uint32_t *);
+int lookup_request_name_assign(struct lookup_request *, const char *);
+int lookup_request_name_get(struct lookup_request *, char * *);
+/* --- lookup_request done --- */
+
+/* Tag definition for lookup_response */
+enum lookup_response_ {
+  LOOKUP_RESPONSE_STAT_ARR=1,
+  LOOKUP_RESPONSE_MAX_TAGS
+};
+
+/* Structure declaration for lookup_response */
+struct lookup_response_access_ {
+  int (*stat_arr_assign)(struct lookup_response *, int, const struct file_stat*);
+  int (*stat_arr_get)(struct lookup_response *, int, struct file_stat* *);
+  struct file_stat*  (*stat_arr_add)(struct lookup_response *msg);
+};
+
+struct lookup_response {
+  struct lookup_response_access_ *base;
+
+  struct file_stat* *stat_arr;
+  int stat_arr_length;
+  int stat_arr_num_allocated;
+
+  ev_uint8_t stat_arr_set;
+};
+
+struct lookup_response *lookup_response_new(void);
+struct lookup_response *lookup_response_new_with_arg(void *);
+void lookup_response_free(struct lookup_response *);
+void lookup_response_clear(struct lookup_response *);
+void lookup_response_marshal(struct evbuffer *, const struct lookup_response *);
+int lookup_response_unmarshal(struct lookup_response *, struct evbuffer *);
+int lookup_response_complete(struct lookup_response *);
+void evtag_marshal_lookup_response(struct evbuffer *, ev_uint32_t,
+    const struct lookup_response *);
+int evtag_unmarshal_lookup_response(struct evbuffer *, ev_uint32_t,
+    struct lookup_response *);
+int lookup_response_stat_arr_assign(struct lookup_response *, int, const struct file_stat*);
+int lookup_response_stat_arr_get(struct lookup_response *, int, struct file_stat* *);
+struct file_stat*  lookup_response_stat_arr_add(struct lookup_response *msg);
+/* --- lookup_response done --- */
 
 /* Tag definition for rm_request */
 enum rm_request_ {

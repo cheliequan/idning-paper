@@ -47,14 +47,14 @@ typedef struct _fsnode {
 } fsnode;
 
 /* type for readdir command */
-#define TYPE_FILE             'f'
-#define TYPE_SYMLINK          'l'
-#define TYPE_DIRECTORY        'd'
-#define TYPE_FIFO             'q'
-#define TYPE_BLOCKDEV         'b'
-#define TYPE_CHARDEV          'c'
-#define TYPE_SOCKET           's'
-#define TYPE_UNKNOWN          '?'
+//#define TYPE_FILE             'f'
+//#define TYPE_SYMLINK          'l'
+//#define TYPE_DIRECTORY        'd'
+//#define TYPE_FIFO             'q'
+//#define TYPE_BLOCKDEV         'b'
+//#define TYPE_CHARDEV          'c'
+//#define TYPE_SOCKET           's'
+//#define TYPE_UNKNOWN          '?'
 
 static fsnode *root;
 
@@ -222,7 +222,7 @@ fsnode* fsnode_new() ;
 
 
 int fs_stat(int ino, struct file_stat * stat);
-int fs_mknod();
+fsnode * fs_mknod(int parent_ino, char * name, int type, int mode);
 int fs_mkdir();
 int fs_create();
 int fs_unlink();

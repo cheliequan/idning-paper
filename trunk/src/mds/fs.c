@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <sys/stat.h>
+static int cur_ino = 3;
+
 void fsnode_tree_insert(fsnode * p, fsnode * n) {
     if (NULL == p->data.ddata.children){
         fsnode * new_node = fsnode_new();
@@ -81,7 +84,12 @@ inline fsnode* fsnode_new() {
 int fs_init(){
     root = fsnode_new();
     root -> ino = 1;
-    
+    root -> type = S_IFDIR;
+    root -> name = "/";
+    root -> nlen = strlen(root ->name);
+    root -> parent = root;
+    root -> data.ddata.children = NULL;
+
     dlist_t * p = &( root->tree_dlist );
     fsnode_hash_insert(root);
 
@@ -91,7 +99,7 @@ int fs_init(){
     fsnode * node2 = fsnode_new();
     fprintf(stderr, "node2 : %p \n", node2);
     node2 -> ino = 2;
-    node2 -> type = TYPE_FILE;
+    node2 -> type = S_IFREG;
     node2 -> name = "hello_";
     node2 -> nlen = strlen(node2->name);
     node2 -> parent = root;
@@ -118,4 +126,45 @@ fsnode * fs_ls(int ino){
     /*if (n->type != TYPE_DIRECTORY)*/
         /*return NULL;*/
     return n->data.ddata.children;
+}
+
+fsnode * fs_lookup(int parent_ino, char * name){
+    fprintf(stderr, "fs_lookup : parent_ino: %d , name: %s\n", parent_ino, name);
+
+    fsnode *n = fsnode_hash_find(parent_ino);
+    n = n-> data.ddata.children;
+
+    fsnode * p;
+
+    dlist_t * head = &(n -> tree_dlist);
+    if (NULL == head)
+        return NULL;
+    dlist_t * pl;
+
+    for (pl = head->next; pl!=head; pl=pl->next){
+        p = dlist_data(pl, fsnode, tree_dlist);
+        fprintf(stderr, "pl : %p , p: %p\n", pl, p);
+
+        if (0 == strcmp(name, p->name)){
+            fprintf(stderr, "fs_lookup return p: %p, \n",  p);
+            return p;
+        }
+    }
+    /*if (n->type != TYPE_DIRECTORY)*/
+        /*return NULL;*/
+    fprintf(stderr, "fs_lookup return NULL \n");
+    return NULL;
+}
+
+fsnode * fs_mknod(int parent_ino, char * name, int type, int mode){
+    fsnode * n = fsnode_new();
+    n -> ino = cur_ino++;
+    n -> type = type;
+    n -> name = strdup(name);
+    n -> nlen = strlen(n->name);
+
+    n -> parent = fsnode_hash_find(parent_ino);
+    fsnode_hash_insert(n);
+    fsnode_tree_insert(n->parent, n);
+    return n;
 }
