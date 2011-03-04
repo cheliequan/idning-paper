@@ -42,16 +42,26 @@ struct ls_response {
 }
 
 /*create & mkdir*/
-struct create_request {
+struct mknod_request {
     int parent_ino                      = 1;
     string name                         = 2;
-    optional int mode                   = 3;
-    int type                            = 4;
+    int type                            = 3;
+    optional int mode                   = 4;
 }
 
-struct create_response {
+struct mknod_response {
     array struct[file_stat] stat_arr    = 1;
 }
+
+struct lookup_request {
+    int parent_ino                      = 1;
+    string name                         = 2;
+}
+
+struct lookup_response {
+    array struct[file_stat] stat_arr    = 1;
+}
+
 
 struct rm_request {
     int ino                             = 1;

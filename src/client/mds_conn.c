@@ -58,8 +58,18 @@ static void stat_cb(struct evrpc_status *status,
     event_loopexit(NULL);
 }
 
-static void ls_cb(struct evrpc_status *status,
-    struct ls_request *request , struct ls_response * response , void *arg){
+static void ls_cb(struct evrpc_status *status, struct ls_request *request , struct ls_response * response , void *arg){
+
+    DBG();
+    event_loopexit(NULL);
+}
+static void mknod_cb(struct evrpc_status *status, struct mknod_request *request , struct mknod_response * response , void *arg){
+
+    DBG();
+    event_loopexit(NULL);
+}
+
+static void lookup_cb(struct evrpc_status *status, struct lookup_request *request , struct lookup_response * response , void *arg){
 
     DBG();
     event_loopexit(NULL);
@@ -74,26 +84,16 @@ int stat_send_request(int * ino_arr, int len, struct file_stat * stat_arr)
     int i;
     for(i=0; i<len; i++){
         EVTAG_ARRAY_ADD_VALUE(req, ino_arr, ino_arr[i]);
-        fprintf(stderr, "add value: %d", ino_arr[i]);
     }
 
     int rst = EVRPC_MAKE_REQUEST(rpc_stat, pool, req, response,  stat_cb, NULL);
-    fprintf(stderr, "rst: %d\n", rst);
     event_dispatch();
-
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
-    fprintf(stderr, "after dispatch cnt: %d\n", cnt);
     if (cnt!=len)
         return -1;
     for (i=0; i< len; i++){
         struct file_stat * stat = stat_arr +i;
         EVTAG_ARRAY_GET(response, stat_arr, i, &stat);
-        fprintf(stderr, "stat_arr[%d].ino : %d\n", i, stat->ino);
-        fprintf(stderr, "stat_arr[%d].size: %d\n", i, stat->size);
-
-        fprintf(stderr, "stat_arr+i: %p", stat_arr+i);
-        fprintf(stderr, "stat : %p", stat);
-
         stat_arr[i].size = stat-> size;
         stat_arr[i].ino = stat-> ino;
     }
@@ -113,12 +113,11 @@ int ls_send_request(int ino, struct file_stat * stat_arr)
     EVRPC_MAKE_REQUEST(rpc_ls, pool, req, response,  ls_cb, NULL);
     event_dispatch();
 
-    int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
-    fprintf(stderr, "after dispatch cnt: %d\n", cnt);
-    /*struct file_stat ** arr = malloc(cnt*sizeof(struct file_stat *));*/
+    EVTAG_ARRAY_LEN(response, stat_arr);
 
     int i;
     struct file_stat * stat = file_stat_new();
+    int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
     for (i=0; i< cnt; i++){
         EVTAG_ARRAY_GET(response, stat_arr, i, &stat);
         stat_arr[i].size = stat-> size;
@@ -127,6 +126,53 @@ int ls_send_request(int ino, struct file_stat * stat_arr)
         stat_arr[i].type = stat-> type;
     }
     return cnt;
+}
+
+int mknod_send_request(int parent_ino, char * name, int type, int mode, struct file_stat *o_stat )
+{
+    DBG();
+    struct mknod_request * req = mknod_request_new();
+
+    struct mknod_response * response = mknod_response_new();
+    EVTAG_ASSIGN(req, parent_ino, parent_ino);
+    EVTAG_ASSIGN(req, name, name);
+    EVTAG_ASSIGN(req, type, type);
+    EVTAG_ASSIGN(req, mode, mode);
+
+
+    EVRPC_MAKE_REQUEST(rpc_mknod, pool, req, response,  mknod_cb, NULL);
+    event_dispatch();
+
+    struct file_stat * stat = file_stat_new();
+    EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
+    o_stat->size = stat->size;
+    o_stat->ino = stat->ino;
+
+    EVTAG_ARRAY_GET(response, stat_arr, 0, &o_stat);
+    return 0;
+}
+
+
+
+int lookup_send_request(int parent_ino, char * name , struct file_stat *o_stat )
+{
+    DBG();
+    struct lookup_request* req = lookup_request_new();
+
+    struct lookup_response * response = lookup_response_new();
+    EVTAG_ASSIGN(req, parent_ino, parent_ino);
+    EVTAG_ASSIGN(req, name, name);
+
+    EVRPC_MAKE_REQUEST(rpc_lookup, pool, req, response,  lookup_cb, NULL);
+    event_dispatch();
+
+    struct file_stat * stat = file_stat_new();
+    EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
+    o_stat->size = stat->size;
+    o_stat->ino = stat->ino;
+
+    fprintf(stderr, "lookup_send_request o_stat return ino : %d\n", o_stat -> ino);
+    return 0;
 }
 
 int ping_send_request(void)

@@ -34,23 +34,17 @@ static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
     stbuf->st_ino = ino;
     stbuf->st_uid = 0;
     stbuf->st_gid = 0;
-
-    switch (ino) {
-    case 1:
-        /*stbuf->st_mode = S_IFDIR | 0755;*/
+    if (ino == 1){
+    
         stbuf->st_mode = S_IFDIR | 0777;
         stbuf->st_nlink = 2;
-        break;
-    case 2:
-
+    }else{
         stat_send_request(arr, 1, stat_arr);
         stbuf->st_size = stat_arr[0].size;
         stbuf->st_mode = S_IFREG | 0777;
         stbuf->st_nlink = 1;
-        break;
-    default:
-        return -1;
     }
+
 	return 0;
 }
 
@@ -72,13 +66,31 @@ static void hello_ll_getattr(fuse_req_t req, fuse_ino_t ino,
 static void hello_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
 {
     DBG();
+    fprintf(stderr, "hello_ll_lookup: %d, %s", parent, name);
 	struct fuse_entry_param e;
-
     memset(&e, 0, sizeof(e));
-    e.ino = 2;
+
+    struct file_stat * stat = file_stat_new();
+    lookup_send_request(parent, name, stat);
+    e.ino = stat -> ino;
     e.attr_timeout = 1.0;
     e.entry_timeout = 1.0;
-    hello_stat(e.ino, &e.attr);
+    fprintf(stderr, "--------------------- hello_ll_lookup find inode : %d \n", e.ino);
+
+    if (e.ino){ // exists
+        hello_stat(e.ino, &e.attr);
+    }
+
+    /*if (0 == strcmp(name , "hello_")){*/
+        /*e.ino = 2;*/
+        /*e.attr_timeout = 1.0;*/
+        /*e.entry_timeout = 1.0;*/
+        /*hello_stat(e.ino, &e.attr);*/
+    /*} else {*/
+        /*e.ino = 0;*/
+        /*e.attr_timeout = 1.0;*/
+    /*}*/
+
 
     fuse_reply_entry(req, &e);
 }
@@ -141,6 +153,8 @@ static void hello_ll_open(fuse_req_t req, fuse_ino_t ino,
 			  struct fuse_file_info *fi)
 {
     DBG();
+    fprintf(stderr, "hello_ll_open : ino:  %d\n", ino);
+
 	/*if ((fi->flags & 3) != O_RDONLY)*/
 		/*fuse_reply_err(req, EACCES);*/
 	/*else*/
@@ -242,6 +256,72 @@ void my_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 }
 
 
+   
+void my_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi) {
+    struct fuse_entry_param e;
+    uint32_t inode;
+    uint8_t oflags;
+    uint8_t attr[35];
+    uint8_t mattr;
+    uint32_t nleng;
+    int status;
+    const struct fuse_ctx *ctx;
+    /*finfo *fileinfo;*/
+
+    fprintf(stderr,"create (%lu,%s,%04o)\n",(unsigned long int)parent,name,mode);
+    struct file_stat * stat = file_stat_new();
+    mknod_send_request(parent, name, S_IFREG, mode, stat);
+
+    memset(&e, 0, sizeof(e));
+    e.ino = stat->ino;
+
+    e.attr_timeout = 0.0;
+    e.entry_timeout = 0.0;
+    /*mfs_attr_to_stat(inode,attr,&e.attr);*/
+    if (fuse_reply_create(req, &e, fi) == -ENOENT) {
+
+    }
+
+    /*oflags = AFTER_CREATE;*/
+    /*if ((fi->flags & O_ACCMODE) == O_RDONLY) {*/
+        /*oflags |= WANT_READ;*/
+    /*} else if ((fi->flags & O_ACCMODE) == O_WRONLY) {*/
+        /*oflags |= WANT_WRITE;*/
+    /*} else if ((fi->flags & O_ACCMODE) == O_RDWR) {*/
+        /*oflags |= WANT_READ | WANT_WRITE;*/
+    /*} else {*/
+        /*fuse_reply_err(req, EINVAL);*/
+    /*}*/
+
+    /*ctx = fuse_req_ctx(req);*/
+    /*status = fs_mknod(parent,nleng,(const uint8_t*)name,TYPE_FILE,mode&07777,ctx->uid,ctx->gid,0,&inode,attr);*/
+    /*status = mfs_errorconv(status);*/
+    /*if (status!=0) {*/
+        /*fuse_reply_err(req, status);*/
+        /*return;*/
+    /*}*/
+    /*status = fs_opencheck(inode,ctx->uid,ctx->gid,oflags,NULL);*/
+    /*status = mfs_errorconv(status);*/
+    /*if (status!=0) {*/
+        /*fuse_reply_err(req, status);*/
+        /*return;*/
+    /*}*/
+
+    /*mattr = mfs_attr_get_mattr(attr);*/
+    /*fileinfo = mfs_newfileinfo(fi->flags & O_ACCMODE,inode);*/
+    /*fi->fh = (unsigned long)fileinfo;*/
+    /*if (keep_cache==1) {*/
+        /*fi->keep_cache=1;*/
+    /*} else if (keep_cache==2) {*/
+        /*fi->keep_cache=0;*/
+    /*} else {*/
+        /*fi->keep_cache = (mattr&MATTR_ALLOWDATACACHE)?1:0;*/
+    /*}*/
+}
+ 
+
+
+
 
 static struct fuse_lowlevel_ops hello_ll_oper = {
 	.lookup		= hello_ll_lookup,
@@ -252,6 +332,7 @@ static struct fuse_lowlevel_ops hello_ll_oper = {
 	.write      = my_ll_write,
 	.setattr    = my_ll_setattr,
 	.flush      = my_ll_flush,
+	.create     = my_ll_create,
 };
 
 int main(int argc, char *argv[])
