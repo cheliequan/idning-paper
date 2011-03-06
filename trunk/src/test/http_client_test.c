@@ -21,7 +21,7 @@
 void test_get(){
     char*  p;
     //http://www.baidu.com/search/error.html
-    http_response * response = http_get("http://10.100.1.76/");  // xiaonei.com/home
+    http_response * response = http_get("http://10.100.1.76/", NULL);  // xiaonei.com/home
     printf("%d\n", response -> status_code);
 
     while(( p = evbuffer_readline(response->headers))){
@@ -40,7 +40,7 @@ void test_post(){
     char*  p;
     struct evbuffer * buffer = evbuffer_new();
     evbuffer_add_printf(buffer, "email=idning@gmail.com&password=88888");
-    http_response * response = http_post("http://123.125.44.242/Plogin.do", 
+    http_response * response = http_post("http://123.125.44.242/Plogin.do",  NULL,
             buffer);  // xiaonei.com/home
     printf("%d\n", response -> status_code);
 

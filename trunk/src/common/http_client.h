@@ -9,5 +9,6 @@ typedef struct http_response{
 }http_response;
 
 void http_response_free(http_response * r);
-struct http_response * http_get(const char * url);
-struct http_response *http_post(const char *url, struct evbuffer * postdata);
+
+struct http_response *http_get(const char *url,  struct evkeyvalq* headers);
+struct http_response *http_post(const char *url, struct evkeyvalq* headers, struct evbuffer * postdata);

@@ -1,6 +1,7 @@
 #include "http_client.h"
 #include "log.h"
 
+
 /*
  * Requires uri parsing helpers from:
  * http://sourceforge.net/tracker/?func=detail&aid=3037660&group_id=50884&atid=461324
@@ -17,6 +18,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/queue.h>
 
 
 /*typedef struct http_response{*/
@@ -27,8 +29,8 @@
 
 static http_response * http_response_new(int status_code, struct evbuffer * headers, struct evbuffer * body);
 void http_response_free(http_response * r);
-struct http_response * http_get(const char * url);
-struct http_response *http_post(const char *url, struct evbuffer * postdata);
+struct http_response *http_get(const char *url,  struct evkeyvalq* headers);
+struct http_response *http_post(const char *url, struct evkeyvalq* headers, struct evbuffer * postdata);
 
 void http_response_free(http_response * r){
     evbuffer_free(r -> headers);
@@ -176,11 +178,18 @@ int download_renew_request(struct request_context *ctx)
     return 0;
 }
 
-struct http_response *http_request(const char *url, int verb, struct evbuffer * data)
+struct http_response *http_request(const char *url, int verb, struct evkeyvalq* headers, struct evbuffer * data)
 {
     fprintf(stderr, "http_request: %s, %d\n",url, verb );
     struct request_context *ctx = context_new(url, verb, data);
-    /* do all of the job */
+
+    if (headers != NULL){
+        struct evkeyval *header;
+        TAILQ_FOREACH(header, headers, next) {
+            evhttp_add_header(ctx->req->output_headers, header->key, header->value);
+        }
+    }
+
     fprintf(stderr, "http_request: method : %d\n", ctx->method);
     event_dispatch();
 
@@ -200,13 +209,15 @@ struct http_response *http_request(const char *url, int verb, struct evbuffer * 
     }
 }
 
-struct http_response *http_get(const char *url){
-    return http_request(url, EVHTTP_REQ_GET, NULL);
+struct http_response *http_get(const char *url,  struct evkeyvalq* headers){
+    return http_request(url, EVHTTP_REQ_GET, headers, NULL);
 }
 
-struct http_response *http_post(const char *url, struct evbuffer * postdata){
-    return http_request(url, EVHTTP_REQ_POST, postdata);
+struct http_response *http_post(const char *url, struct evkeyvalq* headers, struct evbuffer * postdata){
+    return http_request(url, EVHTTP_REQ_POST, headers, postdata);
 }
+
+
 
 int main_test(int argc, char *argv[])
 {
@@ -217,7 +228,7 @@ int main_test(int argc, char *argv[])
     }
 
     event_init();
-    struct http_response * resp = http_get(argv[1]);
+    struct http_response * resp = http_get(argv[1], NULL);
     struct evbuffer *data = resp->body;
 
     printf("got %d bytes\n", data ? evbuffer_get_length(data) : -1);

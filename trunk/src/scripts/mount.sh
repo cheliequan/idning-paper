@@ -1,4 +1,5 @@
 #!/bin/bash
+ulimit -c unlimite
 D="/tmp/$RANDOM"
 echo 
 echo $D

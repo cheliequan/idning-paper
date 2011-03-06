@@ -30,7 +30,7 @@ setattr_handler(EVRPC_STRUCT(rpc_setattr)* rpc, void *arg)
     struct file_stat * stat ;
     EVTAG_ARRAY_GET(request, stat_arr, 0, &stat);
 
-    logging(LOG_DEUBG, "setattr(%ld)", stat->ino);
+    logging(LOG_DEUBG, "setattr(%ld, name=%s, size=%d, mode=%04o)", stat->ino, stat->name, stat->size, stat->mode);
     fs_setattr(stat->ino, stat);
 
     struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
