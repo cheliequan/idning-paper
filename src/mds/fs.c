@@ -84,7 +84,7 @@ inline fsnode* fsnode_new() {
 int fs_init(){
     root = fsnode_new();
     root -> ino = 1;
-    root -> type = S_IFDIR;
+    root -> mode = S_IFDIR;
     root -> name = "/";
     root -> nlen = strlen(root ->name);
     root -> parent = root;
@@ -99,8 +99,8 @@ int fs_init(){
     fsnode * node2 = fsnode_new();
     fprintf(stderr, "node2 : %p \n", node2);
     node2 -> ino = 2;
-    node2 -> type = S_IFREG;
     node2 -> name = "hello_";
+    node2 -> mode = S_IFREG;
     node2 -> nlen = strlen(node2->name);
     node2 -> parent = root;
     node2 -> data.fdata.length = 10;
@@ -124,6 +124,7 @@ int fs_stat(int ino, struct file_stat * st){
     fsnode *n = fsnode_hash_find(ino);
     st->ino = ino;
     st->size = n-> data.fdata.length;
+    st->mode = n-> mode;
     return 0;
 }
 //返回的是children链表上的一个元素，链表中所有元素为兄弟.
@@ -166,6 +167,7 @@ fsnode * fs_mknod(int parent_ino, char * name, int type, int mode){
     fsnode * n = fsnode_new();
     n -> ino = cur_ino++;
     n -> type = type;
+    n -> mode = mode;
     n -> name = strdup(name);
     n -> nlen = strlen(n->name);
     if (type){

@@ -58,7 +58,9 @@ stat_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
         fs_stat(ino, t);
         EVTAG_ASSIGN(t, ino, t-> ino); // 不然它不认..
         EVTAG_ASSIGN(t, size , t-> size); // 不然它不认..
-        logging(LOG_DEUBG, "stat(%ld) return {ino: %ld, size: %ld}", ino, t->ino, t->size);
+        EVTAG_ASSIGN(t, type, t-> type); // 不然它不认..
+        EVTAG_ASSIGN(t, mode, t-> mode); // 不然它不认..
+        logging(LOG_DEUBG, "stat(%ld) return {ino: %ld, size: %ld, type : %d, mode : %04o}", ino, t->ino, t->size, t->type, t->mode);
     }
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -89,7 +91,9 @@ ls_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
         EVTAG_ASSIGN(t, ino, p-> ino); // 不然它不认..
         EVTAG_ASSIGN(t, size, p-> data.fdata.length); // 不然它不认..
         EVTAG_ASSIGN(t, name, p-> name); // 不然它不认..
-        logging(LOG_DEUBG, "ls(%ld) return {ino: %ld, name: %s, size: %d}", ino, t->ino, t->name, t->size);
+        EVTAG_ASSIGN(t, type, p-> type);
+        EVTAG_ASSIGN(t, mode, p-> mode);
+        logging(LOG_DEUBG, "ls(%ld) return {ino: %ld, name: %s, size: %d, mode: %04o}", ino, t->ino, t->name, t->size, t->mode);
     }
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -128,14 +132,17 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod)* rpc, void *arg)
     struct mknod_request *request = rpc->request;
     struct mknod_response *response = rpc->reply;
     fsnode * n = fs_mknod(request -> parent_ino, request->name, request->type, request->mode);
-    logging(LOG_DEUBG, "mknod(parent=%ld, name=%s, type=%d, mode=%d)", 
+    logging(LOG_DEUBG, "mknod(parent=%ld, name=%s, type=%d, mode=%04o)", 
             request -> parent_ino, request->name, request->type, request->mode);
 
     struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
+
     EVTAG_ASSIGN(t, ino, n-> ino); // 不然它不认..
     EVTAG_ASSIGN(t, size, n-> data.fdata.length); // 不然它不认..
     EVTAG_ASSIGN(t, name, n-> name); // 不然它不认..
-    logging(LOG_DEUBG, "mknod(%s) return {ino: %ld, name: %s, size: %d}", request->name, t->ino, t->name, t->size);
+    EVTAG_ASSIGN(t, mode, n-> mode); // 不然它不认..
+    EVTAG_ASSIGN(t, type, n-> type); // 不然它不认..
+    logging(LOG_DEUBG, "mknod(%s) return {ino: %ld, name: %s, size: %d, mode: %04o}", request->name, t->ino, t->name, t->size, t->mode);
 
     EVRPC_REQUEST_DONE(rpc);
 }
