@@ -79,21 +79,42 @@ ls_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
     EVTAG_ARRAY_GET(request, ino_arr, 0, &ino);
     logging(LOG_DEUBG, "ls(%ld)", ino);
 
+
+
+
+    fsnode *p = fsnode_hash_find(ino);
+    struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
+
+    EVTAG_ASSIGN(t, ino,  p-> ino); // 不然它不认..
+    EVTAG_ASSIGN(t, size, 4096); 
+    EVTAG_ASSIGN(t, name, "."); 
+    EVTAG_ASSIGN(t, type, p-> type);
+    EVTAG_ASSIGN(t, mode, p-> mode);
+
+    p = p->parent;
+
+    t = EVTAG_ARRAY_ADD(response, stat_arr);
+    EVTAG_ASSIGN(t, ino,  p-> ino); // 不然它不认..
+    EVTAG_ASSIGN(t, size, 4096); 
+    EVTAG_ASSIGN(t, name, ".."); 
+    EVTAG_ASSIGN(t, type, p-> type);
+    EVTAG_ASSIGN(t, mode, p-> mode);
+
     fsnode * n = fs_ls(ino);
+    if (n!=NULL){
+        dlist_t * head = &(n -> tree_dlist);
+        dlist_t * pl;
+        for (pl = head->next; pl!=head; pl=pl->next){
 
-    fsnode * p;
-    dlist_t * head = &(n -> tree_dlist);
-    dlist_t * pl;
-    for (pl = head->next; pl!=head; pl=pl->next){
-
-        p = dlist_data(pl, fsnode, tree_dlist);
-        struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
-        EVTAG_ASSIGN(t, ino, p-> ino); // 不然它不认..
-        EVTAG_ASSIGN(t, size, p-> data.fdata.length); // 不然它不认..
-        EVTAG_ASSIGN(t, name, p-> name); // 不然它不认..
-        EVTAG_ASSIGN(t, type, p-> type);
-        EVTAG_ASSIGN(t, mode, p-> mode);
-        logging(LOG_DEUBG, "ls(%ld) return {ino: %ld, name: %s, size: %d, mode: %04o}", ino, t->ino, t->name, t->size, t->mode);
+            p = dlist_data(pl, fsnode, tree_dlist);
+            t = EVTAG_ARRAY_ADD(response, stat_arr);
+            EVTAG_ASSIGN(t, ino, p-> ino); // 不然它不认..
+            EVTAG_ASSIGN(t, size, p-> data.fdata.length); // 不然它不认..
+            EVTAG_ASSIGN(t, name, p-> name); // 不然它不认..
+            EVTAG_ASSIGN(t, type, p-> type);
+            EVTAG_ASSIGN(t, mode, p-> mode);
+            logging(LOG_DEUBG, "ls(%ld) return {ino: %ld, name: %s, size: %d, mode: %04o}", ino, t->ino, t->name, t->size, t->mode);
+        }
     }
     EVRPC_REQUEST_DONE(rpc);
 }

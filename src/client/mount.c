@@ -38,12 +38,8 @@ static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
         stbuf->st_size = stat_arr[0].size;
         stbuf->st_mode = stat_arr[0].mode | 0777;
         /*stbuf->st_mode = S_IFDIR| 0777; //TODO*/
-
-
         logging(LOG_DEUBG, "stat (ino = %lu) return {size: %d, mode: %04o}", 
                 ino, stbuf->st_size, stbuf->st_mode);
-
-
         stbuf->st_nlink = 1;
     }
 
@@ -135,8 +131,8 @@ static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     int i;
     struct dirbuf b;
     memset(&b, 0, sizeof(b));
-    dirbuf_add(req, &b, ".", S_IFDIR, 1);
-    dirbuf_add(req, &b, "..", S_IFDIR, 1);
+    /*dirbuf_add(req, &b, ".",  S_IFDIR, 1);*/
+    /*dirbuf_add(req, &b, "..", S_IFDIR, 1);*/
     /*dirbuf_add(req, &b, "xxxxxx", 3);*/
     for(i=0; i<cnt; i++){
         logging(LOG_DEUBG, "readdir(parent = %lu) return {ino: %lu, name : %s, mode: %04o}", 
