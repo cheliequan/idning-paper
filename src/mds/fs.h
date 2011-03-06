@@ -222,6 +222,8 @@ fsnode* fsnode_new() ;
 
 
 int fs_stat(int ino, struct file_stat * stat);
+int fs_setattr(int ino, struct file_stat * st);
+
 fsnode * fs_mknod(int parent_ino, char * name, int type, int mode);
 int fs_mkdir();
 int fs_create();

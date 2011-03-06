@@ -14,6 +14,8 @@ struct pong;
 struct file_stat;
 struct stat_request;
 struct stat_response;
+struct setattr_request;
+struct setattr_response;
 struct ls_request;
 struct ls_response;
 struct mknod_request;
@@ -189,6 +191,11 @@ enum file_stat_ {
   FILE_STAT_SIZE=2,
   FILE_STAT_TYPE=3,
   FILE_STAT_NAME=4,
+  FILE_STAT_MODE=5,
+  FILE_STAT_NLINK=6,
+  FILE_STAT_ATIME=7,
+  FILE_STAT_MTIME=8,
+  FILE_STAT_CTIME=9,
   FILE_STAT_MAX_TAGS
 };
 
@@ -202,6 +209,16 @@ struct file_stat_access_ {
   int (*type_get)(struct file_stat *, ev_uint32_t *);
   int (*name_assign)(struct file_stat *, const char *);
   int (*name_get)(struct file_stat *, char * *);
+  int (*mode_assign)(struct file_stat *, const ev_uint32_t);
+  int (*mode_get)(struct file_stat *, ev_uint32_t *);
+  int (*nlink_assign)(struct file_stat *, const ev_uint32_t);
+  int (*nlink_get)(struct file_stat *, ev_uint32_t *);
+  int (*atime_assign)(struct file_stat *, const ev_uint32_t);
+  int (*atime_get)(struct file_stat *, ev_uint32_t *);
+  int (*mtime_assign)(struct file_stat *, const ev_uint32_t);
+  int (*mtime_get)(struct file_stat *, ev_uint32_t *);
+  int (*ctime_assign)(struct file_stat *, const ev_uint32_t);
+  int (*ctime_get)(struct file_stat *, ev_uint32_t *);
 };
 
 struct file_stat {
@@ -211,11 +228,21 @@ struct file_stat {
   ev_uint32_t size;
   ev_uint32_t type;
   char *name;
+  ev_uint32_t mode;
+  ev_uint32_t nlink;
+  ev_uint32_t atime;
+  ev_uint32_t mtime;
+  ev_uint32_t ctime;
 
   ev_uint8_t ino_set;
   ev_uint8_t size_set;
   ev_uint8_t type_set;
   ev_uint8_t name_set;
+  ev_uint8_t mode_set;
+  ev_uint8_t nlink_set;
+  ev_uint8_t atime_set;
+  ev_uint8_t mtime_set;
+  ev_uint8_t ctime_set;
 };
 
 struct file_stat *file_stat_new(void);
@@ -237,6 +264,16 @@ int file_stat_type_assign(struct file_stat *, const ev_uint32_t);
 int file_stat_type_get(struct file_stat *, ev_uint32_t *);
 int file_stat_name_assign(struct file_stat *, const char *);
 int file_stat_name_get(struct file_stat *, char * *);
+int file_stat_mode_assign(struct file_stat *, const ev_uint32_t);
+int file_stat_mode_get(struct file_stat *, ev_uint32_t *);
+int file_stat_nlink_assign(struct file_stat *, const ev_uint32_t);
+int file_stat_nlink_get(struct file_stat *, ev_uint32_t *);
+int file_stat_atime_assign(struct file_stat *, const ev_uint32_t);
+int file_stat_atime_get(struct file_stat *, ev_uint32_t *);
+int file_stat_mtime_assign(struct file_stat *, const ev_uint32_t);
+int file_stat_mtime_get(struct file_stat *, ev_uint32_t *);
+int file_stat_ctime_assign(struct file_stat *, const ev_uint32_t);
+int file_stat_ctime_get(struct file_stat *, ev_uint32_t *);
 /* --- file_stat done --- */
 
 /* Tag definition for stat_request */
@@ -316,6 +353,84 @@ int stat_response_stat_arr_assign(struct stat_response *, int, const struct file
 int stat_response_stat_arr_get(struct stat_response *, int, struct file_stat* *);
 struct file_stat*  stat_response_stat_arr_add(struct stat_response *msg);
 /* --- stat_response done --- */
+
+/* Tag definition for setattr_request */
+enum setattr_request_ {
+  SETATTR_REQUEST_STAT_ARR=1,
+  SETATTR_REQUEST_MAX_TAGS
+};
+
+/* Structure declaration for setattr_request */
+struct setattr_request_access_ {
+  int (*stat_arr_assign)(struct setattr_request *, int, const struct file_stat*);
+  int (*stat_arr_get)(struct setattr_request *, int, struct file_stat* *);
+  struct file_stat*  (*stat_arr_add)(struct setattr_request *msg);
+};
+
+struct setattr_request {
+  struct setattr_request_access_ *base;
+
+  struct file_stat* *stat_arr;
+  int stat_arr_length;
+  int stat_arr_num_allocated;
+
+  ev_uint8_t stat_arr_set;
+};
+
+struct setattr_request *setattr_request_new(void);
+struct setattr_request *setattr_request_new_with_arg(void *);
+void setattr_request_free(struct setattr_request *);
+void setattr_request_clear(struct setattr_request *);
+void setattr_request_marshal(struct evbuffer *, const struct setattr_request *);
+int setattr_request_unmarshal(struct setattr_request *, struct evbuffer *);
+int setattr_request_complete(struct setattr_request *);
+void evtag_marshal_setattr_request(struct evbuffer *, ev_uint32_t,
+    const struct setattr_request *);
+int evtag_unmarshal_setattr_request(struct evbuffer *, ev_uint32_t,
+    struct setattr_request *);
+int setattr_request_stat_arr_assign(struct setattr_request *, int, const struct file_stat*);
+int setattr_request_stat_arr_get(struct setattr_request *, int, struct file_stat* *);
+struct file_stat*  setattr_request_stat_arr_add(struct setattr_request *msg);
+/* --- setattr_request done --- */
+
+/* Tag definition for setattr_response */
+enum setattr_response_ {
+  SETATTR_RESPONSE_STAT_ARR=1,
+  SETATTR_RESPONSE_MAX_TAGS
+};
+
+/* Structure declaration for setattr_response */
+struct setattr_response_access_ {
+  int (*stat_arr_assign)(struct setattr_response *, int, const struct file_stat*);
+  int (*stat_arr_get)(struct setattr_response *, int, struct file_stat* *);
+  struct file_stat*  (*stat_arr_add)(struct setattr_response *msg);
+};
+
+struct setattr_response {
+  struct setattr_response_access_ *base;
+
+  struct file_stat* *stat_arr;
+  int stat_arr_length;
+  int stat_arr_num_allocated;
+
+  ev_uint8_t stat_arr_set;
+};
+
+struct setattr_response *setattr_response_new(void);
+struct setattr_response *setattr_response_new_with_arg(void *);
+void setattr_response_free(struct setattr_response *);
+void setattr_response_clear(struct setattr_response *);
+void setattr_response_marshal(struct evbuffer *, const struct setattr_response *);
+int setattr_response_unmarshal(struct setattr_response *, struct evbuffer *);
+int setattr_response_complete(struct setattr_response *);
+void evtag_marshal_setattr_response(struct evbuffer *, ev_uint32_t,
+    const struct setattr_response *);
+int evtag_unmarshal_setattr_response(struct evbuffer *, ev_uint32_t,
+    struct setattr_response *);
+int setattr_response_stat_arr_assign(struct setattr_response *, int, const struct file_stat*);
+int setattr_response_stat_arr_get(struct setattr_response *, int, struct file_stat* *);
+struct file_stat*  setattr_response_stat_arr_add(struct setattr_response *msg);
+/* --- setattr_response done --- */
 
 /* Tag definition for ls_request */
 enum ls_request_ {

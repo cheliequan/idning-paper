@@ -12,3 +12,4 @@ EVRPC_HEADER(rpc_rm, rm_request, rm_response)
 EVRPC_HEADER(rpc_statfs, statfs_request, statfs_response)
 
 EVRPC_HEADER(rpc_lookup, lookup_request, lookup_response)
+EVRPC_HEADER(rpc_setattr, setattr_request, setattr_response)

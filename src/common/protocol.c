@@ -9,5 +9,7 @@ EVRPC_GENERATE(rpc_rm, rm_request, rm_response)
 EVRPC_GENERATE(rpc_statfs, statfs_request, statfs_response)
 EVRPC_GENERATE(rpc_lookup, lookup_request, lookup_response)
 
+EVRPC_GENERATE(rpc_setattr, setattr_request, setattr_response)
+
 /*EVRPC_GENERATE(rpc_, _request, _response)*/
 /*EVRPC_GENERATE(rpc_, _request, _response)*/

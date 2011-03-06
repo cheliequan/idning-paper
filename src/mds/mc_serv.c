@@ -5,6 +5,7 @@
 #include "protocol.gen.h"
 #include "protocol.h"
 #include "fs.h"
+#include "log.h"
 
 
 
@@ -20,26 +21,44 @@ void cluster_remove(char * ip, int port);
 void cluster_dump();
 
 static void
+setattr_handler(EVRPC_STRUCT(rpc_setattr)* rpc, void *arg)
+{
+    DBG();
+    struct setattr_request *request = rpc->request;
+    struct setattr_response *response = rpc->reply;
+
+    struct file_stat * stat ;
+    EVTAG_ARRAY_GET(request, stat_arr, 0, &stat);
+
+    logging(LOG_DEUBG, "setattr(%ld)", stat->ino);
+    fs_setattr(stat->ino, stat);
+
+    struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
+    EVTAG_ASSIGN(t, ino, stat-> ino); // 不然它不认..
+    EVTAG_ASSIGN(t, size , stat-> size); // 不然它不认..
+
+    EVRPC_REQUEST_DONE(rpc);
+}
+
+static void
 stat_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
 {
-    fprintf(stderr, "%s: called\n", __func__);
+    DBG();
     struct stat_request *request = rpc->request;
     struct stat_response *response = rpc->reply;
 
     int cnt = EVTAG_ARRAY_LEN(request, ino_arr);
     int i;
     for (i=0; i< cnt; i++){
-        int inode; 
-        EVTAG_ARRAY_GET(request, ino_arr, i, &inode);
-        fprintf(stderr, "inode %d: \n", inode);
+        int ino; 
+        EVTAG_ARRAY_GET(request, ino_arr, i, &ino);
+        logging(LOG_DEUBG, "stat(%ld)", ino);
 
         struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
-        fs_stat(inode, t);
+        fs_stat(ino, t);
         EVTAG_ASSIGN(t, ino, t-> ino); // 不然它不认..
         EVTAG_ASSIGN(t, size , t-> size); // 不然它不认..
-        fprintf(stderr, "ino %d: \n", t->ino);
-        fprintf(stderr, "file size: %d: \n", t-> size);
-        
+        logging(LOG_DEUBG, "stat(%ld) return {ino: %ld, size: %ld}", ino, t->ino, t->size);
     }
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -49,13 +68,15 @@ stat_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
 static void
 ls_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
 {
-    fprintf(stderr, "%s: called\n", __func__);
+    DBG();
     struct stat_request *request = rpc->request;
     struct stat_response *response = rpc->reply;
 
     int cnt = EVTAG_ARRAY_LEN(request, ino_arr);
     int ino; 
     EVTAG_ARRAY_GET(request, ino_arr, 0, &ino);
+    logging(LOG_DEUBG, "ls(%ld)", ino);
+
     fsnode * n = fs_ls(ino);
 
     fsnode * p;
@@ -68,6 +89,7 @@ ls_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
         EVTAG_ASSIGN(t, ino, p-> ino); // 不然它不认..
         EVTAG_ASSIGN(t, size, p-> data.fdata.length); // 不然它不认..
         EVTAG_ASSIGN(t, name, p-> name); // 不然它不认..
+        logging(LOG_DEUBG, "ls(%ld) return {ino: %ld, name: %s, size: %d}", ino, t->ino, t->name, t->size);
     }
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -75,22 +97,17 @@ ls_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
 static void
 ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
 {
-    fprintf(stderr, "%s: called\n", __func__);
+    DBG();
 
     struct ping * ping = rpc->request;
     struct pong * pong = rpc->reply;
 
-#define EV_GET(msg, member) \
-        (msg->member)
-
     int ping_version = ping->version;
-    
 
-
-    fprintf(stderr, "ping->self_ip :%s\n", ping->self_ip);
-    fprintf(stderr, "ping->self_port :%d\n", ping->self_port);
+    /*fprintf(stderr, "ping->self_ip :%s\n", ping->self_ip);*/
+    /*fprintf(stderr, "ping->self_port :%d\n", ping->self_port);*/
     cluster_add((char *)ping->self_ip, ping->self_port, 0);
-    fprintf(stderr, "machine_cnt:%d\n", machine_cnt);
+    /*fprintf(stderr, "machine_cnt:%d\n", machine_cnt);*/
     
     EVTAG_ASSIGN(pong, version, ping_version+1);
     EVTAG_ASSIGN(pong, xx, 8);
@@ -99,36 +116,39 @@ ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
     int i;
     for(i=0; i < machine_cnt; i++){
         struct machine * m = EVTAG_ARRAY_ADD(pong, machines);  // alloc space for machines
-        printf("before assign m->ip  : %s   m[i].ip: %s\n", m->ip, machines[i].ip);
         pong_machines_assign(pong, i, machines+i);
-        printf("after assign m->ip  : %s   m[i].ip: %s\n", m->ip, machines[i].ip);
     }
     EVRPC_REQUEST_DONE(rpc);
 }
 
-
-
 static void mknod_handler(EVRPC_STRUCT(rpc_mknod)* rpc, void *arg)
 {
-    fprintf(stderr, "%s: called\n", __func__);
+    DBG();
 
     struct mknod_request *request = rpc->request;
     struct mknod_response *response = rpc->reply;
     fsnode * n = fs_mknod(request -> parent_ino, request->name, request->type, request->mode);
+    logging(LOG_DEUBG, "mknod(parent=%ld, name=%s, type=%d, mode=%d)", 
+            request -> parent_ino, request->name, request->type, request->mode);
+
     struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
     EVTAG_ASSIGN(t, ino, n-> ino); // 不然它不认..
     EVTAG_ASSIGN(t, size, n-> data.fdata.length); // 不然它不认..
     EVTAG_ASSIGN(t, name, n-> name); // 不然它不认..
+    logging(LOG_DEUBG, "mknod(%s) return {ino: %ld, name: %s, size: %d}", request->name, t->ino, t->name, t->size);
 
     EVRPC_REQUEST_DONE(rpc);
 }
 
 static void lookup_handler(EVRPC_STRUCT(rpc_lookup)* rpc, void *arg)
 {
-    fprintf(stderr, "%s: called\n", __func__);
+    DBG();
 
     struct lookup_request *request = rpc->request;
     struct lookup_response *response = rpc->reply;
+
+    logging(LOG_DEUBG, "lookup(parent=%ld, name=%s)", 
+            request -> parent_ino, request->name);
 
     fsnode * n = fs_lookup(request -> parent_ino, request->name);
     struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
@@ -137,11 +157,11 @@ static void lookup_handler(EVRPC_STRUCT(rpc_lookup)* rpc, void *arg)
         EVTAG_ASSIGN(t, size, 0); // 不然它不认..
         EVTAG_ASSIGN(t, name, "" ); // 不然它不认..
     }else{
-        fprintf(stderr, " fs_lookup : ino: %d \n", n->ino);
         EVTAG_ASSIGN(t, ino, n-> ino); // 不然它不认..
         EVTAG_ASSIGN(t, size, n-> data.fdata.length); // 不然它不认..
         EVTAG_ASSIGN(t, name, n-> name); // 不然它不认..
     }
+    logging(LOG_DEUBG, "lookup(%s) return {ino: %ld, name: %s, size: %d}", request->name, t->ino, t->name, t->size);
 
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -167,6 +187,7 @@ rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
     EVRPC_REGISTER(base, rpc_ls, ls_request, ls_response, ls_handler, NULL);
     EVRPC_REGISTER(base, rpc_mknod, mknod_request, mknod_response, mknod_handler, NULL);
     EVRPC_REGISTER(base, rpc_lookup, lookup_request, lookup_response, lookup_handler, NULL);
+    EVRPC_REGISTER(base, rpc_setattr, setattr_request, setattr_response, setattr_handler, NULL);
 
     *phttp = http;
     *pport = port;
@@ -195,7 +216,7 @@ void cluster_printf(char * hint){
         while(*p)
             p++;
     }
-    printf(" %s clusters: \n----------------------------------------------\n%s\n---------------------------------------\n", hint, tmp);
+    logging(LOG_DEUBG," %s clusters: \n--------------------------------\n%s\n----------------------------\n", hint, tmp);
 }
 
 void cluster_init(){
@@ -204,7 +225,7 @@ void cluster_init(){
 }
 
 void cluster_add(char * ip, int port, char type){
-    //logging(LOG_DEUBG, "%s: called\n", __func__);
+    DBG();
     cluster_printf("before cluster_add");
     int i;
     for(i=0; i < machine_cnt; i++){

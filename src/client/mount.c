@@ -12,21 +12,17 @@
 #include <http_client.h>
 #include "mds_conn.h"
 #include "log.h"
+#include "protocol.gen.h"
 
 
 static const char *hello_name = "hello";
 
-static void test(){
-    fuse_ino_t arr[1] ;
-    struct file_stat stat_arr[1];
-    arr[0] = 2;
-    stat_send_request(arr, 1, stat_arr);
-}
 
 static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
 {
     DBG();
-    fprintf(stderr, "hello_stat(%d)\n", (int)ino);
+    
+    logging(LOG_DEUBG, "stat(%lu)", ino);
     fuse_ino_t arr[1] ;
     struct file_stat stat_arr[1];
     arr[0] = ino;
@@ -52,6 +48,7 @@ static void hello_ll_getattr(fuse_req_t req, fuse_ino_t ino,
 			     struct fuse_file_info *fi)
 {
     DBG();
+    logging(LOG_DEUBG, "getattr(%lu)", ino);
 	struct stat stbuf;
 
 	(void) fi;
@@ -66,7 +63,7 @@ static void hello_ll_getattr(fuse_req_t req, fuse_ino_t ino,
 static void hello_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
 {
     DBG();
-    fprintf(stderr, "hello_ll_lookup: %ld, %s", parent, name);
+    logging(LOG_DEUBG, "lookup(parent = %lu, name = %s)", parent, name);
 	struct fuse_entry_param e;
     memset(&e, 0, sizeof(e));
 
@@ -75,23 +72,12 @@ static void hello_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
     e.ino = stat -> ino;
     e.attr_timeout = 1.0;
     e.entry_timeout = 1.0;
-    fprintf(stderr, "--------------------- hello_ll_lookup find inode : %ld \n", e.ino);
+
+    logging(LOG_DEUBG, "lookup(parent = %lu, name = %s) return inode: %lu", parent, name, e.ino);
 
     if (e.ino){ // exists
         hello_stat(e.ino, &e.attr);
     }
-
-    /*if (0 == strcmp(name , "hello_")){*/
-        /*e.ino = 2;*/
-        /*e.attr_timeout = 1.0;*/
-        /*e.entry_timeout = 1.0;*/
-        /*hello_stat(e.ino, &e.attr);*/
-    /*} else {*/
-        /*e.ino = 0;*/
-        /*e.attr_timeout = 1.0;*/
-    /*}*/
-
-
     fuse_reply_entry(req, &e);
 }
 
@@ -129,6 +115,7 @@ static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
 			     off_t off, struct fuse_file_info *fi)
 {
     DBG();
+    logging(LOG_DEUBG, "readdir(ino = %lu)", ino);
 	(void) fi;
 
     struct file_stat stat_arr[100]; //TODO: 100...
@@ -140,8 +127,7 @@ static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     dirbuf_add(req, &b, "..", 1);
     /*dirbuf_add(req, &b, "xxxxxx", 3);*/
     for(i=0; i<cnt; i++){
-        fprintf(stderr, "stat[%d].name: %s", i, stat_arr[i].name);
-        fprintf(stderr, "stat[%d].ino : %d", i, stat_arr[i].ino);
+        logging(LOG_DEUBG, "readdir(parent = %lu) return {ino: %lu, name : %s}", ino, stat_arr[i].ino, stat_arr[i].name);
         dirbuf_add(req, &b, stat_arr[i].name, stat_arr[i].ino);
     }
 
@@ -153,14 +139,14 @@ static void hello_ll_open(fuse_req_t req, fuse_ino_t ino,
 			  struct fuse_file_info *fi)
 {
     DBG();
-    fprintf(stderr, "hello_ll_open : ino:  %ld\n", ino);
+    logging(LOG_DEUBG, "open(%lu)", ino);
 
 	/*if ((fi->flags & 3) != O_RDONLY)*/
 		/*fuse_reply_err(req, EACCES);*/
 	/*else*/
 		/*fuse_reply_open(req, fi);*/
 
-    fi->fh = ino; //TODO: this is tmp
+    /*fi->fh = ino; //TODO: this is tmp*/
     /*fi->direct_io = 1;*/
     /*fi->keep_cache=1;*/
 
@@ -172,14 +158,14 @@ static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 			  off_t off, struct fuse_file_info *fi)
 {
     DBG();
+    logging(LOG_DEUBG, "read (%lu, size=%d, off=%d)", ino, size, off);
 	(void) fi;
 
-	assert(ino == 2);
     /*char url[256] = "http://10.100.1.76/";*/
     /*sprintf(url, "http://10.100.1.76:6006/get/%d", ino);*/
 
     char url[256] = "http://127.0.0.1/";
-    sprintf(url, "http://127.0.0.1:6006/get/%ld", ino);
+    sprintf(url, "http://127.0.0.1:6006/get/%lu", ino);
     fprintf(stderr, "http_get: %s \n", url);
     //
     http_response * response = http_get(url);
@@ -210,20 +196,55 @@ Fuse is a very cool thing.
 */
 /*
 */
+
+/*
+ * 包括st_atime
+ * 包括st_mtime
+ * 包括st_ctime
+ *
+ * st_size
+ * st_uid
+ * st_gid
+ * st_mode
+ * st_nlink
+ *
+ * 采用方法如戏下：
+ * 先取的stat, 在client端进行set, 然后再写回mds, 
+ * mfs不一样，mfs是直接向mds发送set命令.
+ *
+ *
+ * */
 void my_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf, int to_set, struct fuse_file_info *fi) {
     DBG();
-    struct stat stbuf;
-    uint64_t maxfleng;
-    uint8_t attr[35];
-    int status;
-    const struct fuse_ctx *ctx;
-    uint8_t setmask = 0;
+    logging(LOG_DEUBG, "setattr(%lu)", ino);
+    struct file_stat * fstat = file_stat_new();
+
+    fuse_ino_t arr[1] ;
+    arr[0] = ino;
+
+    stat_send_request(arr, 1, fstat);
+
+    if (to_set & FUSE_SET_ATTR_MODE) {
+        fstat ->mode = in_stbuf->st_mode| 0777;
+        logging(LOG_DEUBG, "setattr(%lu) set mode = %04o", ino, in_stbuf->st_mode);
+    }
+    if (to_set & FUSE_SET_ATTR_SIZE) {
+        fstat->size = in_stbuf->st_size;
+        logging(LOG_DEUBG, "setattr(%lu) set size = %d", ino, in_stbuf->st_size);
+    }
+
+    //FIXME : here shoube a 
+    /*file_stat not a struct stat*/
+    fprintf(stderr, "before setattr_send_request ino is : %d ", fstat->ino);
+    setattr_send_request(fstat);
 
 
+	struct stat stbuf;
+	memset(&stbuf, 0, sizeof(stbuf));
 	if (hello_stat(ino, &stbuf) == -1)
 		fuse_reply_err(req, ENOENT);
-	else
-		fuse_reply_attr(req, &stbuf, 1.0);
+    //TODO: HERE , reply
+    fuse_reply_attr(req, &stbuf, 1.0);
 
     /*fuse_reply_attr(req, &o_stbuf, (mfs_attr_get_mattr(attr)&MATTR_NOACACHE)?0.0:attr_cache_timeout);*/
 }
@@ -231,6 +252,7 @@ void my_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf, int to
 
 void my_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi) {
     DBG();
+    logging(LOG_DEUBG, "write(%lu, size=%d, off=%d)", ino, size, off);
     int err = 0;
     /*if (off>=MAX_FILE_SIZE || off+size>=MAX_FILE_SIZE) {*/
         /*fuse_reply_err(req, EFBIG);*/
@@ -243,10 +265,22 @@ void my_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, o
     /*TODO : evbuffer_add_reference();*/
 
     char url[256];
-    sprintf(url, "http://127.0.0.1:6006/put/%ld", ino);
+    sprintf(url, "http://127.0.0.1:6006/put/%lu", ino);
 
     http_response * response = http_post(url, evb);
     int len = evbuffer_get_length(response->body);
+
+
+	/*struct stat stbuf;*/
+	/*memset(&stbuf, 0, sizeof(stbuf));*/
+	/*if (hello_stat(ino, &stbuf) == -1)*/
+		/*fuse_reply_err(req, ENOENT);*/
+    /*stbuf.size = 8;*/
+    struct file_stat * f_stat = file_stat_new();
+    f_stat -> ino = ino;
+    f_stat -> size = 8;
+
+    setattr_send_request(f_stat);
 
     if (err!=0) {
         fuse_reply_err(req,err);
@@ -264,6 +298,7 @@ void my_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 
    
 void my_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi) {
+    logging(LOG_DEUBG, "create(parent = %lu, name = %s, mode=%04o)", parent, name, mode);
     struct fuse_entry_param e;
     uint32_t inode;
     uint8_t oflags;
@@ -274,7 +309,6 @@ void my_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mo
     const struct fuse_ctx *ctx;
     /*finfo *fileinfo;*/
 
-    fprintf(stderr,"create (%lu,%s,%04o)\n",(unsigned long int)parent,name,mode);
     struct file_stat * stat = file_stat_new();
     mknod_send_request(parent, name, S_IFREG, mode, stat);
 
@@ -345,7 +379,6 @@ int main(int argc, char *argv[])
 {
     mds_conn_init();
     ping_send_request();
-    test();
 
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 	struct fuse_chan *ch;
