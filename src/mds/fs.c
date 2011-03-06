@@ -140,6 +140,8 @@ fsnode * fs_lookup(int parent_ino, char * name){
 
     fsnode *n = fsnode_hash_find(parent_ino);
     n = n-> data.ddata.children;
+    if (!n)
+        return NULL;
 
     fsnode * p;
 
