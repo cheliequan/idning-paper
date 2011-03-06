@@ -170,9 +170,12 @@ fsnode * fs_mknod(int parent_ino, char * name, int type, int mode){
     n -> mode = mode;
     n -> name = strdup(name);
     n -> nlen = strlen(n->name);
-    if (type){
+    if (n->mode & S_IFREG){ //is file 
         n->data.fdata.length = 10;
+    }else if (n->mode & S_IFDIR){
+        n->data.ddata.children = NULL;
     }
+
     n -> parent = fsnode_hash_find(parent_ino);
 
     fsnode_hash_insert(n);
