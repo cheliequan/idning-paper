@@ -114,6 +114,12 @@ int fs_init(){
     return 0;
 }
 
+int fs_setattr(int ino, struct file_stat * st){
+    fsnode *n = fsnode_hash_find(ino);
+    n->data.fdata.length = st->size;
+    return 0;
+}
+
 int fs_stat(int ino, struct file_stat * st){
     fsnode *n = fsnode_hash_find(ino);
     st->ino = ino;
@@ -162,8 +168,11 @@ fsnode * fs_mknod(int parent_ino, char * name, int type, int mode){
     n -> type = type;
     n -> name = strdup(name);
     n -> nlen = strlen(n->name);
-
+    if (type){
+        n->data.fdata.length = 10;
+    }
     n -> parent = fsnode_hash_find(parent_ino);
+
     fsnode_hash_insert(n);
     fsnode_tree_insert(n->parent, n);
     return n;

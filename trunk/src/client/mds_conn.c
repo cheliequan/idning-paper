@@ -77,6 +77,38 @@ static void lookup_cb(struct evrpc_status *status, struct lookup_request *reques
     event_loopexit(NULL);
 }
 
+static void setattr_cb(struct evrpc_status *status, struct setattr_request *request , struct setattr_response * response , void *arg){
+
+    DBG();
+    event_loopexit(NULL);
+}
+
+int setattr_send_request(struct file_stat * stat_arr)
+{
+    DBG();
+    struct setattr_request * req = setattr_request_new();
+    struct setattr_response * response = setattr_response_new();
+
+    struct file_stat * t = EVTAG_ARRAY_ADD(req, stat_arr);
+    EVTAG_ASSIGN(t, ino, stat_arr->ino); // 不然它不认..
+    EVTAG_ASSIGN(t, size , stat_arr->size); // 不然它不认..
+
+
+    EVRPC_MAKE_REQUEST(rpc_setattr, pool, req, response,  setattr_cb, NULL);
+    event_dispatch();
+    int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
+    if (cnt!=1){
+        logging(LOG_ERROR, "setattr_send_request return cnt != 1, cnt= %d", cnt);
+        return -1;
+    }
+    /*for (i=0; i< len; i++){*/
+        /*struct file_stat * stat = stat_arr +i;*/
+        /*EVTAG_ARRAY_GET(response, stat_arr, i, &stat);*/
+        /*stat_arr[i].size = stat-> size;*/
+        /*stat_arr[i].ino = stat-> ino;*/
+    /*}*/
+    return 0;
+}
 
 int stat_send_request(fuse_ino_t * ino_arr, int len, struct file_stat * stat_arr)
 {
