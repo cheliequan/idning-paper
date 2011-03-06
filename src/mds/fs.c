@@ -173,7 +173,7 @@ fsnode * fs_mknod(int parent_ino, char * name, int type, int mode){
     n -> name = strdup(name);
     n -> nlen = strlen(n->name);
     if (n->mode & S_IFREG){ //is file 
-        n->data.fdata.length = 10;
+        n->data.fdata.length = 0;
     }else if (n->mode & S_IFDIR){
         n->data.ddata.children = NULL;
     }

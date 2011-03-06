@@ -11,6 +11,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+typedef struct http_response{
+    int status_code;
+    struct evbuffer * headers;
+    struct evbuffer * body;
+}http_response;
+
+static http_response * http_response_new(int status_code, struct evbuffer * headers, struct evbuffer * body);
+void http_response_free(http_response * r);
+struct http_response * http_get(const char * url);
+struct http_response *http_post(const char *url, struct evbuffer * postdata);
+
+
 /**this should be in http.h
  */
 struct evhttp_uri {
@@ -139,7 +152,7 @@ int download_renew_request(struct request_context *ctx)
 	return 0;
 }
 
-struct evbuffer *do_request(const char *url, int verb, struct evbuffer * data)
+struct http_response *http_request(const char *url, int verb, struct evbuffer * data)
 {
 	struct request_context *ctx = context_new(url);
     ctx -> method = verb;
@@ -147,24 +160,25 @@ struct evbuffer *do_request(const char *url, int verb, struct evbuffer * data)
 	/* do all of the job */
 	event_dispatch();
 
-	struct evbuffer *retval = 0;
+	struct evbuffer *body = 0;
 	if (ctx->ok)
 	{
-		retval = ctx->buffer;
+		body = ctx->buffer;
 		ctx->buffer = 0;
 	}
 
 	context_free(ctx);
 
-	return retval;
+
+	return http_response_new(200, NULL, body);
 }
 
-struct evbuffer *do_get(const char *url){
-    return do_request(url, EVHTTP_REQ_GET, NULL);
+struct http_response *http_get(const char *url){
+    return http_request(url, EVHTTP_REQ_GET, NULL);
 }
 
-struct evbuffer *do_post(const char *url, struct evbuffer * postdata){
-    return do_request(url, EVHTTP_REQ_POST, postdata);
+struct http_response *http_post(const char *url, struct evbuffer * postdata){
+    return http_request(url, EVHTTP_REQ_POST, postdata);
 }
 
 int main(int argc, char *argv[])
@@ -176,7 +190,8 @@ int main(int argc, char *argv[])
 	}
 
     event_init();
-	struct evbuffer *data = do_get(argv[1]);
+    struct http_response * resp = http_get(argv[1]);
+	struct evbuffer *data = resp->body;
 
 	printf("got %d bytes\n", data ? evbuffer_get_length(data) : -1);
 
@@ -192,3 +207,12 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+
+static http_response * http_response_new(int status_code, struct evbuffer * headers, struct evbuffer * body){
+    http_response * r = (http_response *)malloc(sizeof(http_response));
+    r -> status_code = status_code;
+    r -> headers = headers;
+    r -> body = body;
+    return r;
+};
+

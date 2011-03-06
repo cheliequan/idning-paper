@@ -8,8 +8,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <assert.h>
+#include <sys/queue.h>
 
-#include <http_client.h>
+#include "http_client.h"
 #include "mds_conn.h"
 #include "log.h"
 #include "protocol.gen.h"
@@ -52,9 +53,6 @@ static void hello_ll_getattr(fuse_req_t req, fuse_ino_t ino,
     DBG();
     logging(LOG_DEUBG, "getattr(%lu)", ino);
 	struct stat stbuf;
-
-	(void) fi;
-
 	memset(&stbuf, 0, sizeof(stbuf));
 	if (hello_stat(ino, &stbuf) == -1)
 		fuse_reply_err(req, ENOENT);
@@ -177,7 +175,7 @@ static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
     sprintf(url, "http://127.0.0.1:6006/get/%lu", ino);
     fprintf(stderr, "http_get: %s \n", url);
     //
-    http_response * response = http_get(url);
+    http_response * response = http_get(url, NULL);
     if (response){
         int len = evbuffer_get_length(response->body);
         uint8_t * buf = alloca(len);
@@ -186,6 +184,68 @@ static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
         fuse_reply_buf(req, buf+off, size);
     }else{
         //TODO: this is  no replay ,will hold
+    }
+}
+
+
+
+void my_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi) {
+    DBG();
+    logging(LOG_DEUBG, "write(%lu, size=%d, off=%d)", ino, size, off);
+    int err = 0;
+    /*if (off>=MAX_FILE_SIZE || off+size>=MAX_FILE_SIZE) {*/
+        /*fuse_reply_err(req, EFBIG);*/
+        /*return;*/
+    /*}*/
+    /*err = write_data(fileinfo->data,off,size,(const uint8_t*)buf);*/
+    struct evbuffer *  evb = evbuffer_new();
+    evbuffer_add(evb, buf, size);
+
+    /*TODO : evbuffer_add_reference();*/
+
+    char url[256];
+    sprintf(url, "http://127.0.0.1:6006/put/%lu", ino);
+
+
+    struct evkeyvalq * headers = (struct evkeyvalq *) malloc( sizeof(struct evkeyvalq));
+    TAILQ_INIT(headers);
+    char range[255];
+    sprintf(range, "bytes=%d-%d", off, off+size-1);
+    logging(LOG_DEUBG, range);
+
+    evhttp_add_header(headers, "Range", range);
+
+    http_response * response = http_post(url, headers, evb);
+    int len = evbuffer_get_length(response->body);
+    free(headers);
+
+	/*struct stat stbuf;*/
+	/*memset(&stbuf, 0, sizeof(stbuf));*/
+	/*if (hello_stat(ino, &stbuf) == -1)*/
+		/*fuse_reply_err(req, ENOENT);*/
+    /*stbuf.size = 8;*/
+
+
+    //do stat
+	struct stat stbuf;
+	memset(&stbuf, 0, sizeof(stbuf));
+	if (hello_stat(ino, &stbuf) == -1)
+		fuse_reply_err(req, ENOENT);
+
+
+    if (stbuf.st_size < off+size){
+        //修改文件size
+        struct file_stat * f_stat = file_stat_new();
+        f_stat -> ino = ino;
+        f_stat -> size = off+size;
+
+        setattr_send_request(f_stat);
+    }
+
+    if (err!=0) {
+        fuse_reply_err(req,err);
+    } else {
+        fuse_reply_write(req,size);
     }
 }
 
@@ -241,63 +301,14 @@ void my_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf, int to
         fstat->size = in_stbuf->st_size;
         logging(LOG_DEUBG, "setattr(%lu) set size = %d", ino, in_stbuf->st_size);
     }
-
-    //FIXME : here shoube a 
-    /*file_stat not a struct stat*/
-    fprintf(stderr, "before setattr_send_request ino is : %d ", fstat->ino);
     setattr_send_request(fstat);
-
 
 	struct stat stbuf;
 	memset(&stbuf, 0, sizeof(stbuf));
 	if (hello_stat(ino, &stbuf) == -1)
 		fuse_reply_err(req, ENOENT);
-    //TODO: HERE , reply
     fuse_reply_attr(req, &stbuf, 1.0);
-
-    /*fuse_reply_attr(req, &o_stbuf, (mfs_attr_get_mattr(attr)&MATTR_NOACACHE)?0.0:attr_cache_timeout);*/
 }
-
-
-void my_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi) {
-    DBG();
-    logging(LOG_DEUBG, "write(%lu, size=%d, off=%d)", ino, size, off);
-    int err = 0;
-    /*if (off>=MAX_FILE_SIZE || off+size>=MAX_FILE_SIZE) {*/
-        /*fuse_reply_err(req, EFBIG);*/
-        /*return;*/
-    /*}*/
-    /*err = write_data(fileinfo->data,off,size,(const uint8_t*)buf);*/
-    struct evbuffer *  evb = evbuffer_new();
-    evbuffer_add(evb, buf+off, size);
-
-    /*TODO : evbuffer_add_reference();*/
-
-    char url[256];
-    sprintf(url, "http://127.0.0.1:6006/put/%lu", ino);
-
-    http_response * response = http_post(url, evb);
-    int len = evbuffer_get_length(response->body);
-
-
-	/*struct stat stbuf;*/
-	/*memset(&stbuf, 0, sizeof(stbuf));*/
-	/*if (hello_stat(ino, &stbuf) == -1)*/
-		/*fuse_reply_err(req, ENOENT);*/
-    /*stbuf.size = 8;*/
-    struct file_stat * f_stat = file_stat_new();
-    f_stat -> ino = ino;
-    f_stat -> size = 8;
-
-    setattr_send_request(f_stat);
-
-    if (err!=0) {
-        fuse_reply_err(req,err);
-    } else {
-        fuse_reply_write(req,size);
-    }
-}
-
 
 void my_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
     int err = 0;

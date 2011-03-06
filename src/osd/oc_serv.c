@@ -53,10 +53,21 @@ void write_chunk(uint64_t chunkid, struct evhttp_request *req){
         error_reply(req, HTTP_BADREQUEST, "should call write with POST");
         return;
     }
+    int start=0, end;
+    const char * range = evhttp_find_header(req->input_headers, "Range");
+
+    logging(LOG_DEUBG, "write range : %s", range);
+    if (range){
+        sscanf(range, "bytes=%d-%d", &start, &end);
+    }
+
     input = req->input_buffer;
     hdd_chunk * chunk = hdd_create_chunk(chunkid, 0);//TODO
 
     int fd = open(chunk -> path, O_WRONLY|O_CREAT, 0755);
+    logging(LOG_INFO, "write seek to : %d ", start);
+    lseek(fd, start, SEEK_SET);
+
     if (-1 == fd) {
         error_reply(req, HTTP_INTERNAL, "could not open file : %s", chunk->path);
         return;

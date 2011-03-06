@@ -31,7 +31,7 @@ cs:
 	#
 	find . -name "*.c" >> /tmp/cscope.files
 	find . -name "*.h" >> /tmp/cscope.files
-	cscope  -i /tmp/cscope.files -R -b
+	cscope  -i /tmp/cscope.files -I/usr/include/ -R -b
 	#
 	ctags -L /tmp/cscope.files -R
 	#######################################################################################

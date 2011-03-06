@@ -6,6 +6,9 @@ all:
 	cscope  -i cscope.files -R -b
 	gcc -o client libevent_client.c -I/usr/local/include  -L/usr/local/lib -levent  -g
 
+run:
+	./client http://www.baidu.com
+
 c: clean
 clean:
 	rm -rf a.out client server
