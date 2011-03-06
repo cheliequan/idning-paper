@@ -315,6 +315,7 @@ void my_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mo
     e.ino = stat->ino;
     e.attr_timeout = 0.0;
     e.entry_timeout = 0.0;
+    hello_stat(e.ino, &e.attr);
 
     if (fuse_reply_create(req, &e, fi) == -ENOENT) {
 
@@ -331,6 +332,8 @@ void my_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mod
     e.ino = stat->ino;
     e.attr_timeout = 0.0;
     e.entry_timeout = 0.0;
+
+    hello_stat(e.ino, &e.attr);
 
     if (fuse_reply_entry(req, &e) == -ENOENT) {
 
