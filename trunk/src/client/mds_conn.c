@@ -130,6 +130,8 @@ int stat_send_request(fuse_ino_t * ino_arr, int len, struct file_stat * stat_arr
         EVTAG_ARRAY_GET(response, stat_arr, i, &stat);
         stat_arr[i].size = stat-> size;
         stat_arr[i].ino = stat-> ino;
+        stat_arr[i].type = stat-> type;
+        stat_arr[i].mode = stat-> mode;
     }
     return 0;
 }
@@ -156,6 +158,7 @@ int ls_send_request(fuse_ino_t ino, struct file_stat * stat_arr)
         stat_arr[i].ino = stat-> ino;
         stat_arr[i].name = strdup(stat-> name);
         stat_arr[i].type = stat-> type;
+        stat_arr[i].mode = stat-> mode;
     }
     return cnt;
 }

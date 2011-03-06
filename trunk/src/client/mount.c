@@ -31,13 +31,19 @@ static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
     stbuf->st_uid = 0;
     stbuf->st_gid = 0;
     if (ino == 1){
-    
         stbuf->st_mode = S_IFDIR | 0777;
         stbuf->st_nlink = 2;
     }else{
         stat_send_request(arr, 1, stat_arr);
         stbuf->st_size = stat_arr[0].size;
-        stbuf->st_mode = S_IFREG | 0777;
+        stbuf->st_mode = stat_arr[0].mode | 0777;
+        /*stbuf->st_mode = S_IFDIR| 0777; //TODO*/
+
+
+        logging(LOG_DEUBG, "stat (ino = %lu) return {size: %d, mode: %04o}", 
+                ino, stbuf->st_size, stbuf->st_mode);
+
+
         stbuf->st_nlink = 1;
     }
 
@@ -86,7 +92,7 @@ struct dirbuf {
 	size_t size;
 };
 
-static void dirbuf_add(fuse_req_t req, struct dirbuf *b, const char *name,
+static void dirbuf_add(fuse_req_t req, struct dirbuf *b, const char *name, int mode,
 		       fuse_ino_t ino)
 {
 	struct stat stbuf;
@@ -95,8 +101,14 @@ static void dirbuf_add(fuse_req_t req, struct dirbuf *b, const char *name,
 	b->p = (char *) realloc(b->p, b->size);
 	memset(&stbuf, 0, sizeof(stbuf));
 	stbuf.st_ino = ino;
-	fuse_add_direntry(req, b->p + oldsize, b->size - oldsize, name, &stbuf,
-			  b->size);
+    /*stbuf.st_mode = mode;*/
+
+    stbuf.st_mode = S_IFREG;
+    printf("S_IFREG: %04o\n", S_IFREG);
+    printf("S_IFDIR: %04o\n", S_IFDIR);
+    /*stbuf.st_mode = */
+
+	fuse_add_direntry(req, b->p + oldsize, b->size - oldsize, name, &stbuf, b->size);
 }
 
 #define min(x, y) ((x) < (y) ? (x) : (y))
@@ -123,12 +135,13 @@ static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     int i;
     struct dirbuf b;
     memset(&b, 0, sizeof(b));
-    dirbuf_add(req, &b, ".", 1);
-    dirbuf_add(req, &b, "..", 1);
+    dirbuf_add(req, &b, ".", S_IFDIR, 1);
+    dirbuf_add(req, &b, "..", S_IFDIR, 1);
     /*dirbuf_add(req, &b, "xxxxxx", 3);*/
     for(i=0; i<cnt; i++){
-        logging(LOG_DEUBG, "readdir(parent = %lu) return {ino: %lu, name : %s}", ino, stat_arr[i].ino, stat_arr[i].name);
-        dirbuf_add(req, &b, stat_arr[i].name, stat_arr[i].ino);
+        logging(LOG_DEUBG, "readdir(parent = %lu) return {ino: %lu, name : %s, mode: %04o}", 
+                ino, stat_arr[i].ino, stat_arr[i].name, stat_arr[i].mode);
+        dirbuf_add(req, &b, stat_arr[i].name, stat_arr[i].mode, stat_arr[i].ino);
     }
 
     reply_buf_limited(req, b.p, b.size, off, size);
@@ -296,67 +309,36 @@ void my_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 }
 
 
-   
 void my_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi) {
     logging(LOG_DEUBG, "create(parent = %lu, name = %s, mode=%04o)", parent, name, mode);
     struct fuse_entry_param e;
-    uint32_t inode;
-    uint8_t oflags;
-    uint8_t attr[35];
-    uint8_t mattr;
-    uint32_t nleng;
-    int status;
-    const struct fuse_ctx *ctx;
-    /*finfo *fileinfo;*/
-
     struct file_stat * stat = file_stat_new();
-    mknod_send_request(parent, name, S_IFREG, mode, stat);
+    mknod_send_request(parent, name, 0, S_IFREG, stat);
 
     memset(&e, 0, sizeof(e));
     e.ino = stat->ino;
-
     e.attr_timeout = 0.0;
     e.entry_timeout = 0.0;
-    /*mfs_attr_to_stat(inode,attr,&e.attr);*/
+
     if (fuse_reply_create(req, &e, fi) == -ENOENT) {
 
     }
+}
 
-    /*oflags = AFTER_CREATE;*/
-    /*if ((fi->flags & O_ACCMODE) == O_RDONLY) {*/
-        /*oflags |= WANT_READ;*/
-    /*} else if ((fi->flags & O_ACCMODE) == O_WRONLY) {*/
-        /*oflags |= WANT_WRITE;*/
-    /*} else if ((fi->flags & O_ACCMODE) == O_RDWR) {*/
-        /*oflags |= WANT_READ | WANT_WRITE;*/
-    /*} else {*/
-        /*fuse_reply_err(req, EINVAL);*/
-    /*}*/
+void my_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode) {
+    logging(LOG_DEUBG, "mkdir(parent = %lu, name = %s, mode=%04o)", parent, name, mode);
+    struct fuse_entry_param e;
+    struct file_stat * stat = file_stat_new();
+    mknod_send_request(parent, name, 0, S_IFDIR, stat);
 
-    /*ctx = fuse_req_ctx(req);*/
-    /*status = fs_mknod(parent,nleng,(const uint8_t*)name,TYPE_FILE,mode&07777,ctx->uid,ctx->gid,0,&inode,attr);*/
-    /*status = mfs_errorconv(status);*/
-    /*if (status!=0) {*/
-        /*fuse_reply_err(req, status);*/
-        /*return;*/
-    /*}*/
-    /*status = fs_opencheck(inode,ctx->uid,ctx->gid,oflags,NULL);*/
-    /*status = mfs_errorconv(status);*/
-    /*if (status!=0) {*/
-        /*fuse_reply_err(req, status);*/
-        /*return;*/
-    /*}*/
+    memset(&e, 0, sizeof(e));
+    e.ino = stat->ino;
+    e.attr_timeout = 0.0;
+    e.entry_timeout = 0.0;
 
-    /*mattr = mfs_attr_get_mattr(attr);*/
-    /*fileinfo = mfs_newfileinfo(fi->flags & O_ACCMODE,inode);*/
-    /*fi->fh = (unsigned long)fileinfo;*/
-    /*if (keep_cache==1) {*/
-        /*fi->keep_cache=1;*/
-    /*} else if (keep_cache==2) {*/
-        /*fi->keep_cache=0;*/
-    /*} else {*/
-        /*fi->keep_cache = (mattr&MATTR_ALLOWDATACACHE)?1:0;*/
-    /*}*/
+    if (fuse_reply_entry(req, &e) == -ENOENT) {
+
+    }
 }
  
 
@@ -373,6 +355,7 @@ static struct fuse_lowlevel_ops hello_ll_oper = {
 	.setattr    = my_ll_setattr,
 	.flush      = my_ll_flush,
 	.create     = my_ll_create,
+	.mkdir      = my_ll_mkdir,
 };
 
 int main(int argc, char *argv[])
