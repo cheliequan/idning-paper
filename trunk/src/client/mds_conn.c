@@ -77,6 +77,12 @@ static void lookup_cb(struct evrpc_status *status, struct lookup_request *reques
     event_loopexit(NULL);
 }
 
+static void unlink_cb(struct evrpc_status *status, struct unlink_request *request , struct unlink_response * response , void *arg){
+
+    DBG();
+    event_loopexit(NULL);
+}
+
 static void setattr_cb(struct evrpc_status *status, struct setattr_request *request , struct setattr_response * response , void *arg){
 
     DBG();
@@ -207,6 +213,23 @@ int lookup_send_request(fuse_ino_t parent_ino, const char * name , struct file_s
     o_stat->ino = stat->ino;
 
     fprintf(stderr, "lookup_send_request o_stat return ino : %d\n", o_stat -> ino);
+    return 0;
+}
+
+
+
+int unlink_send_request(fuse_ino_t parent_ino, const char * name )
+{
+    DBG();
+    struct unlink_request* req = unlink_request_new();
+
+    struct unlink_response * response = unlink_response_new();
+    EVTAG_ASSIGN(req, parent_ino, parent_ino);
+    EVTAG_ASSIGN(req, name, name);
+
+    EVRPC_MAKE_REQUEST(rpc_unlink, pool, req, response,  unlink_cb, NULL);
+    event_dispatch();
+
     return 0;
 }
 

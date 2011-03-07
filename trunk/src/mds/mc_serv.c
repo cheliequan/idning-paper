@@ -79,9 +79,6 @@ ls_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
     EVTAG_ARRAY_GET(request, ino_arr, 0, &ino);
     logging(LOG_DEUBG, "ls(%ld)", ino);
 
-
-
-
     fsnode *p = fsnode_hash_find(ino);
     struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
 
@@ -129,14 +126,10 @@ ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
 
     int ping_version = ping->version;
 
-    /*fprintf(stderr, "ping->self_ip :%s\n", ping->self_ip);*/
-    /*fprintf(stderr, "ping->self_port :%d\n", ping->self_port);*/
     cluster_add((char *)ping->self_ip, ping->self_port, 0);
-    /*fprintf(stderr, "machine_cnt:%d\n", machine_cnt);*/
     
     EVTAG_ASSIGN(pong, version, ping_version+1);
     EVTAG_ASSIGN(pong, xx, 8);
-    /*EVTAG_ASSIGN(pong, machines, 8, machines);*/
 
     int i;
     for(i=0; i < machine_cnt; i++){
@@ -194,6 +187,24 @@ static void lookup_handler(EVRPC_STRUCT(rpc_lookup)* rpc, void *arg)
     EVRPC_REQUEST_DONE(rpc);
 }
 
+
+
+static void
+unlink_handler(EVRPC_STRUCT(rpc_unlink)* rpc, void *arg)
+{
+    DBG();
+
+    struct unlink_request * request = rpc->request;
+    struct unlink_response * response = rpc->reply;
+
+    logging(LOG_DEUBG, "unlink (parent=%ld, name=%s)", 
+            request -> parent_ino, request->name);
+
+    fs_unlink(request -> parent_ino, request->name);
+
+    EVRPC_REQUEST_DONE(rpc);
+}
+
 static void
 rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
 {
@@ -216,6 +227,7 @@ rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
     EVRPC_REGISTER(base, rpc_mknod, mknod_request, mknod_response, mknod_handler, NULL);
     EVRPC_REGISTER(base, rpc_lookup, lookup_request, lookup_response, lookup_handler, NULL);
     EVRPC_REGISTER(base, rpc_setattr, setattr_request, setattr_response, setattr_handler, NULL);
+    EVRPC_REGISTER(base, rpc_unlink, unlink_request, unlink_response, unlink_handler, NULL);
 
     *phttp = http;
     *pport = port;
