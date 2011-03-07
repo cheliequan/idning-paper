@@ -14,7 +14,7 @@ struct machine {
 
 struct pong {
 	int version                         = 1;
-	int xx                              = 2;
+	optional int xx                              = 2;
     array struct[machine] machines      = 3;
 }
 
@@ -77,12 +77,12 @@ struct lookup_response {
 }
 
 
-struct rm_request {
-    int ino                             = 1;
-    int type                            = 2;
+struct unlink_request {
+    int parent_ino                      = 1;
+    string name                         = 2;
 }
 
-struct rm_response {
+struct unlink_response {
     int ino                             = 1;
 }
 

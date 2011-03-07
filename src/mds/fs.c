@@ -165,6 +165,23 @@ fsnode * fs_lookup(int parent_ino, char * name){
     return NULL;
 }
 
+
+fsnode * fs_unlink(int parent_ino, char * name){
+    fprintf(stderr, "fs_unlink: parent_ino: %d , name: %s\n", parent_ino, name);
+
+    fsnode *p = fsnode_hash_find(parent_ino);
+    fsnode *s = fs_lookup(parent_ino, name);
+    fsnode_tree_remove(s);
+    fsnode_hash_remove(s);
+    free(s);
+
+
+    /*if (n->type != TYPE_DIRECTORY)*/
+        /*return NULL;*/
+    return NULL;
+}
+
+
 fsnode * fs_mknod(int parent_ino, char * name, int type, int mode){
     fsnode * n = fsnode_new();
     n -> ino = cur_ino++;

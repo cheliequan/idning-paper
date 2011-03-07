@@ -353,6 +353,15 @@ void my_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mod
  
 
 
+static void my_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
+{
+    DBG();
+    logging(LOG_DEUBG, "unlink(parent = %lu, name = %s)", parent, name);
+
+    unlink_send_request(parent, name);
+
+    fuse_reply_err(req, 0);
+}
 
 
 static struct fuse_lowlevel_ops hello_ll_oper = {
@@ -366,6 +375,8 @@ static struct fuse_lowlevel_ops hello_ll_oper = {
 	.flush      = my_ll_flush,
 	.create     = my_ll_create,
 	.mkdir      = my_ll_mkdir,
+	.unlink     = my_ll_unlink,
+	.rmdir      = my_ll_unlink,
 };
 
 int main(int argc, char *argv[])

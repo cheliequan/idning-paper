@@ -22,8 +22,8 @@ struct mknod_request;
 struct mknod_response;
 struct lookup_request;
 struct lookup_response;
-struct rm_request;
-struct rm_response;
+struct unlink_request;
+struct unlink_response;
 struct statfs_request;
 struct statfs_response;
 
@@ -686,82 +686,82 @@ int lookup_response_stat_arr_get(struct lookup_response *, int, struct file_stat
 struct file_stat*  lookup_response_stat_arr_add(struct lookup_response *msg);
 /* --- lookup_response done --- */
 
-/* Tag definition for rm_request */
-enum rm_request_ {
-  RM_REQUEST_INO=1,
-  RM_REQUEST_TYPE=2,
-  RM_REQUEST_MAX_TAGS
+/* Tag definition for unlink_request */
+enum unlink_request_ {
+  UNLINK_REQUEST_PARENT_INO=1,
+  UNLINK_REQUEST_NAME=2,
+  UNLINK_REQUEST_MAX_TAGS
 };
 
-/* Structure declaration for rm_request */
-struct rm_request_access_ {
-  int (*ino_assign)(struct rm_request *, const ev_uint32_t);
-  int (*ino_get)(struct rm_request *, ev_uint32_t *);
-  int (*type_assign)(struct rm_request *, const ev_uint32_t);
-  int (*type_get)(struct rm_request *, ev_uint32_t *);
+/* Structure declaration for unlink_request */
+struct unlink_request_access_ {
+  int (*parent_ino_assign)(struct unlink_request *, const ev_uint32_t);
+  int (*parent_ino_get)(struct unlink_request *, ev_uint32_t *);
+  int (*name_assign)(struct unlink_request *, const char *);
+  int (*name_get)(struct unlink_request *, char * *);
 };
 
-struct rm_request {
-  struct rm_request_access_ *base;
+struct unlink_request {
+  struct unlink_request_access_ *base;
+
+  ev_uint32_t parent_ino;
+  char *name;
+
+  ev_uint8_t parent_ino_set;
+  ev_uint8_t name_set;
+};
+
+struct unlink_request *unlink_request_new(void);
+struct unlink_request *unlink_request_new_with_arg(void *);
+void unlink_request_free(struct unlink_request *);
+void unlink_request_clear(struct unlink_request *);
+void unlink_request_marshal(struct evbuffer *, const struct unlink_request *);
+int unlink_request_unmarshal(struct unlink_request *, struct evbuffer *);
+int unlink_request_complete(struct unlink_request *);
+void evtag_marshal_unlink_request(struct evbuffer *, ev_uint32_t,
+    const struct unlink_request *);
+int evtag_unmarshal_unlink_request(struct evbuffer *, ev_uint32_t,
+    struct unlink_request *);
+int unlink_request_parent_ino_assign(struct unlink_request *, const ev_uint32_t);
+int unlink_request_parent_ino_get(struct unlink_request *, ev_uint32_t *);
+int unlink_request_name_assign(struct unlink_request *, const char *);
+int unlink_request_name_get(struct unlink_request *, char * *);
+/* --- unlink_request done --- */
+
+/* Tag definition for unlink_response */
+enum unlink_response_ {
+  UNLINK_RESPONSE_INO=1,
+  UNLINK_RESPONSE_MAX_TAGS
+};
+
+/* Structure declaration for unlink_response */
+struct unlink_response_access_ {
+  int (*ino_assign)(struct unlink_response *, const ev_uint32_t);
+  int (*ino_get)(struct unlink_response *, ev_uint32_t *);
+};
+
+struct unlink_response {
+  struct unlink_response_access_ *base;
 
   ev_uint32_t ino;
-  ev_uint32_t type;
-
-  ev_uint8_t ino_set;
-  ev_uint8_t type_set;
-};
-
-struct rm_request *rm_request_new(void);
-struct rm_request *rm_request_new_with_arg(void *);
-void rm_request_free(struct rm_request *);
-void rm_request_clear(struct rm_request *);
-void rm_request_marshal(struct evbuffer *, const struct rm_request *);
-int rm_request_unmarshal(struct rm_request *, struct evbuffer *);
-int rm_request_complete(struct rm_request *);
-void evtag_marshal_rm_request(struct evbuffer *, ev_uint32_t,
-    const struct rm_request *);
-int evtag_unmarshal_rm_request(struct evbuffer *, ev_uint32_t,
-    struct rm_request *);
-int rm_request_ino_assign(struct rm_request *, const ev_uint32_t);
-int rm_request_ino_get(struct rm_request *, ev_uint32_t *);
-int rm_request_type_assign(struct rm_request *, const ev_uint32_t);
-int rm_request_type_get(struct rm_request *, ev_uint32_t *);
-/* --- rm_request done --- */
-
-/* Tag definition for rm_response */
-enum rm_response_ {
-  RM_RESPONSE_INO=1,
-  RM_RESPONSE_MAX_TAGS
-};
-
-/* Structure declaration for rm_response */
-struct rm_response_access_ {
-  int (*ino_assign)(struct rm_response *, const ev_uint32_t);
-  int (*ino_get)(struct rm_response *, ev_uint32_t *);
-};
-
-struct rm_response {
-  struct rm_response_access_ *base;
-
-  ev_uint32_t ino;
 
   ev_uint8_t ino_set;
 };
 
-struct rm_response *rm_response_new(void);
-struct rm_response *rm_response_new_with_arg(void *);
-void rm_response_free(struct rm_response *);
-void rm_response_clear(struct rm_response *);
-void rm_response_marshal(struct evbuffer *, const struct rm_response *);
-int rm_response_unmarshal(struct rm_response *, struct evbuffer *);
-int rm_response_complete(struct rm_response *);
-void evtag_marshal_rm_response(struct evbuffer *, ev_uint32_t,
-    const struct rm_response *);
-int evtag_unmarshal_rm_response(struct evbuffer *, ev_uint32_t,
-    struct rm_response *);
-int rm_response_ino_assign(struct rm_response *, const ev_uint32_t);
-int rm_response_ino_get(struct rm_response *, ev_uint32_t *);
-/* --- rm_response done --- */
+struct unlink_response *unlink_response_new(void);
+struct unlink_response *unlink_response_new_with_arg(void *);
+void unlink_response_free(struct unlink_response *);
+void unlink_response_clear(struct unlink_response *);
+void unlink_response_marshal(struct evbuffer *, const struct unlink_response *);
+int unlink_response_unmarshal(struct unlink_response *, struct evbuffer *);
+int unlink_response_complete(struct unlink_response *);
+void evtag_marshal_unlink_response(struct evbuffer *, ev_uint32_t,
+    const struct unlink_response *);
+int evtag_unmarshal_unlink_response(struct evbuffer *, ev_uint32_t,
+    struct unlink_response *);
+int unlink_response_ino_assign(struct unlink_response *, const ev_uint32_t);
+int unlink_response_ino_get(struct unlink_response *, ev_uint32_t *);
+/* --- unlink_response done --- */
 
 /* Tag definition for statfs_request */
 enum statfs_request_ {

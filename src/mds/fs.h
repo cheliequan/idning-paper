@@ -225,9 +225,10 @@ int fs_stat(int ino, struct file_stat * stat);
 int fs_setattr(int ino, struct file_stat * st);
 
 fsnode * fs_mknod(int parent_ino, char * name, int type, int mode);
+fsnode * fs_unlink(int parent_ino, char * name);
+
 int fs_mkdir();
 int fs_create();
-int fs_unlink();
 int fs_rmdir();
 int fs_rename();
 int fs_link();
