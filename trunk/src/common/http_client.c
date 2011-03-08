@@ -33,8 +33,10 @@ struct http_response *http_get(const char *url,  struct evkeyvalq* headers);
 struct http_response *http_post(const char *url, struct evkeyvalq* headers, struct evbuffer * postdata);
 
 void http_response_free(http_response * r){
-    evbuffer_free(r -> headers);
-    evbuffer_free(r -> body);
+    if (r->headers)
+        evbuffer_free(r -> headers);
+    if(r->body)
+        evbuffer_free(r -> body);
     free(r);
 }
     

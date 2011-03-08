@@ -1,0 +1,22 @@
+MDS 收到：
+mds/mc_serv.c:stat_handler: called
+03-06-2011 12:53:15.343584 [DEBUG] stat(160003384)
+
+原来是因为：
+
+int setattr_send_request(struct file_stat * stat_arr)                                                  
+||     main                   |{   
+                              |    DBG();
+-  mds_conn.c (/home/ning/idni|    struct setattr_request * req = setattr_request_new();                                              
+|-   variable                 |    struct setattr_response * response = setattr_response_new();                                       
+||     pool                   |    
+|                             |    struct file_stat * t = EVTAG_ARRAY_ADD(req, stat_arr);                                             
+|-   function                 |    EVTAG_ASSIGN(t, ino, t-> ino); // 不然它不认..                                                     
+||     ping_cb                |    EVTAG_ASSIGN(t, size , t-> size); // 不然它不认..                                                  
+||     stat_cb                |    
+||     ls_cb                  |    
+||     mknod_cb               |    EVRPC_MAKE_REQUEST(rpc_stat, pool, req, response,  setattr_cb, NULL); 
+
+明明是setattr,却发送 stat命令..
+在匆忙状态下写的代码，就是糟糕哟.
+
