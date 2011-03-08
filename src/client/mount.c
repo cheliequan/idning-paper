@@ -182,6 +182,7 @@ static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
         evbuffer_copyout(response->body, buf, len);
 
         fuse_reply_buf(req, buf+off, size);
+        http_response_free(response);
     }else{
         //TODO: this is  no replay ,will hold
     }
@@ -241,6 +242,7 @@ void my_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, o
 
         setattr_send_request(f_stat);
     }
+    http_response_free(response);
 
     if (err!=0) {
         fuse_reply_err(req,err);
