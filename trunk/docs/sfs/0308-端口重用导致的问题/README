@@ -2,5 +2,100 @@ client用了太多端口，导致端口空间耗尽，端口重用
 
 根本原因是：
 每个write都是以4k为单位调用..每4k一个请求
+端口空间大约3w个。
+	4k*3w = 120M，就是大约写120 M数据 ，client就崩溃，确实如此
 1. 连接池
 2. 调整write block size
+3. do buffer.
+
+FUSE always returns 4KB block size for the file system it is responsible (ignore st_blksize retuned by the stat() call). Unix tools such as ‘cp’, ‘tar’ use this value as the read/write block size. Therefore, the speed of ‘cp’ is significantly slower than ‘dd’ with a large block size.
+
+
+stat 的 st_blksize .
+有这个么，总是4k不能调？只能通过编译内核调整.
+
+
+---－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－据说需要改内核：：
+
+From:http://sourceforge.net/mailarchive/forum.php?thread_name=BAY129-DAV1E31DE99398212608457198050%40phx.gbl&forum_name=fuse-devel
+
+[fuse-devel] Block size >128k
+From: Gilad Rom <gilad@fa...> -	2008-07-27 12:08
+Hi,
+
+Regarding larger read/write block sizes, will the ability to use larger
+block sizes (>128k) be included in 2.6.27? is it already available in
+the latest git kernel?
+
+I would like to use 1MB block sizes for my custom file system, but can't
+seem to manage that at the moment.
+
+Thanks,
+
+Gilad
+
+
+
+
+Re: [fuse-devel] Block size >128k
+From: Szabolcs Szakacsits <szaka@nt...> -	2008-07-27 12:37
+On Sun, 27 Jul 2008, Gilad Rom wrote:
+
+> Regarding larger read/write block sizes, will the ability to use larger
+> block sizes (>128k) be included in 2.6.27? is it already available in
+> the latest git kernel?
+
+Well, it would be nice. 
+
+The below two patches increased the supported block size to 1 MB. Then the 
+max_write= FUSE option (with big_writes) made the difference. It improved 
+(the otherwise still unoptimized) ntfs-3g performance from 687 -> 889 MB/s. 
+Ext3 could do under 700 MB/s.
+
+The kernel needed only this change:
+
+-------------------------------->
+--- a/fs/fuse/fuse_i.h
++++ b/fs/fuse/fuse_i.h
+@@ -18,7 +18,7 @@
+ #include <linux/rwsem.h>
+ 
+ /** Max number of pages that can be used in a single read request */
+-#define FUSE_MAX_PAGES_PER_REQ 32
++#define FUSE_MAX_PAGES_PER_REQ 256
+ 
+ /** Maximum number of outstanding background requests */
+ #define FUSE_MAX_BACKGROUND 12
+<--------------------------------
+
+And FUSE CVS this one:
+
+------------------------>
+--- lib/fuse_kern_chan.c        12 Dec 2007 14:25:40 -0000      1.12
++++ lib/fuse_kern_chan.c        26 Jul 2008 14:22:56 -0000
+@@ -80,7 +80,7 @@
+        close(fuse_chan_fd(ch));
+ }
+ 
+-#define MIN_BUFSIZE 0x21000
++#define MIN_BUFSIZE 0x101000
+ 
+ struct fuse_chan *fuse_kern_chan_new(int fd)
+ {
+<------------------
+ 
+> I would like to use 1MB block sizes for my custom file system, but can't
+> seem to manage that at the moment.
+
+We got the highest write throughput using 512 kB block size. Bigger block 
+sizes rapidly decreased the performance. The optimal value depends on the 
+hardware architecture.
+
+	Szaka
+
+-- 
+NTFS-3G:  http://ntfs-3g.org
+
+
+---－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－这个贴子很有用：：
+

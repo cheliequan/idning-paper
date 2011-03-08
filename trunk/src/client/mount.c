@@ -37,6 +37,7 @@ static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
     }else{
         stat_send_request(arr, 1, stat_arr);
         stbuf->st_size = stat_arr[0].size;
+        stbuf->st_blksize = 1024*1024*1024;
         stbuf->st_mode = stat_arr[0].mode | 0777;
         /*stbuf->st_mode = S_IFDIR| 0777; //TODO*/
         logging(LOG_DEUBG, "stat (ino = %lu) return {size: %d, mode: %04o}", 
