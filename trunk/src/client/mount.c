@@ -385,6 +385,7 @@ static struct fuse_lowlevel_ops hello_ll_oper = {
 int main(int argc, char *argv[])
 {
     mds_conn_init();
+    http_client_init();
     ping_send_request();
 
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
