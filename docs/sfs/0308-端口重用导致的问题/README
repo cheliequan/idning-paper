@@ -98,4 +98,54 @@ NTFS-3G:  http://ntfs-3g.org
 
 
 ---－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－这个贴子很有用：：
+> I have read the following in fuse.g
+> 
+>   *  - Getattr() doesn't need to fill in the following fields:
+>   *      st_ino
+>   *      st_dev
+>   *      st_blksize
+> 
+> Does this mean that FUSE disregards what I write in st_blksize?
 
+Yes.
+
+> I set the blocksize to 64Kb but when I stat a file in my filesystem
+> st_blksize is 4Kb instead of the 64Kb that I set it to. This is a
+> problem in my filesystem where write operations would be a lot more
+> efficient if they where done in 64Kb chunks.
+
+There are several issues here:
+
+  1) Transfer size between application - kernel
+
+  2) Transfer size between kernel - userspace fs
+
+  3) Physical transfer size  by userspace fs
+
+The optimum for 1) is satisfied by blocksize == pagesize (which is 4k
+on x86)
+
+2) is currently constrained to be <= 4k for writes and <= 128k for
+reads by the FUSE kernel interface
+
+3) is up to the filesystem
+
+So setting st_blksize to 64k would gain you nothing, since the request
+would be broken up into 4k chunks before sending to userspace.
+
+If write performance is a real problem, than one soultion is to buffer
+writes in your filesystem: e.g. if no new data arrives in 5s or fsync
+operation is called or next write is not contiguous, or 64k buffer is
+filled than do writeback otherwise add data to buffer.
+
+This is normally done by the kernel for most filesystems, but is
+problematic for FUSE, because leaving dirty pages in kernel makes
+writeback deadlock prone (this has been extensively discussed on the
+kernel mailing list).
+
+So for the moment userspace buffering is the only solution.  Maybe
+sometime the writeback deadlock problem will be dealt with and write
+buffering can be left to the kernel.
+
+Thanks,
+Miklos

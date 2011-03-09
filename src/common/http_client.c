@@ -1,12 +1,6 @@
 #include "http_client.h"
 #include "log.h"
 
-
-/*
- * Requires uri parsing helpers from:
- * http://sourceforge.net/tracker/?func=detail&aid=3037660&group_id=50884&atid=461324
- */
-
 #include <event.h>
 #include <evhttp.h>
 #include <evutil.h>
@@ -20,45 +14,14 @@
 #include <string.h>
 #include <sys/queue.h>
 
-
-/*typedef struct http_response{*/
-    /*int status_code;*/
-    /*struct evbuffer * headers;*/
-    /*struct evbuffer * body;*/
-/*}http_response;*/
-
 static http_response * http_response_new(int status_code, struct evbuffer * headers, struct evbuffer * body);
 void http_response_free(http_response * r);
 struct http_response *http_get(const char *url,  struct evkeyvalq* headers);
 struct http_response *http_post(const char *url, struct evkeyvalq* headers, struct evbuffer * postdata);
 
-void http_response_free(http_response * r){
-    if (r->headers)
-        evbuffer_free(r -> headers);
-    if(r->body)
-        evbuffer_free(r -> body);
-    free(r);
-}
-    
-
-
-
-/**this should be in http.h
- */
-struct evhttp_uri {
-    char *scheme; /* scheme; e.g http, ftp etc */
-    char *userinfo; /* userinfo (typically username:pass), or NULL */
-    char *host; /* hostname, IP address, or NULL */
-    int port; /* port, or zero */
-    char *path; /* path, or "". */
-    char *query; /* query, or NULL */
-    char *fragment; /* fragment or NULL */
-};
-
-struct request_context
-{
+struct request_context {
     struct evhttp_uri *uri;
-    struct evhttp_connection *cn;
+    struct evhttp_connection *conn;
     struct evhttp_request *req;
 
     struct evbuffer *buffer;
@@ -68,25 +31,55 @@ struct request_context
     int ok;
 };
 
-static
-void download_callback(struct evhttp_request *req, void *arg);
+TAILQ_HEAD(connection_queue, connection_wrapper) s_connections;
+struct connection_queue * connection_pool = & s_connections;
+struct connection_wrapper {
+    TAILQ_ENTRY(connection_wrapper) queue_entry;
+    struct evhttp_connection *conn;
+    /*char * host;*/
+    /*int port;*/
+    
+};
 
-static
-int download_renew_request(struct request_context *ctx);
+static void connection_pool_init(){
+    TAILQ_INIT(connection_pool); 
 
-static
-void download_callback(struct evhttp_request *req, void *arg)
+}
+
+static void connection_pool_insert( struct evhttp_connection * conn){
+    DBG();
+    struct connection_wrapper * cw = malloc(sizeof(struct connection_wrapper));      
+    cw->conn = conn;
+    TAILQ_INSERT_HEAD(connection_pool, cw, queue_entry);
+}
+
+static struct evhttp_connection * connection_pool_get_free_conn( ){
+    DBG();
+    if (connection_pool->tqh_first != NULL){
+        struct connection_wrapper * cw = connection_pool -> tqh_first;
+        struct http_connection * conn = cw->conn;
+        TAILQ_REMOVE(connection_pool, connection_pool->tqh_first, queue_entry);
+        free(cw);
+        logging(LOG_DEUBG, "connection_pool_get_free_conn return a conn!!");
+        return conn;
+    }
+    logging(LOG_DEUBG, "connection_pool_get_free_conn return NULL!!");
+    return NULL;
+}
+
+static void client_callback(struct evhttp_request *req, void *arg);
+
+static int client_renew_request(struct request_context *ctx);
+
+static void client_callback(struct evhttp_request *req, void *arg)
 {
     struct request_context *ctx = (struct request_context *)arg;
     struct evhttp_uri *new_uri = NULL;
     const char *new_location = NULL;
+
     switch(req->response_code)
     {
     case HTTP_OK:
-        /* 
-         * Response is received. No futher handling is required.
-         * Finish
-         */
         event_loopexit( 0);
         break;
 
@@ -103,7 +96,7 @@ void download_callback(struct evhttp_request *req, void *arg)
         evhttp_uri_free(ctx->uri);
         ctx->uri = new_uri;
 
-        download_renew_request(ctx);
+        client_renew_request(ctx);
         return;
 
     default:
@@ -136,14 +129,16 @@ struct request_context *context_new (const char *url, int verb, struct evbuffer 
 
     ctx->buffer = evbuffer_new();
 
-    download_renew_request(ctx);
+    client_renew_request(ctx);
 
     return ctx;
 }
 
 void context_free(struct request_context *ctx)
 {
-    evhttp_connection_free(ctx->cn);
+
+    connection_pool_insert(ctx->conn);
+    /*evhttp_connection_free(ctx->conn);*/
 
     if (ctx->buffer)
         evbuffer_free(ctx->buffer);
@@ -152,25 +147,26 @@ void context_free(struct request_context *ctx)
     free(ctx);
 }
 
-static
-int download_renew_request(struct request_context *ctx)
+static int client_renew_request(struct request_context *ctx)
 {
     /* free connections & request */
-    if (ctx->cn)
-        evhttp_connection_free(ctx->cn);
+    if (ctx->conn)
+        evhttp_connection_free(ctx->conn);
+    struct http_connection * conn = connection_pool_get_free_conn();
+    if (conn!=NULL){
+        ctx->conn = conn;
+        evhttp_connection_done
+    }else{
+        ctx->conn = evhttp_connection_new( ctx->uri->host, ctx->uri->port > 0 ? ctx->uri->port : 80);
+    }
 
-    ctx->cn = evhttp_connection_new( ctx->uri->host, ctx->uri->port > 0 ? ctx->uri->port : 80);
-
-    ctx->req = evhttp_request_new(download_callback, ctx);
+    ctx->req = evhttp_request_new(client_callback, ctx);
     
     if (ctx->method == EVHTTP_REQ_POST){
-        fprintf(stderr, "EVHTTP_REQ_POST\n");
         ctx->req->output_buffer = ctx->postdata_buffer;
-        evhttp_make_request(ctx->cn, ctx->req, EVHTTP_REQ_POST, ctx->uri->path ? ctx->uri->path : "/");
+        evhttp_make_request(ctx->conn, ctx->req, EVHTTP_REQ_POST, ctx->uri->path ? ctx->uri->path : "/");
     }else if (ctx->method == EVHTTP_REQ_GET){
-        fprintf(stderr, "EVHTTP_REQ_GET\n");
-        
-        evhttp_make_request(ctx->cn, ctx->req, EVHTTP_REQ_GET, ctx->uri->path ? ctx->uri->path : "/");
+        evhttp_make_request(ctx->conn, ctx->req, EVHTTP_REQ_GET, ctx->uri->path ? ctx->uri->path : "/");
     }else {
         assert(0);
     }
@@ -180,7 +176,7 @@ int download_renew_request(struct request_context *ctx)
     return 0;
 }
 
-struct http_response *http_request(const char *url, int verb, struct evkeyvalq* headers, struct evbuffer * data)
+static struct http_response *http_request(const char *url, int verb, struct evkeyvalq* headers, struct evbuffer * data)
 {
     fprintf(stderr, "http_request: %s, %d\n",url, verb );
     struct request_context *ctx = context_new(url, verb, data);
@@ -219,36 +215,7 @@ struct http_response *http_post(const char *url, struct evkeyvalq* headers, stru
     return http_request(url, EVHTTP_REQ_POST, headers, postdata);
 }
 
-
-
-int main_test(int argc, char *argv[])
-{
-    if (argc < 2)
-    {
-        printf("usage: %s http://example.com/\n", argv[0]);
-        return 1;
-    }
-
-    event_init();
-    struct http_response * resp = http_get(argv[1], NULL);
-    struct evbuffer *data = resp->body;
-
-    printf("got %d bytes\n", data ? evbuffer_get_length(data) : -1);
-
-    if (data)
-    {
-        const char *joined = evbuffer_pullup(data, -1);
-        printf("data itself:\n====================\n");
-        write(1, joined, evbuffer_get_length(data));
-        printf("\n====================\n");
-
-        evbuffer_free(data);
-    }
-
-    return 0;
-}
-
-static http_response * http_response_new(int status_code, struct evbuffer * headers, struct evbuffer * body){
+http_response * http_response_new(int status_code, struct evbuffer * headers, struct evbuffer * body){
     http_response * r = (http_response *)malloc(sizeof(http_response));
     r -> status_code = status_code;
     r -> headers = headers;
@@ -257,3 +224,14 @@ static http_response * http_response_new(int status_code, struct evbuffer * head
 };
 
 
+void http_response_free(http_response * r){
+    if (r->headers)
+        evbuffer_free(r -> headers);
+    if(r->body)
+        evbuffer_free(r -> body);
+    free(r);
+}
+
+void http_client_init(){
+    connection_pool_init();
+}
