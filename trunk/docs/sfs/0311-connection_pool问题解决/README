@@ -1,0 +1,57 @@
+
+
+20110311-0229总算解决了 connection pool神奇的不打头问题
+这个问题花了我两天晚上..
+
+
+
+Breakpoint 2, evhttp_make_header (evcon=0x804c730, req=0x804ca78) at http.c:588
+588             struct evbuffer *output = bufferevent_get_output(evcon->bufev);
+(gdb) bt
+#0  evhttp_make_header (evcon=0x804c730, req=0x804ca78) at http.c:588
+#1  0x00156fe9 in evhttp_request_dispatch (evcon=0x804c730) at http.c:1155
+#2  0x001579da in evhttp_connection_cb (bufev=0x804c900, what=<value optimized out>, arg=0x804c730) at http.c:1363
+#3  0x001456de in _bufferevent_run_eventcb (bufev=0x804c900, what=-13704) at bufferevent.c:264
+#4  0x00145d59 in bufferevent_writecb (fd=9, event=4, arg=0x804c900) at bufferevent_sock.c:243
+#5  0x0013d798 in event_process_active_single_queue (base=0x804c008, flags=<value optimized out>) at event.c:1287
+#6  event_process_active (base=0x804c008, flags=<value optimized out>) at event.c:1354
+#7  event_base_loop (base=0x804c008, flags=<value optimized out>) at event.c:1551
+#8  0x0013e419 in event_loop (flags=0) at event.c:1465
+#9  0x0013e43e in event_dispatch () at event.c:1376
+#10 0x080495e4 in http_request (url=0x8049ada "http://127.0.0.1:6006/put/2", verb=2, headers=0x0, data=0x804c3b0)
+    at common/http_client.c:219
+#11 0x080496de in http_post (url=0x8049ada "http://127.0.0.1:6006/put/2", headers=0x0, postdata=0x804c3b0) at common/http_client.c:246
+#12 0x08048dee in test_post () at test/http_client_test.c:43
+#13 0x08048e82 in main () at test/http_client_test.c:62
+(gdb) c
+Continuing.
+ning: req->kind : 0 
+ning: headers1 : Host ; 127.0.0.1
+ning: headers1 : tt ; v_of_tt
+ning: headers : Host ; 127.0.0.1
+ning: headers : tt ; v_of_tt
+common/http_client.c:connection_pool_insert: called
+200
+http_request: http://127.0.0.1:6006/put/2, 2
+DEBUG: url-> path : /put/2 
+DEBUG: url-> method : /put/2 
+common/http_client.c:connection_pool_get_free_conn: called
+03-11-2011 02:14:07.991453 [DEBUG] connection_pool_get_free_conn return a conn!!
+
+Breakpoint 2, evhttp_make_header (evcon=0x804c730, req=0x804c5b8) at http.c:588
+588             struct evbuffer *output = bufferevent_get_output(evcon->bufev);
+(gdb) bt
+#0  evhttp_make_header (evcon=0x804c730, req=0x804c5b8) at http.c:588
+#1  0x00156fe9 in evhttp_request_dispatch (evcon=0x804c730) at http.c:1155
+#2  0x0015783f in evhttp_make_request (evcon=0x804c730, req=0x804c5b8, type=EVHTTP_REQ_POST, uri=0x804cae8 "/put/2") at http.c:2173
+#3  0x080492df in client_renew_request (ctx=0x804ca78) at common/http_client.c:171
+#4  0x080491b2 in context_new (url=0x8049ada "http://127.0.0.1:6006/put/2", verb=2, data=0x804c698) at common/http_client.c:132
+#5  0x0804947e in http_request (url=0x8049ada "http://127.0.0.1:6006/put/2", verb=2, headers=0x0, data=0x804c698)
+    at common/http_client.c:196
+#6  0x080496de in http_post (url=0x8049ada "http://127.0.0.1:6006/put/2", headers=0x0, postdata=0x804c698) at common/http_client.c:246
+#7  0x08048dee in test_post () at test/http_client_test.c:43
+#8  0x08048e87 in main () at test/http_client_test.c:63
+
+原因是对于 不是第一个request的情况，
+需要在 evhttp_make_request 之前设置好req->output_header,否则，会直接调用 evhttp_request_dispatch， 在里面 通过 evhttp_make_header 输出header,后面加的header就没用了.  原来那个人写的client有问题!!
+
