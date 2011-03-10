@@ -231,7 +231,7 @@ static struct http_response *http_request(const char *url, int verb, struct evke
         context_free(ctx);
         struct evbuffer * header = evbuffer_new();
 
-        evbuffer_drain(body, evbuffer_get_length(body)+10);
+        /*evbuffer_drain(body, evbuffer_get_length(body)+10);*/
 
         return http_response_new(200, header, body);
 
