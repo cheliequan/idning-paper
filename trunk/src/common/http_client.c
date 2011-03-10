@@ -27,6 +27,7 @@ struct request_context {
     struct evbuffer *buffer;
 
     int method;
+    struct evkeyvalq * req_headers;
     struct evbuffer *postdata_buffer;
     int ok;
 };
@@ -57,7 +58,7 @@ static struct evhttp_connection * connection_pool_get_free_conn( ){
     DBG();
     if (connection_pool->tqh_first != NULL){
         struct connection_wrapper * cw = connection_pool -> tqh_first;
-        struct http_connection * conn = cw->conn;
+        struct evhttp_connection * conn = cw->conn;
         TAILQ_REMOVE(connection_pool, connection_pool->tqh_first, queue_entry);
         free(cw);
         logging(LOG_DEUBG, "connection_pool_get_free_conn return a conn!!");
@@ -111,7 +112,7 @@ static void client_callback(struct evhttp_request *req, void *arg)
     ctx->ok = 1;
 }
 
-struct request_context *context_new (const char *url, int verb, struct evbuffer * data) 
+struct request_context *context_new (const char *url, int verb, struct evkeyvalq* headers, struct evbuffer * data) 
 {
     struct request_context *ctx = 0;
     ctx = calloc(1, sizeof(*ctx));
@@ -121,6 +122,7 @@ struct request_context *context_new (const char *url, int verb, struct evbuffer 
     ctx->uri = evhttp_uri_parse(url);
     ctx -> method = verb;
     ctx -> postdata_buffer = data;
+    ctx -> req_headers = headers;
 
     fprintf(stderr, "DEBUG: url-> path : %s \n",ctx->uri->path );
     fprintf(stderr, "DEBUG: url-> method : %s \n",ctx->uri->path );
@@ -152,43 +154,71 @@ static int client_renew_request(struct request_context *ctx)
     /* free connections & request */
     if (ctx->conn)
         evhttp_connection_free(ctx->conn);
-    struct http_connection * conn = connection_pool_get_free_conn();
+    struct evhttp_connection * conn = connection_pool_get_free_conn();
     if (conn!=NULL){
         ctx->conn = conn;
-        evhttp_connection_done
+        //fprintf(stderr, " conn->state: %d\n", conn->state);
+
+        /*conn*/
+        /*evhttp_connection_reset(ctx->conn); no !!! this will send FIN . what should I do*/
     }else{
         ctx->conn = evhttp_connection_new( ctx->uri->host, ctx->uri->port > 0 ? ctx->uri->port : 80);
+        //fprintf(stderr, " conn->state: %d\n", conn->state);
     }
 
     ctx->req = evhttp_request_new(client_callback, ctx);
+
+
+    struct evkeyval *header;
+
+    if (ctx->req_headers != NULL){
+        struct evkeyval *header;
+        TAILQ_FOREACH(header, ctx->req_headers, next) {
+            evhttp_add_header(ctx->req->output_headers, header->key, header->value);
+        }
+    }
+
+
+
+    fprintf(stderr, " .... \n");
+    TAILQ_FOREACH(header, ctx->req->output_headers, next) {
+        fprintf(stderr, "headers : %s ; %s\n", header->key, header->value);
+    }
+    fprintf(stderr, " .... \n");
+
+    evhttp_add_header(ctx->req->output_headers,
+                            "Host", ctx->uri->host);
+    evhttp_add_header(ctx->req->output_headers,
+                            "tt", "v_of_tt");
     
     if (ctx->method == EVHTTP_REQ_POST){
         ctx->req->output_buffer = ctx->postdata_buffer;
         evhttp_make_request(ctx->conn, ctx->req, EVHTTP_REQ_POST, ctx->uri->path ? ctx->uri->path : "/");
+
     }else if (ctx->method == EVHTTP_REQ_GET){
         evhttp_make_request(ctx->conn, ctx->req, EVHTTP_REQ_GET, ctx->uri->path ? ctx->uri->path : "/");
     }else {
         assert(0);
     }
-
-    evhttp_add_header(ctx->req->output_headers,
-                            "Host", ctx->uri->host);
+    
     return 0;
 }
 
 static struct http_response *http_request(const char *url, int verb, struct evkeyvalq* headers, struct evbuffer * data)
 {
     fprintf(stderr, "http_request: %s, %d\n",url, verb );
-    struct request_context *ctx = context_new(url, verb, data);
+    struct request_context *ctx = context_new(url, verb, headers, data);
+    fprintf(stderr, "ctx->req: %p\n", ctx->req);
+    fprintf(stderr, "ctx->req->output_headers: %p\n", ctx->req->output_headers);
 
-    if (headers != NULL){
-        struct evkeyval *header;
-        TAILQ_FOREACH(header, headers, next) {
-            evhttp_add_header(ctx->req->output_headers, header->key, header->value);
-        }
-    }
 
-    fprintf(stderr, "http_request: method : %d\n", ctx->method);
+    /*fprintf(stderr, " after add headers ----------------\n");*/
+
+    /*TAILQ_FOREACH(header, ctx->req->output_headers, next) {*/
+        /*fprintf(stderr, "headers : %s ; %s\n", header->key, header->value);*/
+    /*}*/
+
+    /*fprintf(stderr, "http_request: method : %d\n", ctx->method);*/
     event_dispatch();
 
     struct evbuffer *body = 0;
@@ -200,7 +230,11 @@ static struct http_response *http_request(const char *url, int verb, struct evke
         ctx->buffer = 0;
         context_free(ctx);
         struct evbuffer * header = evbuffer_new();
+
+        evbuffer_drain(body, evbuffer_get_length(body)+10);
+
         return http_response_new(200, header, body);
+
     }else{
         logging(LOG_INFO, "http_request error %d : %s ", response_code, url );
         return NULL;
