@@ -1,6 +1,6 @@
 #!/bin/bash
 ulimit -c unlimite
-D="/tmp/$RANDOM"
+D="/tmp/_$RANDOM"
 echo 
 echo $D
 echo 
@@ -19,3 +19,5 @@ alias x='scripts/mount.sh'
 
 
 #konsole --profile run
+
+#umount /tmp/* -l
