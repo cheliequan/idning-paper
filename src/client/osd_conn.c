@@ -118,7 +118,7 @@ void buffered_write(uint32_t ino, uint64_t offset, uint32_t size, const uint8_t 
     }
 }
 
-void buffered_write_flush(uint32_t ino){
+int buffered_write_flush(uint32_t ino){
     DBG();
     struct write_buf * b = write_buf_hash_find(ino);
     if (NULL == b)
@@ -126,6 +126,7 @@ void buffered_write_flush(uint32_t ino){
     flush_write_buf(b);
     write_buf_hash_remove(b);
     write_buf_free(b);
+    return b->offset+b->size;
 
 }
 
