@@ -240,21 +240,6 @@ void my_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, o
     buffered_write(ino, off, size, buf);
 
 
-    //do stat
-	struct stat stbuf;
-	memset(&stbuf, 0, sizeof(stbuf));
-	if (hello_stat(ino, &stbuf) == -1)
-		fuse_reply_err(req, ENOENT);
-
-
-    if (stbuf.st_size < off+size){
-        //修改文件size
-        struct file_stat * f_stat = file_stat_new();
-        f_stat -> ino = ino;
-        f_stat -> size = off+size;
-
-        setattr_send_request(f_stat);
-    }
 
     if (err!=0) {
         fuse_reply_err(req,err);
@@ -328,7 +313,25 @@ void my_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
     logging(LOG_DEUBG, "flush(ino= %lu)", ino);
 
     int err = 0;
-    buffered_write_flush(ino);
+    int sizenow = buffered_write_flush(ino);
+
+    //do stat
+	struct stat stbuf;
+	memset(&stbuf, 0, sizeof(stbuf));
+	if (hello_stat(ino, &stbuf) == -1)
+		fuse_reply_err(req, ENOENT);
+
+
+    if (stbuf.st_size < sizenow){
+        //修改文件size
+        struct file_stat * f_stat = file_stat_new();
+        f_stat -> ino = ino;
+        f_stat -> size = sizenow;
+
+        setattr_send_request(f_stat);
+    }
+
+
     fuse_reply_err(req,err);
 }
 
