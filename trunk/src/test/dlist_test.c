@@ -23,6 +23,9 @@ int main(){
     dlist_entry entries [10];
 
     dlist_init(head);
+    printf("head: %p; head->next->%p ; head->next->next: %p", head, head->next, head->next->next);
+
+
     for (i=0; i<10; i++){
         entries[i].str = (char *)malloc(100);
         sprintf(entries[i].str, "entry %d", i);
