@@ -28,7 +28,7 @@ struct write_buf{
 };
 static void flush_write_buf(struct write_buf * b);
 
-#define BUF_HASH_BITS (22)  
+#define BUF_HASH_BITS (10)  
 #define BUF_HASH_SIZE (1<<BUF_HASH_BITS) 
 #define BUF_HASH_POS(nodeid) ((nodeid)&(BUF_HASH_SIZE-1))
 
