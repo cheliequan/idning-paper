@@ -58,6 +58,10 @@ inline fsnode* fsnode_hash_insert(fsnode * n) {
 inline fsnode* fsnode_hash_find(uint32_t ino) {
     uint32_t pos = NODEHASHPOS(ino);
     fsnode * bucket = nodehash[pos];
+
+    if (bucket == NULL)
+        return NULL;
+
     fsnode * p;
     dlist_t * head = &(bucket->hash_dlist);
     dlist_t * pl;

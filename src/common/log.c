@@ -52,6 +52,8 @@ static int putlevel(char ** buf, int level){
 }
 
 int logging(int level, char * fmt, ...){
+    if (level==LOG_DEUBG)
+        return;
     char stmp[10240];
     char *buf = stmp;
     puttime(&buf);

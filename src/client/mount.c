@@ -9,12 +9,33 @@
 #include <unistd.h>
 #include <assert.h>
 #include <sys/queue.h>
+#include <signal.h>
 
 #include "http_client.h"
 #include "mds_conn.h"
+#include "osd_conn.h"
 #include "log.h"
 #include "protocol.gen.h"
 
+
+void termination_handler (int signum)
+{
+    fprintf(stderr, "is going to exit!" );
+    exit(0);
+    //struct temp_file *p;
+
+    //for (p = temp_file_list; p; p = p->next)
+    //    unlink (p->name);
+}
+
+void init_sig_handler(){
+  if (signal (SIGINT, termination_handler) == SIG_IGN)
+    signal (SIGINT, SIG_IGN);
+  if (signal (SIGHUP, termination_handler) == SIG_IGN)
+    signal (SIGHUP, SIG_IGN);
+  if (signal (SIGTERM, termination_handler) == SIG_IGN)
+    signal (SIGTERM, SIG_IGN);
+}
 
 static const char *hello_name = "hello";
 
@@ -195,37 +216,28 @@ void my_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, o
     DBG();
     logging(LOG_DEUBG, "write(%lu, size=%d, off=%d)", ino, size, off);
     int err = 0;
-    /*if (off>=MAX_FILE_SIZE || off+size>=MAX_FILE_SIZE) {*/
-        /*fuse_reply_err(req, EFBIG);*/
-        /*return;*/
-    /*}*/
-    /*err = write_data(fileinfo->data,off,size,(const uint8_t*)buf);*/
-    struct evbuffer *  evb = evbuffer_new();
-    evbuffer_add(evb, buf, size);
 
+    //struct evbuffer *  evb = evbuffer_new();
+    //evbuffer_add(evb, buf, size);
     /*TODO : evbuffer_add_reference();*/
+    //char url[256];
+    //sprintf(url, "http://127.0.0.1:6006/put/%lu", ino);
+    //struct evkeyvalq * headers = (struct evkeyvalq *) malloc( sizeof(struct evkeyvalq));
+    //TAILQ_INIT(headers);
+    //char range[255];
+    //sprintf(range, "bytes=%d-%d", off, off+size-1);
+    //logging(LOG_DEUBG, range);
 
-    char url[256];
-    sprintf(url, "http://127.0.0.1:6006/put/%lu", ino);
+    //evhttp_add_header(headers, "Range", range);
+
+    //http_response * response = http_post(url, headers, evb);
+    //int len = evbuffer_get_length(response->body);
+    //free(headers);
+    //http_response_free(response);
 
 
-    struct evkeyvalq * headers = (struct evkeyvalq *) malloc( sizeof(struct evkeyvalq));
-    TAILQ_INIT(headers);
-    char range[255];
-    sprintf(range, "bytes=%d-%d", off, off+size-1);
-    logging(LOG_DEUBG, range);
-
-    evhttp_add_header(headers, "Range", range);
-
-    http_response * response = http_post(url, headers, evb);
-    int len = evbuffer_get_length(response->body);
-    free(headers);
-
-	/*struct stat stbuf;*/
-	/*memset(&stbuf, 0, sizeof(stbuf));*/
-	/*if (hello_stat(ino, &stbuf) == -1)*/
-		/*fuse_reply_err(req, ENOENT);*/
-    /*stbuf.size = 8;*/
+    
+    buffered_write(ino, off, size, buf);
 
 
     //do stat
@@ -243,7 +255,6 @@ void my_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, o
 
         setattr_send_request(f_stat);
     }
-    http_response_free(response);
 
     if (err!=0) {
         fuse_reply_err(req,err);
@@ -314,7 +325,10 @@ void my_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf, int to
 }
 
 void my_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
+    logging(LOG_DEUBG, "flush(ino= %lu)", ino);
+
     int err = 0;
+    buffered_write_flush(ino);
     fuse_reply_err(req,err);
 }
 
@@ -387,6 +401,7 @@ int main(int argc, char *argv[])
     mds_conn_init();
     http_client_init();
     ping_send_request();
+    init_sig_handler();
 
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 	struct fuse_chan *ch;

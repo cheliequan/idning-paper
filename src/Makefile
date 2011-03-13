@@ -35,3 +35,10 @@ cs:
 	#
 	ctags -L /tmp/cscope.files -R
 	#######################################################################################
+
+gcov:
+	# -o 指的是path. 垃圾.
+	gcov client/mount.c -o client
+	gcov client/osd_conn.c -o client
+	gcov client/mds_conn.c -o client
+

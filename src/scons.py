@@ -8,6 +8,7 @@ mds_src = glob.glob('mds/*.c')
 cmgr_src = glob.glob('cmgr/*.c')
 
 client_src = glob.glob('client/*.c')
+#client_src.append('/usr/lib/gcrt1.o')
 
 test_c = glob.glob('test/*test.c')
 tests = [s.replace('.c', '') for s in test_c]
@@ -31,11 +32,13 @@ def test():
     print '\nThank God, All Tests Are Passed!!!!!!'
 
 
-LIBS = ['common', 'event', 'fuse']
+LIBS = ['common', 'event', 'fuse', 'gcov']
 LIBPATH = ['common',  '/usr/local/lib', '/usr/lib'] #顺序很重要
 
 CPPPATH = ['common', '/usr/local/include/', '/usr/include/fuse']
-CCFLAGS='-D_DEBUG -Wall -g -Wno-pointer-sign'
+CCFLAGS='-D_DEBUG -Wall -g -Wno-pointer-sign -pg -fprofile-arcs -ftest-coverage' # -pg is for gprof
+
+LINKFLAGS=' -pg '
 
 def compile():
     Library('common/common', common_src, CPPPATH = CPPPATH, CCFLAGS = CCFLAGS)
@@ -52,7 +55,7 @@ def compile():
     Program( 'mds/mds.out', mds_src, LIBS = LIBS, LIBPATH = LIBPATH, CPPPATH = CPPPATH, CCFLAGS = CCFLAGS)
     Program( 'cmgr/cmgr.out', cmgr_src, LIBS = LIBS, LIBPATH = LIBPATH, CPPPATH = CPPPATH, CCFLAGS = CCFLAGS)
 
-    Program( 'client/mount.out', client_src, LIBS = LIBS, LIBPATH = LIBPATH, CPPPATH = CPPPATH, CCFLAGS = CCFLAGS +' -D_FILE_OFFSET_BITS=64 ' )
+    Program( 'client/mount.out', client_src, LIBS = LIBS, LIBPATH = LIBPATH, CPPPATH = CPPPATH, CCFLAGS = CCFLAGS +' -D_FILE_OFFSET_BITS=64 ', LINKFLAGS=LINKFLAGS)
 
 
 target = ARGUMENTS.get('ning_target', 'compile') #default target is 'compile'!!! haha
