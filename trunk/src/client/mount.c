@@ -38,9 +38,6 @@ void init_sig_handler(){
     signal (SIGTERM, SIG_IGN);
 }
 
-static const char *hello_name = "hello";
-
-
 static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
 {
     DBG();

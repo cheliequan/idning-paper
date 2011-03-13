@@ -169,7 +169,7 @@ int ls_send_request(fuse_ino_t ino, struct file_stat * stat_arr)
     return cnt;
 }
 
-int mknod_send_request(fuse_ino_t parent_ino, char * name, int type, int mode, struct file_stat *o_stat )
+int mknod_send_request(fuse_ino_t parent_ino, const char * name, int type, int mode, struct file_stat *o_stat )
 {
     DBG();
     struct mknod_request * req = mknod_request_new();

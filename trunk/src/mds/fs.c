@@ -31,15 +31,18 @@ fsnode* fsnode_tree_find(fsnode * p, uint32_t ino) {
     }
     return NULL;
 }
-
+/* useless 
+ * */
 fsnode* fsnode_tree_lookup(fsnode * p, char * name) {
      // todo : copy from fsnode_tree_find
+     return NULL;
 }
 
 //把这个node 从父节点的众儿子中删除，解除兄弟关系 ---??解除父子关系
 inline fsnode* fsnode_tree_remove(fsnode * n) {
     dlist_t * pl = & (n->tree_dlist);
     dlist_remove(pl);
+    return n;
 }
 
 inline fsnode* fsnode_hash_insert(fsnode * n) {
@@ -54,6 +57,7 @@ inline fsnode* fsnode_hash_insert(fsnode * n) {
     dlist_t * head = &(bucket->hash_dlist);
     dlist_t * pl = &(n->hash_dlist);
     dlist_insert_head(head, pl);
+    return n;
 }
 inline fsnode* fsnode_hash_find(uint32_t ino) {
     uint32_t pos = NODEHASHPOS(ino);
@@ -94,7 +98,6 @@ int fs_init(){
     root -> parent = root;
     root -> data.ddata.children = NULL;
 
-    dlist_t * p = &( root->tree_dlist );
     fsnode_hash_insert(root);
 
     fsnode * n = fsnode_hash_find(1);
@@ -173,7 +176,6 @@ fsnode * fs_lookup(int parent_ino, char * name){
 fsnode * fs_unlink(int parent_ino, char * name){
     fprintf(stderr, "fs_unlink: parent_ino: %d , name: %s\n", parent_ino, name);
 
-    fsnode *p = fsnode_hash_find(parent_ino);
     fsnode *s = fs_lookup(parent_ino, name);
     fsnode_tree_remove(s);
     fsnode_hash_remove(s);

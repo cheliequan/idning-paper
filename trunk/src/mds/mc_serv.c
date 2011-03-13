@@ -1,6 +1,7 @@
 #include <event.h>
 #include <evhttp.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "protocol.gen.h"
 #include "protocol.h"
@@ -74,7 +75,6 @@ ls_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
     struct stat_request *request = rpc->request;
     struct stat_response *response = rpc->reply;
 
-    int cnt = EVTAG_ARRAY_LEN(request, ino_arr);
     int ino; 
     EVTAG_ARRAY_GET(request, ino_arr, 0, &ino);
     logging(LOG_DEUBG, "ls(%ld)", ino);
@@ -133,7 +133,7 @@ ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
 
     int i;
     for(i=0; i < machine_cnt; i++){
-        struct machine * m = EVTAG_ARRAY_ADD(pong, machines);  // alloc space for machines
+        EVTAG_ARRAY_ADD(pong, machines);  // alloc space for machines
         pong_machines_assign(pong, i, machines+i);
     }
     EVRPC_REQUEST_DONE(rpc);
@@ -195,7 +195,7 @@ unlink_handler(EVRPC_STRUCT(rpc_unlink)* rpc, void *arg)
     DBG();
 
     struct unlink_request * request = rpc->request;
-    struct unlink_response * response = rpc->reply;
+    //struct unlink_response * response = rpc->reply;
 
     logging(LOG_DEUBG, "unlink (parent=%ld, name=%s)", 
             request -> parent_ino, request->name);
