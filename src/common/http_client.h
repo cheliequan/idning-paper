@@ -2,6 +2,8 @@
 #include <evutil.h>
 #include <event.h>
 
+#include <evhttp.h>
+
 typedef struct http_response{
     int status_code;
     struct evbuffer * headers;

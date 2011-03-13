@@ -1,5 +1,7 @@
 #include <event.h>
 #include <evhttp.h>
+#include <stdlib.h>
+#include <string.h>
 #include "protocol.gen.h"
 
 EVRPC_HEADER(rpc_ping, ping, pong)
@@ -80,11 +82,10 @@ int main()
     ev_uint16_t port;
     struct evhttp *http = NULL;
     struct evrpc_base *base = NULL;
-    struct evrpc_pool *pool = NULL;
-
     event_init();
     rpc_setup(&http, &port, &base);
     event_dispatch();
+    return 0;
 }
 
 void cluster_printf(char * hint){

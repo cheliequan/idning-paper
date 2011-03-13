@@ -20,7 +20,7 @@ c:
 	find . -name '*.gcov' | xargs rm -f
 	find . -name '*.gcda' | xargs rm -f
 	find . -name '*.gcno' | xargs rm -f
-	find . -name '*.out' | xargs rm -f
+	#find . -name '*.out' | xargs rm -f
 
 t: all
 	scons -Q -f scons.py ning_target=test

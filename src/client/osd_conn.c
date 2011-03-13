@@ -122,7 +122,7 @@ int buffered_write_flush(uint32_t ino){
     DBG();
     struct write_buf * b = write_buf_hash_find(ino);
     if (NULL == b)
-        return ;
+        return 0;
     flush_write_buf(b);
     write_buf_hash_remove(b);
     write_buf_free(b);
@@ -145,7 +145,7 @@ static void flush_write_buf(struct write_buf * b){
     evhttp_add_header(headers, "Range", range);
 
     http_response * response = http_post(url, headers, b->evb);
-    int len = evbuffer_get_length(response->body);
+    evbuffer_get_length(response->body);
     free(headers);
 
 }
