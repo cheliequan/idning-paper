@@ -154,9 +154,3 @@ void osd_conn_init(){
     DBG();
 }
 
-/*int main(){*/
-    /*event_init();*/
-    /*rpc_basic_client();*/
-    /*doit();*/
-/*}*/
-
