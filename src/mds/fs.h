@@ -74,19 +74,24 @@ inline fsnode* fsnode_hash_find(uint32_t ino) ;
 int fs_stat(int ino, struct file_stat * stat);
 int fs_setattr(int ino, struct file_stat * st);
 
+/*
+ * create, mkdir
+ * */
 fsnode * fs_mknod(int parent_ino, char * name, int type, int mode);
+/*
+ *  rmdir 
+ *  rm
+ * */
 fsnode * fs_unlink(int parent_ino, char * name);
 fsnode * fs_lookup(int parent_ino, char * name);
 fsnode * fs_ls(int ino);
 
-int fs_mkdir();
-int fs_create();
-int fs_rmdir();
 int fs_rename();
 int fs_link();
 int fs_get_goal();
 int fs_set_goal();
 int fs_init();
+
 int fs_load();
 int fs_store();
 

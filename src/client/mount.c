@@ -398,6 +398,9 @@ static void my_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
 }
 
 
+
+
+
 static struct fuse_lowlevel_ops hello_ll_oper = {
 	.lookup		= hello_ll_lookup,
 	.getattr	= hello_ll_getattr,
