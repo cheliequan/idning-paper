@@ -92,6 +92,16 @@ void read_chunk(uint64_t chunkid, struct evhttp_request *req){
     }
 
     hdd_chunk_printf(chunk);
+
+
+
+    int start=0, end;
+    const char * range = evhttp_find_header(req->input_headers, "Range");
+
+    logging(LOG_DEUBG, "write range : %s", range);
+    if (range){
+        sscanf(range, "bytes=%d-%d", &start, &end);
+    }
     
     int fd = open(chunk -> path, O_RDONLY);
     struct stat st;
@@ -100,7 +110,8 @@ void read_chunk(uint64_t chunkid, struct evhttp_request *req){
         error_reply(req, HTTP_NOTFOUND, "file not exist : %s", chunk->path);
         return ;
     }
-    evbuffer_add_file(evb, fd, 0, st.st_size);
+    lseek(fd, start, SEEK_SET);
+    evbuffer_add_file(evb, fd, 0, end-start+1);
 
     evhttp_send_reply(req, HTTP_OK, "OK", evb);
     evbuffer_free(evb);

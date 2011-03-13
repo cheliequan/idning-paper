@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <assert.h>
@@ -196,14 +197,30 @@ static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
     char url[256] = "http://127.0.0.1/";
     sprintf(url, "http://127.0.0.1:6006/get/%lu", ino);
     fprintf(stderr, "http_get: %s \n", url);
+
+
+    struct evkeyvalq * headers = (struct evkeyvalq *) malloc( sizeof(struct evkeyvalq));
+    TAILQ_INIT(headers);
+    char range[255];
+
+    logging(LOG_DEUBG, "sizeof(off) = %d, sizeof(off+size-1) = %d",sizeof(off), sizeof(off+size-1));
+    logging(LOG_DEUBG, "(int)off: %d ",(int)off);
+    logging(LOG_DEUBG, "bytes=%llu-%llu" , off, off+size-1);
+
+
+    sprintf(range, "bytes=%llu-%llu" , off, off+size-1);
+    logging(LOG_DEUBG, range);
+
+    evhttp_add_header(headers, "Range", range);
+
     //
-    http_response * response = http_get(url, NULL);
+    http_response * response = http_get(url, headers);
     if (response){
         int len = evbuffer_get_length(response->body);
         uint8_t * buf = alloca(len);
         evbuffer_copyout(response->body, buf, len);
 
-        fuse_reply_buf(req, buf+off, size);
+        fuse_reply_buf(req, buf, size);
         http_response_free(response);
     }else{
         //TODO: this is  no replay ,will hold
@@ -405,6 +422,8 @@ int main(int argc, char *argv[])
     http_client_init();
     ping_send_request();
     init_sig_handler();
+    logging(LOG_DEUBG, "sizeof(off_t) = %d, sizeof(size_t) = %d;", sizeof(off_t), sizeof(size_t));
+    logging(LOG_DEUBG, "sizeof(fuse_ino_t) = %d", sizeof(fuse_ino_t));
 
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 	struct fuse_chan *ch;
