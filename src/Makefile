@@ -46,3 +46,7 @@ gcov:
 	gcov client/osd_conn.c -o client
 	gcov client/mds_conn.c -o client
 
+m:
+	sudo umount /tmp/a -l
+	./client/mount.out /tmp/a
+
