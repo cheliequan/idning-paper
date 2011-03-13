@@ -34,58 +34,26 @@ static void ping_cb(struct evrpc_status *status,
     event_loopexit(NULL);
 }
 
-static void stat_cb(struct evrpc_status *status,
-    struct stat_request *request , struct stat_response * response , void *arg)
-{
-    DBG();
-    int i;
-    int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
-    if (cnt == 0)
-        return;
-    fprintf(stderr, "msg->stat_arr_set : %d\n", response->stat_arr_set);
-    fprintf(stderr, "msg->: %d\n", response->stat_arr[0] -> ino);
-    fprintf(stderr, "msg->: %d\n", response->stat_arr[0] -> size);
-
-    for (i=0; i< cnt; i++){
-        struct file_stat * stat = file_stat_new();
-        fprintf(stderr, "stat_arr[%d].ino : %d\n", i, stat->ino);
-        fprintf(stderr, "stat_arr[%d].size: %d\n", i, stat->size);
-
-        if (0 != EVTAG_ARRAY_GET(response, stat_arr, i, &stat))
-            fprintf(stderr, "something error on EVTAG_ARRAY_GET");
-
-        fprintf(stderr, "stat_arr[%d].ino : %d\n", i, stat->ino);
-        fprintf(stderr, "stat_arr[%d].size: %d\n", i, stat->size);
-    }
+static void stat_cb(struct evrpc_status *status, struct stat_request *request , struct stat_response * response , void *arg) {
     event_loopexit(NULL);
 }
 
 static void ls_cb(struct evrpc_status *status, struct ls_request *request , struct ls_response * response , void *arg){
-
-    DBG();
     event_loopexit(NULL);
 }
 static void mknod_cb(struct evrpc_status *status, struct mknod_request *request , struct mknod_response * response , void *arg){
-
-    DBG();
     event_loopexit(NULL);
 }
 
 static void lookup_cb(struct evrpc_status *status, struct lookup_request *request , struct lookup_response * response , void *arg){
-
-    DBG();
     event_loopexit(NULL);
 }
 
 static void unlink_cb(struct evrpc_status *status, struct unlink_request *request , struct unlink_response * response , void *arg){
-
-    DBG();
     event_loopexit(NULL);
 }
 
 static void setattr_cb(struct evrpc_status *status, struct setattr_request *request , struct setattr_response * response , void *arg){
-
-    DBG();
     event_loopexit(NULL);
 }
 
@@ -99,7 +67,6 @@ int setattr_send_request(struct file_stat * stat_arr)
     EVTAG_ASSIGN(t, ino, stat_arr->ino); // 不然它不认..
     EVTAG_ASSIGN(t, size , stat_arr->size); // 不然它不认..
 
-
     EVRPC_MAKE_REQUEST(rpc_setattr, pool, req, response,  setattr_cb, NULL);
     event_dispatch();
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
@@ -107,12 +74,6 @@ int setattr_send_request(struct file_stat * stat_arr)
         logging(LOG_ERROR, "setattr_send_request return cnt != 1, cnt= %d", cnt);
         return -1;
     }
-    /*for (i=0; i< len; i++){*/
-        /*struct file_stat * stat = stat_arr +i;*/
-        /*EVTAG_ARRAY_GET(response, stat_arr, i, &stat);*/
-        /*stat_arr[i].size = stat-> size;*/
-        /*stat_arr[i].ino = stat-> ino;*/
-    /*}*/
     return 0;
 }
 
@@ -212,7 +173,6 @@ int lookup_send_request(fuse_ino_t parent_ino, const char * name , struct file_s
     o_stat->size = stat->size;
     o_stat->ino = stat->ino;
 
-    fprintf(stderr, "lookup_send_request o_stat return ino : %d\n", o_stat -> ino);
     return 0;
 }
 
@@ -262,15 +222,6 @@ void mds_conn_init(){
     pool = evrpc_pool_new(NULL); 
 
     evcon = evhttp_connection_new("127.0.0.1", port);
-    /*evcon = evhttp_connection_new("192.168.1.102", port);*/
-    fprintf(stderr, "evcon : %p\n", evcon);
-
     evrpc_pool_add_connection(pool, evcon);
 }
-
-/*int main(){*/
-    /*event_init();*/
-    /*rpc_basic_client();*/
-    /*doit();*/
-/*}*/
 

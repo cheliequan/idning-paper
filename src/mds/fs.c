@@ -4,6 +4,8 @@
 #include <stdlib.h>
 
 #include <sys/stat.h>
+
+#include "log.h"
 static int cur_ino = 3;
 
 void fsnode_tree_insert(fsnode * p, fsnode * n) {
@@ -90,6 +92,7 @@ inline fsnode* fsnode_new() {
 }
 
 int fs_init(){
+    DBG();
     root = fsnode_new();
     root -> ino = 1;
     root -> mode = S_IFDIR;
@@ -100,50 +103,50 @@ int fs_init(){
 
     fsnode_hash_insert(root);
 
-    fsnode * n = fsnode_hash_find(1);
-    fprintf(stderr, "n : %p \n", n);
+    //fsnode * n = fsnode_hash_find(1);
 
-    fsnode * node2 = fsnode_new();
-    fprintf(stderr, "node2 : %p \n", node2);
-    node2 -> ino = 2;
-    node2 -> name = "hello_";
-    node2 -> mode = S_IFREG;
-    node2 -> nlen = strlen(node2->name);
-    node2 -> parent = root;
-    node2 -> data.fdata.length = 10;
+    //fsnode * node2 = fsnode_new();
+    //node2 -> ino = 2;
+    //node2 -> name = "hello_";
+    //node2 -> mode = S_IFREG;
+    //node2 -> nlen = strlen(node2->name);
+    //node2 -> parent = root;
+    //node2 -> data.fdata.length = 10;
 
-    fsnode_hash_insert(node2);
-    fsnode_tree_insert(root, node2);
+    //fsnode_hash_insert(node2);
+    //fsnode_tree_insert(root, node2);
 
-    fsnode * node3 = fsnode_tree_find(root, 2);
-    fprintf(stderr, "node3 : %p \n", node3);
+    //fsnode * node3 = fsnode_tree_find(root, 2);
 
     return 0;
 }
 
 int fs_setattr(int ino, struct file_stat * st){
+    logging(LOG_DEUBG, "fs_setattr(%d)", ino);
+
     fsnode *n = fsnode_hash_find(ino);
     n->data.fdata.length = st->size;
     return 0;
 }
 
 int fs_stat(int ino, struct file_stat * st){
+    logging(LOG_DEUBG, "fs_stat(%d)", ino);
     fsnode *n = fsnode_hash_find(ino);
     st->ino = ino;
     st->size = n-> data.fdata.length;
     st->mode = n-> mode;
     return 0;
 }
+
 //返回的是children链表上的一个元素，链表中所有元素为兄弟.
 fsnode * fs_ls(int ino){
+    logging(LOG_DEUBG, "fs_ls(%d)", ino);
     fsnode *n = fsnode_hash_find(ino);
-    /*if (n->type != TYPE_DIRECTORY)*/
-        /*return NULL;*/
     return n->data.ddata.children;
 }
 
 fsnode * fs_lookup(int parent_ino, char * name){
-    fprintf(stderr, "fs_lookup : parent_ino: %d , name: %s\n", parent_ino, name);
+    logging(LOG_DEUBG, "fs_lookup (parent_ino = %d , name = %s)", parent_ino, name);
 
     fsnode *n = fsnode_hash_find(parent_ino);
     n = n-> data.ddata.children;
@@ -159,36 +162,29 @@ fsnode * fs_lookup(int parent_ino, char * name){
 
     for (pl = head->next; pl!=head; pl=pl->next){
         p = dlist_data(pl, fsnode, tree_dlist);
-        fprintf(stderr, "pl : %p , p: %p\n", pl, p);
 
         if (0 == strcmp(name, p->name)){
-            fprintf(stderr, "fs_lookup return p: %p, \n",  p);
             return p;
         }
     }
-    /*if (n->type != TYPE_DIRECTORY)*/
-        /*return NULL;*/
-    fprintf(stderr, "fs_lookup return NULL \n");
+    logging(LOG_DEUBG, "fs_lookup (parent_ino = %d , name = %s) return NULL", parent_ino, name);
     return NULL;
 }
 
 
 fsnode * fs_unlink(int parent_ino, char * name){
-    fprintf(stderr, "fs_unlink: parent_ino: %d , name: %s\n", parent_ino, name);
+    logging(LOG_DEUBG, "fs_unlink(parent_ino = %d , name = %s)", parent_ino, name);
 
     fsnode *s = fs_lookup(parent_ino, name);
     fsnode_tree_remove(s);
     fsnode_hash_remove(s);
     free(s);
-
-
-    /*if (n->type != TYPE_DIRECTORY)*/
-        /*return NULL;*/
     return NULL;
 }
 
 
 fsnode * fs_mknod(int parent_ino, char * name, int type, int mode){
+    logging(LOG_DEUBG, "fs_unlink(parent_ino = %d , name = %s)", parent_ino, name);
     fsnode * n = fsnode_new();
     n -> ino = cur_ino++;
     n -> type = type;
@@ -207,3 +203,6 @@ fsnode * fs_mknod(int parent_ino, char * name, int type, int mode){
     fsnode_tree_insert(n->parent, n);
     return n;
 }
+
+
+

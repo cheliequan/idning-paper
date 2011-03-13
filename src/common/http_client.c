@@ -101,14 +101,12 @@ static void client_callback(struct evhttp_request *req, void *arg)
         return;
 
     default:
-        /* FAILURE */
         event_loopexit(0);
         return;
     }
 
     evbuffer_add_buffer(ctx->buffer, req->input_buffer);
 
-    /* SUCCESS */
     ctx->ok = 1;
 }
 
@@ -124,8 +122,6 @@ struct request_context *context_new (const char *url, int verb, struct evkeyvalq
     ctx -> postdata_buffer = data;
     ctx -> req_headers = headers;
 
-    fprintf(stderr, "DEBUG: url-> path : %s \n",ctx->uri->path );
-    fprintf(stderr, "DEBUG: url-> method : %s \n",ctx->uri->path );
     if (!ctx->uri)
         return 0;
 
@@ -178,18 +174,8 @@ static int client_renew_request(struct request_context *ctx)
         }
     }
 
-
-
-    fprintf(stderr, " .... \n");
-    TAILQ_FOREACH(header, ctx->req->output_headers, next) {
-        fprintf(stderr, "headers : %s ; %s\n", header->key, header->value);
-    }
-    fprintf(stderr, " .... \n");
-
     evhttp_add_header(ctx->req->output_headers,
                             "Host", ctx->uri->host);
-    evhttp_add_header(ctx->req->output_headers,
-                            "tt", "v_of_tt");
     
     if (ctx->method == EVHTTP_REQ_POST){
         ctx->req->output_buffer = ctx->postdata_buffer;
@@ -208,17 +194,7 @@ static struct http_response *http_request(const char *url, int verb, struct evke
 {
     fprintf(stderr, "http_request: %s, %d\n",url, verb );
     struct request_context *ctx = context_new(url, verb, headers, data);
-    fprintf(stderr, "ctx->req: %p\n", ctx->req);
-    fprintf(stderr, "ctx->req->output_headers: %p\n", ctx->req->output_headers);
 
-
-    /*fprintf(stderr, " after add headers ----------------\n");*/
-
-    /*TAILQ_FOREACH(header, ctx->req->output_headers, next) {*/
-        /*fprintf(stderr, "headers : %s ; %s\n", header->key, header->value);*/
-    /*}*/
-
-    /*fprintf(stderr, "http_request: method : %d\n", ctx->method);*/
     event_dispatch();
 
     struct evbuffer *body = 0;
@@ -230,11 +206,7 @@ static struct http_response *http_request(const char *url, int verb, struct evke
         ctx->buffer = 0;
         context_free(ctx);
         struct evbuffer * header = evbuffer_new();
-
-        /*evbuffer_drain(body, evbuffer_get_length(body)+10);*/
-
         return http_response_new(200, header, body);
-
     }else{
         logging(LOG_INFO, "http_request error %d : %s ", response_code, url );
         return NULL;

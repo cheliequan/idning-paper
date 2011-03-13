@@ -19,29 +19,23 @@
 #include "protocol.gen.h"
 
 
-void termination_handler (int signum)
+void sig_handler (int signum)
 {
     fprintf(stderr, "is going to exit!" );
     exit(0);
-    //struct temp_file *p;
-
-    //for (p = temp_file_list; p; p = p->next)
-    //    unlink (p->name);
 }
 
 void init_sig_handler(){
-  if (signal (SIGINT, termination_handler) == SIG_IGN)
+  if (signal (SIGINT, sig_handler) == SIG_IGN)
     signal (SIGINT, SIG_IGN);
-  if (signal (SIGHUP, termination_handler) == SIG_IGN)
+  if (signal (SIGHUP, sig_handler) == SIG_IGN)
     signal (SIGHUP, SIG_IGN);
-  if (signal (SIGTERM, termination_handler) == SIG_IGN)
+  if (signal (SIGTERM, sig_handler) == SIG_IGN)
     signal (SIGTERM, SIG_IGN);
 }
 
 static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
 {
-    DBG();
-    
     logging(LOG_DEUBG, "stat(%lu)", ino);
     fuse_ino_t arr[1] ;
     struct file_stat stat_arr[1];
@@ -50,15 +44,15 @@ static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
     stbuf->st_ino = ino;
     stbuf->st_uid = 0;
     stbuf->st_gid = 0;
-    if (ino == 1){
-        stbuf->st_mode = S_IFDIR | 0777;
-        stbuf->st_nlink = 2;
-    }else{
+    /*if (ino == 1){*/
+        /*stbuf->st_mode = S_IFDIR | 0777;*/
+        /*stbuf->st_nlink = 2;*/
+    /*}else{*/
+    {
         stat_send_request(arr, 1, stat_arr);
         stbuf->st_size = stat_arr[0].size;
         stbuf->st_blksize = 1024*1024*1024;
         stbuf->st_mode = stat_arr[0].mode | 0777;
-        /*stbuf->st_mode = S_IFDIR| 0777; //TODO*/
         logging(LOG_DEUBG, "stat (ino = %lu) return {size: %d, mode: %04o}", 
                 ino, stbuf->st_size, stbuf->st_mode);
         stbuf->st_nlink = 1;
@@ -70,7 +64,6 @@ static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
 static void hello_ll_getattr(fuse_req_t req, fuse_ino_t ino,
 			     struct fuse_file_info *fi)
 {
-    DBG();
     logging(LOG_DEUBG, "getattr(%lu)", ino);
 	struct stat stbuf;
 	memset(&stbuf, 0, sizeof(stbuf));
@@ -82,7 +75,6 @@ static void hello_ll_getattr(fuse_req_t req, fuse_ino_t ino,
 
 static void hello_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
 {
-    DBG();
     logging(LOG_DEUBG, "lookup(parent = %lu, name = %s)", parent, name);
 	struct fuse_entry_param e;
     memset(&e, 0, sizeof(e));
@@ -140,7 +132,6 @@ static int reply_buf_limited(fuse_req_t req, const char *buf, size_t bufsize,
 static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
 			     off_t off, struct fuse_file_info *fi)
 {
-    DBG();
     logging(LOG_DEUBG, "readdir(ino = %lu)", ino);
 	(void) fi;
 
@@ -149,9 +140,6 @@ static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     int i;
     struct dirbuf b;
     memset(&b, 0, sizeof(b));
-    /*dirbuf_add(req, &b, ".",  S_IFDIR, 1);*/
-    /*dirbuf_add(req, &b, "..", S_IFDIR, 1);*/
-    /*dirbuf_add(req, &b, "xxxxxx", 3);*/
     for(i=0; i<cnt; i++){
         logging(LOG_DEUBG, "readdir(parent = %lu) return {ino: %lu, name : %s, mode: %04o}", 
                 ino, stat_arr[i].ino, stat_arr[i].name, stat_arr[i].mode);
@@ -165,18 +153,7 @@ static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
 static void hello_ll_open(fuse_req_t req, fuse_ino_t ino,
 			  struct fuse_file_info *fi)
 {
-    DBG();
     logging(LOG_DEUBG, "open(%lu)", ino);
-
-	/*if ((fi->flags & 3) != O_RDONLY)*/
-		/*fuse_reply_err(req, EACCES);*/
-	/*else*/
-		/*fuse_reply_open(req, fi);*/
-
-    /*fi->fh = ino; //TODO: this is tmp*/
-    /*fi->direct_io = 1;*/
-    /*fi->keep_cache=1;*/
-
 
     fuse_reply_open(req, fi);
 }
@@ -184,29 +161,18 @@ static void hello_ll_open(fuse_req_t req, fuse_ino_t ino,
 static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 			  off_t off, struct fuse_file_info *fi)
 {
-    DBG();
     logging(LOG_DEUBG, "read (%lu, size=%d, off=%d)", ino, size, off);
 	(void) fi;
 
-    /*char url[256] = "http://10.100.1.76/";*/
-    /*sprintf(url, "http://10.100.1.76:6006/get/%d", ino);*/
-
     char url[256] = "http://127.0.0.1/";
     sprintf(url, "http://127.0.0.1:6006/get/%lu", ino);
-    fprintf(stderr, "http_get: %s \n", url);
-
 
     struct evkeyvalq * headers = (struct evkeyvalq *) malloc( sizeof(struct evkeyvalq));
     TAILQ_INIT(headers);
     char range[255];
 
-    logging(LOG_DEUBG, "sizeof(off) = %d, sizeof(off+size-1) = %d",sizeof(off), sizeof(off+size-1));
-    logging(LOG_DEUBG, "(int)off: %d ",(int)off);
-    logging(LOG_DEUBG, "bytes=%llu-%llu" , off, off+size-1);
-
-
     sprintf(range, "bytes=%llu-%llu" , off, off+size-1);
-    logging(LOG_DEUBG, range);
+    logging(LOG_DEUBG, "Range: %s", range);
 
     evhttp_add_header(headers, "Range", range);
 
@@ -231,29 +197,7 @@ void my_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, o
     logging(LOG_DEUBG, "write(%lu, size=%d, off=%d)", ino, size, off);
     int err = 0;
 
-    //struct evbuffer *  evb = evbuffer_new();
-    //evbuffer_add(evb, buf, size);
-    /*TODO : evbuffer_add_reference();*/
-    //char url[256];
-    //sprintf(url, "http://127.0.0.1:6006/put/%lu", ino);
-    //struct evkeyvalq * headers = (struct evkeyvalq *) malloc( sizeof(struct evkeyvalq));
-    //TAILQ_INIT(headers);
-    //char range[255];
-    //sprintf(range, "bytes=%d-%d", off, off+size-1);
-    //logging(LOG_DEUBG, range);
-
-    //evhttp_add_header(headers, "Range", range);
-
-    //http_response * response = http_post(url, headers, evb);
-    //int len = evbuffer_get_length(response->body);
-    //free(headers);
-    //http_response_free(response);
-
-
-    
     buffered_write(ino, off, size, buf);
-
-
 
     if (err!=0) {
         fuse_reply_err(req,err);
@@ -261,23 +205,6 @@ void my_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, o
         fuse_reply_write(req,size);
     }
 }
-
-/* 
-实现了write 函数后.
-不能write, 
-报如下错：
-unique: 21, opcode: SETATTR (4), nodeid: 2, insize: 128
-   unique: 21, error: -38 (Function not implemented), outsize: 16
-unique: 22, opcode: FORGET (2), nodeid: 2, insize: 48
-
-网上有人说：
-The attributes of a filesystem element are set by the filesystem itself. You can only define any attributes of a filesystem element when you open() it. For example, a file can be opened read-only. Once it is open, this status can only be gotten, and not set. The exceptions would be the chown()/chmod() operations, which have their own specific handlers.
-Fuse is a very cool thing.
---- rod.
-
-*/
-/*
-*/
 
 /*
  * 包括st_atime
@@ -297,7 +224,6 @@ Fuse is a very cool thing.
  *
  * */
 void my_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf, int to_set, struct fuse_file_info *fi) {
-    DBG();
     logging(LOG_DEUBG, "setattr(%lu)", ino);
     struct file_stat * fstat = file_stat_new();
 
@@ -389,7 +315,6 @@ void my_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mod
 
 static void my_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
 {
-    DBG();
     logging(LOG_DEUBG, "unlink(parent = %lu, name = %s)", parent, name);
 
     unlink_send_request(parent, name);
@@ -422,8 +347,6 @@ int main(int argc, char *argv[])
     http_client_init();
     ping_send_request();
     init_sig_handler();
-    logging(LOG_DEUBG, "sizeof(off_t) = %d, sizeof(size_t) = %d;", sizeof(off_t), sizeof(size_t));
-    logging(LOG_DEUBG, "sizeof(fuse_ino_t) = %d", sizeof(fuse_ino_t));
 
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 	struct fuse_chan *ch;

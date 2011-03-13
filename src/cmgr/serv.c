@@ -2,7 +2,9 @@
 #include <evhttp.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "protocol.gen.h"
+#include "log.h"
 
 EVRPC_HEADER(rpc_ping, ping, pong)
 EVRPC_GENERATE(rpc_ping, ping, pong)

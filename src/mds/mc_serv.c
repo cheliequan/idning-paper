@@ -272,7 +272,7 @@ void cluster_add(char * ip, int port, char type){
         if (machines[i].port == port && (0 == strcmp((char *)machines[i].ip, ip)) ) //already in array
             return;
     }
-    fprintf(stderr, "add machine %s:%d @ %d\n", ip, port, machine_cnt);
+    logging(LOG_DEUBG, "add machine %s:%d @ %d\n", ip, port, machine_cnt);
     
     machines[machine_cnt].ip = strdup(ip);
     machines[machine_cnt].port = port;
