@@ -9,6 +9,7 @@ EVRPC_HEADER(rpc_ls, ls_request, ls_response)
 
 EVRPC_HEADER(rpc_mknod, mknod_request, mknod_response)
 EVRPC_HEADER(rpc_unlink, unlink_request, unlink_response)
+
 EVRPC_HEADER(rpc_statfs, statfs_request, statfs_response)
 
 EVRPC_HEADER(rpc_lookup, lookup_request, lookup_response)

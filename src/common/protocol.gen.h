@@ -765,22 +765,22 @@ int unlink_response_ino_get(struct unlink_response *, ev_uint32_t *);
 
 /* Tag definition for statfs_request */
 enum statfs_request_ {
-  STATFS_REQUEST_X=1,
+  STATFS_REQUEST_NOTHING=1,
   STATFS_REQUEST_MAX_TAGS
 };
 
 /* Structure declaration for statfs_request */
 struct statfs_request_access_ {
-  int (*x_assign)(struct statfs_request *, const ev_uint32_t);
-  int (*x_get)(struct statfs_request *, ev_uint32_t *);
+  int (*nothing_assign)(struct statfs_request *, const ev_uint32_t);
+  int (*nothing_get)(struct statfs_request *, ev_uint32_t *);
 };
 
 struct statfs_request {
   struct statfs_request_access_ *base;
 
-  ev_uint32_t x;
+  ev_uint32_t nothing;
 
-  ev_uint8_t x_set;
+  ev_uint8_t nothing_set;
 };
 
 struct statfs_request *statfs_request_new(void);
@@ -794,28 +794,38 @@ void evtag_marshal_statfs_request(struct evbuffer *, ev_uint32_t,
     const struct statfs_request *);
 int evtag_unmarshal_statfs_request(struct evbuffer *, ev_uint32_t,
     struct statfs_request *);
-int statfs_request_x_assign(struct statfs_request *, const ev_uint32_t);
-int statfs_request_x_get(struct statfs_request *, ev_uint32_t *);
+int statfs_request_nothing_assign(struct statfs_request *, const ev_uint32_t);
+int statfs_request_nothing_get(struct statfs_request *, ev_uint32_t *);
 /* --- statfs_request done --- */
 
 /* Tag definition for statfs_response */
 enum statfs_response_ {
-  STATFS_RESPONSE_X=1,
+  STATFS_RESPONSE_TOTAL_SPACE=1,
+  STATFS_RESPONSE_AVAIL_SPACE=2,
+  STATFS_RESPONSE_INODE_CNT=3,
   STATFS_RESPONSE_MAX_TAGS
 };
 
 /* Structure declaration for statfs_response */
 struct statfs_response_access_ {
-  int (*x_assign)(struct statfs_response *, const ev_uint32_t);
-  int (*x_get)(struct statfs_response *, ev_uint32_t *);
+  int (*total_space_assign)(struct statfs_response *, const ev_uint32_t);
+  int (*total_space_get)(struct statfs_response *, ev_uint32_t *);
+  int (*avail_space_assign)(struct statfs_response *, const ev_uint32_t);
+  int (*avail_space_get)(struct statfs_response *, ev_uint32_t *);
+  int (*inode_cnt_assign)(struct statfs_response *, const ev_uint32_t);
+  int (*inode_cnt_get)(struct statfs_response *, ev_uint32_t *);
 };
 
 struct statfs_response {
   struct statfs_response_access_ *base;
 
-  ev_uint32_t x;
+  ev_uint32_t total_space;
+  ev_uint32_t avail_space;
+  ev_uint32_t inode_cnt;
 
-  ev_uint8_t x_set;
+  ev_uint8_t total_space_set;
+  ev_uint8_t avail_space_set;
+  ev_uint8_t inode_cnt_set;
 };
 
 struct statfs_response *statfs_response_new(void);
@@ -829,8 +839,12 @@ void evtag_marshal_statfs_response(struct evbuffer *, ev_uint32_t,
     const struct statfs_response *);
 int evtag_unmarshal_statfs_response(struct evbuffer *, ev_uint32_t,
     struct statfs_response *);
-int statfs_response_x_assign(struct statfs_response *, const ev_uint32_t);
-int statfs_response_x_get(struct statfs_response *, ev_uint32_t *);
+int statfs_response_total_space_assign(struct statfs_response *, const ev_uint32_t);
+int statfs_response_total_space_get(struct statfs_response *, ev_uint32_t *);
+int statfs_response_avail_space_assign(struct statfs_response *, const ev_uint32_t);
+int statfs_response_avail_space_get(struct statfs_response *, ev_uint32_t *);
+int statfs_response_inode_cnt_assign(struct statfs_response *, const ev_uint32_t);
+int statfs_response_inode_cnt_get(struct statfs_response *, ev_uint32_t *);
 /* --- statfs_response done --- */
 
 #endif  /* _COMMON_PROTOCOL_RPC_ */

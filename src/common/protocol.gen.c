@@ -3820,8 +3820,8 @@ evtag_marshal_unlink_response(struct evbuffer *evbuf, ev_uint32_t tag, const str
  */
 
 static struct statfs_request_access_ __statfs_request_base = {
-  statfs_request_x_assign,
-  statfs_request_x_get,
+  statfs_request_nothing_assign,
+  statfs_request_nothing_get,
 };
 
 struct statfs_request *
@@ -3840,34 +3840,34 @@ statfs_request_new_with_arg(void *unused)
   }
   tmp->base = &__statfs_request_base;
 
-  tmp->x = 0;
-  tmp->x_set = 0;
+  tmp->nothing = 0;
+  tmp->nothing_set = 0;
 
   return (tmp);
 }
 
 
 int
-statfs_request_x_assign(struct statfs_request *msg, const ev_uint32_t value)
+statfs_request_nothing_assign(struct statfs_request *msg, const ev_uint32_t value)
 {
-  msg->x_set = 1;
-  msg->x = value;
+  msg->nothing_set = 1;
+  msg->nothing = value;
   return (0);
 }
 
 int
-statfs_request_x_get(struct statfs_request *msg, ev_uint32_t *value)
+statfs_request_nothing_get(struct statfs_request *msg, ev_uint32_t *value)
 {
-  if (msg->x_set != 1)
+  if (msg->nothing_set != 1)
     return (-1);
-  *value = msg->x;
+  *value = msg->nothing;
   return (0);
 }
 
 void
 statfs_request_clear(struct statfs_request *tmp)
 {
-  tmp->x_set = 0;
+  tmp->nothing_set = 0;
 }
 
 void
@@ -3878,7 +3878,9 @@ statfs_request_free(struct statfs_request *tmp)
 
 void
 statfs_request_marshal(struct evbuffer *evbuf, const struct statfs_request *tmp){
-  evtag_marshal_int(evbuf, STATFS_REQUEST_X, tmp->x);
+  if (tmp->nothing_set) {
+    evtag_marshal_int(evbuf, STATFS_REQUEST_NOTHING, tmp->nothing);
+  }
 }
 
 int
@@ -3890,15 +3892,15 @@ statfs_request_unmarshal(struct statfs_request *tmp,  struct evbuffer *evbuf)
       return (-1);
     switch (tag) {
 
-      case STATFS_REQUEST_X:
+      case STATFS_REQUEST_NOTHING:
 
-        if (tmp->x_set)
+        if (tmp->nothing_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, STATFS_REQUEST_X, &tmp->x) == -1) {
-          event_warnx("%s: failed to unmarshal x", __func__);
+        if (evtag_unmarshal_int(evbuf, STATFS_REQUEST_NOTHING, &tmp->nothing) == -1) {
+          event_warnx("%s: failed to unmarshal nothing", __func__);
           return (-1);
         }
-        tmp->x_set = 1;
+        tmp->nothing_set = 1;
         break;
 
       default:
@@ -3914,8 +3916,6 @@ statfs_request_unmarshal(struct statfs_request *tmp,  struct evbuffer *evbuf)
 int
 statfs_request_complete(struct statfs_request *msg)
 {
-  if (!msg->x_set)
-    return (-1);
   return (0);
 }
 
@@ -3955,8 +3955,12 @@ evtag_marshal_statfs_request(struct evbuffer *evbuf, ev_uint32_t tag, const stru
  */
 
 static struct statfs_response_access_ __statfs_response_base = {
-  statfs_response_x_assign,
-  statfs_response_x_get,
+  statfs_response_total_space_assign,
+  statfs_response_total_space_get,
+  statfs_response_avail_space_assign,
+  statfs_response_avail_space_get,
+  statfs_response_inode_cnt_assign,
+  statfs_response_inode_cnt_get,
 };
 
 struct statfs_response *
@@ -3975,34 +3979,78 @@ statfs_response_new_with_arg(void *unused)
   }
   tmp->base = &__statfs_response_base;
 
-  tmp->x = 0;
-  tmp->x_set = 0;
+  tmp->total_space = 0;
+  tmp->total_space_set = 0;
+
+  tmp->avail_space = 0;
+  tmp->avail_space_set = 0;
+
+  tmp->inode_cnt = 0;
+  tmp->inode_cnt_set = 0;
 
   return (tmp);
 }
 
 
+
+
 int
-statfs_response_x_assign(struct statfs_response *msg, const ev_uint32_t value)
+statfs_response_total_space_assign(struct statfs_response *msg, const ev_uint32_t value)
 {
-  msg->x_set = 1;
-  msg->x = value;
+  msg->total_space_set = 1;
+  msg->total_space = value;
   return (0);
 }
 
 int
-statfs_response_x_get(struct statfs_response *msg, ev_uint32_t *value)
+statfs_response_avail_space_assign(struct statfs_response *msg, const ev_uint32_t value)
 {
-  if (msg->x_set != 1)
+  msg->avail_space_set = 1;
+  msg->avail_space = value;
+  return (0);
+}
+
+int
+statfs_response_inode_cnt_assign(struct statfs_response *msg, const ev_uint32_t value)
+{
+  msg->inode_cnt_set = 1;
+  msg->inode_cnt = value;
+  return (0);
+}
+
+int
+statfs_response_total_space_get(struct statfs_response *msg, ev_uint32_t *value)
+{
+  if (msg->total_space_set != 1)
     return (-1);
-  *value = msg->x;
+  *value = msg->total_space;
+  return (0);
+}
+
+int
+statfs_response_avail_space_get(struct statfs_response *msg, ev_uint32_t *value)
+{
+  if (msg->avail_space_set != 1)
+    return (-1);
+  *value = msg->avail_space;
+  return (0);
+}
+
+int
+statfs_response_inode_cnt_get(struct statfs_response *msg, ev_uint32_t *value)
+{
+  if (msg->inode_cnt_set != 1)
+    return (-1);
+  *value = msg->inode_cnt;
   return (0);
 }
 
 void
 statfs_response_clear(struct statfs_response *tmp)
 {
-  tmp->x_set = 0;
+  tmp->total_space_set = 0;
+  tmp->avail_space_set = 0;
+  tmp->inode_cnt_set = 0;
 }
 
 void
@@ -4013,7 +4061,9 @@ statfs_response_free(struct statfs_response *tmp)
 
 void
 statfs_response_marshal(struct evbuffer *evbuf, const struct statfs_response *tmp){
-  evtag_marshal_int(evbuf, STATFS_RESPONSE_X, tmp->x);
+  evtag_marshal_int(evbuf, STATFS_RESPONSE_TOTAL_SPACE, tmp->total_space);
+  evtag_marshal_int(evbuf, STATFS_RESPONSE_AVAIL_SPACE, tmp->avail_space);
+  evtag_marshal_int(evbuf, STATFS_RESPONSE_INODE_CNT, tmp->inode_cnt);
 }
 
 int
@@ -4025,15 +4075,37 @@ statfs_response_unmarshal(struct statfs_response *tmp,  struct evbuffer *evbuf)
       return (-1);
     switch (tag) {
 
-      case STATFS_RESPONSE_X:
+      case STATFS_RESPONSE_TOTAL_SPACE:
 
-        if (tmp->x_set)
+        if (tmp->total_space_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, STATFS_RESPONSE_X, &tmp->x) == -1) {
-          event_warnx("%s: failed to unmarshal x", __func__);
+        if (evtag_unmarshal_int(evbuf, STATFS_RESPONSE_TOTAL_SPACE, &tmp->total_space) == -1) {
+          event_warnx("%s: failed to unmarshal total_space", __func__);
           return (-1);
         }
-        tmp->x_set = 1;
+        tmp->total_space_set = 1;
+        break;
+
+      case STATFS_RESPONSE_AVAIL_SPACE:
+
+        if (tmp->avail_space_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, STATFS_RESPONSE_AVAIL_SPACE, &tmp->avail_space) == -1) {
+          event_warnx("%s: failed to unmarshal avail_space", __func__);
+          return (-1);
+        }
+        tmp->avail_space_set = 1;
+        break;
+
+      case STATFS_RESPONSE_INODE_CNT:
+
+        if (tmp->inode_cnt_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, STATFS_RESPONSE_INODE_CNT, &tmp->inode_cnt) == -1) {
+          event_warnx("%s: failed to unmarshal inode_cnt", __func__);
+          return (-1);
+        }
+        tmp->inode_cnt_set = 1;
         break;
 
       default:
@@ -4049,7 +4121,11 @@ statfs_response_unmarshal(struct statfs_response *tmp,  struct evbuffer *evbuf)
 int
 statfs_response_complete(struct statfs_response *msg)
 {
-  if (!msg->x_set)
+  if (!msg->total_space_set)
+    return (-1);
+  if (!msg->avail_space_set)
+    return (-1);
+  if (!msg->inode_cnt_set)
     return (-1);
   return (0);
 }

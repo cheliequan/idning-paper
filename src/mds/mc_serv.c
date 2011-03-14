@@ -139,6 +139,28 @@ ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
     EVRPC_REQUEST_DONE(rpc);
 }
 
+
+static void
+statfs_handler(EVRPC_STRUCT(rpc_statfs)* rpc, void *arg)
+{
+    DBG();
+
+    struct statfs_response * response = rpc->reply;
+    int avail_space;
+    int total_space;
+    int inode_cnt;
+
+    fs_statfs( &total_space, &avail_space, &inode_cnt);
+
+    EVTAG_ASSIGN(response, total_space, total_space);
+    EVTAG_ASSIGN(response, avail_space, avail_space);
+    EVTAG_ASSIGN(response, inode_cnt, inode_cnt);
+
+    EVRPC_REQUEST_DONE(rpc);
+}
+
+
+
 static void mknod_handler(EVRPC_STRUCT(rpc_mknod)* rpc, void *arg)
 {
     DBG();
@@ -228,6 +250,8 @@ rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
     EVRPC_REGISTER(base, rpc_lookup, lookup_request, lookup_response, lookup_handler, NULL);
     EVRPC_REGISTER(base, rpc_setattr, setattr_request, setattr_response, setattr_handler, NULL);
     EVRPC_REGISTER(base, rpc_unlink, unlink_request, unlink_response, unlink_handler, NULL);
+
+    EVRPC_REGISTER(base, rpc_statfs, statfs_request, statfs_response, statfs_handler, NULL);
 
     *phttp = http;
     *pport = port;

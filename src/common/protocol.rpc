@@ -88,11 +88,13 @@ struct unlink_response {
 
 
 struct statfs_request {
-    int x                               = 1;
+    optional int nothing                         = 1;
 }
 
 struct statfs_response {
-    int x                               = 1;
+    int total_space                     = 1;
+    int avail_space                     = 2;
+    int inode_cnt                        = 3;
 }
 
 
