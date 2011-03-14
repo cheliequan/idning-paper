@@ -15,6 +15,7 @@
 #include "hdd.h"
 #include "http_client.h"
 #include "protocol.gen.h"
+#include "app.h"
 
 
 static void error_reply(struct evhttp_request *req, int err_code, char * fmt, ...){
@@ -164,19 +165,29 @@ void gen_handler(struct evhttp_request *req, void * arg){
     }
 }
 
-int main(int argc, char **argv){
+
+void usage(const char* appname) {
+    
+}
+
+int main(int argc, char ** argv)
+{
+    init_app(argc, argv, "osd");
+
     hdd_init("etc/hdd.conf");
     /*do_ping(&this_machine, &mgr_machine);*/
 
     struct evhttp * httpd;
-    int port = 6006;
+
+    char *listen_host = cfg_getstr("OSD2CLIENT_LISTEN_HOST","*");
+    int port = cfg_getint32("OSD2CLIENT_LISTEN_PORT", 9527);
     event_init();
-    httpd = evhttp_start("0.0.0.0", port);
+    httpd = evhttp_start(listen_host, port);
     if( httpd == NULL){
         logging(LOG_ERROR, "start server error %m");
         exit(1);
     }else{
-        printf("Start server at port  %d\n", port);
+        printf("Start osd at %s:%d\n", listen_host, port);
     }
     evhttp_set_cb(httpd, "/shutdown", shutdown_handler, NULL);
     evhttp_set_gencb(httpd, gen_handler, NULL);
