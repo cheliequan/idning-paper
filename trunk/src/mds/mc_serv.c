@@ -7,6 +7,8 @@
 #include "protocol.h"
 #include "fs.h"
 #include "log.h"
+#include "app.h"
+
 
 
 
@@ -233,13 +235,16 @@ rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
     struct evhttp *http = NULL;
     struct evrpc_base *base = NULL;
 
-    int port = 9527;
-    http = evhttp_start("0.0.0.0", port);
+    char *listen_host = cfg_getstr("MDS2CLIENT_LISTEN_HOST","*");
+    int port = cfg_getint32("MDS2CLIENT_LISTEN_PORT", 9527);
+
+    http = evhttp_start("*", port);
     /*http = evhttp_start("192.168.1.102", port);*/
     if (!http){
         perror("can't start server!");
         exit(-1);
     }
+    printf("Start mds at %s:%d\n", listen_host, port);
 
     base = evrpc_init(http);
 
@@ -258,8 +263,13 @@ rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
     *pbase = base;
 }
 
-int main()
+void usage(const char* appname) {
+    
+}
+
+int main(int argc, char ** argv)
 {
+    init_app(argc, argv, "mds");
     fs_init();
     ev_uint16_t port;
     struct evhttp *http = NULL;
