@@ -18,7 +18,7 @@
 #include "app.h"
 
 
-static void error_reply(struct evhttp_request *req, int err_code, char * fmt, ...){
+static void reply_error(struct evhttp_request *req, int err_code, char * fmt, ...){
     DBG();
     char buf[1024];
     va_list ap;
@@ -27,7 +27,7 @@ static void error_reply(struct evhttp_request *req, int err_code, char * fmt, ..
     vsnprintf(buf, sizeof(buf) -30 , fmt, ap);
     va_end(ap);
 
-    logging(LOG_ERROR, "error_reply : %s", buf);
+    logging(LOG_ERROR, "reply_error : %s", buf);
 
     /*struct evbuffer *evb = evbuffer_new();*/
     /*evhttp_send_reply(req, err_code, buf, evb);*/
@@ -38,7 +38,7 @@ void shutdown_handler(struct evhttp_request *req, void * arg){
     DBG();
 
     if (evhttp_request_get_command(req) != EVHTTP_REQ_GET) {
-        error_reply(req, HTTP_BADREQUEST, "should call with GET");
+        reply_error(req, HTTP_BADREQUEST, "should call with GET");
         return;
     }
     exit(0);
@@ -51,7 +51,7 @@ void write_chunk(uint64_t chunkid, struct evhttp_request *req){
     struct evbuffer *evb = evbuffer_new();
 
     if (evhttp_request_get_command(req) != EVHTTP_REQ_POST) {
-        error_reply(req, HTTP_BADREQUEST, "should call write with POST");
+        reply_error(req, HTTP_BADREQUEST, "should call write with POST");
         return;
     }
     int start=0, end;
@@ -70,7 +70,7 @@ void write_chunk(uint64_t chunkid, struct evhttp_request *req){
     lseek(fd, start, SEEK_SET);
 
     if (-1 == fd) {
-        error_reply(req, HTTP_INTERNAL, "could not open file : %s", chunk->path);
+        reply_error(req, HTTP_INTERNAL, "could not open file : %s", chunk->path);
         return;
     }
 
@@ -88,7 +88,7 @@ void read_chunk(uint64_t chunkid, struct evhttp_request *req){
     hdd_chunk * chunk = chunk_hashtable_get(chunkid);
 
     if (chunk == NULL){
-        error_reply(req, HTTP_NOTFOUND, "not found chunk %"PRIx64 ";", chunkid);
+        reply_error(req, HTTP_NOTFOUND, "not found chunk %"PRIx64 ";", chunkid);
         return ;
     }
 
@@ -108,7 +108,7 @@ void read_chunk(uint64_t chunkid, struct evhttp_request *req){
     struct stat st;
 
     if (fstat(fd, &st)<0) {
-        error_reply(req, HTTP_NOTFOUND, "file not exist : %s", chunk->path);
+        reply_error(req, HTTP_NOTFOUND, "file not exist : %s", chunk->path);
         return ;
     }
     lseek(fd, start, SEEK_SET);
@@ -133,7 +133,7 @@ void gen_handler(struct evhttp_request *req, void * arg){
     /* Decode the URI */
     decoded_uri = evhttp_uri_parse(uri);
     if (!decoded_uri) {
-        error_reply(req, HTTP_BADREQUEST, "Bad URI: %s", uri);
+        reply_error(req, HTTP_BADREQUEST, "Bad URI: %s", uri);
         return;
     }
 
@@ -160,7 +160,7 @@ void gen_handler(struct evhttp_request *req, void * arg){
     }else if (strcmp(op, "get") == 0){
         read_chunk(chunkid, req);
     }else {
-        error_reply(req, HTTP_NOTFOUND, "not found: %s", uri);
+        reply_error(req, HTTP_NOTFOUND, "not found: %s", uri);
         return;
     }
 }
@@ -175,13 +175,13 @@ int main(int argc, char ** argv)
     init_app(argc, argv, "osd");
 
     hdd_init("etc/hdd.conf");
-    /*do_ping(&this_machine, &mgr_machine);*/
+    event_init();
 
     struct evhttp * httpd;
 
     char *listen_host = cfg_getstr("OSD2CLIENT_LISTEN_HOST","*");
     int port = cfg_getint32("OSD2CLIENT_LISTEN_PORT", 9527);
-    event_init();
+
     httpd = evhttp_start(listen_host, port);
     if( httpd == NULL){
         logging(LOG_ERROR, "start server error %m");

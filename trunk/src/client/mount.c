@@ -372,8 +372,8 @@ int main(int argc, char *argv[])
 {
     mds_conn_init();
     http_client_init();
-    ping_send_request();
     init_sig_handler();
+    ping_send_request();
 
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 	struct fuse_chan *ch;
