@@ -48,5 +48,5 @@ gcov:
 
 m:
 	-sudo umount /tmp/a -l
-	./client/mount.out /tmp/a
+	./client/mount.out /tmp/a -d
 

@@ -57,6 +57,10 @@ static void setattr_cb(struct evrpc_status *status, struct setattr_request *requ
     event_loopexit(NULL);
 }
 
+static void statfs_cb(struct evrpc_status *status, struct statfs_request *request , struct statfs_response* response , void *arg){
+    event_loopexit(NULL);
+}
+
 int setattr_send_request(struct file_stat * stat_arr)
 {
     DBG();
@@ -211,6 +215,31 @@ int ping_send_request(void)
     fprintf(stderr, "after event_dispatch: version is : %d\n", v);
     return 0;
 }
+
+
+
+
+int statfs_send_request(int * total_space, int * avail_space, int * inode_cnt)
+{
+    DBG();
+    struct statfs_request * req = statfs_request_new();
+    struct statfs_response * response =  statfs_response_new();
+
+    EVTAG_ASSIGN(req, nothing, 1);
+
+    EVRPC_MAKE_REQUEST(rpc_statfs, pool, req, response,  statfs_cb, NULL);
+
+    event_dispatch();
+
+    EVTAG_GET(response, total_space, total_space);
+    EVTAG_GET(response, avail_space, avail_space);
+    EVTAG_GET(response, inode_cnt, inode_cnt);
+
+    return 0;
+}
+
+
+
 
 
 void mds_conn_init(){

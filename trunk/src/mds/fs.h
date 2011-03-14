@@ -86,6 +86,8 @@ fsnode * fs_unlink(int parent_ino, char * name);
 fsnode * fs_lookup(int parent_ino, char * name);
 fsnode * fs_ls(int ino);
 
+void fs_statfs(int *total_space, int * avail_space, int *inode_cnt);
+
 int fs_rename();
 int fs_link();
 int fs_get_goal();

@@ -323,6 +323,32 @@ static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
 }
 
 
+void sfs_statfs(fuse_req_t req, fuse_ino_t ino) {
+    uint32_t totalspace,availspace;
+    uint32_t inodes;
+
+    uint32_t bsize = 0x10000;
+    struct statvfs stfsbuf;
+    memset(&stfsbuf,0,sizeof(stfsbuf));
+
+    (void)ino;
+    statfs_send_request(&totalspace, &availspace, & inodes);
+
+    stfsbuf.f_namemax = 1000000;
+    stfsbuf.f_frsize = bsize; 
+    stfsbuf.f_bsize = bsize;  
+
+    stfsbuf.f_blocks = totalspace/bsize;
+    stfsbuf.f_bfree = availspace/bsize;
+    stfsbuf.f_bavail = availspace/bsize;
+
+    stfsbuf.f_files = inodes;
+    stfsbuf.f_ffree = 1000000000;
+    stfsbuf.f_favail = 1000000000;
+    fuse_reply_statfs(req,&stfsbuf);
+}
+
+
 
 
 
@@ -339,6 +365,7 @@ static struct fuse_lowlevel_ops sfs_ll_op = {
 	.mkdir      = sfs_ll_mkdir,
 	.unlink     = sfs_ll_unlink,
 	.rmdir      = sfs_ll_unlink,
+	.statfs     = sfs_statfs,
 };
 
 int main(int argc, char *argv[])
