@@ -34,7 +34,7 @@ void init_sig_handler(){
     signal (SIGTERM, SIG_IGN);
 }
 
-static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
+static int sfs_stat(fuse_ino_t ino, struct stat *stbuf)
 {
     logging(LOG_DEUBG, "stat(%lu)", ino);
     fuse_ino_t arr[1] ;
@@ -61,19 +61,19 @@ static int hello_stat(fuse_ino_t ino, struct stat *stbuf)
 	return 0;
 }
 
-static void hello_ll_getattr(fuse_req_t req, fuse_ino_t ino,
+static void sfs_ll_getattr(fuse_req_t req, fuse_ino_t ino,
 			     struct fuse_file_info *fi)
 {
     logging(LOG_DEUBG, "getattr(%lu)", ino);
 	struct stat stbuf;
 	memset(&stbuf, 0, sizeof(stbuf));
-	if (hello_stat(ino, &stbuf) == -1)
+	if (sfs_stat(ino, &stbuf) == -1)
 		fuse_reply_err(req, ENOENT);
 	else
 		fuse_reply_attr(req, &stbuf, 1.0);
 }
 
-static void hello_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
+static void sfs_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
 {
     logging(LOG_DEUBG, "lookup(parent = %lu, name = %s)", parent, name);
 	struct fuse_entry_param e;
@@ -88,7 +88,7 @@ static void hello_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
     logging(LOG_DEUBG, "lookup(parent = %lu, name = %s) return inode: %lu", parent, name, e.ino);
 
     if (e.ino){ // exists
-        hello_stat(e.ino, &e.attr);
+        sfs_stat(e.ino, &e.attr);
     }
     fuse_reply_entry(req, &e);
 }
@@ -129,7 +129,7 @@ static int reply_buf_limited(fuse_req_t req, const char *buf, size_t bufsize,
 		return fuse_reply_buf(req, NULL, 0);
 }
 
-static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
+static void sfs_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
 			     off_t off, struct fuse_file_info *fi)
 {
     logging(LOG_DEUBG, "readdir(ino = %lu)", ino);
@@ -150,7 +150,7 @@ static void hello_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     free(b.p);
 }
 
-static void hello_ll_open(fuse_req_t req, fuse_ino_t ino,
+static void sfs_ll_open(fuse_req_t req, fuse_ino_t ino,
 			  struct fuse_file_info *fi)
 {
     logging(LOG_DEUBG, "open(%lu)", ino);
@@ -158,7 +158,7 @@ static void hello_ll_open(fuse_req_t req, fuse_ino_t ino,
     fuse_reply_open(req, fi);
 }
 
-static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
+static void sfs_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 			  off_t off, struct fuse_file_info *fi)
 {
     logging(LOG_DEUBG, "read (%lu, size=%d, off=%d)", ino, size, off);
@@ -192,7 +192,7 @@ static void hello_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 
 
 
-void my_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi) {
+void sfs_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi) {
     DBG();
     logging(LOG_DEUBG, "write(%lu, size=%d, off=%d)", ino, size, off);
     int err = 0;
@@ -223,7 +223,7 @@ void my_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, o
  *
  *
  * */
-void my_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf, int to_set, struct fuse_file_info *fi) {
+void sfs_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf, int to_set, struct fuse_file_info *fi) {
     logging(LOG_DEUBG, "setattr(%lu)", ino);
     struct file_stat * fstat = file_stat_new();
 
@@ -244,12 +244,12 @@ void my_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf, int to
 
 	struct stat stbuf;
 	memset(&stbuf, 0, sizeof(stbuf));
-	if (hello_stat(ino, &stbuf) == -1)
+	if (sfs_stat(ino, &stbuf) == -1)
 		fuse_reply_err(req, ENOENT);
     fuse_reply_attr(req, &stbuf, 1.0);
 }
 
-void my_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
+void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
     logging(LOG_DEUBG, "flush(ino= %lu)", ino);
 
     int err = 0;
@@ -258,7 +258,7 @@ void my_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
     //do stat
 	struct stat stbuf;
 	memset(&stbuf, 0, sizeof(stbuf));
-	if (hello_stat(ino, &stbuf) == -1)
+	if (sfs_stat(ino, &stbuf) == -1)
 		fuse_reply_err(req, ENOENT);
 
 
@@ -276,7 +276,7 @@ void my_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 }
 
 
-void my_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi) {
+void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode, struct fuse_file_info *fi) {
     logging(LOG_DEUBG, "create(parent = %lu, name = %s, mode=%04o)", parent, name, mode);
     struct fuse_entry_param e;
     struct file_stat * stat = file_stat_new();
@@ -286,14 +286,14 @@ void my_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mo
     e.ino = stat->ino;
     e.attr_timeout = 0.0;
     e.entry_timeout = 0.0;
-    hello_stat(e.ino, &e.attr);
+    sfs_stat(e.ino, &e.attr);
 
     if (fuse_reply_create(req, &e, fi) == -ENOENT) {
 
     }
 }
 
-void my_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode) {
+void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode) {
     logging(LOG_DEUBG, "mkdir(parent = %lu, name = %s, mode=%04o)", parent, name, mode);
     struct fuse_entry_param e;
     struct file_stat * stat = file_stat_new();
@@ -304,7 +304,7 @@ void my_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mod
     e.attr_timeout = 0.0;
     e.entry_timeout = 0.0;
 
-    hello_stat(e.ino, &e.attr);
+    sfs_stat(e.ino, &e.attr);
 
     if (fuse_reply_entry(req, &e) == -ENOENT) {
 
@@ -313,7 +313,7 @@ void my_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mod
  
 
 
-static void my_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
+static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
 {
     logging(LOG_DEUBG, "unlink(parent = %lu, name = %s)", parent, name);
 
@@ -326,19 +326,19 @@ static void my_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
 
 
 
-static struct fuse_lowlevel_ops hello_ll_oper = {
-	.lookup		= hello_ll_lookup,
-	.getattr	= hello_ll_getattr,
-	.readdir	= hello_ll_readdir,
-	.open		= hello_ll_open,
-	.read		= hello_ll_read,
-	.write      = my_ll_write,
-	.setattr    = my_ll_setattr,
-	.flush      = my_ll_flush,
-	.create     = my_ll_create,
-	.mkdir      = my_ll_mkdir,
-	.unlink     = my_ll_unlink,
-	.rmdir      = my_ll_unlink,
+static struct fuse_lowlevel_ops sfs_ll_op = {
+	.lookup		= sfs_ll_lookup,
+	.getattr	= sfs_ll_getattr,
+	.readdir	= sfs_ll_readdir,
+	.open		= sfs_ll_open,
+	.read		= sfs_ll_read,
+	.write      = sfs_ll_write,
+	.setattr    = sfs_ll_setattr,
+	.flush      = sfs_ll_flush,
+	.create     = sfs_ll_create,
+	.mkdir      = sfs_ll_mkdir,
+	.unlink     = sfs_ll_unlink,
+	.rmdir      = sfs_ll_unlink,
 };
 
 int main(int argc, char *argv[])
@@ -357,8 +357,8 @@ int main(int argc, char *argv[])
 	    (ch = fuse_mount(mountpoint, &args)) != NULL) {
 		struct fuse_session *se;
 
-		se = fuse_lowlevel_new(&args, &hello_ll_oper,
-				       sizeof(hello_ll_oper), NULL);
+		se = fuse_lowlevel_new(&args, &sfs_ll_op,
+				       sizeof(sfs_ll_op), NULL);
 		if (se != NULL) {
 			if (fuse_set_signal_handlers(se) != -1) {
 				fuse_session_add_chan(se, ch);

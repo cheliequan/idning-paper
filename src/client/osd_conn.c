@@ -12,7 +12,7 @@
 #include "dlist.h"
 #include "http_client.h"
 
-
+#define CFG_BLOCK_SIZE 524288000
 /* 只保存连续buffer, 不连续的马上flush.
  *
  * 否则的话，就要保存: {offse, size, buffer,}这样的结构数组，而且osd得支持这样的写法，好像不太现实.
@@ -103,16 +103,19 @@ void buffered_write(uint32_t ino, uint64_t offset, uint32_t size, const uint8_t 
         evbuffer_add(b->evb, buff, size);
         write_buf_hash_insert(b);
     }else{
-        if (offset == ( b->offset+b->size) ){
-            b->size += size;
-            evbuffer_add(b->evb, buff, size);
-            //write_buf_hash_insert(b);
-        }else{ //不连续
+        if( ( b->size > CFG_BLOCK_SIZE )  // 一个块满了.
+          ||(  offset != ( b->offset+b->size)  ) //不连续块.
+          ){
+
             flush_write_buf(b);
 
             write_buf_hash_remove(b);
             write_buf_free(b);
             buffered_write(ino, offset, size, buff);
+
+        }else{ //连续块，追加在它后面
+            b->size += size;
+            evbuffer_add(b->evb, buff, size);
         }
 
     }
