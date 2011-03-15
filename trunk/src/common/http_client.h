@@ -4,6 +4,12 @@
 
 #include <evhttp.h>
 
+
+#ifndef _HTTP_CLIENT_H__
+#define _HTTP_CLIENT_H__
+
+
+
 typedef struct http_response{
     int status_code;
     struct evbuffer * headers;
@@ -29,3 +35,6 @@ struct evhttp_uri {
     char *query; /* query, or NULL */
     char *fragment; /* fragment or NULL */
 };
+
+
+#endif

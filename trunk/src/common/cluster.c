@@ -4,10 +4,9 @@
 #include <string.h>
 
 #include "protocol.gen.h"
+#include "protocol.h"
 #include "log.h"
 
-EVRPC_HEADER(rpc_ping, ping, pong)
-EVRPC_GENERATE(rpc_ping, ping, pong)
 
 #define MAX_MACHINE_CNT 256
 
@@ -19,76 +18,72 @@ void cluster_init();
 void cluster_add(char * ip, int port, char type);
 void cluster_remove(char * ip, int port);
 void cluster_dump();
-
-
-static void
+//evrpc server side
+void
 ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
 {
-    fprintf(stderr, "%s: called\n", __func__);
+    DBG();
 
     struct ping * ping = rpc->request;
     struct pong * pong = rpc->reply;
 
-#define EV_GET(msg, member) \
-        (msg->member)
-
     int ping_version = ping->version;
-    
 
-
-    fprintf(stderr, "ping->self_ip :%s\n", ping->self_ip);
-    fprintf(stderr, "ping->self_port :%d\n", ping->self_port);
     cluster_add((char *)ping->self_ip, ping->self_port, 0);
-    fprintf(stderr, "machine_cnt:%d\n", machine_cnt);
     
     EVTAG_ASSIGN(pong, version, ping_version+1);
     EVTAG_ASSIGN(pong, xx, 8);
-    /*EVTAG_ASSIGN(pong, machines, 8, machines);*/
 
     int i;
     for(i=0; i < machine_cnt; i++){
-        struct machine * m = EVTAG_ARRAY_ADD(pong, machines);  // alloc space for machines
-        printf("before assign m->ip  : %s   m[i].ip: %s\n", m->ip, machines[i].ip);
+        EVTAG_ARRAY_ADD(pong, machines);  // alloc space for machines
         pong_machines_assign(pong, i, machines+i);
-        printf("after assign m->ip  : %s   m[i].ip: %s\n", m->ip, machines[i].ip);
     }
     EVRPC_REQUEST_DONE(rpc);
 }
 
-static void
-rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
-{
-    struct evhttp *http = NULL;
-    struct evrpc_base *base = NULL;
 
-    int port = 9527;
-    http = evhttp_start("0.0.0.0", port);
-    if (!http){
-        perror("can't start server!");
-        exit(-1);
+//evrpc client side
+void ping_cb(struct evrpc_status *status, struct ping *ping , struct pong * pong, void *arg)
+{
+    event_loopexit(NULL);
+}
+
+
+
+int ping_send_request(struct evrpc_pool * pool)
+{
+    DBG();
+    struct ping * ping = ping_new();
+    struct pong * pong =  pong_new();
+
+    EVTAG_ASSIGN(ping, version, 7);
+    EVTAG_ASSIGN(ping, self_ip, "127.0.0.2");
+    EVTAG_ASSIGN(ping, self_port, 8080);
+
+    EVRPC_MAKE_REQUEST(rpc_ping, pool, ping , pong,  ping_cb, NULL);
+    event_dispatch();
+
+
+    int v;
+    EVTAG_GET(pong, version, &v);
+
+    printf("get pong version is : %d \n", v);
+    int cnt = EVTAG_ARRAY_LEN(pong, machines);
+    int i;
+    for (i=0; i< cnt; i++){
+        struct machine * m;
+        EVTAG_ARRAY_GET(pong, machines, 0, &m);
+        printf("machine %d: \n", i);
+        
+        printf("m->port : %d \n", m->port);
+        printf("m->ip : %s \n", m->ip);
     }
 
 
-    base = evrpc_init(http);
-
-    EVRPC_REGISTER(base, rpc_ping, ping, pong, ping_handler, NULL);
-
-    *phttp = http;
-    *pport = port;
-    *pbase = base;
-
-}
-
-int main()
-{
-    ev_uint16_t port;
-    struct evhttp *http = NULL;
-    struct evrpc_base *base = NULL;
-    event_init();
-    rpc_setup(&http, &port, &base);
-    event_dispatch();
     return 0;
 }
+
 
 void cluster_printf(char * hint){
     char tmp[36000];
@@ -99,7 +94,7 @@ void cluster_printf(char * hint){
         while(*p)
             p++;
     }
-    printf(" %s clusters: \n----------------------------------------------\n%s\n---------------------------------------\n", hint, tmp);
+    logging(LOG_DEUBG," %s clusters: \n--------------------------------\n%s\n----------------------------\n", hint, tmp);
 }
 
 void cluster_init(){
@@ -108,14 +103,14 @@ void cluster_init(){
 }
 
 void cluster_add(char * ip, int port, char type){
-    //logging(LOG_DEUBG, "%s: called\n", __func__);
+    DBG();
     cluster_printf("before cluster_add");
     int i;
     for(i=0; i < machine_cnt; i++){
         if (machines[i].port == port && (0 == strcmp((char *)machines[i].ip, ip)) ) //already in array
             return;
     }
-    fprintf(stderr, "add machine %s:%d @ %d\n", ip, port, machine_cnt);
+    logging(LOG_DEUBG, "add machine %s:%d @ %d\n", ip, port, machine_cnt);
     
     machines[machine_cnt].ip = strdup(ip);
     machines[machine_cnt].port = port;
@@ -148,6 +143,4 @@ void cluster_dump(){
 
     /*pong_buffer[pong_buffer_len] = 0;*/
 }
-
-
 
