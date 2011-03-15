@@ -13,10 +13,10 @@
 #include <signal.h>
 
 #include "http_client.h"
-#include "mds_conn.h"
 #include "osd_conn.h"
 #include "log.h"
 #include "protocol.gen.h"
+#include "mds_conn.h"
 
 
 void sig_handler (int signum)
@@ -373,7 +373,7 @@ int main(int argc, char *argv[])
     mds_conn_init();
     http_client_init();
     init_sig_handler();
-    ping_send_request();
+    ping_send_request(pool);
 
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 	struct fuse_chan *ch;

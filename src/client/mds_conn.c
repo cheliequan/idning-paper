@@ -8,14 +8,10 @@
 #include "protocol.gen.h"
 #include "protocol.h"
 #include "log.h"
+#include "cluster.h"
+#include "mds_conn.h"
 
 struct evrpc_pool *pool = NULL;
-
-static void ping_cb(struct evrpc_status *status,
-    struct ping *ping , struct pong * pong, void *arg)
-{
-    event_loopexit(NULL);
-}
 
 static void stat_cb(struct evrpc_status *status, struct stat_request *request , struct stat_response * response , void *arg) {
     event_loopexit(NULL);
@@ -180,38 +176,6 @@ int unlink_send_request(fuse_ino_t parent_ino, const char * name )
     return 0;
 }
 
-int ping_send_request(void)
-{
-    DBG();
-    struct ping * ping = ping_new();
-    struct pong * pong =  pong_new();
-
-    EVTAG_ASSIGN(ping, version, 7);
-    EVTAG_ASSIGN(ping, self_ip, "127.0.0.2");
-    EVTAG_ASSIGN(ping, self_port, 8080);
-
-    EVRPC_MAKE_REQUEST(rpc_ping, pool, ping , pong,  ping_cb, NULL);
-    event_dispatch();
-
-
-    int v;
-    EVTAG_GET(pong, version, &v);
-
-    printf("get pong version is : %d \n", v);
-    int cnt = EVTAG_ARRAY_LEN(pong, machines);
-    int i;
-    for (i=0; i< cnt; i++){
-        struct machine * m;
-        EVTAG_ARRAY_GET(pong, machines, 0, &m);
-        printf("machine %d: \n", i);
-        
-        printf("m->port : %d \n", m->port);
-        printf("m->ip : %s \n", m->ip);
-    }
-
-
-    return 0;
-}
 
 
 
