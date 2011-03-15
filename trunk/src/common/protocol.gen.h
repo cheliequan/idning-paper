@@ -32,6 +32,7 @@ enum ping_ {
   PING_VERSION=1,
   PING_SELF_IP=2,
   PING_SELF_PORT=3,
+  PING_SELF_TYPE=4,
   PING_MAX_TAGS
 };
 
@@ -43,6 +44,8 @@ struct ping_access_ {
   int (*self_ip_get)(struct ping *, char * *);
   int (*self_port_assign)(struct ping *, const ev_uint32_t);
   int (*self_port_get)(struct ping *, ev_uint32_t *);
+  int (*self_type_assign)(struct ping *, const ev_uint32_t);
+  int (*self_type_get)(struct ping *, ev_uint32_t *);
 };
 
 struct ping {
@@ -51,10 +54,12 @@ struct ping {
   ev_uint32_t version;
   char *self_ip;
   ev_uint32_t self_port;
+  ev_uint32_t self_type;
 
   ev_uint8_t version_set;
   ev_uint8_t self_ip_set;
   ev_uint8_t self_port_set;
+  ev_uint8_t self_type_set;
 };
 
 struct ping *ping_new(void);
@@ -74,6 +79,8 @@ int ping_self_ip_assign(struct ping *, const char *);
 int ping_self_ip_get(struct ping *, char * *);
 int ping_self_port_assign(struct ping *, const ev_uint32_t);
 int ping_self_port_get(struct ping *, ev_uint32_t *);
+int ping_self_type_assign(struct ping *, const ev_uint32_t);
+int ping_self_type_get(struct ping *, ev_uint32_t *);
 /* --- ping done --- */
 
 /* Tag definition for machine */
@@ -135,7 +142,6 @@ int machine_type_get(struct machine *, ev_uint32_t *);
 /* Tag definition for pong */
 enum pong_ {
   PONG_VERSION=1,
-  PONG_XX=2,
   PONG_MACHINES=3,
   PONG_MAX_TAGS
 };
@@ -144,8 +150,6 @@ enum pong_ {
 struct pong_access_ {
   int (*version_assign)(struct pong *, const ev_uint32_t);
   int (*version_get)(struct pong *, ev_uint32_t *);
-  int (*xx_assign)(struct pong *, const ev_uint32_t);
-  int (*xx_get)(struct pong *, ev_uint32_t *);
   int (*machines_assign)(struct pong *, int, const struct machine*);
   int (*machines_get)(struct pong *, int, struct machine* *);
   struct machine*  (*machines_add)(struct pong *msg);
@@ -155,13 +159,11 @@ struct pong {
   struct pong_access_ *base;
 
   ev_uint32_t version;
-  ev_uint32_t xx;
   struct machine* *machines;
   int machines_length;
   int machines_num_allocated;
 
   ev_uint8_t version_set;
-  ev_uint8_t xx_set;
   ev_uint8_t machines_set;
 };
 
@@ -178,8 +180,6 @@ int evtag_unmarshal_pong(struct evbuffer *, ev_uint32_t,
     struct pong *);
 int pong_version_assign(struct pong *, const ev_uint32_t);
 int pong_version_get(struct pong *, ev_uint32_t *);
-int pong_xx_assign(struct pong *, const ev_uint32_t);
-int pong_xx_get(struct pong *, ev_uint32_t *);
 int pong_machines_assign(struct pong *, int, const struct machine*);
 int pong_machines_get(struct pong *, int, struct machine* *);
 struct machine*  pong_machines_add(struct pong *msg);

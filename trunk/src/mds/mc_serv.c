@@ -195,7 +195,7 @@ unlink_handler(EVRPC_STRUCT(rpc_unlink)* rpc, void *arg)
 }
 
 static void
-rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
+rpc_setup()
 {
     struct evhttp *http = NULL;
     struct evrpc_base *base = NULL;
@@ -203,7 +203,7 @@ rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
     char *listen_host = cfg_getstr("MDS2CLIENT_LISTEN_HOST","*");
     int port = cfg_getint32("MDS2CLIENT_LISTEN_PORT", 9527);
 
-    http = evhttp_start("*", port);
+    http = evhttp_start(listen_host, port);
     /*http = evhttp_start("192.168.1.102", port);*/
     if (!http){
         perror("can't start server!");
@@ -224,11 +224,28 @@ rpc_setup(struct evhttp **phttp, ev_uint16_t *pport, struct evrpc_base **pbase)
 
     EVRPC_REGISTER(base, rpc_statfs, statfs_request, statfs_response, statfs_handler, NULL);
 
-    *phttp = http;
-    *pport = port;
-    *pbase = base;
 }
 
+
+
+
+void rpc_client_setup(){
+    struct evhttp_connection *evcon;
+    struct evrpc_pool *cmgr_conn_pool = evrpc_pool_new(NULL); 
+    char *host = cfg_getstr("CMGR_HOST","127.0.0.1");
+    int port = cfg_getint32("CMGR_PORT", 9527);
+    int i ;
+    for (i=0;i<2;i++){ // 2 connections
+        evcon = evhttp_connection_new(host, port);
+        evrpc_pool_add_connection(cmgr_conn_pool, evcon);
+    }
+
+    char *self_host = cfg_getstr("MDS2CLIENT_LISTEN_HOST","*");
+    int self_port = cfg_getint32("MDS2CLIENT_LISTEN_PORT", 9527);
+    ping_send_request(cmgr_conn_pool, self_host, self_port, MACHINE_MDS);
+
+
+}
 void usage(const char* appname) {
     
 }
@@ -236,13 +253,12 @@ void usage(const char* appname) {
 int main(int argc, char ** argv)
 {
     init_app(argc, argv, "mds");
-    fs_init();
-    ev_uint16_t port;
-    struct evhttp *http = NULL;
-    struct evrpc_base *base = NULL;
-
     event_init();
-    rpc_setup(&http, &port, &base);
+
+    fs_init();
+    rpc_setup();
+    rpc_client_setup();
+
     event_dispatch();
     return 0;
 }

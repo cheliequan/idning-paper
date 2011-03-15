@@ -4,11 +4,9 @@
 #ifndef _MDS_CONN_H__
 #define _MDS_CONN_H__
 
-struct evrpc_pool *pool ;
 
 void mds_conn_init(void);
 
-int ping_send_request(struct evrpc_pool * pool);
 int ls_send_request(fuse_ino_t ino, struct file_stat * stat_arr);
 int stat_send_request(fuse_ino_t * ino_arr, int len, struct file_stat * stat_arr);
 
