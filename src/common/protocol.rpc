@@ -2,6 +2,7 @@ struct ping {
 	int version                         = 1;
 	string self_ip                      = 2;
 	int self_port                       = 3; 
+	int self_type                       = 4; 
 }
 
 struct machine {
@@ -14,7 +15,6 @@ struct machine {
 
 struct pong {
 	int version                         = 1;
-	optional int xx                              = 2;
     array struct[machine] machines      = 3;
 }
 

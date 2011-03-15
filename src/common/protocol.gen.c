@@ -33,6 +33,8 @@ static struct ping_access_ __ping_base = {
   ping_self_ip_get,
   ping_self_port_assign,
   ping_self_port_get,
+  ping_self_type_assign,
+  ping_self_type_get,
 };
 
 struct ping *
@@ -60,8 +62,12 @@ ping_new_with_arg(void *unused)
   tmp->self_port = 0;
   tmp->self_port_set = 0;
 
+  tmp->self_type = 0;
+  tmp->self_type_set = 0;
+
   return (tmp);
 }
+
 
 
 
@@ -95,6 +101,14 @@ ping_self_port_assign(struct ping *msg, const ev_uint32_t value)
 }
 
 int
+ping_self_type_assign(struct ping *msg, const ev_uint32_t value)
+{
+  msg->self_type_set = 1;
+  msg->self_type = value;
+  return (0);
+}
+
+int
 ping_version_get(struct ping *msg, ev_uint32_t *value)
 {
   if (msg->version_set != 1)
@@ -121,6 +135,15 @@ ping_self_port_get(struct ping *msg, ev_uint32_t *value)
   return (0);
 }
 
+int
+ping_self_type_get(struct ping *msg, ev_uint32_t *value)
+{
+  if (msg->self_type_set != 1)
+    return (-1);
+  *value = msg->self_type;
+  return (0);
+}
+
 void
 ping_clear(struct ping *tmp)
 {
@@ -131,6 +154,7 @@ ping_clear(struct ping *tmp)
     tmp->self_ip_set = 0;
   }
   tmp->self_port_set = 0;
+  tmp->self_type_set = 0;
 }
 
 void
@@ -146,6 +170,7 @@ ping_marshal(struct evbuffer *evbuf, const struct ping *tmp){
   evtag_marshal_int(evbuf, PING_VERSION, tmp->version);
   evtag_marshal_string(evbuf, PING_SELF_IP, tmp->self_ip);
   evtag_marshal_int(evbuf, PING_SELF_PORT, tmp->self_port);
+  evtag_marshal_int(evbuf, PING_SELF_TYPE, tmp->self_type);
 }
 
 int
@@ -190,6 +215,17 @@ ping_unmarshal(struct ping *tmp,  struct evbuffer *evbuf)
         tmp->self_port_set = 1;
         break;
 
+      case PING_SELF_TYPE:
+
+        if (tmp->self_type_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, PING_SELF_TYPE, &tmp->self_type) == -1) {
+          event_warnx("%s: failed to unmarshal self_type", __func__);
+          return (-1);
+        }
+        tmp->self_type_set = 1;
+        break;
+
       default:
         return -1;
     }
@@ -208,6 +244,8 @@ ping_complete(struct ping *msg)
   if (!msg->self_ip_set)
     return (-1);
   if (!msg->self_port_set)
+    return (-1);
+  if (!msg->self_type_set)
     return (-1);
   return (0);
 }
@@ -509,8 +547,6 @@ evtag_marshal_machine(struct evbuffer *evbuf, ev_uint32_t tag, const struct mach
 static struct pong_access_ __pong_base = {
   pong_version_assign,
   pong_version_get,
-  pong_xx_assign,
-  pong_xx_get,
   pong_machines_assign,
   pong_machines_get,
   pong_machines_add,
@@ -535,9 +571,6 @@ pong_new_with_arg(void *unused)
   tmp->version = 0;
   tmp->version_set = 0;
 
-  tmp->xx = 0;
-  tmp->xx_set = 0;
-
   tmp->machines = NULL;
   tmp->machines_length = 0;
   tmp->machines_num_allocated = 0;
@@ -545,7 +578,6 @@ pong_new_with_arg(void *unused)
 
   return (tmp);
 }
-
 
 
 static int
@@ -584,14 +616,6 @@ pong_version_assign(struct pong *msg, const ev_uint32_t value)
 {
   msg->version_set = 1;
   msg->version = value;
-  return (0);
-}
-
-int
-pong_xx_assign(struct pong *msg, const ev_uint32_t value)
-{
-  msg->xx_set = 1;
-  msg->xx = value;
   return (0);
 }
 
@@ -637,15 +661,6 @@ pong_version_get(struct pong *msg, ev_uint32_t *value)
 }
 
 int
-pong_xx_get(struct pong *msg, ev_uint32_t *value)
-{
-  if (msg->xx_set != 1)
-    return (-1);
-  *value = msg->xx;
-  return (0);
-}
-
-int
 pong_machines_get(struct pong *msg, int offset,
     struct machine* *value)
 {
@@ -659,7 +674,6 @@ void
 pong_clear(struct pong *tmp)
 {
   tmp->version_set = 0;
-  tmp->xx_set = 0;
   if (tmp->machines_set == 1) {
     int i;
     for (i = 0; i < tmp->machines_length; ++i) {
@@ -694,9 +708,6 @@ pong_free(struct pong *tmp)
 void
 pong_marshal(struct evbuffer *evbuf, const struct pong *tmp){
   evtag_marshal_int(evbuf, PONG_VERSION, tmp->version);
-  if (tmp->xx_set) {
-    evtag_marshal_int(evbuf, PONG_XX, tmp->xx);
-  }
   if (tmp->machines_set) {
     {
       int i;
@@ -725,17 +736,6 @@ pong_unmarshal(struct pong *tmp,  struct evbuffer *evbuf)
           return (-1);
         }
         tmp->version_set = 1;
-        break;
-
-      case PONG_XX:
-
-        if (tmp->xx_set)
-          return (-1);
-        if (evtag_unmarshal_int(evbuf, PONG_XX, &tmp->xx) == -1) {
-          event_warnx("%s: failed to unmarshal xx", __func__);
-          return (-1);
-        }
-        tmp->xx_set = 1;
         break;
 
       case PONG_MACHINES:

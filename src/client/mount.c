@@ -17,6 +17,8 @@
 #include "log.h"
 #include "protocol.gen.h"
 #include "mds_conn.h"
+#include "app.h"
+#include "cluster.h"
 
 
 void sig_handler (int signum)
@@ -368,12 +370,19 @@ static struct fuse_lowlevel_ops sfs_ll_op = {
 	.statfs     = sfs_statfs,
 };
 
+
+void usage(const char* appname) {
+    
+}
+
+
+extern struct evrpc_pool *pool ;
 int main(int argc, char *argv[])
 {
+    init_app(argc, argv, "client");
     mds_conn_init();
     http_client_init();
     init_sig_handler();
-    ping_send_request(pool);
 
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 	struct fuse_chan *ch;
