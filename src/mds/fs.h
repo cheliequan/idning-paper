@@ -89,14 +89,9 @@ fsnode * fs_ls(int ino);
 void fs_statfs(int *total_space, int * avail_space, int *inode_cnt);
 
 int fs_rename();
-int fs_link();
 int fs_get_goal();
 int fs_set_goal();
 int fs_init();
 
 int fs_load();
 int fs_store();
-
-
-
-

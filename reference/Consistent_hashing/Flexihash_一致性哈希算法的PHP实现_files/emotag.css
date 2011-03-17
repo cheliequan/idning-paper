@@ -1,0 +1,29 @@
+/* emoTag widget style */
+div.emoTag {
+	padding: 4px 4px 4px 0;
+	margin: 0 0 12px 0;
+	border-bottom: 1px dotted #b0c4de;
+	font-size: 12px;
+	position: relative;
+}
+div.emoTag dl {
+}
+div.emoTag dl dt {
+	float: left;
+	width: 50px;
+	text-align: center;
+}
+div.emoTag dl dd {
+	margin: 0 0 0 50px;
+}
+div.emoTag dl dd.time {
+	color: #666;
+}
+div.emoTag dl dd.text {
+	padding: 4px 0 2px 0;
+	line-height: 160%;
+}
+div.emoTag span.user {
+	color: #036;
+}
+/* /emoTag widget style */
