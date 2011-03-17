@@ -1,0 +1,58 @@
+/* Styles for printing */
+
+body {
+	background-color: #fff;
+	color: #000;
+	font-family: Georgia, "Times New Roman", serif;
+	font-size: 10.5pt;
+}
+
+#wrapper, #body, #main {
+	width: 100%;
+}
+
+#header,
+#footer,
+#side,
+#jumper,
+#comments,
+#mgmtBox,
+#friendLoginBox,
+#prvMsgBox,
+#image_pre_loader {
+	display: none;
+}
+
+.entry h3 {
+	text-align: center;
+	font-size: 16pt;
+	margin: 0 0 1em 0;
+	background: none;
+}
+.entry h3 span {
+	display: none; /* no posting date */
+}
+.entry .watch {
+	display: none;
+}
+.entry .cate {
+	text-align: right;
+	font-size: 9pt;
+}
+.entry .content {
+	line-height: 150%;
+	margin-bottom: 1em;
+}
+.entry .content a:link:after, .entry .content a:visited:after {
+	content: " (" attr(href) ") ";
+}
+.entry .tags {
+	font-size: 9pt;
+}
+.entry .info {
+	text-align: right;
+	font-size: 9pt;
+}
+.entry .info input {
+	display: none;
+}

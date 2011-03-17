@@ -1,0 +1,116 @@
+/* Expression images for entry-title */
+
+/* CSS-Sprite Version */
+.exprs_1 {
+	background: url(/img/expr/expr.gif) no-repeat 0 50%;
+}
+
+.exprs_2 {
+	background: url(/img/expr/expr.gif) no-repeat -15px 50%;
+}
+
+.exprs_3 {
+	background: url(/img/expr/expr.gif) no-repeat -30px 50%;
+}
+
+.exprs_4 {
+	background: url(/img/expr/expr.gif) no-repeat -45px 50%;
+}
+
+.exprs_5 {
+	background: url(/img/expr/expr.gif) no-repeat -60px 50%;
+}
+
+.exprs_6 {
+	background: url(/img/expr/expr.gif) no-repeat -75px 50%;
+}
+
+.exprs_7 {
+	background: url(/img/expr/expr.gif) no-repeat -90px 50%;
+}
+
+.exprs_8 {
+	background: url(/img/expr/expr.gif) no-repeat -105px 50%;
+}
+
+.exprs_9 {
+	background: url(/img/expr/expr.gif) no-repeat -120px 50%;
+}
+
+.exprs_10 {
+	background: url(/img/expr/expr.gif) no-repeat -135px 50%;
+}
+
+.exprs_11 {
+	background: url(/img/expr/expr.gif) no-repeat -150px 50%;
+}
+
+.exprs_12 {
+	background: url(/img/expr/expr.gif) no-repeat -165px 50%;
+}
+
+.exprs_13 {
+	background: url(/img/expr/expr.gif) no-repeat -180px 50%;
+}
+
+.exprs_14 {
+	background: url(/img/expr/expr.gif) no-repeat -195px 50%;
+}
+
+/* Normal Version */
+/* Expression images for entry-title */
+.expr_1 {
+	background-image: url(../img/expr/E1.gif);
+}
+
+.expr_2 {
+	background-image: url(../img/expr/E2.gif);
+}
+
+.expr_3 {
+	background-image: url(../img/expr/E3.gif);
+}
+
+.expr_4 {
+	background-image: url(../img/expr/E4.gif);
+}
+
+.expr_5 {
+	background-image: url(../img/expr/E5.gif);
+}
+
+.expr_6 {
+	background-image: url(../img/expr/E6.gif);
+}
+
+.expr_7 {
+	background-image: url(../img/expr/E7.gif);
+}
+
+.expr_8 {
+	background-image: url(../img/expr/E8.gif);
+}
+
+.expr_9 {
+	background-image: url(../img/expr/E9.gif);
+}
+
+.expr_10 {
+	background-image: url(../img/expr/E10.gif);
+}
+
+.expr_11 {
+	background-image: url(../img/expr/E11.gif);
+}
+
+.expr_12 {
+	background-image: url(../img/expr/E12.gif);
+}
+
+.expr_13 {
+	background-image: url(../img/expr/E13.gif);
+}
+
+.expr_14 {
+	background-image: url(../img/expr/E14.gif);
+}
