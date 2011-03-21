@@ -14,7 +14,7 @@ int init_app(int argc,char **argv, char * appname) {
     sprintf(cfgfile, "etc/%s.cfg", appname);
     rundaemon=1;
     //runmode = RM_RESTART;
-    logundefined=0;
+    logundefined=1; //TODO
     //appname = argv[0];
 
     while ((ch = getopt(argc, argv, "vduc:h?")) != -1) {
@@ -36,29 +36,33 @@ int init_app(int argc,char **argv, char * appname) {
                 exit(0);
         }
     }
-    argc -= optind;
-    argv += optind;
-    if (argc==1) {
-        if (strcasecmp(argv[0],"start")==0) {
-            //runmode = RM_START;
-        } else if (strcasecmp(argv[0],"stop")==0) {
-            //runmode = RM_STOP;
-        } else if (strcasecmp(argv[0],"restart")==0) {
-            //runmode = RM_RESTART;
-        } else if (strcasecmp(argv[0],"reload")==0) {
-            //runmode = RM_RELOAD;
-        } else {
-            usage(appname);
-            return 1;
-        }
-    } else if (argc!=0) {
-        usage(appname);
-        return 1;
-    }
+    fprintf(stderr, "take %s as config file: ", cfgfile);
+
 
     if (cfg_load(cfgfile,logundefined)==0) {
         fprintf(stderr,"can't load config file: %s - using defaults\n",cfgfile);
     }
+
+    argc -= optind;
+    argv += optind;
+    //if (argc==1) {
+    //    if (strcasecmp(argv[0],"start")==0) {
+    //        //runmode = RM_START;
+    //    } else if (strcasecmp(argv[0],"stop")==0) {
+    //        //runmode = RM_STOP;
+    //    } else if (strcasecmp(argv[0],"restart")==0) {
+    //        //runmode = RM_RESTART;
+    //    } else if (strcasecmp(argv[0],"reload")==0) {
+    //        //runmode = RM_RELOAD;
+    //    } else {
+    //        usage(appname);
+    //        exit(1);
+    //    }
+    //} else if (argc!=0) {
+    //    usage(appname);
+    //    exit(1);
+    //}
+
 
     rls.rlim_cur = MAX_FILES;
     rls.rlim_max = MAX_FILES;
