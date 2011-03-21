@@ -135,6 +135,7 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod)* rpc, void *arg)
     struct mknod_request *request = rpc->request;
     struct mknod_response *response = rpc->reply;
     fsnode * n = fs_mknod(request -> parent_ino, request->name, request->type, request->mode);
+
     logging(LOG_DEUBG, "mknod(parent=%ld, name=%s, type=%d, mode=%04o)", 
             request -> parent_ino, request->name, request->type, request->mode);
 

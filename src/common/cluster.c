@@ -10,21 +10,35 @@
 #include "protocol.gen.h"
 #include "protocol.h"
 #include "log.h"
+#include "cluster.h"
 
 
 #define MAX_MACHINE_CNT 256
 
 static struct machine machines [MAX_MACHINE_CNT];
 static int machine_cnt = 0;
-static uint64_t cluster_version = 0;
+static uint32_t cluster_version = 0;
 
 void cluster_init();
 int cluster_add(char * ip, int port, char type);
 void cluster_remove(char * ip, int port);
 void cluster_dump();
+
+static char *cluster_type_str(int type){
+    switch(type){
+        case MACHINE_CMGR:    
+            return "MGR";
+        case MACHINE_MDS:    
+            return "MDS";
+        case MACHINE_OSD:
+            return "OSD";
+        case MACHINE_CLIENT:    
+            return "client";
+    }
+    return NULL;
+}
 //evrpc server side
-void
-ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
+void ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
 {
     DBG();
 
@@ -38,6 +52,7 @@ ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
     evhttp_connection_get_peer(rpc->http_req->evcon, &remote_ip, &remote_port);
     remote_port = ping->self_port;
     int type = ping->self_type;
+    logging(LOG_INFO, "ping_handler(ip=%s, port=%d, type=%s)", remote_ip, remote_port, cluster_type_str(type));
 
     cluster_add(remote_ip, remote_port, type);
     if (cluster_version > ping_version ){// new machine added to cluster
@@ -92,7 +107,7 @@ int ping_send_request(struct evrpc_pool * pool, const char * self_ip,int self_po
         struct machine * m;
         EVTAG_ARRAY_GET(pong, machines, 0, &m);
         /*loggging(LOG_DEUBG, "pong: machines[x].type")*/
-        cluster_add(m->ip, m->port, m->type);
+        cluster_add(m->ip, m->port, m->type); //TODO: should not inc the version
     }
     cluster_printf("after pong::");
     return 0;
@@ -103,12 +118,15 @@ void cluster_printf(char * hint){
     char tmp[36000];
     char * p = tmp;
     int i;
+
     for (i=0; i< machine_cnt; i++){
-        sprintf(p, "%s:%d _ %d \n", machines[i].ip, machines[i].port, machines[i].type);
+        sprintf(p, "%s\t:%s:%d \n", cluster_type_str(machines[i].type), machines[i].ip, machines[i].port);
+        fprintf(stderr, "%s\t:%s:%d \n", cluster_type_str(machines[i].type), machines[i].ip, machines[i].port);
+
         while(*p)
             p++;
     }
-    logging(LOG_DEUBG," %s clusters: \n--------------------------------\n%s\n----------------------------\n", hint, tmp);
+    logging(LOG_DEUBG," %s clusters: v%d \n--------------\n%s\n------------\n", hint, cluster_version, tmp);
 }
 
 void cluster_init(){
