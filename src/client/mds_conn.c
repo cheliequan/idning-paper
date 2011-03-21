@@ -205,13 +205,14 @@ void rpc_client_setup(){
     struct evrpc_pool *cmgr_conn_pool = evrpc_pool_new(NULL); 
 
 
-    char *host = cfg_getstr("CMGR_HOST","127.0.0.1");
+    char *host = cfg_getstr("CMGR_HOST","127.0.0.2");
     int port = cfg_getint32("CMGR_PORT", 9527);
     int i ;
     for (i=0;i<2;i++){ // 2 connections
         evcon = evhttp_connection_new(host, port);
         evrpc_pool_add_connection(cmgr_conn_pool, evcon);
     }
+    logging(LOG_DEUBG, "connection to cmgr : %s:%d", host, port );
 
 
     char *self_host = "client";

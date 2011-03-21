@@ -94,7 +94,7 @@ typedef struct dlist_t {
 
 
 #define dlist_data(q, type, link)                                         \
-    (type *) ((u_char *) q - offsetof(type, link))
+    (type *) ((unsigned char *) q - offsetof(type, link))
 
 
 #endif /* _NGX_QUEUE_H_INCLUDED_ */
