@@ -18,29 +18,27 @@
 
 
 
-void test_get(){
+char * test_get(){
     char*  p;
     //http://www.baidu.com/search/error.html
-    http_response * response = http_get("http://127.0.0.1:6006/get/9999", NULL);  // xiaonei.com/home
+    http_response * response = http_get("http://127.0.0.1:6006/get/999999", NULL);  // xiaonei.com/home
     printf("%d\n", response -> status_code);
 
     while(( p = evbuffer_readline(response->headers))){
         printf("%s\n", p);
         free(p);
     }
+    p = malloc(1024000);
+    evbuffer_copyout(response->body, p, evbuffer_get_length(response->body));
+    return p;
 
-    while(( p = evbuffer_readline(response->body))){
-        printf("%s\n", p);
-        free(p);
-    }
-    http_response_free(response);
 }
 
-void test_post(){
+void test_post(char * str){
     char*  p;
     struct evbuffer * buffer = evbuffer_new();
-    evbuffer_add_printf(buffer, "email=idning@gmail.com&password=88888");
-    http_response * response = http_post("http://127.0.0.1:6006/put/9999",  NULL, buffer);  // xiaonei.com/home
+    evbuffer_add_printf(buffer, str);
+    http_response * response = http_post("http://127.0.0.1:6006/put/999999",  NULL, buffer);  // xiaonei.com/home
     printf("%d\n", response -> status_code);
 
     while(( p = evbuffer_readline(response->headers))){
@@ -59,8 +57,11 @@ void test_post(){
 int main(){
     event_init();
     http_client_init();
-    test_post();
-    test_get();
-    test_post();
+    char * s = "abc";
+    test_post(s);
+    char * t = test_get();
+    printf("get: %s", t);
+    assert(0 == strcmp(s, t));
+    test_post(s);
     return 0;
 }
