@@ -19,6 +19,7 @@ ConnectionPool * connection_pool_free(ConnectionPool * pool){
 void connection_pool_insert(ConnectionPool * pool, char * host, int port, struct evhttp_connection * conn){
     logging(LOG_DEUBG, "connection_pool_insert on %s:%d", host, port);
     struct PoolEntry * e = malloc(sizeof(struct PoolEntry));      
+    e->conn = conn;
     sprintf(e->host_port, "%s:%d", host, port);
     dlist_t * pl ;
     
@@ -45,7 +46,6 @@ struct evhttp_connection * connection_pool_get_free_conn(ConnectionPool * pool ,
     sprintf(str, "%s:%d", host, port);
     
     struct PoolEntry * old = hashtable_lookup(pool->ht, str);
-    logging(LOG_DEUBG, "old : %p ", old);
     if (NULL == old){
         logging(LOG_DEUBG, "_connection_pool_get_free_conn on %s:%d return NULL!!!!!", host, port);
         return NULL;
@@ -57,6 +57,7 @@ struct evhttp_connection * connection_pool_get_free_conn(ConnectionPool * pool ,
     for (pl = head->next; pl!=head; pl=pl->next){
         p = dlist_data(pl, struct PoolEntry, dlist);
         dlist_remove(pl);
+        //FIXME free something
         return p->conn;
     }
     logging(LOG_DEUBG, "connection_pool_get_free_conn on %s:%d return NULL!!!!!", host, port);
