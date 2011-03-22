@@ -10,16 +10,14 @@
  * actually it's a mutiMap
  * */
 typedef struct ConnectionPool{
-    Hashtable * mid_to_conn_hashtable; // map from machine id to conn;
+    Hashtable * ht ; // map from machine id to conn;
 }ConnectionPool;
 
 /*
  * this is a list
  * */
 struct PoolEntry{
-    int mid;
-    char * host;
-    int port;
+    char host_port[25];
 
     struct evhttp_connection *conn;
     struct dlist_t dlist;
@@ -29,9 +27,9 @@ ConnectionPool * connection_pool_new();
 ConnectionPool * connection_pool_free(ConnectionPool * pool);
 
 
-void connection_pool_insert(ConnectionPool * pool, int mid, char * host, int port, struct evhttp_connection * conn);
+void connection_pool_insert(ConnectionPool * pool, char * host, int port, struct evhttp_connection * conn);
 
-struct evhttp_connection * connection_pool_get_free_conn(ConnectionPool * pool , int mid);
+struct evhttp_connection * connection_pool_get_free_conn(ConnectionPool * pool , char * host, int port);
 
 
 #endif /* _CONN_POLL*/

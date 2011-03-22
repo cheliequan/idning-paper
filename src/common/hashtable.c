@@ -116,7 +116,7 @@ void hashtable_foreach(Hashtable * ht, ForeachFunc func, void * user_data){
     int i;
     for (i=0; i< ht->bucket_cnt; i++){
         bucket = ht->buckets[i];
-        if (p == NULL)
+        if (bucket == NULL)
             continue;
         dlist_t * head = &(bucket->dlist);
         dlist_t * pl;
@@ -132,12 +132,12 @@ int hashtable_size(Hashtable * ht){
 }
 
 
-int hash_int_equal (void * v1, void * v2)
+int hash_int_equal_func (void * v1, void * v2)
 {
     return *((const int *) v1) == *((const int *) v2);
 }
 
-uint32_t hash_int_hash (const void * v)
+uint32_t hash_int_hash_func_func (const void * v)
 {
     return *(const int *) v;
 }
@@ -147,12 +147,17 @@ void  hash_int_str_foreach (void *key, void *value, void * user_data){
     
 }
 
-int hash_str_equal (void * v1, void * v2)
+void  hash_str_str_foreach (void *key, void *value, void * user_data){
+    printf("%s => %s\n", (char * )key, (char *)value);
+    
+}
+
+int hash_str_equal_func (void * v1, void * v2)
 {
     return 0 == strcmp ( ((char *) v1) , ((char *) v2) );
 }
 
-uint32_t hash_str_hash (const void * v)
+uint32_t hash_str_hash_func (const void * v)
 {
     char * p = (char * )v ;
     int i = 1;

@@ -1,4 +1,5 @@
 #include "http_client.h"
+#include "connection_pool.h"
 #include "log.h"
 
 #include <event.h>
@@ -13,6 +14,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/queue.h>
+
+ConnectionPool * conn_pool = NULL;
 
 static http_response * http_response_new(int status_code, struct evbuffer * headers, struct evbuffer * body);
 void http_response_free(http_response * r);
@@ -31,42 +34,6 @@ struct request_context {
     struct evbuffer *postdata_buffer;
     int ok;
 };
-
-TAILQ_HEAD(connection_queue, connection_wrapper) s_connections;
-struct connection_queue * connection_pool = & s_connections;
-struct connection_wrapper {
-    TAILQ_ENTRY(connection_wrapper) queue_entry;
-    struct evhttp_connection *conn;
-    /*char * host;*/
-    /*int port;*/
-    
-};
-
-static void connection_pool_init(){
-    TAILQ_INIT(connection_pool); 
-
-}
-
-static void connection_pool_insert( struct evhttp_connection * conn){
-    DBG();
-    struct connection_wrapper * cw = malloc(sizeof(struct connection_wrapper));      
-    cw->conn = conn;
-    TAILQ_INSERT_HEAD(connection_pool, cw, queue_entry);
-}
-
-static struct evhttp_connection * connection_pool_get_free_conn( ){
-    DBG();
-    if (connection_pool->tqh_first != NULL){
-        struct connection_wrapper * cw = connection_pool -> tqh_first;
-        struct evhttp_connection * conn = cw->conn;
-        TAILQ_REMOVE(connection_pool, connection_pool->tqh_first, queue_entry);
-        free(cw);
-        logging(LOG_DEUBG, "connection_pool_get_free_conn return a conn!!");
-        return conn;
-    }
-    logging(LOG_DEUBG, "connection_pool_get_free_conn return NULL!!");
-    return NULL;
-}
 
 static void client_callback(struct evhttp_request *req, void *arg);
 
@@ -135,7 +102,7 @@ struct request_context *context_new (const char *url, int verb, struct evkeyvalq
 void context_free(struct request_context *ctx)
 {
 
-    connection_pool_insert(ctx->conn);
+    connection_pool_insert(conn_pool, ctx->uri->host, ctx->uri->port, ctx->conn);
     /*evhttp_connection_free(ctx->conn);*/
 
     if (ctx->buffer)
@@ -150,14 +117,16 @@ static int client_renew_request(struct request_context *ctx)
     /* free connections & request */
     if (ctx->conn)
         evhttp_connection_free(ctx->conn);
-    struct evhttp_connection * conn = connection_pool_get_free_conn();
+    struct evhttp_connection * conn = connection_pool_get_free_conn(conn_pool, ctx->uri->host, ctx->uri->port);
     if (conn!=NULL){
+        logging(LOG_DEUBG, "get a conn from pool");
         ctx->conn = conn;
         //fprintf(stderr, " conn->state: %d\n", conn->state);
 
         /*conn*/
         /*evhttp_connection_reset(ctx->conn); no !!! this will send FIN . what should I do*/
     }else{
+        logging(LOG_DEUBG, "no conn in pool, new one");
         ctx->conn = evhttp_connection_new( ctx->uri->host, ctx->uri->port > 0 ? ctx->uri->port : 80);
         //fprintf(stderr, " conn->state: %d\n", conn->state);
     }
@@ -237,7 +206,6 @@ void http_response_free(http_response * r){
         evbuffer_free(r -> body);
     free(r);
 }
-
 void http_client_init(){
-    connection_pool_init();
+    conn_pool = connection_pool_new();
 }

@@ -27,12 +27,13 @@ void hashtable_foreach(Hashtable * ht, ForeachFunc func, void * user_data);
 int hashtable_size(Hashtable * ht);
 
 
-int hash_int_equal (void * v1, void * v2);
-uint32_t hash_int_hash (const void * v);
+int hash_int_equal_func (void * v1, void * v2);
+uint32_t hash_int_hash_func_func (const void * v);
 void  hash_int_str_foreach (void *key, void *value, void * user_data);
 
-int hash_str_equal (void * v1, void * v2);
-uint32_t hash_str_hash (const void * v);
+int hash_str_equal_func (void * v1, void * v2);
+uint32_t hash_str_hash_func (const void * v);
+void  hash_str_str_foreach (void *key, void *value, void * user_data);
 
 #endif /* _HASH_H */
 
