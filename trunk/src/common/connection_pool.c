@@ -1,11 +1,12 @@
 #include "connection_pool.h"
 #include "dlist.h"
+#include "log.h"
 
 
 ConnectionPool * connection_pool_new(){
     ConnectionPool * pool = (ConnectionPool * )malloc(sizeof(ConnectionPool ));
-    Hashtable *ht = hashtable_new(hash_int_hash, hash_int_equal, 1024);
-    pool->mid_to_conn_hashtable = ht;
+    Hashtable *ht = hashtable_new(hash_str_hash_func, hash_str_equal_func, 1024);
+    pool->ht = ht;
     return pool;
 };
 
@@ -15,30 +16,40 @@ ConnectionPool * connection_pool_free(ConnectionPool * pool){
 }
 
 
-void connection_pool_insert(ConnectionPool * pool, int mid, char * host, int port, struct evhttp_connection * conn){
+void connection_pool_insert(ConnectionPool * pool, char * host, int port, struct evhttp_connection * conn){
+    logging(LOG_DEUBG, "connection_pool_insert on %s:%d", host, port);
     struct PoolEntry * e = malloc(sizeof(struct PoolEntry));      
-    e -> mid = mid;
-    e -> host = strdup(host);
-    e -> port = port;
-    dlist_t * pl = &( e -> dlist);
-    dlist_init(pl);
+    sprintf(e->host_port, "%s:%d", host, port);
+    dlist_t * pl ;
     
-    struct PoolEntry * old = hashtable_lookup(pool->mid_to_conn_hashtable, &(e->mid));
+    struct PoolEntry * old = hashtable_lookup(pool->ht , e->host_port);
     if (NULL == old){
-        hashtable_insert(pool->mid_to_conn_hashtable, &(e->mid), e);
-        return;
+        struct PoolEntry * head = malloc(sizeof(struct PoolEntry));      
+        sprintf(head->host_port, "%s:%d", host, port);
+        pl = &( head -> dlist);
+
+        dlist_init(pl);
+        old = head;
+        
+        hashtable_insert(pool->ht, head->host_port, head);
     }
+    pl = &( e -> dlist);
 
     dlist_t * headpl= &( old -> dlist);
     dlist_insert_head(headpl, pl);
 }
 
-struct evhttp_connection * connection_pool_get_free_conn(ConnectionPool * pool , int mid){
-    struct PoolEntry * old = hashtable_lookup(pool->mid_to_conn_hashtable, &(mid));
+struct evhttp_connection * connection_pool_get_free_conn(ConnectionPool * pool , char * host, int port){
+    logging(LOG_DEUBG, "connection_pool_get_free_conn on %s:%d", host, port);
+    char str[25];
+    sprintf(str, "%s:%d", host, port);
+    
+    struct PoolEntry * old = hashtable_lookup(pool->ht, str);
+    logging(LOG_DEUBG, "old : %p ", old);
     if (NULL == old){
+        logging(LOG_DEUBG, "_connection_pool_get_free_conn on %s:%d return NULL!!!!!", host, port);
         return NULL;
     }
-
 
     struct PoolEntry* p;
     dlist_t * head = &(old->dlist);
@@ -48,5 +59,6 @@ struct evhttp_connection * connection_pool_get_free_conn(ConnectionPool * pool ,
         dlist_remove(pl);
         return p->conn;
     }
+    logging(LOG_DEUBG, "connection_pool_get_free_conn on %s:%d return NULL!!!!!", host, port);
     return NULL;
 }
