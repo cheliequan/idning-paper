@@ -30,6 +30,7 @@ struct file_stat {
     optional int   atime                = 7;
     optional int   mtime                = 8;
     optional int   ctime                = 9;
+    array int pos_arr                   = 10;
 }
 
 struct stat_request {

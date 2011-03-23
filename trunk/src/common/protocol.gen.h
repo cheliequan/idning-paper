@@ -210,6 +210,7 @@ enum file_stat_ {
   FILE_STAT_ATIME=7,
   FILE_STAT_MTIME=8,
   FILE_STAT_CTIME=9,
+  FILE_STAT_POS_ARR=10,
   FILE_STAT_MAX_TAGS
 };
 
@@ -233,6 +234,9 @@ struct file_stat_access_ {
   int (*mtime_get)(struct file_stat *, ev_uint32_t *);
   int (*ctime_assign)(struct file_stat *, const ev_uint32_t);
   int (*ctime_get)(struct file_stat *, ev_uint32_t *);
+  int (*pos_arr_assign)(struct file_stat *, int, const ev_uint32_t);
+  int (*pos_arr_get)(struct file_stat *, int, ev_uint32_t *);
+  ev_uint32_t * (*pos_arr_add)(struct file_stat *msg, const ev_uint32_t value);
 };
 
 struct file_stat {
@@ -247,6 +251,9 @@ struct file_stat {
   ev_uint32_t atime;
   ev_uint32_t mtime;
   ev_uint32_t ctime;
+  ev_uint32_t *pos_arr;
+  int pos_arr_length;
+  int pos_arr_num_allocated;
 
   ev_uint8_t ino_set;
   ev_uint8_t size_set;
@@ -257,6 +264,7 @@ struct file_stat {
   ev_uint8_t atime_set;
   ev_uint8_t mtime_set;
   ev_uint8_t ctime_set;
+  ev_uint8_t pos_arr_set;
 };
 
 struct file_stat *file_stat_new(void);
@@ -288,6 +296,9 @@ int file_stat_mtime_assign(struct file_stat *, const ev_uint32_t);
 int file_stat_mtime_get(struct file_stat *, ev_uint32_t *);
 int file_stat_ctime_assign(struct file_stat *, const ev_uint32_t);
 int file_stat_ctime_get(struct file_stat *, ev_uint32_t *);
+int file_stat_pos_arr_assign(struct file_stat *, int, const ev_uint32_t);
+int file_stat_pos_arr_get(struct file_stat *, int, ev_uint32_t *);
+ev_uint32_t * file_stat_pos_arr_add(struct file_stat *msg, const ev_uint32_t value);
 /* --- file_stat done --- */
 
 /* Tag definition for stat_request */
