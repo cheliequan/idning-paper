@@ -217,7 +217,15 @@ void rpc_client_setup(){
 
     char *self_host = "client";
     int self_port = 0;
-    ping_send_request(cmgr_conn_pool, self_host, self_port, MACHINE_CLIENT);
+
+    int cluster_mid = cfg_getint32("CLUSTER_MID", 0);
+    int new_mid = ping_send_request(cmgr_conn_pool, self_host, self_port, MACHINE_CLIENT, cluster_mid);
+    if (cluster_mid == 0 ){
+        char tmp[32];
+        sprintf(tmp, "CLUSTER_MID = %d", new_mid);
+        cfg_append(tmp);
+    }
+
 
     struct machine * mds = cluster_get_machine_of_type(MACHINE_MDS);
     pool = evrpc_pool_new(NULL);

@@ -37,4 +37,8 @@ _CONFIG_MAKE_PROTOTYPE(uint64,uint64_t);
 _CONFIG_MAKE_PROTOTYPE(int64,int64_t);
 _CONFIG_MAKE_PROTOTYPE(double,double);
 
+
+
+void cfg_append(char *s);
+
 #endif

@@ -20,10 +20,11 @@ static int machine_cnt = 0;
 static uint32_t cluster_version = 0;
 
 void cluster_init();
-int cluster_add(char * ip, int port, char type);
+int cluster_add(char * ip, int port, char type, int mid);
 void cluster_remove(char * ip, int port);
 void cluster_printf(char * hint);
 void cluster_dump();
+static int cluster_uuid();
 
 static char *cluster_type_str(int type){
     switch(type){
@@ -53,9 +54,16 @@ void ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
     evhttp_connection_get_peer(rpc->http_req->evcon, &remote_ip, &remote_port);
     remote_port = ping->self_port;
     int type = ping->self_type;
+    int mid = ping->mid;
     logging(LOG_INFO, "ping_handler(ip=%s, port=%d, type=%s)", remote_ip, remote_port, cluster_type_str(type));
 
-    cluster_add(remote_ip, remote_port, type);
+    if(ping->mid == 0){
+        mid = cluster_uuid();
+        EVTAG_ASSIGN(pong, mid, mid);
+    }
+
+    cluster_add(remote_ip, remote_port, type, mid);
+    
     if (cluster_version > ping_version ){// new machine added to cluster
         EVTAG_ASSIGN(pong, version, cluster_version);
         int i;
@@ -78,7 +86,7 @@ void ping_cb(struct evrpc_status *status, struct ping *ping , struct pong * pong
 
 
 
-int ping_send_request(struct evrpc_pool * pool, const char * self_ip,int self_port, int self_type)
+int ping_send_request(struct evrpc_pool * pool, const char * self_ip,int self_port, int self_type, int mid)
 {
     DBG();
     struct ping * ping = ping_new();
@@ -88,12 +96,15 @@ int ping_send_request(struct evrpc_pool * pool, const char * self_ip,int self_po
     EVTAG_ASSIGN(ping, self_ip, self_ip);
     EVTAG_ASSIGN(ping, self_port, self_port);
     EVTAG_ASSIGN(ping, self_type, self_type);
+    EVTAG_ASSIGN(ping, mid, mid);
 
     EVRPC_MAKE_REQUEST(rpc_ping, pool, ping , pong,  ping_cb, NULL);
     event_dispatch();
 
     int pong_version;
+    int pong_mid;
     EVTAG_GET(pong, version, &pong_version);
+    EVTAG_GET(pong, mid, &pong_mid);
 
     printf("get pong version is : %d \n", pong_version);
     if (pong_version == cluster_version){
@@ -114,9 +125,10 @@ int ping_send_request(struct evrpc_pool * pool, const char * self_ip,int self_po
         machines[i].ip = strdup(m->ip);
         machines[i].port = m->port;
         machines[i].type = m->type;
+        machines[i].mid = m->mid;
     }
     cluster_printf("after pong::");
-    return 0;
+    return pong_mid;
 }
 
 
@@ -126,9 +138,8 @@ void cluster_printf(char * hint){
     int i;
 
     for (i=0; i< machine_cnt; i++){
-        sprintf(p, "%s\t:%s:%d \n", cluster_type_str(machines[i].type), machines[i].ip, machines[i].port);
-        fprintf(stderr, "%s\t:%s:%d \n", cluster_type_str(machines[i].type), machines[i].ip, machines[i].port);
-
+        sprintf(p, "%s\t:%s:%d\t\t(%d)\n", cluster_type_str(machines[i].type)
+                , machines[i].ip, machines[i].port, machines[i].mid);
         while(*p)
             p++;
     }
@@ -150,7 +161,23 @@ struct machine * cluster_get_machine_of_type(int type){
     return NULL;
 }
 
-int cluster_add(char * ip, int port, char type){
+
+static int cluster_lookup(int mid){
+    int i;
+    for(i=0; i < machine_cnt; i++){
+        if (machines[i].mid == mid) //already in array
+            return 1;
+    }
+    return 0;
+}
+static int cluster_uuid(){
+    int t = cluster_version;
+    while(cluster_lookup(t))
+        t++;
+    return t;
+}
+
+int cluster_add(char * ip, int port, char type, int mid){
     DBG();
     cluster_printf("before cluster_add");
     int i;
@@ -163,6 +190,7 @@ int cluster_add(char * ip, int port, char type){
     machines[machine_cnt].ip = strdup(ip);
     machines[machine_cnt].port = port;
     machines[machine_cnt].type = type;
+    machines[machine_cnt].mid = mid;
     machine_cnt ++;
     cluster_printf("after cluster_add");
     //logging(LOG_DEUBG, "current machine_cnt : %d", machine_cnt);

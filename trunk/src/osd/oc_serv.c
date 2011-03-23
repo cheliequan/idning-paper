@@ -184,7 +184,14 @@ void rpc_client_setup(){
 
     char *self_host = cfg_getstr("OSD2CLIENT_LISTEN_HOST","*");
     int self_port = cfg_getint32("OSD2CLIENT_LISTEN_PORT", 9527);
-    ping_send_request(cmgr_conn_pool, self_host, self_port, MACHINE_OSD);
+
+    int cluster_mid = cfg_getint32("CLUSTER_MID", 0);
+    int new_mid = ping_send_request(cmgr_conn_pool, self_host, self_port, MACHINE_OSD, cluster_mid);
+    if (cluster_mid == 0 ){
+        char tmp[32];
+        sprintf(tmp, "CLUSTER_MID = %d", new_mid);
+        cfg_append(tmp);
+    }
 }
 
 
