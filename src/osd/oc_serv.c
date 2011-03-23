@@ -82,7 +82,11 @@ void write_chunk(uint64_t chunkid, struct evhttp_request *req){
     evhttp_send_reply(req, HTTP_OK, "OK", evb);
     evbuffer_free(evb);
 }
-
+/*
+ * request start - end 
+ * if file_size < end;
+ * return start - file_size
+ * */
 void read_chunk(uint64_t chunkid, struct evhttp_request *req){
     DBG();
     struct evbuffer *evb = evbuffer_new();
@@ -110,6 +114,12 @@ void read_chunk(uint64_t chunkid, struct evhttp_request *req){
 
     if (range){
         sscanf(range, "bytes=%d-%d", &start, &end);
+        //假设文件st_size = 2
+        //if end = 0, 应该返回1个字节           end=end
+        //if end = 1, 应该返回0,1 共2个字节.    end = st_size - 1  || end = end
+        //if end = 2, 还是应该2个字节.          end = st_size - 1
+        if (st.st_size <= end)  
+            end = st.st_size-1;
     }else{
         start = 0;
         end = st.st_size-1;

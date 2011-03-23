@@ -163,7 +163,8 @@ static void sfs_ll_open(fuse_req_t req, fuse_ino_t ino,
 static void sfs_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 			  off_t off, struct fuse_file_info *fi)
 {
-    logging(LOG_DEUBG, "read (%lu, size=%d, off=%d)", ino, size, off);
+    logging(LOG_DEUBG, "read (%lu, size=%d, off=%d)", ino, size, off); //read (3, size=4096, off=0)
+
 	(void) fi;
 
     char url[256] = "http://127.0.0.1/";

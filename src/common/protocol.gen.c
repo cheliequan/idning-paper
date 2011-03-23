@@ -911,6 +911,9 @@ static struct file_stat_access_ __file_stat_base = {
   file_stat_mtime_get,
   file_stat_ctime_assign,
   file_stat_ctime_get,
+  file_stat_pos_arr_assign,
+  file_stat_pos_arr_get,
+  file_stat_pos_arr_add,
 };
 
 struct file_stat *
@@ -956,6 +959,11 @@ file_stat_new_with_arg(void *unused)
   tmp->ctime = 0;
   tmp->ctime_set = 0;
 
+  tmp->pos_arr = NULL;
+  tmp->pos_arr_length = 0;
+  tmp->pos_arr_num_allocated = 0;
+  tmp->pos_arr_set = 0;
+
   return (tmp);
 }
 
@@ -967,6 +975,35 @@ file_stat_new_with_arg(void *unused)
 
 
 
+
+static int
+file_stat_pos_arr_expand_to_hold_more(struct file_stat *msg)
+{
+  int tobe_allocated = msg->pos_arr_num_allocated;
+  ev_uint32_t* new_d_ata = NULL;
+  tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
+  new_d_ata = (ev_uint32_t*) realloc(msg->pos_arr,
+      tobe_allocated * sizeof(ev_uint32_t));
+  if (new_d_ata == NULL)
+    return -1;
+  msg->pos_arr = new_d_ata;
+  msg->pos_arr_num_allocated = tobe_allocated;
+  return 0;}
+
+ev_uint32_t *
+file_stat_pos_arr_add(struct file_stat *msg, const ev_uint32_t value)
+{
+  if (++msg->pos_arr_length >= msg->pos_arr_num_allocated) {
+    if (file_stat_pos_arr_expand_to_hold_more(msg)<0)
+      goto error;
+  }
+  msg->pos_arr[msg->pos_arr_length - 1] = value;
+  msg->pos_arr_set = 1;
+  return &(msg->pos_arr[msg->pos_arr_length - 1]);
+error:
+  --msg->pos_arr_length;
+  return (NULL);
+}
 
 int
 file_stat_ino_assign(struct file_stat *msg, const ev_uint32_t value)
@@ -1041,6 +1078,19 @@ file_stat_ctime_assign(struct file_stat *msg, const ev_uint32_t value)
 {
   msg->ctime_set = 1;
   msg->ctime = value;
+  return (0);
+}
+
+int
+file_stat_pos_arr_assign(struct file_stat *msg, int off,
+    const ev_uint32_t value)
+{
+  if (!msg->pos_arr_set || off < 0 || off >= msg->pos_arr_length)
+    return (-1);
+
+  {
+    msg->pos_arr[off] = value;
+  }
   return (0);
 }
 
@@ -1125,6 +1175,16 @@ file_stat_ctime_get(struct file_stat *msg, ev_uint32_t *value)
   return (0);
 }
 
+int
+file_stat_pos_arr_get(struct file_stat *msg, int offset,
+    ev_uint32_t *value)
+{
+  if (!msg->pos_arr_set || offset < 0 || offset >= msg->pos_arr_length)
+    return (-1);
+  *value = msg->pos_arr[offset];
+  return (0);
+}
+
 void
 file_stat_clear(struct file_stat *tmp)
 {
@@ -1141,6 +1201,13 @@ file_stat_clear(struct file_stat *tmp)
   tmp->atime_set = 0;
   tmp->mtime_set = 0;
   tmp->ctime_set = 0;
+  if (tmp->pos_arr_set == 1) {
+    free(tmp->pos_arr);
+    tmp->pos_arr = NULL;
+    tmp->pos_arr_set = 0;
+    tmp->pos_arr_length = 0;
+    tmp->pos_arr_num_allocated = 0;
+  }
 }
 
 void
@@ -1148,6 +1215,14 @@ file_stat_free(struct file_stat *tmp)
 {
   if (tmp->name != NULL)
       free (tmp->name);
+  if (tmp->pos_arr_set == 1) {
+    free(tmp->pos_arr);
+    tmp->pos_arr = NULL;
+    tmp->pos_arr_set = 0;
+    tmp->pos_arr_length = 0;
+    tmp->pos_arr_num_allocated = 0;
+  }
+  free(tmp->pos_arr);
   free(tmp);
 }
 
@@ -1175,6 +1250,14 @@ file_stat_marshal(struct evbuffer *evbuf, const struct file_stat *tmp){
   }
   if (tmp->ctime_set) {
     evtag_marshal_int(evbuf, FILE_STAT_CTIME, tmp->ctime);
+  }
+  if (tmp->pos_arr_set) {
+    {
+      int i;
+      for (i = 0; i < tmp->pos_arr_length; ++i) {
+    evtag_marshal_int(evbuf, FILE_STAT_POS_ARR, tmp->pos_arr[i]);
+      }
+    }
   }
 }
 
@@ -1284,6 +1367,21 @@ file_stat_unmarshal(struct file_stat *tmp,  struct evbuffer *evbuf)
           return (-1);
         }
         tmp->ctime_set = 1;
+        break;
+
+      case FILE_STAT_POS_ARR:
+
+        if (tmp->pos_arr_length >= tmp->pos_arr_num_allocated &&
+            file_stat_pos_arr_expand_to_hold_more(tmp) < 0) {
+          puts("HEY NOW");
+          return (-1);
+        }
+        if (evtag_unmarshal_int(evbuf, FILE_STAT_POS_ARR, &tmp->pos_arr[tmp->pos_arr_length]) == -1) {
+          event_warnx("%s: failed to unmarshal pos_arr", __func__);
+          return (-1);
+        }
+        ++tmp->pos_arr_length;
+        tmp->pos_arr_set = 1;
         break;
 
       default:
