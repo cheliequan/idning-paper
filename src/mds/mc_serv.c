@@ -10,6 +10,10 @@
 #include "app.h"
 #include "cluster.h"
 
+static struct evrpc_pool *cmgr_conn_pool ; 
+struct machine self_machine;
+
+
 static void
 setattr_handler(EVRPC_STRUCT(rpc_setattr)* rpc, void *arg)
 {
@@ -131,6 +135,8 @@ statfs_handler(EVRPC_STRUCT(rpc_statfs)* rpc, void *arg)
 static void mknod_handler(EVRPC_STRUCT(rpc_mknod)* rpc, void *arg)
 {
     DBG();
+    //ping cmgr, get current cluster_map
+    /*ping_send_request(cmgr_conn_pool, self_host, self_port, MACHINE_MDS, cluster_mid);*/
 
     struct mknod_request *request = rpc->request;
     struct mknod_response *response = rpc->reply;
@@ -146,6 +152,9 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod)* rpc, void *arg)
     EVTAG_ASSIGN(t, name, n-> name); // 不然它不认..
     EVTAG_ASSIGN(t, mode, n-> mode); // 不然它不认..
     EVTAG_ASSIGN(t, type, n-> type); // 不然它不认..
+    EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[0]);
+    EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[1]);
+
     logging(LOG_DEUBG, "mknod(%s) return {ino: %ld, name: %s, size: %d, mode: %04o}", request->name, t->ino, t->name, t->size, t->mode);
 
     EVRPC_REQUEST_DONE(rpc);
@@ -232,7 +241,7 @@ rpc_setup()
 
 void rpc_client_setup(){
     struct evhttp_connection *evcon;
-    struct evrpc_pool *cmgr_conn_pool = evrpc_pool_new(NULL); 
+    cmgr_conn_pool = evrpc_pool_new(NULL); 
     char *host = cfg_getstr("CMGR_HOST","127.0.0.1");
     int port = cfg_getint32("CMGR_PORT", 9527);
     int i ;
