@@ -35,6 +35,8 @@ static struct ping_access_ __ping_base = {
   ping_self_port_get,
   ping_self_type_assign,
   ping_self_type_get,
+  ping_mid_assign,
+  ping_mid_get,
 };
 
 struct ping *
@@ -65,8 +67,12 @@ ping_new_with_arg(void *unused)
   tmp->self_type = 0;
   tmp->self_type_set = 0;
 
+  tmp->mid = 0;
+  tmp->mid_set = 0;
+
   return (tmp);
 }
+
 
 
 
@@ -109,6 +115,14 @@ ping_self_type_assign(struct ping *msg, const ev_uint32_t value)
 }
 
 int
+ping_mid_assign(struct ping *msg, const ev_uint32_t value)
+{
+  msg->mid_set = 1;
+  msg->mid = value;
+  return (0);
+}
+
+int
 ping_version_get(struct ping *msg, ev_uint32_t *value)
 {
   if (msg->version_set != 1)
@@ -144,6 +158,15 @@ ping_self_type_get(struct ping *msg, ev_uint32_t *value)
   return (0);
 }
 
+int
+ping_mid_get(struct ping *msg, ev_uint32_t *value)
+{
+  if (msg->mid_set != 1)
+    return (-1);
+  *value = msg->mid;
+  return (0);
+}
+
 void
 ping_clear(struct ping *tmp)
 {
@@ -155,6 +178,7 @@ ping_clear(struct ping *tmp)
   }
   tmp->self_port_set = 0;
   tmp->self_type_set = 0;
+  tmp->mid_set = 0;
 }
 
 void
@@ -171,6 +195,7 @@ ping_marshal(struct evbuffer *evbuf, const struct ping *tmp){
   evtag_marshal_string(evbuf, PING_SELF_IP, tmp->self_ip);
   evtag_marshal_int(evbuf, PING_SELF_PORT, tmp->self_port);
   evtag_marshal_int(evbuf, PING_SELF_TYPE, tmp->self_type);
+  evtag_marshal_int(evbuf, PING_MID, tmp->mid);
 }
 
 int
@@ -226,6 +251,17 @@ ping_unmarshal(struct ping *tmp,  struct evbuffer *evbuf)
         tmp->self_type_set = 1;
         break;
 
+      case PING_MID:
+
+        if (tmp->mid_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, PING_MID, &tmp->mid) == -1) {
+          event_warnx("%s: failed to unmarshal mid", __func__);
+          return (-1);
+        }
+        tmp->mid_set = 1;
+        break;
+
       default:
         return -1;
     }
@@ -246,6 +282,8 @@ ping_complete(struct ping *msg)
   if (!msg->self_port_set)
     return (-1);
   if (!msg->self_type_set)
+    return (-1);
+  if (!msg->mid_set)
     return (-1);
   return (0);
 }
@@ -286,8 +324,8 @@ evtag_marshal_ping(struct evbuffer *evbuf, ev_uint32_t tag, const struct ping *m
  */
 
 static struct machine_access_ __machine_base = {
-  machine_uuid_assign,
-  machine_uuid_get,
+  machine_mid_assign,
+  machine_mid_get,
   machine_ip_assign,
   machine_ip_get,
   machine_port_assign,
@@ -312,8 +350,8 @@ machine_new_with_arg(void *unused)
   }
   tmp->base = &__machine_base;
 
-  tmp->uuid = 0;
-  tmp->uuid_set = 0;
+  tmp->mid = 0;
+  tmp->mid_set = 0;
 
   tmp->ip = NULL;
   tmp->ip_set = 0;
@@ -332,10 +370,10 @@ machine_new_with_arg(void *unused)
 
 
 int
-machine_uuid_assign(struct machine *msg, const ev_uint32_t value)
+machine_mid_assign(struct machine *msg, const ev_uint32_t value)
 {
-  msg->uuid_set = 1;
-  msg->uuid = value;
+  msg->mid_set = 1;
+  msg->mid = value;
   return (0);
 }
 
@@ -368,11 +406,11 @@ machine_type_assign(struct machine *msg, const ev_uint32_t value)
 }
 
 int
-machine_uuid_get(struct machine *msg, ev_uint32_t *value)
+machine_mid_get(struct machine *msg, ev_uint32_t *value)
 {
-  if (msg->uuid_set != 1)
+  if (msg->mid_set != 1)
     return (-1);
-  *value = msg->uuid;
+  *value = msg->mid;
   return (0);
 }
 
@@ -406,7 +444,7 @@ machine_type_get(struct machine *msg, ev_uint32_t *value)
 void
 machine_clear(struct machine *tmp)
 {
-  tmp->uuid_set = 0;
+  tmp->mid_set = 0;
   if (tmp->ip_set == 1) {
     free(tmp->ip);
     tmp->ip = NULL;
@@ -426,7 +464,7 @@ machine_free(struct machine *tmp)
 
 void
 machine_marshal(struct evbuffer *evbuf, const struct machine *tmp){
-  evtag_marshal_int(evbuf, MACHINE_UUID, tmp->uuid);
+  evtag_marshal_int(evbuf, MACHINE_MID, tmp->mid);
   evtag_marshal_string(evbuf, MACHINE_IP, tmp->ip);
   evtag_marshal_int(evbuf, MACHINE_PORT, tmp->port);
   evtag_marshal_int(evbuf, MACHINE_TYPE, tmp->type);
@@ -441,15 +479,15 @@ machine_unmarshal(struct machine *tmp,  struct evbuffer *evbuf)
       return (-1);
     switch (tag) {
 
-      case MACHINE_UUID:
+      case MACHINE_MID:
 
-        if (tmp->uuid_set)
+        if (tmp->mid_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, MACHINE_UUID, &tmp->uuid) == -1) {
-          event_warnx("%s: failed to unmarshal uuid", __func__);
+        if (evtag_unmarshal_int(evbuf, MACHINE_MID, &tmp->mid) == -1) {
+          event_warnx("%s: failed to unmarshal mid", __func__);
           return (-1);
         }
-        tmp->uuid_set = 1;
+        tmp->mid_set = 1;
         break;
 
       case MACHINE_IP:
@@ -498,7 +536,7 @@ machine_unmarshal(struct machine *tmp,  struct evbuffer *evbuf)
 int
 machine_complete(struct machine *msg)
 {
-  if (!msg->uuid_set)
+  if (!msg->mid_set)
     return (-1);
   if (!msg->ip_set)
     return (-1);
@@ -547,6 +585,8 @@ evtag_marshal_machine(struct evbuffer *evbuf, ev_uint32_t tag, const struct mach
 static struct pong_access_ __pong_base = {
   pong_version_assign,
   pong_version_get,
+  pong_mid_assign,
+  pong_mid_get,
   pong_machines_assign,
   pong_machines_get,
   pong_machines_add,
@@ -571,6 +611,9 @@ pong_new_with_arg(void *unused)
   tmp->version = 0;
   tmp->version_set = 0;
 
+  tmp->mid = 0;
+  tmp->mid_set = 0;
+
   tmp->machines = NULL;
   tmp->machines_length = 0;
   tmp->machines_num_allocated = 0;
@@ -578,6 +621,7 @@ pong_new_with_arg(void *unused)
 
   return (tmp);
 }
+
 
 
 static int
@@ -616,6 +660,14 @@ pong_version_assign(struct pong *msg, const ev_uint32_t value)
 {
   msg->version_set = 1;
   msg->version = value;
+  return (0);
+}
+
+int
+pong_mid_assign(struct pong *msg, const ev_uint32_t value)
+{
+  msg->mid_set = 1;
+  msg->mid = value;
   return (0);
 }
 
@@ -661,6 +713,15 @@ pong_version_get(struct pong *msg, ev_uint32_t *value)
 }
 
 int
+pong_mid_get(struct pong *msg, ev_uint32_t *value)
+{
+  if (msg->mid_set != 1)
+    return (-1);
+  *value = msg->mid;
+  return (0);
+}
+
+int
 pong_machines_get(struct pong *msg, int offset,
     struct machine* *value)
 {
@@ -674,6 +735,7 @@ void
 pong_clear(struct pong *tmp)
 {
   tmp->version_set = 0;
+  tmp->mid_set = 0;
   if (tmp->machines_set == 1) {
     int i;
     for (i = 0; i < tmp->machines_length; ++i) {
@@ -708,6 +770,9 @@ pong_free(struct pong *tmp)
 void
 pong_marshal(struct evbuffer *evbuf, const struct pong *tmp){
   evtag_marshal_int(evbuf, PONG_VERSION, tmp->version);
+  if (tmp->mid_set) {
+    evtag_marshal_int(evbuf, PONG_MID, tmp->mid);
+  }
   if (tmp->machines_set) {
     {
       int i;
@@ -736,6 +801,17 @@ pong_unmarshal(struct pong *tmp,  struct evbuffer *evbuf)
           return (-1);
         }
         tmp->version_set = 1;
+        break;
+
+      case PONG_MID:
+
+        if (tmp->mid_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, PONG_MID, &tmp->mid) == -1) {
+          event_warnx("%s: failed to unmarshal mid", __func__);
+          return (-1);
+        }
+        tmp->mid_set = 1;
         break;
 
       case PONG_MACHINES:

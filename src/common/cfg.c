@@ -33,11 +33,13 @@ typedef struct paramsstr {
 
 static paramstr *paramhead=NULL;
 static int logundefined=0;
+static char * config_filename = NULL;
 
 int cfg_load (const char *configfname,int _lu) {
 	FILE *fd;
 	char linebuff[1000];
 	uint32_t nps,npe,vps,vpe,i;
+    config_filename = strdup(configfname);
 
 	paramstr *tmp;
 	paramhead = NULL;
@@ -90,6 +92,9 @@ int cfg_load (const char *configfname,int _lu) {
 		tmp->next = paramhead;
 		paramhead = tmp;
 	}
+
+
+
 	fclose(fd);
 	return 1;
 }
@@ -135,3 +140,13 @@ _CONFIG_GEN_FUNCTION(uint32,uint32_t,uint32,"%"PRIu32)
 _CONFIG_GEN_FUNCTION(int64,int64_t,int64,"%"PRId64)
 _CONFIG_GEN_FUNCTION(uint64,uint64_t,uint64,"%"PRIu64)
 _CONFIG_GEN_FUNCTION(double,double,double,"%lf")
+
+
+void cfg_append(char *s){
+    fprintf(stderr, "write cfg to file %s : %s\n", config_filename, s);
+	FILE *fd;
+	fd = fopen(config_filename,"a");
+    fprintf(fd, "\n#Auto Added by the program\n");
+    fprintf(fd, "%s\n", s);
+    fclose(fd);
+}
