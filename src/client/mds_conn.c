@@ -200,42 +200,17 @@ int statfs_send_request(int * total_space, int * avail_space, int * inode_cnt)
     return 0;
 }
 
-void rpc_client_setup(){
-    struct evhttp_connection *evcon;
-    struct evrpc_pool *cmgr_conn_pool = evrpc_pool_new(NULL); 
-
-
-    char *host = cfg_getstr("CMGR_HOST","127.0.0.2");
-    int port = cfg_getint32("CMGR_PORT", 9527);
-    int i ;
-    for (i=0;i<2;i++){ // 2 connections
-        evcon = evhttp_connection_new(host, port);
-        evrpc_pool_add_connection(cmgr_conn_pool, evcon);
-    }
-    logging(LOG_DEUBG, "connection to cmgr : %s:%d", host, port );
-
-
-    char *self_host = "client";
-    int self_port = 0;
-
-    int cluster_mid = cfg_getint32("CLUSTER_MID", 0);
-    int new_mid = ping_send_request(cmgr_conn_pool, self_host, self_port, MACHINE_CLIENT, cluster_mid);
-    if (cluster_mid == 0 ){
-        char tmp[32];
-        sprintf(tmp, "CLUSTER_MID = %d", new_mid);
-        cfg_append(tmp);
-    }
-
-
-    struct machine * mds = cluster_get_machine_of_type(MACHINE_MDS);
-    pool = evrpc_pool_new(NULL);
-    evcon = evhttp_connection_new(mds->ip, mds->port);
-    evrpc_pool_add_connection(pool, evcon);
-}
 
 void mds_conn_init(){
     DBG();
     event_init();
-    rpc_client_setup();
+    rpc_client_setup("client", 0, MACHINE_CLIENT);
+
+
+    struct machine * mds = cluster_get_machine_of_type(MACHINE_MDS);
+    pool = evrpc_pool_new(NULL);
+    struct evhttp_connection *evcon = evhttp_connection_new(mds->ip, mds->port);
+    evrpc_pool_add_connection(pool, evcon);
+
 }
 

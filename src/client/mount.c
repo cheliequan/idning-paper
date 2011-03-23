@@ -55,8 +55,12 @@ static int sfs_stat(fuse_ino_t ino, struct stat *stbuf)
         stbuf->st_size = stat_arr[0].size;
         stbuf->st_blksize = 1024*1024*1024;
         stbuf->st_mode = stat_arr[0].mode | 0777;
-        logging(LOG_DEUBG, "stat (ino = %lu) return {size: %d, mode: %04o}", 
-                ino, stbuf->st_size, stbuf->st_mode);
+        int pos1, pos2;
+        EVTAG_ARRAY_GET( stat_arr+0, pos_arr, 0, &pos1);
+        EVTAG_ARRAY_GET( stat_arr+0, pos_arr, 1, &pos1);
+
+        logging(LOG_DEUBG, "stat (ino = %lu) return {size: %d, mode: %04o, pos1: %d, pos2: %d}", 
+                ino, stbuf->st_size, stbuf->st_mode, pos1, pos2);
         stbuf->st_nlink = 1;
     }
 

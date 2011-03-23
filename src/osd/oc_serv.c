@@ -181,30 +181,6 @@ void gen_handler(struct evhttp_request *req, void * arg){
 }
 
 
-void rpc_client_setup(){
-    struct evhttp_connection *evcon;
-    struct evrpc_pool *cmgr_conn_pool = evrpc_pool_new(NULL); 
-    char *host = cfg_getstr("CMGR_HOST","127.0.0.1");
-    int port = cfg_getint32("CMGR_PORT", 9527);
-    int i ;
-    for (i=0;i<2;i++){ // 2 connections
-        evcon = evhttp_connection_new(host, port);
-        evrpc_pool_add_connection(cmgr_conn_pool, evcon);
-    }
-
-    char *self_host = cfg_getstr("OSD2CLIENT_LISTEN_HOST","*");
-    int self_port = cfg_getint32("OSD2CLIENT_LISTEN_PORT", 9527);
-
-    int cluster_mid = cfg_getint32("CLUSTER_MID", 0);
-    int new_mid = ping_send_request(cmgr_conn_pool, self_host, self_port, MACHINE_OSD, cluster_mid);
-    if (cluster_mid == 0 ){
-        char tmp[32];
-        sprintf(tmp, "CLUSTER_MID = %d", new_mid);
-        cfg_append(tmp);
-    }
-}
-
-
 void usage(const char* appname) {
     
 }
@@ -216,7 +192,9 @@ int main(int argc, char ** argv)
     hdd_init("etc/hdd.conf");
     event_init();
 
-    rpc_client_setup();
+    char *self_host = cfg_getstr("OSD2CLIENT_LISTEN_HOST","*");
+    int self_port = cfg_getint32("OSD2CLIENT_LISTEN_PORT", 9527);
+    rpc_client_setup(self_host, self_port, MACHINE_OSD);
 
     struct evhttp * httpd;
 
