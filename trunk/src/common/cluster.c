@@ -26,6 +26,12 @@ static int mds_cnt = 0;
 static int osd_arr[MAX_MACHINE_CNT];
 static int osd_cnt = 0;
 
+
+static struct evrpc_pool *cmgr_conn_pool ; 
+struct event_base *to_cmgr_ev_base;
+struct machine self_machine;
+
+
 void cluster_init();
 int cluster_add(char * ip, int port, char type, int mid);
 void cluster_remove(char * ip, int port);
@@ -88,25 +94,25 @@ void ping_handler(EVRPC_STRUCT(rpc_ping)* rpc, void *arg)
 //evrpc client side
 void ping_cb(struct evrpc_status *status, struct ping *ping , struct pong * pong, void *arg)
 {
-    event_loopexit(NULL);
+    event_base_loopexit(to_cmgr_ev_base, NULL);
 }
 
 
 
-int ping_send_request(struct evrpc_pool * pool, const char * self_ip,int self_port, int self_type, int mid)
+int ping_send_request()
 {
     DBG();
     struct ping * ping = ping_new();
     struct pong * pong =  pong_new();
 
     EVTAG_ASSIGN(ping, version, cluster_version);
-    EVTAG_ASSIGN(ping, self_ip, self_ip);
-    EVTAG_ASSIGN(ping, self_port, self_port);
-    EVTAG_ASSIGN(ping, self_type, self_type);
-    EVTAG_ASSIGN(ping, mid, mid);
+    EVTAG_ASSIGN(ping, self_ip, self_machine.ip);
+    EVTAG_ASSIGN(ping, self_port, self_machine.port);
+    EVTAG_ASSIGN(ping, self_type, self_machine.type);
+    EVTAG_ASSIGN(ping, mid, self_machine.mid);
 
-    EVRPC_MAKE_REQUEST(rpc_ping, pool, ping , pong,  ping_cb, NULL);
-    event_dispatch();
+    EVRPC_MAKE_REQUEST(rpc_ping, cmgr_conn_pool, ping , pong,  ping_cb, NULL);
+    event_base_dispatch(to_cmgr_ev_base);
 
     int pong_version;
     int pong_mid;
@@ -137,6 +143,36 @@ int ping_send_request(struct evrpc_pool * pool, const char * self_ip,int self_po
     cluster_printf("after pong::");
     cluster_dump();
     return pong_mid;
+}
+
+
+void rpc_client_setup(char * self_host, int self_port, int self_type){
+    struct evhttp_connection *evcon;
+
+    to_cmgr_ev_base = event_base_new();
+    cmgr_conn_pool = evrpc_pool_new(to_cmgr_ev_base); 
+
+    self_machine.ip = strdup(self_host);
+    self_machine.port = self_port;
+    self_machine.type = self_type;
+
+    char *host = cfg_getstr("CMGR_HOST","127.0.0.1");
+    int port = cfg_getint32("CMGR_PORT", 9527);
+    int i ;
+    for (i=0;i<2;i++){ // 2 connections
+        evcon = evhttp_connection_new(host, port);
+        evrpc_pool_add_connection(cmgr_conn_pool, evcon);
+    }
+
+
+    int cluster_mid = cfg_getint32("CLUSTER_MID", 0);
+    int new_mid = ping_send_request();
+    if (cluster_mid == 0 ){
+        char tmp[32];
+        sprintf(tmp, "CLUSTER_MID = %d", new_mid);
+        cfg_append(tmp);
+    }
+    self_machine.mid = new_mid;
 }
 
 

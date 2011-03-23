@@ -135,6 +135,8 @@ int fs_stat(int ino, struct file_stat * st){
     st->ino = ino;
     st->size = n-> data.fdata.length;
     st->mode = n-> mode;
+    EVTAG_ARRAY_ADD_VALUE(st, pos_arr, n->pos_arr[0]);
+    EVTAG_ARRAY_ADD_VALUE(st, pos_arr, n->pos_arr[1]);
     return 0;
 }
 

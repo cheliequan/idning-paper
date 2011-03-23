@@ -10,8 +10,6 @@
 #include "app.h"
 #include "cluster.h"
 
-static struct evrpc_pool *cmgr_conn_pool ; 
-struct machine self_machine;
 
 
 static void
@@ -54,6 +52,12 @@ stat_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
         EVTAG_ASSIGN(t, size , t-> size); // 不然它不认..
         EVTAG_ASSIGN(t, type, t-> type); // 不然它不认..
         EVTAG_ASSIGN(t, mode, t-> mode); // 不然它不认..
+
+        /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, t->pos_arr[0]);*/
+        /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, t->pos_arr[1]);*/
+        EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 0);
+        EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 1);
+
         logging(LOG_DEUBG, "stat(%ld) return {ino: %ld, size: %ld, type : %d, mode : %04o}", ino, t->ino, t->size, t->type, t->mode);
     }
     EVRPC_REQUEST_DONE(rpc);
@@ -136,7 +140,7 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod)* rpc, void *arg)
 {
     DBG();
     //ping cmgr, get current cluster_map
-    /*ping_send_request(cmgr_conn_pool, self_host, self_port, MACHINE_MDS, cluster_mid);*/
+    ping_send_request();
 
     struct mknod_request *request = rpc->request;
     struct mknod_response *response = rpc->reply;
@@ -239,28 +243,6 @@ rpc_setup()
 
 
 
-void rpc_client_setup(){
-    struct evhttp_connection *evcon;
-    cmgr_conn_pool = evrpc_pool_new(NULL); 
-    char *host = cfg_getstr("CMGR_HOST","127.0.0.1");
-    int port = cfg_getint32("CMGR_PORT", 9527);
-    int i ;
-    for (i=0;i<2;i++){ // 2 connections
-        evcon = evhttp_connection_new(host, port);
-        evrpc_pool_add_connection(cmgr_conn_pool, evcon);
-    }
-
-    char *self_host = cfg_getstr("MDS2CLIENT_LISTEN_HOST","*");
-    int self_port = cfg_getint32("MDS2CLIENT_LISTEN_PORT", 9527);
-
-    int cluster_mid = cfg_getint32("CLUSTER_MID", 0);
-    int new_mid = ping_send_request(cmgr_conn_pool, self_host, self_port, MACHINE_MDS, cluster_mid);
-    if (cluster_mid == 0 ){
-        char tmp[32];
-        sprintf(tmp, "CLUSTER_MID = %d", new_mid);
-        cfg_append(tmp);
-    }
-}
 
 void usage(const char* appname) {
     
@@ -273,7 +255,9 @@ int main(int argc, char ** argv)
 
     fs_init();
     rpc_setup();
-    rpc_client_setup();
+    char *self_host = cfg_getstr("MDS2CLIENT_LISTEN_HOST","*");
+    int self_port = cfg_getint32("MDS2CLIENT_LISTEN_PORT", 9527);
+    rpc_client_setup(self_host, self_port, MACHINE_MDS);
 
     event_dispatch();
     return 0;
