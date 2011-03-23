@@ -22,6 +22,7 @@ static uint32_t cluster_version = 0;
 void cluster_init();
 int cluster_add(char * ip, int port, char type);
 void cluster_remove(char * ip, int port);
+void cluster_printf(char * hint);
 void cluster_dump();
 
 static char *cluster_type_str(int type){
@@ -102,12 +103,17 @@ int ping_send_request(struct evrpc_pool * pool, const char * self_ip,int self_po
     logging(LOG_INFO, "cluster changed!");
     int cnt = EVTAG_ARRAY_LEN(pong, machines);
     int i;
-    machine_cnt = 0;
+    machine_cnt = cnt;
+    cluster_version = pong->version;
     for (i=0; i< cnt; i++){
         struct machine * m;
-        EVTAG_ARRAY_GET(pong, machines, 0, &m);
-        /*loggging(LOG_DEUBG, "pong: machines[x].type")*/
-        cluster_add(m->ip, m->port, m->type); //TODO: should not inc the version
+        EVTAG_ARRAY_GET(pong, machines, i, &m);
+
+        if (machines[i].ip)
+            free(machines[i].ip);
+        machines[i].ip = strdup(m->ip);
+        machines[i].port = m->port;
+        machines[i].type = m->type;
     }
     cluster_printf("after pong::");
     return 0;
