@@ -193,6 +193,8 @@ fsnode * fs_mknod(int parent_ino, char * name, int type, int mode){
     n -> nlen = strlen(n->name);
     if (n->mode & S_IFREG){ //is file 
         n->data.fdata.length = 0;
+        n-> pos_arr[0] = select_osd();
+        n-> pos_arr[1] = select_osd();
     }else if (n->mode & S_IFDIR){
         n->data.ddata.children = NULL;
     }

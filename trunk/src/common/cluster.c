@@ -19,6 +19,13 @@ static struct machine machines [MAX_MACHINE_CNT];
 static int machine_cnt = 0;
 static uint32_t cluster_version = 0;
 
+
+
+static int mds_arr[MAX_MACHINE_CNT];
+static int mds_cnt = 0;
+static int osd_arr[MAX_MACHINE_CNT];
+static int osd_cnt = 0;
+
 void cluster_init();
 int cluster_add(char * ip, int port, char type, int mid);
 void cluster_remove(char * ip, int port);
@@ -128,6 +135,7 @@ int ping_send_request(struct evrpc_pool * pool, const char * self_ip,int self_po
         machines[i].mid = m->mid;
     }
     cluster_printf("after pong::");
+    cluster_dump();
     return pong_mid;
 }
 
@@ -161,6 +169,22 @@ struct machine * cluster_get_machine_of_type(int type){
     return NULL;
 }
 
+struct machine * cluster_get_machine_by_mid(int mid){
+    logging(LOG_DEUBG, "cluster_get_machine_by_mid(%d)", mid);
+    int i;
+    for(i=0; i < machine_cnt; i++){
+        if (machines[i].mid == mid) 
+            return machines+i;
+    }
+    logging(LOG_INFO, "cluster_get_machine_by_mid(%d) return NULL!!", mid);
+    return NULL;
+}
+
+int select_osd(){
+    static int i = 0;
+    i = (i+1)%osd_cnt;
+    return i;
+}
 
 static int cluster_lookup(int mid){
     int i;
@@ -213,6 +237,16 @@ void cluster_remove(char * ip, int port){
 }
 
 void cluster_dump(){
+    int i;
+    mds_cnt = 0;
+    osd_cnt = 0;
+    for(i=0; i < machine_cnt; i++){
+        if (machines[i].type == MACHINE_MDS)
+            mds_arr[mds_cnt++] = machines[i].mid;
+        else if (machines[i].type == MACHINE_OSD)
+            osd_arr[osd_cnt++] = machines[i].mid;
+    }
+
     /*pong_p -> machine_arrlength = machine_cnt;*/
     /*pong_p -> machine_arr = machines;*/
 
