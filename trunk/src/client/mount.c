@@ -40,7 +40,7 @@ static int sfs_stat(fuse_ino_t ino, struct stat *stbuf)
         int pos1 = stat_arr[0].pos_arr[0];
         int pos2 = stat_arr[0].pos_arr[1];
 
-        logging(LOG_DEUBG, "stat (ino = %lu) return {size: %"PRIu64", mode: %04o, pos1: %d, pos2: %d}", 
+        logging(LOG_DEUBG, "stat (ino = %lu) return {size: %"PRIu64", mode: %04o, pos at [%d, %d] }", 
                 ino, stbuf->st_size, stbuf->st_mode, pos1, pos2);
         stbuf->st_nlink = 1;
     }
@@ -194,7 +194,7 @@ void sfs_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, 
     logging(LOG_DEUBG, "write (%lu, size=%ld, off=%"PRIu64")", ino, size, off); 
     int err = 0;
 
-    struct file_stat * stat = (struct file_stat * ) fi->fh;
+    struct file_stat * stat = (struct file_stat * ) (fi->fh);
     logging(LOG_DEUBG, "ready to write content on pos [%d, %d]", stat->pos_arr[0], stat->pos_arr[1]);
 
     buffered_write(stat, off, (uint64_t)size, buf);
@@ -324,7 +324,7 @@ static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
 
     unlink_send_request(parent, name);
 
-    fuse_reply_err((uint64_t)req, 0);
+    fuse_reply_err(req, 0);
 }
 
 

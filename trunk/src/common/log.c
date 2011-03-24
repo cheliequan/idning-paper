@@ -59,6 +59,7 @@ int log_init(char * logfile){
     fprintf(stderr, "log_init:  %s\n", logfile);
     mkdir("log", 0755);
     fout = fopen(logfile, "a");
+    return 0;
 }
 
 int logging(int level, char * fmt, ...){

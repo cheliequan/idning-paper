@@ -110,14 +110,9 @@ void read_chunk(uint64_t chunkid, struct evhttp_request *req){
     }
     logging(LOG_DEUBG, "get return range : %"PRIu64" - %"PRIu64, start, end);
     logging(LOG_DEUBG, "d : %"PRIu64 , end-start+1);
-    logging(LOG_DEUBG, "fd : %d", fd);
-    logging(LOG_DEUBG, "sizeof(ev_off_t): %d", sizeof(ev_off_t));
     
     lseek(fd, start, SEEK_SET);
-    /*evbuffer_add(evb, "xxxx", 3);*/
     evbuffer_add_file(evb, fd, (int)0, end-start+1); //如果编译的时候加上 -D_FILE_OFFSET_BITS=64 ,，evbuffer认为length = 0
-    logging(LOG_DEUBG, "len : %d" , evbuffer_get_length(evb));
-
 
     evhttp_send_reply(req, HTTP_OK, "OK", evb);
     evbuffer_free(evb);

@@ -23,7 +23,6 @@
 int main(){
     ConnectionPool * pool = connection_pool_new();
     char s1[] = "s1";
-    char s2[] = "s2";
     connection_pool_insert(pool, "1", 1,  (struct evhttp_connection*)s1);
 
 
