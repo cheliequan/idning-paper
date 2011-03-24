@@ -2,7 +2,6 @@
 #include <evhttp.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fuse_lowlevel.h>
 
 
 #include "protocol.gen.h"
@@ -61,7 +60,7 @@ int setattr_send_request(struct file_stat * stat_arr)
     return 0;
 }
 
-int stat_send_request(fuse_ino_t * ino_arr, int len, struct file_stat * stat_arr)
+int stat_send_request(uint64_t * ino_arr, int len, struct file_stat * stat_arr)
 {
     DBG();
     struct stat_request * req = stat_request_new();
@@ -92,7 +91,7 @@ int stat_send_request(fuse_ino_t * ino_arr, int len, struct file_stat * stat_arr
 
 
 //seams same as stat_send_request
-int ls_send_request(fuse_ino_t ino, struct file_stat * stat_arr)
+int ls_send_request(uint64_t ino, struct file_stat * stat_arr)
 {
     DBG();
     struct ls_request * req = ls_request_new();
@@ -117,7 +116,7 @@ int ls_send_request(fuse_ino_t ino, struct file_stat * stat_arr)
     return cnt;
 }
 
-int mknod_send_request(fuse_ino_t parent_ino, const char * name, int type, int mode, struct file_stat *o_stat )
+int mknod_send_request(uint64_t parent_ino, const char * name, int type, int mode, struct file_stat *o_stat )
 {
     DBG();
     struct mknod_request * req = mknod_request_new();
@@ -149,7 +148,7 @@ int mknod_send_request(fuse_ino_t parent_ino, const char * name, int type, int m
 
 
 
-int lookup_send_request(fuse_ino_t parent_ino, const char * name , struct file_stat *o_stat )
+int lookup_send_request(uint64_t parent_ino, const char * name , struct file_stat *o_stat )
 {
     DBG();
     struct lookup_request* req = lookup_request_new();
@@ -171,7 +170,7 @@ int lookup_send_request(fuse_ino_t parent_ino, const char * name , struct file_s
 
 
 
-int unlink_send_request(fuse_ino_t parent_ino, const char * name )
+int unlink_send_request(uint64_t parent_ino, const char * name )
 {
     DBG();
     struct unlink_request* req = unlink_request_new();

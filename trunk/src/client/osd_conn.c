@@ -2,7 +2,7 @@
 #include <evhttp.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fuse_lowlevel.h>
+#include <inttypes.h>
 #include <sys/queue.h>
 
 
@@ -19,9 +19,9 @@
  * 否则的话，就要保存: {offse, size, buffer,}这样的结构数组，而且osd得支持这样的写法，好像不太现实.
  */
 struct write_buf{
-    fuse_ino_t ino;
-    off_t offset;
-    size_t size;
+    uint64_t ino;
+    uint64_t offset;
+    uint64_t size;
     struct evbuffer * evb;
 
     struct dlist_t hash_dlist; 
@@ -93,7 +93,7 @@ struct write_buf* write_buf_hash_remove(struct write_buf * p) {
     return 0;
 }
 
-void buffered_write(struct file_stat * stat, uint64_t offset, uint32_t size, const uint8_t * buff){
+void buffered_write(struct file_stat * stat, uint64_t offset, uint64_t size, const uint8_t * buff){
     DBG();
     struct write_buf * b = write_buf_hash_find(stat->ino);
     if (!b){
@@ -164,12 +164,12 @@ static void flush_write_buf(struct file_stat * stat, struct write_buf * b){
 
 
         char url[256];
-        sprintf(url, "http://%s:%d/put/%lu", m->ip, m->port, b->ino);
+        sprintf(url, "http://%s:%d/put/%"PRIu64"", m->ip, m->port, b->ino);
 
         struct evkeyvalq * headers = (struct evkeyvalq *) malloc( sizeof(struct evkeyvalq));
         TAILQ_INIT(headers);
         char range[255];
-        sprintf(range, "bytes=%d-%d", (int)b->offset, (int)b->offset+b->size-1);
+        sprintf(range, "bytes=%"PRIu64"-%"PRIu64"", b->offset, b->offset+b->size-1);
         logging(LOG_DEUBG, range);
 
         evhttp_add_header(headers, "Range", range);

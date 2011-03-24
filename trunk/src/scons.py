@@ -40,7 +40,7 @@ CPPPATH = ['common', '/usr/local/include/', '/usr/include/fuse']
 #CCFLAGS='-D_DEBUG -Wall -g -Wno-pointer-sign -pg -fprofile-arcs -ftest-coverage' # -pg is for gprof
 #LINKFLAGS=' -pg '
 
-CCFLAGS='-D_DEBUG -Wall -g -Wno-pointer-sign ' # -pg is for gprof
+CCFLAGS='-D_DEBUG -Wall -g -Wno-pointer-sign ' # -pg is for gprof  osd 不能用 -D_FILE_OFFSET_BITS=64
 LINKFLAGS=' '
 
 def compile():

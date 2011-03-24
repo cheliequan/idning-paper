@@ -7,12 +7,11 @@ the source code is mainly from mfs/mfsmaster/filesystem.c
 
 
 typedef struct _fsnode {
-    uint32_t ino;   //4
+    uint64_t ino;   //4
     uint32_t ctime,mtime,atime; //16
     uint8_t type; //
     uint8_t goal;  
-    uint16_t mode;  // only 12 lowest bits are used for mode, in unix standard upper 4 are used for object type, but since there is field "type" this bits can be used as extra flags
-    //20
+    uint16_t mode; //20
     uint32_t uid;
     uint32_t gid;
     struct _fsnode * parent;
@@ -70,22 +69,22 @@ static uint64_t version;
 fsnode* fsnode_new() ;
 
 
-inline fsnode* fsnode_hash_find(uint32_t ino) ;
+inline fsnode* fsnode_hash_find(uint64_t ino) ;
 
-int fs_stat(int ino, struct file_stat * stat);
-int fs_setattr(int ino, struct file_stat * st);
+int fs_stat(uint64_t ino, struct file_stat * stat);
+int fs_setattr(uint64_t ino, struct file_stat * st);
 
 /*
  * create, mkdir
  * */
-fsnode * fs_mknod(int parent_ino, char * name, int type, int mode);
+fsnode * fs_mknod(uint64_t parent_ino, char * name, int type, int mode);
 /*
  *  rmdir 
  *  rm
  * */
-fsnode * fs_unlink(int parent_ino, char * name);
-fsnode * fs_lookup(int parent_ino, char * name);
-fsnode * fs_ls(int ino);
+fsnode * fs_unlink(uint64_t parent_ino, char * name);
+fsnode * fs_lookup(uint64_t parent_ino, char * name);
+fsnode * fs_ls(uint64_t ino);
 
 void fs_statfs(int *total_space, int * avail_space, int *inode_cnt);
 

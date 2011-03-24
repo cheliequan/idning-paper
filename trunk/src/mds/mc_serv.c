@@ -22,7 +22,7 @@ setattr_handler(EVRPC_STRUCT(rpc_setattr)* rpc, void *arg)
     struct file_stat * stat ;
     EVTAG_ARRAY_GET(request, stat_arr, 0, &stat);
 
-    logging(LOG_DEUBG, "setattr(%ld, name=%s, size=%d, mode=%04o)", stat->ino, stat->name, stat->size, stat->mode);
+    logging(LOG_DEUBG, "setattr(%"PRIu64", name=%s, size=%"PRIu64", mode=%04o)", stat->ino, stat->name, stat->size, stat->mode);
     fs_setattr(stat->ino, stat);
 
     struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
@@ -42,9 +42,9 @@ stat_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
     int cnt = EVTAG_ARRAY_LEN(request, ino_arr);
     int i;
     for (i=0; i< cnt; i++){
-        int ino; 
+        uint64_t ino; 
         EVTAG_ARRAY_GET(request, ino_arr, i, &ino);
-        logging(LOG_DEUBG, "stat(%ld)", ino);
+        logging(LOG_DEUBG, "stat(%"PRIu64")", ino);
 
         struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
         fs_stat(ino, t);
@@ -53,7 +53,7 @@ stat_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
         EVTAG_ASSIGN(t, type, t-> type); // 不然它不认..
         EVTAG_ASSIGN(t, mode, t-> mode); // 不然它不认..
 
-        logging(LOG_DEUBG, "stat(%ld) return {ino: %ld, size: %ld, type : %d, mode : %04o, pos [%d, %d]}", ino, t->ino, t->size, t->type, t->mode,
+        logging(LOG_DEUBG, "stat(%"PRIu64") return {ino: %"PRIu64", size: %"PRIu64", type : %d, mode : %04o, pos [%d, %d]}", ino, t->ino, t->size, t->type, t->mode,
                 t->pos_arr[0], t->pos_arr[1]);
     }
     EVRPC_REQUEST_DONE(rpc);
@@ -68,9 +68,9 @@ ls_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
     struct stat_request *request = rpc->request;
     struct stat_response *response = rpc->reply;
 
-    int ino; 
+    uint64_t ino; 
     EVTAG_ARRAY_GET(request, ino_arr, 0, &ino);
-    logging(LOG_DEUBG, "ls(%ld)", ino);
+    logging(LOG_DEUBG, "ls(%"PRIu64")", ino);
 
     fsnode *p = fsnode_hash_find(ino);
     struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
@@ -103,7 +103,7 @@ ls_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
             EVTAG_ASSIGN(t, name, p-> name); // 不然它不认..
             EVTAG_ASSIGN(t, type, p-> type);
             EVTAG_ASSIGN(t, mode, p-> mode);
-            logging(LOG_DEUBG, "ls(%ld) return {ino: %ld, name: %s, size: %d, mode: %04o}", ino, t->ino, t->name, t->size, t->mode);
+            logging(LOG_DEUBG, "ls(%"PRIu64") return {ino: %"PRIu64", name: %s, size: %"PRIu64", mode: %04o}", ino, t->ino, t->name, t->size, t->mode);
         }
     }
     EVRPC_REQUEST_DONE(rpc);
@@ -142,7 +142,7 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod)* rpc, void *arg)
     struct mknod_response *response = rpc->reply;
     fsnode * n = fs_mknod(request -> parent_ino, request->name, request->type, request->mode);
 
-    logging(LOG_DEUBG, "mknod(parent=%ld, name=%s, type=%d, mode=%04o)", 
+    logging(LOG_DEUBG, "mknod(parent=%"PRIu64", name=%s, type=%d, mode=%04o)", 
             request -> parent_ino, request->name, request->type, request->mode);
 
     struct file_stat * t = EVTAG_ARRAY_ADD(response, stat_arr);
@@ -157,7 +157,7 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod)* rpc, void *arg)
     /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 8);*/
     /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 9);*/
 
-    logging(LOG_DEUBG, "mknod(%s) return {ino: %ld, name: %s, size: %d, mode: %04o}", request->name, t->ino, t->name, t->size, t->mode);
+    logging(LOG_DEUBG, "mknod(%s) return {ino: %"PRIu64", name: %s, size: %"PRIu64", mode: %04o}", request->name, t->ino, t->name, t->size, t->mode);
 
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -169,7 +169,7 @@ static void lookup_handler(EVRPC_STRUCT(rpc_lookup)* rpc, void *arg)
     struct lookup_request *request = rpc->request;
     struct lookup_response *response = rpc->reply;
 
-    logging(LOG_DEUBG, "lookup(parent=%ld, name=%s)", 
+    logging(LOG_DEUBG, "lookup(parent=%"PRIu64", name=%s)", 
             request -> parent_ino, request->name);
 
     fsnode * n = fs_lookup(request -> parent_ino, request->name);
@@ -183,7 +183,7 @@ static void lookup_handler(EVRPC_STRUCT(rpc_lookup)* rpc, void *arg)
         EVTAG_ASSIGN(t, size, n-> data.fdata.length); // 不然它不认..
         EVTAG_ASSIGN(t, name, n-> name); // 不然它不认..
     }
-    logging(LOG_DEUBG, "lookup(%s) return {ino: %ld, name: %s, size: %d}", request->name, t->ino, t->name, t->size);
+    logging(LOG_DEUBG, "lookup(%s) return {ino: %"PRIu64", name: %s, size: %"PRIu64"}", request->name, t->ino, t->name, t->size);
 
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -198,7 +198,7 @@ unlink_handler(EVRPC_STRUCT(rpc_unlink)* rpc, void *arg)
     struct unlink_request * request = rpc->request;
     //struct unlink_response * response = rpc->reply;
 
-    logging(LOG_DEUBG, "unlink (parent=%ld, name=%s)", 
+    logging(LOG_DEUBG, "unlink (parent=%"PRIu64", name=%s)", 
             request -> parent_ino, request->name);
 
     fs_unlink(request -> parent_ino, request->name);

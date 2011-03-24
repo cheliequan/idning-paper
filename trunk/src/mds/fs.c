@@ -4,9 +4,10 @@
 #include <stdlib.h>
 
 #include <sys/stat.h>
+#include <inttypes.h>
 
 #include "log.h"
-static int cur_ino = 3;
+static uint64_t cur_ino = 3;
 
 void fsnode_tree_insert(fsnode * p, fsnode * n) {
     if (NULL == p->data.ddata.children){
@@ -22,7 +23,7 @@ void fsnode_tree_insert(fsnode * p, fsnode * n) {
     dlist_insert_head(head, pl);
 }
 
-fsnode* fsnode_tree_find(fsnode * p, uint32_t ino) {
+fsnode* fsnode_tree_find(fsnode * p, uint64_t ino) {
     fsnode * children_head = p->data.ddata.children;
     dlist_t * head = &(children_head -> tree_dlist);
     dlist_t * pl;
@@ -61,7 +62,7 @@ inline fsnode* fsnode_hash_insert(fsnode * n) {
     dlist_insert_head(head, pl);
     return n;
 }
-inline fsnode* fsnode_hash_find(uint32_t ino) {
+inline fsnode* fsnode_hash_find(uint64_t ino) {
     uint32_t pos = NODEHASHPOS(ino);
     fsnode * bucket = nodehash[pos];
 
@@ -121,16 +122,16 @@ int fs_init(){
     return 0;
 }
 
-int fs_setattr(int ino, struct file_stat * st){
-    logging(LOG_DEUBG, "fs_setattr(%d)", ino);
+int fs_setattr(uint64_t ino, struct file_stat * st){
+    logging(LOG_DEUBG, "fs_setattr(%"PRIu64")", ino);
 
     fsnode *n = fsnode_hash_find(ino);
     n->data.fdata.length = st->size;
     return 0;
 }
 
-int fs_stat(int ino, struct file_stat * st){
-    logging(LOG_DEUBG, "fs_stat(%d)", ino);
+int fs_stat(uint64_t ino, struct file_stat * st){
+    logging(LOG_DEUBG, "fs_stat(%"PRIu64")", ino);
     fsnode *n = fsnode_hash_find(ino);
     st->ino = ino;
     st->size = n-> data.fdata.length;
@@ -141,14 +142,14 @@ int fs_stat(int ino, struct file_stat * st){
 }
 
 //返回的是children链表上的一个元素，链表中所有元素为兄弟.
-fsnode * fs_ls(int ino){
-    logging(LOG_DEUBG, "fs_ls(%d)", ino);
+fsnode * fs_ls(uint64_t ino){
+    logging(LOG_DEUBG, "fs_ls(%"PRIu64")", ino);
     fsnode *n = fsnode_hash_find(ino);
     return n->data.ddata.children;
 }
 
-fsnode * fs_lookup(int parent_ino, char * name){
-    logging(LOG_DEUBG, "fs_lookup (parent_ino = %d , name = %s)", parent_ino, name);
+fsnode * fs_lookup(uint64_t parent_ino, char * name){
+    logging(LOG_DEUBG, "fs_lookup (parent_ino = %"PRIu64" , name = %s)", parent_ino, name);
 
     fsnode *n = fsnode_hash_find(parent_ino);
     n = n-> data.ddata.children;
@@ -169,13 +170,13 @@ fsnode * fs_lookup(int parent_ino, char * name){
             return p;
         }
     }
-    logging(LOG_DEUBG, "fs_lookup (parent_ino = %d , name = %s) return NULL", parent_ino, name);
+    logging(LOG_DEUBG, "fs_lookup (parent_ino = %"PRIu64" , name = %s) return NULL!!", parent_ino, name);
     return NULL;
 }
 
 
-fsnode * fs_unlink(int parent_ino, char * name){
-    logging(LOG_DEUBG, "fs_unlink(parent_ino = %d , name = %s)", parent_ino, name);
+fsnode * fs_unlink(uint64_t parent_ino, char * name){
+    logging(LOG_DEUBG, "fs_unlink(parent_ino = %"PRIu64" , name = %s)", parent_ino, name);
 
     fsnode *s = fs_lookup(parent_ino, name);
     fsnode_tree_remove(s);
@@ -185,8 +186,8 @@ fsnode * fs_unlink(int parent_ino, char * name){
 }
 
 
-fsnode * fs_mknod(int parent_ino, char * name, int type, int mode){
-    logging(LOG_DEUBG, "fs_unlink(parent_ino = %d , name = %s)", parent_ino, name);
+fsnode * fs_mknod(uint64_t parent_ino, char * name, int type, int mode){
+    logging(LOG_DEUBG, "fs_unlink(parent_ino = %"PRIu64" , name = %s)", parent_ino, name);
     fsnode * n = fsnode_new();
     n -> ino = cur_ino++;
     n -> type = type;
