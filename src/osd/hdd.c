@@ -1,15 +1,5 @@
-#include <inttypes.h>
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <dirent.h>
-
-#include <sys/statvfs.h>
-#include <sys/stat.h> 
+#include "sfs_common.h"
 #include "hdd.h"
-#include "random.h"
-#include "log.h"
 
 
 #define HASHSIZE 32768

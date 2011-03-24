@@ -1,24 +1,10 @@
 #define FUSE_USE_VERSION 26
 
+#include "sfs_common.h"
 #include <fuse_lowlevel.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <inttypes.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <assert.h>
-#include <sys/queue.h>
-#include <signal.h>
 
-#include "http_client.h"
 #include "osd_conn.h"
-#include "log.h"
-#include "protocol.gen.h"
 #include "mds_conn.h"
-#include "app.h"
-#include "cluster.h"
 
 
 void sig_handler (int signum)

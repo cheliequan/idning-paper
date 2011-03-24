@@ -1,17 +1,4 @@
-#include <event.h>
-#include <evhttp.h>
-#include <stdlib.h>
-#include <string.h>
-#include <inttypes.h>
-#include <sys/queue.h>
-
-
-#include "protocol.gen.h"
-#include "protocol.h"
-#include "log.h"
-#include "dlist.h"
-#include "http_client.h"
-#include "cluster.h"
+#include "sfs_common.h"
 
 #define CFG_BLOCK_SIZE 524288000
 /* 只保存连续buffer, 不连续的马上flush.
