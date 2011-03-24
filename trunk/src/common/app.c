@@ -1,4 +1,3 @@
-
 #include "app.h"
 int usage(char * appname);
 
@@ -45,6 +44,11 @@ int init_app(int argc,char **argv, char * appname) {
 
     argc -= optind;
     argv += optind;
+
+    char * bname = basename(cfgfile);
+    char logfile[999];
+    sprintf(logfile, "log/%s.log", bname);
+    log_init(logfile);
     //if (argc==1) {
     //    if (strcasecmp(argv[0],"start")==0) {
     //        //runmode = RM_START;
@@ -66,6 +70,9 @@ int init_app(int argc,char **argv, char * appname) {
 
     rls.rlim_cur = MAX_FILES;
     rls.rlim_max = MAX_FILES;
+
+
+
     if (setrlimit(RLIMIT_NOFILE,&rls)<0) {
 
         fprintf(stderr,"can't change open files limit to %u\n",MAX_FILES);

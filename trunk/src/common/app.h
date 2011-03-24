@@ -8,6 +8,7 @@
 
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <libgen.h>
 
 #include "log.h"
 #include "cfg.h"

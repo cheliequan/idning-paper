@@ -56,8 +56,10 @@ static int sfs_stat(fuse_ino_t ino, struct stat *stbuf)
         stbuf->st_blksize = 1024*1024*1024;
         stbuf->st_mode = stat_arr[0].mode | 0777;
         int pos1, pos2;
-        EVTAG_ARRAY_GET( stat_arr+0, pos_arr, 0, &pos1);
-        EVTAG_ARRAY_GET( stat_arr+0, pos_arr, 1, &pos1);
+        logging(LOG_DEUBG, "------%d", stat_arr[0].pos_arr[0]);
+        logging(LOG_DEUBG, "------%d", stat_arr[0].pos_arr[1]);
+        /*EVTAG_ARRAY_GET( stat_arr+0, pos_arr, 0, &pos1);*/
+        /*EVTAG_ARRAY_GET( stat_arr+0, pos_arr, 1, &pos1);*/
 
         logging(LOG_DEUBG, "stat (ino = %lu) return {size: %d, mode: %04o, pos1: %d, pos2: %d}", 
                 ino, stbuf->st_size, stbuf->st_mode, pos1, pos2);
@@ -141,7 +143,7 @@ static void sfs_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     logging(LOG_DEUBG, "readdir(ino = %lu)", ino);
 	(void) fi;
 
-    struct file_stat stat_arr[100]; //TODO: 100...
+    struct file_stat stat_arr[100]; //FIXME: 100...
     int cnt = ls_send_request(ino, &stat_arr);
     int i;
     struct dirbuf b;
