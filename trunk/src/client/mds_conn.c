@@ -84,10 +84,6 @@ int stat_send_request(fuse_ino_t * ino_arr, int len, struct file_stat * stat_arr
         stat_arr[i].type = stat-> type;
         stat_arr[i].mode = stat-> mode;
 
-
-        logging(LOG_DEUBG, "--%d", stat->pos_arr[0]);
-        logging(LOG_DEUBG, "--%d", stat->pos_arr[1]);
-
         stat_arr[i].pos_arr = stat-> pos_arr; //  FIXME, 如果后面free response，这就会出错.
 
     }
@@ -140,6 +136,12 @@ int mknod_send_request(fuse_ino_t parent_ino, const char * name, int type, int m
     EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
     o_stat->size = stat->size;
     o_stat->ino = stat->ino;
+
+    o_stat->pos_arr = stat-> pos_arr; //  FIXME, 如果后面free response，这就会出错.
+
+    int pos1 = o_stat->pos_arr[0];
+    int pos2 = o_stat->pos_arr[1];
+    logging(LOG_DEUBG, "pos: [%d, %d]", pos1, pos2);
 
     EVTAG_ARRAY_GET(response, stat_arr, 0, &o_stat);
     return 0;

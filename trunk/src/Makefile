@@ -58,9 +58,10 @@ ARG=--window-with-profile=tmp --working-directory=/home/ning/idning-paper/src --
 # show log windows
 logo:
 	gnome-terminal $(ARG) -e "tail -f log/cmgr.cfg.log" 	-t "cmgr" 	--geometry=80x22+0+0
-	gnome-terminal $(ARG) -e "tail -f log/osd.cfg.log" 		-t "osd" 	--geometry=80x22+0+420
-	gnome-terminal $(ARG) -e "tail -f log/mds.cfg.log" 		-t "mds" 	--geometry=80x22+600+0
-	gnome-terminal $(ARG) -e "tail -f log/client.cfg.log" 	-t "client" --geometry=80x22+600+420
+	gnome-terminal $(ARG) -e "tail -f log/client.cfg.log" 	-t "client" --geometry=80x22+600+0
+	gnome-terminal $(ARG) -e "tail -f log/mds.cfg.log" 		-t "mds" 	--geometry=80x22+600+400
+	gnome-terminal $(ARG) -e "tail -f log/osd.cfg.log" 		-t "osd" 	--geometry=80x22+0+800
+	gnome-terminal $(ARG) -e "tail -f log/osd.cfg.2.log" 	-t "osd2" 	--geometry=80x22+600+800
 
 # close log windows
 logc:
@@ -74,7 +75,7 @@ k:
 r:
 	./cmgr/cmgr.out									&
 	./mds/mds.out									& 
-	./mds/mds.out -c etc/mcs.cfg.2					&
+	#./mds/mds.out -c etc/mcs.cfg.2					&
 	./osd/osd.out									& 
 	./osd/osd.out -c etc/osd.cfg.2					&
 
