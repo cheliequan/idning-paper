@@ -58,10 +58,10 @@ ARG=--window-with-profile=tmp --working-directory=/home/ning/idning-paper/src --
 # show log windows
 r:
 	gnome-terminal $(ARG) -e "./cmgr/cmgr.out" 						-t "cmgr" 	--geometry=40x10+0+0
-	gnome-terminal $(ARG) -e "./mds/mds.out" 						-t "mds" 	--geometry=80x22+0+200
+	gnome-terminal $(ARG) -e "./mds/mds.out" 						-t "mds" 	--geometry=80x28+0+200
 	#gnome-terminal $(ARG) -e "./mds/mds.out" 						-t "mds" 	--geometry=80x22-0+200
-	gnome-terminal $(ARG) -e "./osd/osd.out" 						-t "osd" 	--geometry=80x22+0+700
-	gnome-terminal $(ARG) -e "./osd/osd.out -c etc/osd.cfg.2" 		-t "osd2" 	--geometry=80x22-0+700
+	gnome-terminal $(ARG) -e "./osd/osd.out" 						-t "osd" 	--geometry=80x28+0+700
+	gnome-terminal $(ARG) -e "./osd/osd.out -c etc/osd.cfg.2" 		-t "osd2" 	--geometry=80x28-0+700
 
 #killall
 k: 
