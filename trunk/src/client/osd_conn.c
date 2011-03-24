@@ -139,7 +139,8 @@ int buffered_write_flush(struct file_stat * stat){
  * */
 static struct evbuffer * evbuffer_dup(struct evbuffer * orig){
     int len = evbuffer_get_length(orig);
-    char * data  = malloc(sizeof(len)); // this maybe large!!!!!
+    logging(LOG_INFO, "dup buffer len: %d", len);
+    char * data  = malloc(len); // this maybe large!!!!!
     if (!data)
         logging(LOG_ERROR, "ning: no memory on evbuffer_dup");
     evbuffer_copyout(orig, data, len); //被吃掉，orig现在为空了.
@@ -147,14 +148,13 @@ static struct evbuffer * evbuffer_dup(struct evbuffer * orig){
     evbuffer_add(new_buf, data, len);
     /*evbuffer_add(orig   , data, len);  //放回去.*/
 
-    logging(LOG_INFO, "len1 : %d", evbuffer_get_length(orig));
-    logging(LOG_INFO, "len2 : %d", evbuffer_get_length(new_buf));
-
     return new_buf;
 }
 
 static void flush_write_buf(struct file_stat * stat, struct write_buf * b){
     DBG();
+    logging(LOG_INFO, "flush_write_buf buflen: %d", evbuffer_get_length(b->evb));
+    
     int i;
     for(i = 0; i< 2; i++){
         struct evbuffer * buf = evbuffer_dup(b->evb); 
