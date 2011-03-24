@@ -189,8 +189,10 @@ int main(int argc, char ** argv)
 {
     init_app(argc, argv, "osd");
 
-    hdd_init("etc/hdd.conf");
     event_init();
+
+    char *hdd_cfg = cfg_getstr("HDD_CONF_FILENAME","etc/hdd.conf");
+    hdd_init(hdd_cfg);
 
     char *self_host = cfg_getstr("OSD2CLIENT_LISTEN_HOST","*");
     int self_port = cfg_getint32("OSD2CLIENT_LISTEN_PORT", 9527);

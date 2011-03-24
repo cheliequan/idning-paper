@@ -219,7 +219,7 @@ struct machine * cluster_get_machine_by_mid(int mid){
 int select_osd(){
     static int i = 0;
     i = (i+1)%osd_cnt;
-    return i;
+    return osd_arr[i];
 }
 
 static int cluster_lookup(int mid){
