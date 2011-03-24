@@ -30,6 +30,8 @@ char * test_get(){
     }
     p = malloc(1024000);
     evbuffer_copyout(response->body, p, evbuffer_get_length(response->body));
+    printf("evbuffer_get_length after evbuffer_copyout:  %d\n", evbuffer_get_length(response -> body));
+    
     return p;
 
 }
@@ -47,6 +49,15 @@ void test_post(char * str){
     }
 
     while(( p = evbuffer_readline(response->body))){
+        printf("%s\n", p);
+        free(p);
+    }
+
+    printf(" here is the request body len : %d " ,evbuffer_get_length(buffer));
+    
+    while(( p = evbuffer_readline(buffer))){
+        printf(" g");
+
         printf("%s\n", p);
         free(p);
     }

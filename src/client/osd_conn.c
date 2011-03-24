@@ -11,6 +11,7 @@
 #include "log.h"
 #include "dlist.h"
 #include "http_client.h"
+#include "cluster.h"
 
 #define CFG_BLOCK_SIZE 524288000
 /* 只保存连续buffer, 不连续的马上flush.
@@ -26,7 +27,7 @@ struct write_buf{
     struct dlist_t hash_dlist; 
 
 };
-static void flush_write_buf(struct write_buf * b);
+static void flush_write_buf(struct file_stat * stat, struct write_buf * b);
 
 #define BUF_HASH_BITS (10)  
 #define BUF_HASH_SIZE (1<<BUF_HASH_BITS) 
@@ -42,7 +43,7 @@ struct write_buf * write_buf_new(){
 
 void write_buf_free(struct write_buf * b){
     if (b->evb){
-        //evbuffer_free(b->evb); //TODO. is this freeed by http_post
+        evbuffer_free(b->evb); 
     }
     free(b);
 }
@@ -92,12 +93,12 @@ struct write_buf* write_buf_hash_remove(struct write_buf * p) {
     return 0;
 }
 
-void buffered_write(uint32_t ino, uint64_t offset, uint32_t size, const uint8_t * buff){
+void buffered_write(struct file_stat * stat, uint64_t offset, uint32_t size, const uint8_t * buff){
     DBG();
-    struct write_buf * b = write_buf_hash_find(ino);
+    struct write_buf * b = write_buf_hash_find(stat->ino);
     if (!b){
-        b= write_buf_new(ino);
-        b->ino = ino;
+        b= write_buf_new(stat->ino);
+        b->ino = stat->ino;
         b->offset = offset;
         b->size = size;
         evbuffer_add(b->evb, buff, size);
@@ -107,11 +108,11 @@ void buffered_write(uint32_t ino, uint64_t offset, uint32_t size, const uint8_t 
           ||(  offset != ( b->offset+b->size)  ) //不连续块.
           ){
 
-            flush_write_buf(b);
+            flush_write_buf(stat, b);
 
             write_buf_hash_remove(b);
             write_buf_free(b);
-            buffered_write(ino, offset, size, buff);
+            buffered_write(stat, offset, size, buff);
 
         }else{ //连续块，追加在它后面
             b->size += size;
@@ -121,35 +122,62 @@ void buffered_write(uint32_t ino, uint64_t offset, uint32_t size, const uint8_t 
     }
 }
 
-int buffered_write_flush(uint32_t ino){
+int buffered_write_flush(struct file_stat * stat){
     DBG();
-    struct write_buf * b = write_buf_hash_find(ino);
+    struct write_buf * b = write_buf_hash_find(stat->ino);
     if (NULL == b)
         return 0;
-    flush_write_buf(b);
+    flush_write_buf(stat, b);
     write_buf_hash_remove(b);
     write_buf_free(b);
     return b->offset+b->size;
 
 }
 
-static void flush_write_buf(struct write_buf * b){
+/*
+ * I do this after read the src of libevent 2.0.1
+ * */
+static struct evbuffer * evbuffer_dup(struct evbuffer * orig){
+    int len = evbuffer_get_length(orig);
+    char * data  = malloc(sizeof(len)); // this maybe large!!!!!
+    if (!data)
+        logging(LOG_ERROR, "ning: no memory on evbuffer_dup");
+    evbuffer_copyout(orig, data, len); //被吃掉，orig现在为空了.
+    struct evbuffer * new_buf = evbuffer_new();
+    evbuffer_add(new_buf, data, len);
+    /*evbuffer_add(orig   , data, len);  //放回去.*/
+
+    logging(LOG_INFO, "len1 : %d", evbuffer_get_length(orig));
+    logging(LOG_INFO, "len2 : %d", evbuffer_get_length(new_buf));
+
+    return new_buf;
+}
+
+static void flush_write_buf(struct file_stat * stat, struct write_buf * b){
     DBG();
+    int i;
+    for(i = 0; i< 2; i++){
+        struct evbuffer * buf = evbuffer_dup(b->evb); 
 
-    char url[256];
-    sprintf(url, "http://127.0.0.1:6006/put/%lu", b->ino);
+        int osd = stat->pos_arr[i];
+        struct machine * m = cluster_get_machine_by_mid(osd);
 
-    struct evkeyvalq * headers = (struct evkeyvalq *) malloc( sizeof(struct evkeyvalq));
-    TAILQ_INIT(headers);
-    char range[255];
-    sprintf(range, "bytes=%d-%d", (int)b->offset, (int)b->offset+b->size-1);
-    logging(LOG_DEUBG, range);
 
-    evhttp_add_header(headers, "Range", range);
+        char url[256];
+        sprintf(url, "http://%s:%d/put/%lu", m->ip, m->port, b->ino);
 
-    http_response * response = http_post(url, headers, b->evb);
-    evbuffer_get_length(response->body);
-    free(headers);
+        struct evkeyvalq * headers = (struct evkeyvalq *) malloc( sizeof(struct evkeyvalq));
+        TAILQ_INIT(headers);
+        char range[255];
+        sprintf(range, "bytes=%d-%d", (int)b->offset, (int)b->offset+b->size-1);
+        logging(LOG_DEUBG, range);
+
+        evhttp_add_header(headers, "Range", range);
+
+        http_response * response = http_post(url, headers, buf);
+        evbuffer_get_length(response->body);
+        free(headers);
+    }
 
 }
 
