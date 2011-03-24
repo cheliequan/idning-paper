@@ -1,9 +1,7 @@
 /*
 the source code is mainly from mfs/mfsmaster/filesystem.c
 */
-#include <stdio.h>
-#include "protocol.gen.h"
-#include "dlist.h"
+#include "sfs_common.h"
 
 
 typedef struct _fsnode {

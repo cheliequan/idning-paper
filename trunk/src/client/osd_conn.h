@@ -1,6 +1,5 @@
 
-#include "protocol.gen.h"
-#include "protocol.h"
+#include "sfs_common.h"
 
 struct write_buf* write_buf_hash_find(uint64_t ino) ;
 

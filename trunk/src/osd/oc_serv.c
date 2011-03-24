@@ -1,22 +1,5 @@
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
-
-#include <event.h>
-#include <evhttp.h>
-#include <evutil.h>
-
-#include "oc_serv.h"
-#include "network.h"
-#include "log.h"
+#include "sfs_common.h"
 #include "hdd.h"
-#include "http_client.h"
-#include "protocol.gen.h"
-#include "app.h"
-#include "cluster.h"
 
 
 static void reply_error(struct evhttp_request *req, int err_code, char * fmt, ...){

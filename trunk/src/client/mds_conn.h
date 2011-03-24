@@ -1,8 +1,7 @@
-#include "protocol.gen.h"
-
 #ifndef _MDS_CONN_H__
 #define _MDS_CONN_H__
 
+#include "sfs_common.h"
 
 void mds_conn_init(void);
 

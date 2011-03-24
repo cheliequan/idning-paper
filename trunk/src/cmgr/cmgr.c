@@ -1,13 +1,4 @@
-#include <event.h>
-#include <evhttp.h>
-#include <string.h>
-#include <stdlib.h>
-
-#include "protocol.gen.h"
-#include "protocol.h"
-#include "log.h"
-#include "app.h"
-#include "cluster.h"
+#include "sfs_common.h"
 
 
 static void

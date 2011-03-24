@@ -1,12 +1,4 @@
 #include "fs.h"
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <sys/stat.h>
-#include <inttypes.h>
-
-#include "log.h"
 static uint64_t cur_ino = 3;
 
 void fsnode_tree_insert(fsnode * p, fsnode * n) {

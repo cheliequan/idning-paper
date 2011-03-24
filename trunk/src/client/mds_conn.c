@@ -1,15 +1,5 @@
-#include <event.h>
-#include <evhttp.h>
-#include <stdlib.h>
-#include <string.h>
-
-
-#include "protocol.gen.h"
-#include "protocol.h"
-#include "log.h"
-#include "cluster.h"
+#include "sfs_common.h"
 #include "mds_conn.h"
-#include "cfg.h"
 
 struct evrpc_pool *pool = NULL;
 

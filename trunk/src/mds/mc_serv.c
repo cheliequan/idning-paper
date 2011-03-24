@@ -1,16 +1,5 @@
-#include <event.h>
-#include <evhttp.h>
-#include <string.h>
-#include <stdlib.h>
-
-#include "protocol.gen.h"
-#include "protocol.h"
+#include "sfs_common.h"
 #include "fs.h"
-#include "log.h"
-#include "app.h"
-#include "cluster.h"
-
-
 
 static void
 setattr_handler(EVRPC_STRUCT(rpc_setattr)* rpc, void *arg)
