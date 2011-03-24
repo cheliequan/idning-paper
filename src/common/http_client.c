@@ -138,7 +138,6 @@ static int client_renew_request(struct request_context *ctx)
     struct evkeyval *header;
 
     if (ctx->req_headers != NULL){
-        struct evkeyval *header;
         TAILQ_FOREACH(header, ctx->req_headers, next) {
             evhttp_add_header(ctx->req->output_headers, header->key, header->value);
         }

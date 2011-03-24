@@ -19,7 +19,6 @@
 
 
 void test_post(char * str){
-    char*  p;
     struct evbuffer * b1 = evbuffer_new();
     struct evbuffer * b2 = evbuffer_new();
     printf("len(b1): %d \n",evbuffer_get_length(b1));
