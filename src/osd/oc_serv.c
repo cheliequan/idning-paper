@@ -55,19 +55,19 @@ void write_chunk(uint64_t chunkid, struct evhttp_request *req){
         reply_error(req, HTTP_BADREQUEST, "should call write with POST");
         return;
     }
-    int start=0, end;
+    uint64_t start=0, end;
     const char * range = evhttp_find_header(req->input_headers, "Range");
 
     logging(LOG_DEUBG, "write range : %s", range);
     if (range){
-        sscanf(range, "bytes=%d-%d", &start, &end);
+        sscanf(range, "bytes=%"SCNu64"-%"SCNu64, &start, &end);
     }
 
     input = req->input_buffer;
     hdd_chunk * chunk = hdd_create_chunk(chunkid, 0);//TODO
 
     int fd = open(chunk -> path, O_WRONLY|O_CREAT, 0755);
-    logging(LOG_INFO, "write seek to : %d ", start);
+    logging(LOG_INFO, "write seek to : %"PRIu64"", start);
     lseek(fd, start, SEEK_SET);
 
     if (-1 == fd) {
@@ -101,7 +101,7 @@ void read_chunk(uint64_t chunkid, struct evhttp_request *req){
 
 
 
-    int start=0, end=0;
+    uint64_t start=0, end=0;
     const char * range = evhttp_find_header(req->input_headers, "Range");
     struct stat st;
 
@@ -111,9 +111,10 @@ void read_chunk(uint64_t chunkid, struct evhttp_request *req){
         reply_error(req, HTTP_NOTFOUND, "file not exist : %s", chunk->path);
         return ;
     }
+    logging(LOG_DEUBG, "st.st_size = : %d", st.st_size);
 
     if (range){
-        sscanf(range, "bytes=%d-%d", &start, &end);
+        sscanf(range, "bytes=%"SCNu64"-%"SCNu64, &start, &end);
         //假设文件st_size = 2
         //if end = 0, 应该返回1个字节           end=end
         //if end = 1, 应该返回0,1 共2个字节.    end = st_size - 1  || end = end
@@ -124,10 +125,16 @@ void read_chunk(uint64_t chunkid, struct evhttp_request *req){
         start = 0;
         end = st.st_size-1;
     }
-    logging(LOG_DEUBG, "get return range : %d - %d", start, end);
+    logging(LOG_DEUBG, "get return range : %"PRIu64" - %"PRIu64, start, end);
+    logging(LOG_DEUBG, "d : %"PRIu64 , end-start+1);
+    logging(LOG_DEUBG, "fd : %d", fd);
+    logging(LOG_DEUBG, "sizeof(ev_off_t): %d", sizeof(ev_off_t));
     
     lseek(fd, start, SEEK_SET);
-    evbuffer_add_file(evb, fd, 0, end-start+1);
+    /*evbuffer_add(evb, "xxxx", 3);*/
+    evbuffer_add_file(evb, fd, (int)0, end-start+1); //如果编译的时候加上 -D_FILE_OFFSET_BITS=64 ,，evbuffer认为length = 0
+    logging(LOG_DEUBG, "len : %d" , evbuffer_get_length(evb));
+
 
     evhttp_send_reply(req, HTTP_OK, "OK", evb);
     evbuffer_free(evb);
@@ -166,9 +173,9 @@ void gen_handler(struct evhttp_request *req, void * arg){
     char * slash = strchr(path+1, '/');
     *slash = '\0';
     const char * op = path + 1; 
-    sscanf(slash+1, "%"SCNx64, &chunkid);
+    sscanf(slash+1, "%"SCNu64, &chunkid);
 
-    logging(LOG_INFO, "%s, %"PRIx64, op, chunkid);
+    logging(LOG_INFO, "%s, %"PRIu64, op, chunkid);
 
     if (strcmp(op, "put") == 0){
         write_chunk(chunkid, req);
@@ -191,7 +198,7 @@ int main(int argc, char ** argv)
 
     event_init();
 
-    char *hdd_cfg = cfg_getstr("HDD_CONF_FILENAME","etc/hdd.conf");
+    char *hdd_cfg = cfg_getstr("HDD_CONF_FILENAME", "etc/hdd.conf");
     hdd_init(hdd_cfg);
 
     char *self_host = cfg_getstr("OSD2CLIENT_LISTEN_HOST","*");

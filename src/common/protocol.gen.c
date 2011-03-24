@@ -1006,7 +1006,7 @@ error:
 }
 
 int
-file_stat_ino_assign(struct file_stat *msg, const ev_uint32_t value)
+file_stat_ino_assign(struct file_stat *msg, const ev_uint64_t value)
 {
   msg->ino_set = 1;
   msg->ino = value;
@@ -1014,7 +1014,7 @@ file_stat_ino_assign(struct file_stat *msg, const ev_uint32_t value)
 }
 
 int
-file_stat_size_assign(struct file_stat *msg, const ev_uint32_t value)
+file_stat_size_assign(struct file_stat *msg, const ev_uint64_t value)
 {
   msg->size_set = 1;
   msg->size = value;
@@ -1095,7 +1095,7 @@ file_stat_pos_arr_assign(struct file_stat *msg, int off,
 }
 
 int
-file_stat_ino_get(struct file_stat *msg, ev_uint32_t *value)
+file_stat_ino_get(struct file_stat *msg, ev_uint64_t *value)
 {
   if (msg->ino_set != 1)
     return (-1);
@@ -1104,7 +1104,7 @@ file_stat_ino_get(struct file_stat *msg, ev_uint32_t *value)
 }
 
 int
-file_stat_size_get(struct file_stat *msg, ev_uint32_t *value)
+file_stat_size_get(struct file_stat *msg, ev_uint64_t *value)
 {
   if (msg->size_set != 1)
     return (-1);
@@ -1228,8 +1228,8 @@ file_stat_free(struct file_stat *tmp)
 
 void
 file_stat_marshal(struct evbuffer *evbuf, const struct file_stat *tmp){
-  evtag_marshal_int(evbuf, FILE_STAT_INO, tmp->ino);
-  evtag_marshal_int(evbuf, FILE_STAT_SIZE, tmp->size);
+  evtag_marshal_int64(evbuf, FILE_STAT_INO, tmp->ino);
+  evtag_marshal_int64(evbuf, FILE_STAT_SIZE, tmp->size);
   if (tmp->type_set) {
     evtag_marshal_int(evbuf, FILE_STAT_TYPE, tmp->type);
   }
@@ -1274,7 +1274,7 @@ file_stat_unmarshal(struct file_stat *tmp,  struct evbuffer *evbuf)
 
         if (tmp->ino_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, FILE_STAT_INO, &tmp->ino) == -1) {
+        if (evtag_unmarshal_int64(evbuf, FILE_STAT_INO, &tmp->ino) == -1) {
           event_warnx("%s: failed to unmarshal ino", __func__);
           return (-1);
         }
@@ -1285,7 +1285,7 @@ file_stat_unmarshal(struct file_stat *tmp,  struct evbuffer *evbuf)
 
         if (tmp->size_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, FILE_STAT_SIZE, &tmp->size) == -1) {
+        if (evtag_unmarshal_int64(evbuf, FILE_STAT_SIZE, &tmp->size) == -1) {
           event_warnx("%s: failed to unmarshal size", __func__);
           return (-1);
         }
@@ -1473,18 +1473,18 @@ static int
 stat_request_ino_arr_expand_to_hold_more(struct stat_request *msg)
 {
   int tobe_allocated = msg->ino_arr_num_allocated;
-  ev_uint32_t* new_d_ata = NULL;
+  ev_uint64_t* new_d_ata = NULL;
   tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
-  new_d_ata = (ev_uint32_t*) realloc(msg->ino_arr,
-      tobe_allocated * sizeof(ev_uint32_t));
+  new_d_ata = (ev_uint64_t*) realloc(msg->ino_arr,
+      tobe_allocated * sizeof(ev_uint64_t));
   if (new_d_ata == NULL)
     return -1;
   msg->ino_arr = new_d_ata;
   msg->ino_arr_num_allocated = tobe_allocated;
   return 0;}
 
-ev_uint32_t *
-stat_request_ino_arr_add(struct stat_request *msg, const ev_uint32_t value)
+ev_uint64_t *
+stat_request_ino_arr_add(struct stat_request *msg, const ev_uint64_t value)
 {
   if (++msg->ino_arr_length >= msg->ino_arr_num_allocated) {
     if (stat_request_ino_arr_expand_to_hold_more(msg)<0)
@@ -1500,7 +1500,7 @@ error:
 
 int
 stat_request_ino_arr_assign(struct stat_request *msg, int off,
-    const ev_uint32_t value)
+    const ev_uint64_t value)
 {
   if (!msg->ino_arr_set || off < 0 || off >= msg->ino_arr_length)
     return (-1);
@@ -1513,7 +1513,7 @@ stat_request_ino_arr_assign(struct stat_request *msg, int off,
 
 int
 stat_request_ino_arr_get(struct stat_request *msg, int offset,
-    ev_uint32_t *value)
+    ev_uint64_t *value)
 {
   if (!msg->ino_arr_set || offset < 0 || offset >= msg->ino_arr_length)
     return (-1);
@@ -1553,7 +1553,7 @@ stat_request_marshal(struct evbuffer *evbuf, const struct stat_request *tmp){
     {
       int i;
       for (i = 0; i < tmp->ino_arr_length; ++i) {
-    evtag_marshal_int(evbuf, STAT_REQUEST_INO_ARR, tmp->ino_arr[i]);
+    evtag_marshal_int64(evbuf, STAT_REQUEST_INO_ARR, tmp->ino_arr[i]);
       }
     }
   }
@@ -1575,7 +1575,7 @@ stat_request_unmarshal(struct stat_request *tmp,  struct evbuffer *evbuf)
           puts("HEY NOW");
           return (-1);
         }
-        if (evtag_unmarshal_int(evbuf, STAT_REQUEST_INO_ARR, &tmp->ino_arr[tmp->ino_arr_length]) == -1) {
+        if (evtag_unmarshal_int64(evbuf, STAT_REQUEST_INO_ARR, &tmp->ino_arr[tmp->ino_arr_length]) == -1) {
           event_warnx("%s: failed to unmarshal ino_arr", __func__);
           return (-1);
         }
@@ -2370,18 +2370,18 @@ static int
 ls_request_ino_arr_expand_to_hold_more(struct ls_request *msg)
 {
   int tobe_allocated = msg->ino_arr_num_allocated;
-  ev_uint32_t* new_d_ata = NULL;
+  ev_uint64_t* new_d_ata = NULL;
   tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
-  new_d_ata = (ev_uint32_t*) realloc(msg->ino_arr,
-      tobe_allocated * sizeof(ev_uint32_t));
+  new_d_ata = (ev_uint64_t*) realloc(msg->ino_arr,
+      tobe_allocated * sizeof(ev_uint64_t));
   if (new_d_ata == NULL)
     return -1;
   msg->ino_arr = new_d_ata;
   msg->ino_arr_num_allocated = tobe_allocated;
   return 0;}
 
-ev_uint32_t *
-ls_request_ino_arr_add(struct ls_request *msg, const ev_uint32_t value)
+ev_uint64_t *
+ls_request_ino_arr_add(struct ls_request *msg, const ev_uint64_t value)
 {
   if (++msg->ino_arr_length >= msg->ino_arr_num_allocated) {
     if (ls_request_ino_arr_expand_to_hold_more(msg)<0)
@@ -2397,7 +2397,7 @@ error:
 
 int
 ls_request_ino_arr_assign(struct ls_request *msg, int off,
-    const ev_uint32_t value)
+    const ev_uint64_t value)
 {
   if (!msg->ino_arr_set || off < 0 || off >= msg->ino_arr_length)
     return (-1);
@@ -2410,7 +2410,7 @@ ls_request_ino_arr_assign(struct ls_request *msg, int off,
 
 int
 ls_request_ino_arr_get(struct ls_request *msg, int offset,
-    ev_uint32_t *value)
+    ev_uint64_t *value)
 {
   if (!msg->ino_arr_set || offset < 0 || offset >= msg->ino_arr_length)
     return (-1);
@@ -2450,7 +2450,7 @@ ls_request_marshal(struct evbuffer *evbuf, const struct ls_request *tmp){
     {
       int i;
       for (i = 0; i < tmp->ino_arr_length; ++i) {
-    evtag_marshal_int(evbuf, LS_REQUEST_INO_ARR, tmp->ino_arr[i]);
+    evtag_marshal_int64(evbuf, LS_REQUEST_INO_ARR, tmp->ino_arr[i]);
       }
     }
   }
@@ -2472,7 +2472,7 @@ ls_request_unmarshal(struct ls_request *tmp,  struct evbuffer *evbuf)
           puts("HEY NOW");
           return (-1);
         }
-        if (evtag_unmarshal_int(evbuf, LS_REQUEST_INO_ARR, &tmp->ino_arr[tmp->ino_arr_length]) == -1) {
+        if (evtag_unmarshal_int64(evbuf, LS_REQUEST_INO_ARR, &tmp->ino_arr[tmp->ino_arr_length]) == -1) {
           event_warnx("%s: failed to unmarshal ino_arr", __func__);
           return (-1);
         }
@@ -2812,7 +2812,7 @@ mknod_request_new_with_arg(void *unused)
 
 
 int
-mknod_request_parent_ino_assign(struct mknod_request *msg, const ev_uint32_t value)
+mknod_request_parent_ino_assign(struct mknod_request *msg, const ev_uint64_t value)
 {
   msg->parent_ino_set = 1;
   msg->parent_ino = value;
@@ -2848,7 +2848,7 @@ mknod_request_mode_assign(struct mknod_request *msg, const ev_uint32_t value)
 }
 
 int
-mknod_request_parent_ino_get(struct mknod_request *msg, ev_uint32_t *value)
+mknod_request_parent_ino_get(struct mknod_request *msg, ev_uint64_t *value)
 {
   if (msg->parent_ino_set != 1)
     return (-1);
@@ -2906,7 +2906,7 @@ mknod_request_free(struct mknod_request *tmp)
 
 void
 mknod_request_marshal(struct evbuffer *evbuf, const struct mknod_request *tmp){
-  evtag_marshal_int(evbuf, MKNOD_REQUEST_PARENT_INO, tmp->parent_ino);
+  evtag_marshal_int64(evbuf, MKNOD_REQUEST_PARENT_INO, tmp->parent_ino);
   evtag_marshal_string(evbuf, MKNOD_REQUEST_NAME, tmp->name);
   evtag_marshal_int(evbuf, MKNOD_REQUEST_TYPE, tmp->type);
   if (tmp->mode_set) {
@@ -2927,7 +2927,7 @@ mknod_request_unmarshal(struct mknod_request *tmp,  struct evbuffer *evbuf)
 
         if (tmp->parent_ino_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, MKNOD_REQUEST_PARENT_INO, &tmp->parent_ino) == -1) {
+        if (evtag_unmarshal_int64(evbuf, MKNOD_REQUEST_PARENT_INO, &tmp->parent_ino) == -1) {
           event_warnx("%s: failed to unmarshal parent_ino", __func__);
           return (-1);
         }
@@ -3293,7 +3293,7 @@ lookup_request_new_with_arg(void *unused)
 
 
 int
-lookup_request_parent_ino_assign(struct lookup_request *msg, const ev_uint32_t value)
+lookup_request_parent_ino_assign(struct lookup_request *msg, const ev_uint64_t value)
 {
   msg->parent_ino_set = 1;
   msg->parent_ino = value;
@@ -3313,7 +3313,7 @@ lookup_request_name_assign(struct lookup_request *msg,
 }
 
 int
-lookup_request_parent_ino_get(struct lookup_request *msg, ev_uint32_t *value)
+lookup_request_parent_ino_get(struct lookup_request *msg, ev_uint64_t *value)
 {
   if (msg->parent_ino_set != 1)
     return (-1);
@@ -3351,7 +3351,7 @@ lookup_request_free(struct lookup_request *tmp)
 
 void
 lookup_request_marshal(struct evbuffer *evbuf, const struct lookup_request *tmp){
-  evtag_marshal_int(evbuf, LOOKUP_REQUEST_PARENT_INO, tmp->parent_ino);
+  evtag_marshal_int64(evbuf, LOOKUP_REQUEST_PARENT_INO, tmp->parent_ino);
   evtag_marshal_string(evbuf, LOOKUP_REQUEST_NAME, tmp->name);
 }
 
@@ -3368,7 +3368,7 @@ lookup_request_unmarshal(struct lookup_request *tmp,  struct evbuffer *evbuf)
 
         if (tmp->parent_ino_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, LOOKUP_REQUEST_PARENT_INO, &tmp->parent_ino) == -1) {
+        if (evtag_unmarshal_int64(evbuf, LOOKUP_REQUEST_PARENT_INO, &tmp->parent_ino) == -1) {
           event_warnx("%s: failed to unmarshal parent_ino", __func__);
           return (-1);
         }
@@ -3710,7 +3710,7 @@ unlink_request_new_with_arg(void *unused)
 
 
 int
-unlink_request_parent_ino_assign(struct unlink_request *msg, const ev_uint32_t value)
+unlink_request_parent_ino_assign(struct unlink_request *msg, const ev_uint64_t value)
 {
   msg->parent_ino_set = 1;
   msg->parent_ino = value;
@@ -3730,7 +3730,7 @@ unlink_request_name_assign(struct unlink_request *msg,
 }
 
 int
-unlink_request_parent_ino_get(struct unlink_request *msg, ev_uint32_t *value)
+unlink_request_parent_ino_get(struct unlink_request *msg, ev_uint64_t *value)
 {
   if (msg->parent_ino_set != 1)
     return (-1);
@@ -3768,7 +3768,7 @@ unlink_request_free(struct unlink_request *tmp)
 
 void
 unlink_request_marshal(struct evbuffer *evbuf, const struct unlink_request *tmp){
-  evtag_marshal_int(evbuf, UNLINK_REQUEST_PARENT_INO, tmp->parent_ino);
+  evtag_marshal_int64(evbuf, UNLINK_REQUEST_PARENT_INO, tmp->parent_ino);
   evtag_marshal_string(evbuf, UNLINK_REQUEST_NAME, tmp->name);
 }
 
@@ -3785,7 +3785,7 @@ unlink_request_unmarshal(struct unlink_request *tmp,  struct evbuffer *evbuf)
 
         if (tmp->parent_ino_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, UNLINK_REQUEST_PARENT_INO, &tmp->parent_ino) == -1) {
+        if (evtag_unmarshal_int64(evbuf, UNLINK_REQUEST_PARENT_INO, &tmp->parent_ino) == -1) {
           event_warnx("%s: failed to unmarshal parent_ino", __func__);
           return (-1);
         }
@@ -3887,7 +3887,7 @@ unlink_response_new_with_arg(void *unused)
 
 
 int
-unlink_response_ino_assign(struct unlink_response *msg, const ev_uint32_t value)
+unlink_response_ino_assign(struct unlink_response *msg, const ev_uint64_t value)
 {
   msg->ino_set = 1;
   msg->ino = value;
@@ -3895,7 +3895,7 @@ unlink_response_ino_assign(struct unlink_response *msg, const ev_uint32_t value)
 }
 
 int
-unlink_response_ino_get(struct unlink_response *msg, ev_uint32_t *value)
+unlink_response_ino_get(struct unlink_response *msg, ev_uint64_t *value)
 {
   if (msg->ino_set != 1)
     return (-1);
@@ -3917,7 +3917,7 @@ unlink_response_free(struct unlink_response *tmp)
 
 void
 unlink_response_marshal(struct evbuffer *evbuf, const struct unlink_response *tmp){
-  evtag_marshal_int(evbuf, UNLINK_RESPONSE_INO, tmp->ino);
+  evtag_marshal_int64(evbuf, UNLINK_RESPONSE_INO, tmp->ino);
 }
 
 int
@@ -3933,7 +3933,7 @@ unlink_response_unmarshal(struct unlink_response *tmp,  struct evbuffer *evbuf)
 
         if (tmp->ino_set)
           return (-1);
-        if (evtag_unmarshal_int(evbuf, UNLINK_RESPONSE_INO, &tmp->ino) == -1) {
+        if (evtag_unmarshal_int64(evbuf, UNLINK_RESPONSE_INO, &tmp->ino) == -1) {
           event_warnx("%s: failed to unmarshal ino", __func__);
           return (-1);
         }

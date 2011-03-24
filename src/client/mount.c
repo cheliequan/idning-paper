@@ -39,7 +39,7 @@ void init_sig_handler(){
 static int sfs_stat(fuse_ino_t ino, struct stat *stbuf)
 {
     logging(LOG_DEUBG, "stat(%lu)", ino);
-    fuse_ino_t arr[1] ;
+    uint64_t arr[1] ;
     struct file_stat stat_arr[1];
     arr[0] = ino;
 
@@ -54,7 +54,7 @@ static int sfs_stat(fuse_ino_t ino, struct stat *stbuf)
         int pos1 = stat_arr[0].pos_arr[0];
         int pos2 = stat_arr[0].pos_arr[1];
 
-        logging(LOG_DEUBG, "stat (ino = %lu) return {size: %lld, mode: %04o, pos1: %d, pos2: %d}", 
+        logging(LOG_DEUBG, "stat (ino = %lu) return {size: %"PRIu64", mode: %04o, pos1: %d, pos2: %d}", 
                 ino, stbuf->st_size, stbuf->st_mode, pos1, pos2);
         stbuf->st_nlink = 1;
     }
@@ -68,7 +68,7 @@ static void sfs_ll_getattr(fuse_req_t req, fuse_ino_t ino,
     logging(LOG_DEUBG, "getattr(%lu)", ino);
 	struct stat stbuf;
 	memset(&stbuf, 0, sizeof(stbuf));
-	if (sfs_stat(ino, &stbuf) == -1)
+	if (sfs_stat((uint64_t)ino, &stbuf) == -1)
 		fuse_reply_err(req, ENOENT);
 	else
 		fuse_reply_attr(req, &stbuf, 1.0);
@@ -81,7 +81,7 @@ static void sfs_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
     memset(&e, 0, sizeof(e));
 
     struct file_stat * stat = file_stat_new();
-    lookup_send_request(parent, name, stat);
+    lookup_send_request((uint64_t )parent, name, stat);
     e.ino = stat -> ino;
     e.attr_timeout = 1.0;
     e.entry_timeout = 1.0;
@@ -157,11 +157,11 @@ static void sfs_ll_open(fuse_req_t req, fuse_ino_t ino,
     logging(LOG_DEUBG, "open(%lu)", ino);
 
     //get attr
-    fuse_ino_t arr[1] ;
+    uint64_t arr[1] ;
     arr[0] = ino;
     struct file_stat * stat = file_stat_new();
     stat_send_request(arr, 1, stat);
-    fi->fh = stat;
+    fi->fh = (unsigned long )stat;
 
     fuse_reply_open(req, fi);
 }
@@ -169,7 +169,9 @@ static void sfs_ll_open(fuse_req_t req, fuse_ino_t ino,
 static void sfs_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 			  off_t off, struct fuse_file_info *fi)
 {
-    logging(LOG_DEUBG, "read (%lu, size=%d, off=%d)", ino, size, off); //read (3, size=4096, off=0)
+    // size -> long unsigned int 
+    // off -> int64
+    logging(LOG_DEUBG, "read (%lu, size=%ld, off=%"PRIu64")", ino, size, off); //read (3, size=4096, off=0)
 
 	(void) fi;
 
@@ -180,7 +182,7 @@ static void sfs_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
     TAILQ_INIT(headers);
     char range[255];
 
-    sprintf(range, "bytes=%llu-%llu" , off, off+size-1);
+    sprintf(range, "bytes=%"PRIu64"-%"PRIu64"" , off, off+size-1);
     logging(LOG_DEUBG, "Range: %s", range);
 
     evhttp_add_header(headers, "Range", range);
@@ -203,13 +205,13 @@ static void sfs_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
 
 void sfs_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, off_t off, struct fuse_file_info *fi) {
     DBG();
-    logging(LOG_DEUBG, "write(%lu, size=%d, off=%d)", ino, size, off);
+    logging(LOG_DEUBG, "write (%lu, size=%ld, off=%"PRIu64")", ino, size, off); 
     int err = 0;
 
-    struct file_stat * stat =  fi->fh;
+    struct file_stat * stat = (struct file_stat * ) fi->fh;
     logging(LOG_DEUBG, "ready to write content on pos [%d, %d]", stat->pos_arr[0], stat->pos_arr[1]);
 
-    buffered_write(stat, off, size, buf);
+    buffered_write(stat, off, (uint64_t)size, buf);
 
     if (err!=0) {
         fuse_reply_err(req,err);
@@ -239,7 +241,7 @@ void sfs_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf, int t
     logging(LOG_DEUBG, "setattr(%lu)", ino);
     struct file_stat * fstat = file_stat_new();
 
-    fuse_ino_t arr[1] ;
+    uint64_t arr[1] ;
     arr[0] = ino;
 
     stat_send_request(arr, 1, fstat);
@@ -265,13 +267,13 @@ void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
     logging(LOG_DEUBG, "flush(ino= %lu)", ino);
 
     int err = 0;
-    struct file_stat * stat =  fi->fh;
+    struct file_stat * stat =  (struct file_stat * )fi->fh;
     int sizenow = buffered_write_flush(stat);
 
     //do stat
 	struct stat stbuf;
 	memset(&stbuf, 0, sizeof(stbuf));
-	if (sfs_stat(ino, &stbuf) == -1)
+	if (sfs_stat((uint64_t)ino, &stbuf) == -1)
 		fuse_reply_err(req, ENOENT);
 
 
@@ -303,7 +305,7 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t m
 
 
     //get attr
-    fi->fh = stat;
+    fi->fh = (unsigned long )stat;
 
     if (fuse_reply_create(req, &e, fi) == -ENOENT) {
 
@@ -336,7 +338,7 @@ static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
 
     unlink_send_request(parent, name);
 
-    fuse_reply_err(req, 0);
+    fuse_reply_err((uint64_t)req, 0);
 }
 
 
