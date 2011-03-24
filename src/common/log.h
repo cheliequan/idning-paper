@@ -11,6 +11,7 @@
 
 
 int logging(int level, char * fmt, ...);
+int log_init(char * logfile);
 
 #define DBG() (fprintf(stderr, "%s:%s: called\n", __FILE__, __func__))
 

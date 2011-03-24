@@ -83,6 +83,13 @@ int stat_send_request(fuse_ino_t * ino_arr, int len, struct file_stat * stat_arr
         stat_arr[i].ino = stat-> ino;
         stat_arr[i].type = stat-> type;
         stat_arr[i].mode = stat-> mode;
+
+
+        logging(LOG_DEUBG, "--%d", stat->pos_arr[0]);
+        logging(LOG_DEUBG, "--%d", stat->pos_arr[1]);
+
+        stat_arr[i].pos_arr = stat-> pos_arr; //  FIXME, 如果后面free response，这就会出错.
+
     }
     return 0;
 }

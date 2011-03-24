@@ -53,3 +53,30 @@ m:
 	-sudo umount /tmp/a -l
 	./client/mount.out /tmp/a -d 
 
+ARG=--window-with-profile=tmp --working-directory=/home/ning/idning-paper/src --hide-menubar
+
+# show log windows
+logo:
+	gnome-terminal $(ARG) -e "tail -f log/cmgr.cfg.log" 	-t "cmgr" 	--geometry=80x22+0+0
+	gnome-terminal $(ARG) -e "tail -f log/osd.cfg.log" 		-t "osd" 	--geometry=80x22+0+420
+	gnome-terminal $(ARG) -e "tail -f log/mds.cfg.log" 		-t "mds" 	--geometry=80x22+600+0
+	gnome-terminal $(ARG) -e "tail -f log/client.cfg.log" 	-t "client" --geometry=80x22+600+420
+
+# close log windows
+logc:
+	killall tail
+
+#killall
+k: 
+	-killall -q cmgr.out osd.out mds.out mount.out
+
+#run , restart all
+r:
+	./cmgr/cmgr.out									&
+	./mds/mds.out									& 
+	./mds/mds.out -c etc/mcs.cfg.2					&
+	./osd/osd.out									& 
+	./osd/osd.out -c etc/osd.cfg.2					&
+
+
+

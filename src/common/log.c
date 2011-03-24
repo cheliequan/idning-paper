@@ -5,6 +5,8 @@
 #include <time.h>
 
 #include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "log.h"
 
 #define  LOG_DEUBG 1
@@ -51,6 +53,14 @@ static int putlevel(char ** buf, int level){
     }
 }
 
+
+FILE * fout = NULL; 
+int log_init(char * logfile){
+    fprintf(stderr, "log_init:  %s\n", logfile);
+    mkdir("log", 0755);
+    fout = fopen(logfile, "a");
+}
+
 int logging(int level, char * fmt, ...){
     /*if (level==LOG_DEUBG)*/
         /*return;*/
@@ -63,7 +73,13 @@ int logging(int level, char * fmt, ...){
     va_start(ap, fmt);
     vsnprintf(buf, sizeof(stmp) -30 , fmt, ap);
     va_end(ap);
-    printf("%s\n", stmp);
+    fprintf(stderr, "%s\n", stmp);
+    if (fout){
+        fprintf(fout, "%s\n", stmp);
+        fflush(fout);
+    }
+        
     return 0;
 }
+
 

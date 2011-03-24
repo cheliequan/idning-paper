@@ -55,10 +55,20 @@ stat_handler(EVRPC_STRUCT(rpc_stat)* rpc, void *arg)
 
         /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, t->pos_arr[0]);*/
         /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, t->pos_arr[1]);*/
-        EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 0);
-        EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 1);
+        int * rst;
+        logging(LOG_DEUBG, "pos_arr_length-- : %d", t->pos_arr_length);
+        rst = EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 9);
+        if (!rst) logging(LOG_DEUBG, "error ");
+
+        rst = EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 8);
+        if (!rst) logging(LOG_DEUBG, "error ");
 
         logging(LOG_DEUBG, "stat(%ld) return {ino: %ld, size: %ld, type : %d, mode : %04o}", ino, t->ino, t->size, t->type, t->mode);
+        logging(LOG_DEUBG, "pos_arr_length-- : %d", t->pos_arr_length);
+        logging(LOG_DEUBG, "-- : %d", t->pos_arr[0]);
+        logging(LOG_DEUBG, "-- : %d", t->pos_arr[1]);
+        logging(LOG_DEUBG, "-- : %d", t->pos_arr[2]);
+        logging(LOG_DEUBG, "-- : %d", t->pos_arr[3]);
     }
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -156,8 +166,10 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod)* rpc, void *arg)
     EVTAG_ASSIGN(t, name, n-> name); // 不然它不认..
     EVTAG_ASSIGN(t, mode, n-> mode); // 不然它不认..
     EVTAG_ASSIGN(t, type, n-> type); // 不然它不认..
-    EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[0]);
-    EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[1]);
+    /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[0]);*/
+    /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[1]);*/
+    EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 8);
+    EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 9);
 
     logging(LOG_DEUBG, "mknod(%s) return {ino: %ld, name: %s, size: %d, mode: %04o}", request->name, t->ino, t->name, t->size, t->mode);
 
