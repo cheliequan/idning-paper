@@ -156,6 +156,13 @@ static void sfs_ll_open(fuse_req_t req, fuse_ino_t ino,
 {
     logging(LOG_DEUBG, "open(%lu)", ino);
 
+    //get attr
+    fuse_ino_t arr[1] ;
+    arr[0] = ino;
+    struct file_stat * stat = file_stat_new();
+    stat_send_request(arr, 1, stat);
+    fi->fh = stat;
+
     fuse_reply_open(req, fi);
 }
 
@@ -199,7 +206,10 @@ void sfs_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, 
     logging(LOG_DEUBG, "write(%lu, size=%d, off=%d)", ino, size, off);
     int err = 0;
 
-    buffered_write(ino, off, size, buf);
+    struct file_stat * stat =  fi->fh;
+    logging(LOG_DEUBG, "ready to write content on pos [%d, %d]", stat->pos_arr[0], stat->pos_arr[1]);
+
+    buffered_write(stat, off, size, buf);
 
     if (err!=0) {
         fuse_reply_err(req,err);
@@ -255,7 +265,8 @@ void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
     logging(LOG_DEUBG, "flush(ino= %lu)", ino);
 
     int err = 0;
-    int sizenow = buffered_write_flush(ino);
+    struct file_stat * stat =  fi->fh;
+    int sizenow = buffered_write_flush(stat);
 
     //do stat
 	struct stat stbuf;
@@ -289,6 +300,10 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t m
     e.attr_timeout = 0.0;
     e.entry_timeout = 0.0;
     sfs_stat(e.ino, &e.attr);
+
+
+    //get attr
+    fi->fh = stat;
 
     if (fuse_reply_create(req, &e, fi) == -ENOENT) {
 

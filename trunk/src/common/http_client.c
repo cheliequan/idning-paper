@@ -86,6 +86,7 @@ struct request_context *context_new (const char *url, int verb, struct evkeyvalq
 
     ctx->uri = evhttp_uri_parse(url);
     ctx -> method = verb;
+
     ctx -> postdata_buffer = data;
     ctx -> req_headers = headers;
 
