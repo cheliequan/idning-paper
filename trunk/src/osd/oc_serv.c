@@ -41,7 +41,7 @@ void write_chunk(uint64_t chunkid, struct evhttp_request *req){
     uint64_t start=0, end;
     const char * range = evhttp_find_header(req->input_headers, "Range");
 
-    logging(LOG_DEUBG, "write range : %s", range);
+    logging(LOG_DEUBG, "write Range Header: %s", range);
     if (range){
         sscanf(range, "bytes=%"SCNu64"-%"SCNu64, &start, &end);
     }
@@ -51,6 +51,7 @@ void write_chunk(uint64_t chunkid, struct evhttp_request *req){
 
     int fd = open(chunk -> path, O_WRONLY|O_CREAT, 0755);
     logging(LOG_INFO, "write seek to : %"PRIu64"", start);
+    logging(LOG_INFO, "evbuffer_get_length(input) = %d", evbuffer_get_length(input));
     lseek(fd, start, SEEK_SET);
 
     if (-1 == fd) {
@@ -58,7 +59,13 @@ void write_chunk(uint64_t chunkid, struct evhttp_request *req){
         return;
     }
 
-    evbuffer_write(input, fd);
+    int rst = 0;
+	while (evbuffer_get_length(input) &&
+	    (rst = evbuffer_write(input, fd)) > 0) {
+        ;
+	}
+
+    /*evbuffer_write(input, fd);*/
     close(fd);
 
     evbuffer_add(evb, "success", strlen("success"));
