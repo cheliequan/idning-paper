@@ -1,6 +1,6 @@
 #include "sfs_common.h"
 
-#define CFG_BLOCK_SIZE 524288000
+#define CFG_BLOCK_SIZE 524288
 /* 只保存连续buffer, 不连续的马上flush.
  *
  * 否则的话，就要保存: {offse, size, buffer,}这样的结构数组，而且osd得支持这样的写法，好像不太现实.
@@ -91,6 +91,8 @@ void buffered_write(struct file_stat * stat, uint64_t offset, uint64_t size, con
         evbuffer_add(b->evb, buff, size);
         write_buf_hash_insert(b);
     }else{
+        logging(LOG_DEUBG, "b->size = %d", b->size);
+        logging(LOG_DEUBG, "evbuffer_get_length(b->evb) = %d", evbuffer_get_length(b->evb));
         if( ( b->size > CFG_BLOCK_SIZE )  // 一个块满了.
           ||(  offset != ( b->offset+b->size)  ) //不连续块.
           ){
@@ -133,6 +135,8 @@ static struct evbuffer * evbuffer_dup(struct evbuffer * orig){
     evbuffer_copyout(orig, data, len); //被吃掉，orig现在为空了.
     struct evbuffer * new_buf = evbuffer_new();
     evbuffer_add(new_buf, data, len);
+    free(data);
+    
     /*evbuffer_add(orig   , data, len);  //放回去.*/
 
     return new_buf;
