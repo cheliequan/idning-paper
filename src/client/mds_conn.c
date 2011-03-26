@@ -3,6 +3,8 @@
 
 struct evrpc_pool *pool = NULL;
 
+static void rpc_request_gen_cb(struct evhttp_request *req, void *arg);
+
 static void stat_cb(struct evrpc_status *status, struct stat_request *request , struct stat_response * response , void *arg) {
     event_loopexit(NULL);
 }
@@ -187,15 +189,37 @@ int statfs_send_request(int * total_space, int * avail_space, int * inode_cnt)
 
     EVTAG_ASSIGN(req, nothing, 1);
 
-    EVRPC_MAKE_REQUEST(rpc_statfs, pool, req, response,  statfs_cb, NULL);
+
+    struct evhttp_connection *evcon = evhttp_connection_new("127.0.0.1", 9528);
+    struct evhttp_request *evreq = evhttp_request_new(rpc_request_gen_cb, NULL);
+
+    statfs_request_marshal(evreq->output_buffer, req);
+    if ( evhttp_make_request(evcon, evreq, EVHTTP_REQ_POST, "/.rpc.rpc_statfs"))
+        logging(LOG_ERROR, "error on statfs_response_unmarshal");
+
+    /*EVRPC_MAKE_REQUEST(rpc_statfs, pool, req, response,  statfs_cb, NULL);*/
 
     event_dispatch();
+    if (statfs_response_unmarshal(response, evreq -> input_buffer)){
+        logging(LOG_ERROR, "error on statfs_response_unmarshal");
+    }
 
     EVTAG_GET(response, total_space, total_space);
     EVTAG_GET(response, avail_space, avail_space);
     EVTAG_GET(response, inode_cnt, inode_cnt);
 
     return 0;
+}
+
+
+
+static void rpc_request_gen_cb(struct evhttp_request *req, void *arg)
+{
+    if (req->response_code != HTTP_OK) {
+        fprintf(stderr, "FAILED (response code)\n");
+        exit(1);
+    }
+    event_loopexit(NULL);
 }
 
 
