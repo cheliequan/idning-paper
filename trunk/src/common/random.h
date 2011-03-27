@@ -4,7 +4,7 @@
 #include<stdlib.h>
 #include<time.h>
 
-int rand_init() ;
+int rand_init();
 
 /**
  * Exponential Distribution

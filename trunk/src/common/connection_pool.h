@@ -3,34 +3,35 @@
 #include "hashtable.h"
 #include "dlist.h"
 
-
 /*
  * a map of int -> list 
  *
  * actually it's a mutiMap
  * */
-typedef struct ConnectionPool{
-    Hashtable * ht ; // map from machine id to conn;
-}ConnectionPool;
+typedef struct ConnectionPool {
+    Hashtable *ht;              // map from machine id to conn;
+} ConnectionPool;
 
 /*
  * this is a list
  * */
-struct PoolEntry{
+struct PoolEntry {
     char host_port[25];
 
     struct evhttp_connection *conn;
     struct dlist_t dlist;
 };
 
-ConnectionPool * connection_pool_new();
-ConnectionPool * connection_pool_free(ConnectionPool * pool);
+ConnectionPool *connection_pool_new();
+ConnectionPool *connection_pool_free(ConnectionPool * pool);
 
+void connection_pool_insert(ConnectionPool * pool, char *host, int port,
+                            struct evhttp_connection *conn);
 
-void connection_pool_insert(ConnectionPool * pool, char * host, int port, struct evhttp_connection * conn);
+struct evhttp_connection *connection_pool_get_free_conn(ConnectionPool * pool,
+                                                        char *host, int port);
+struct evhttp_connection *connection_pool_get_or_create_conn(ConnectionPool *
+                                                             pool, char *host,
+                                                             int port);
 
-struct evhttp_connection * connection_pool_get_free_conn(ConnectionPool * pool , char * host, int port);
-struct evhttp_connection * connection_pool_get_or_create_conn(ConnectionPool * pool , char * host, int port);
-
-
-#endif /* _CONN_POLL*/
+#endif /* _CONN_POLL */

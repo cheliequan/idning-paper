@@ -7,21 +7,17 @@
 #ifndef _NGX_QUEUE_H_INCLUDED_
 #define _NGX_QUEUE_H_INCLUDED_
 
-
 typedef struct dlist_t {
-    struct dlist_t  *prev;
-    struct dlist_t  *next;
-}dlist_t;
-
+    struct dlist_t *prev;
+    struct dlist_t *next;
+} dlist_t;
 
 #define dlist_init(q)                                                     \
     (q)->prev = q;                                                            \
     (q)->next = q
 
-
 #define dlist_empty(h)                                                    \
     (h == (h)->prev)
-
 
 #define dlist_insert_head(h, x)                                           \
     (x)->next = (h)->next;                                                    \
@@ -29,9 +25,7 @@ typedef struct dlist_t {
     (x)->prev = h;                                                            \
     (h)->next = x
 
-
 #define dlist_insert_after   dlist_insert_head
-
 
 #define dlist_insert_tail(h, x)                                           \
     (x)->prev = (h)->prev;                                                    \
@@ -39,26 +33,20 @@ typedef struct dlist_t {
     (x)->next = h;                                                            \
     (h)->prev = x
 
-
 #define dlist_head(h)                                                     \
     (h)->next
-
 
 #define dlist_last(h)                                                     \
     (h)->prev
 
-
 #define dlist_sentinel(h)                                                 \
     (h)
-
 
 #define dlist_next(q)                                                     \
     (q)->next
 
-
 #define dlist_prev(q)                                                     \
     (q)->prev
-
 
 #if (NGX_DEBUG)
 
@@ -76,7 +64,6 @@ typedef struct dlist_t {
 
 #endif
 
-
 #define dlist_split(h, q, n)                                              \
     (n)->prev = (h)->prev;                                                    \
     (n)->prev->next = n;                                                      \
@@ -85,16 +72,13 @@ typedef struct dlist_t {
     (h)->prev->next = h;                                                      \
     (q)->prev = n;
 
-
 #define dlist_add(h, n)                                                   \
     (h)->prev->next = (n)->next;                                              \
     (n)->next->prev = (h)->prev;                                              \
     (h)->prev = (n)->prev;                                                    \
     (h)->prev->next = h;
 
-
 #define dlist_data(q, type, link)                                         \
     (type *) ((unsigned char *) q - offsetof(type, link))
-
 
 #endif /* _NGX_QUEUE_H_INCLUDED_ */

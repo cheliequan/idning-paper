@@ -23,79 +23,81 @@
 #include <stdlib.h>
 #include <syslog.h>
 
-
 typedef struct paramsstr {
-	char *name;
-	char *value;
-	struct paramsstr *next;
+    char *name;
+    char *value;
+    struct paramsstr *next;
 } paramstr;
 
-static paramstr *paramhead=NULL;
-static int logundefined=0;
-static char * config_filename = NULL;
+static paramstr *paramhead = NULL;
+static int logundefined = 0;
+static char *config_filename = NULL;
 
-int cfg_load (const char *configfname,int _lu) {
-	FILE *fd;
-	char linebuff[1000];
-	uint32_t nps,npe,vps,vpe,i;
+int cfg_load(const char *configfname, int _lu)
+{
+    FILE *fd;
+    char linebuff[1000];
+    uint32_t nps, npe, vps, vpe, i;
     config_filename = strdup(configfname);
 
-	paramstr *tmp;
-	paramhead = NULL;
-	logundefined = _lu;
+    paramstr *tmp;
+    paramhead = NULL;
+    logundefined = _lu;
 
-	fd = fopen(configfname,"r");
-	if (fd==NULL) {
-		syslog(LOG_ERR,"cannot load config file: %s",configfname);
-		return 0;
-	}
-	while (fgets(linebuff,999,fd)!=NULL) {
-		linebuff[999]=0;
-		if (linebuff[0]=='#') {
-			continue;
-		}
-		i = 0;
-		while (linebuff[i]==' ' || linebuff[i]=='\t') i++;
-		nps = i;
-		while (linebuff[i]>32 && linebuff[i]<127) {
-			i++;
-		}
-		npe = i;
-		while (linebuff[i]==' ' || linebuff[i]=='\t') i++;
-		if (linebuff[i]!='=' || npe==nps) {
-			continue;
-		}
-		i++;
-		while (linebuff[i]==' ' || linebuff[i]=='\t') i++;
-		vps = i;
-		while (linebuff[i]>=32 && linebuff[i]<127) {
-			i++;
-		}
-		while (i>vps && linebuff[i-1]==32) {
-			i--;
-		}
-		vpe = i;
-		while (linebuff[i]==' ' || linebuff[i]=='\t') i++;
-		if (linebuff[i]!='\0' && linebuff[i]!='\r' && linebuff[i]!='\n') {
-			continue;
-		}
-		tmp = (paramstr*)malloc(sizeof(paramstr));
-		tmp->name = (char*)malloc(npe-nps+1);
-		tmp->value = (char*)malloc(vpe-vps+1);
-		memcpy(tmp->name,linebuff+nps,npe-nps);
-		if (vpe>vps) {
-			memcpy(tmp->value,linebuff+vps,vpe-vps);
-		}
-		tmp->name[npe-nps]=0;
-		tmp->value[vpe-vps]=0;
-		tmp->next = paramhead;
-		paramhead = tmp;
-	}
+    fd = fopen(configfname, "r");
+    if (fd == NULL) {
+        syslog(LOG_ERR, "cannot load config file: %s", configfname);
+        return 0;
+    }
+    while (fgets(linebuff, 999, fd) != NULL) {
+        linebuff[999] = 0;
+        if (linebuff[0] == '#') {
+            continue;
+        }
+        i = 0;
+        while (linebuff[i] == ' ' || linebuff[i] == '\t')
+            i++;
+        nps = i;
+        while (linebuff[i] > 32 && linebuff[i] < 127) {
+            i++;
+        }
+        npe = i;
+        while (linebuff[i] == ' ' || linebuff[i] == '\t')
+            i++;
+        if (linebuff[i] != '=' || npe == nps) {
+            continue;
+        }
+        i++;
+        while (linebuff[i] == ' ' || linebuff[i] == '\t')
+            i++;
+        vps = i;
+        while (linebuff[i] >= 32 && linebuff[i] < 127) {
+            i++;
+        }
+        while (i > vps && linebuff[i - 1] == 32) {
+            i--;
+        }
+        vpe = i;
+        while (linebuff[i] == ' ' || linebuff[i] == '\t')
+            i++;
+        if (linebuff[i] != '\0' && linebuff[i] != '\r' && linebuff[i] != '\n') {
+            continue;
+        }
+        tmp = (paramstr *) malloc(sizeof(paramstr));
+        tmp->name = (char *)malloc(npe - nps + 1);
+        tmp->value = (char *)malloc(vpe - vps + 1);
+        memcpy(tmp->name, linebuff + nps, npe - nps);
+        if (vpe > vps) {
+            memcpy(tmp->value, linebuff + vps, vpe - vps);
+        }
+        tmp->name[npe - nps] = 0;
+        tmp->value[vpe - vps] = 0;
+        tmp->next = paramhead;
+        paramhead = tmp;
+    }
 
-
-
-	fclose(fd);
-	return 1;
+    fclose(fd);
+    return 1;
 }
 
 #define STR_TO_int(x) strtol(x,NULL,0)
@@ -128,23 +130,25 @@ type cfg_get##fname(const char *name,type def) { \
 	return COPY_##convname(def); \
 }
 
-_CONFIG_GEN_FUNCTION(str,char*,charptr,"%s")
-_CONFIG_GEN_FUNCTION(num,int,int,"%d")
-_CONFIG_GEN_FUNCTION(int8,int8_t,int32,"%"PRId8)
-_CONFIG_GEN_FUNCTION(uint8,uint8_t,uint32,"%"PRIu8)
-_CONFIG_GEN_FUNCTION(int16,int16_t,int32,"%"PRId16)
-_CONFIG_GEN_FUNCTION(uint16,uint16_t,uint32,"%"PRIu16)
-_CONFIG_GEN_FUNCTION(int32,int32_t,int32,"%"PRId32)
-_CONFIG_GEN_FUNCTION(uint32,uint32_t,uint32,"%"PRIu32)
-_CONFIG_GEN_FUNCTION(int64,int64_t,int64,"%"PRId64)
-_CONFIG_GEN_FUNCTION(uint64,uint64_t,uint64,"%"PRIu64)
-_CONFIG_GEN_FUNCTION(double,double,double,"%lf")
+_CONFIG_GEN_FUNCTION(str, char *, charptr, "%s")
 
 
-void cfg_append(char *s){
+_CONFIG_GEN_FUNCTION(num, int, int, "%d")
+_CONFIG_GEN_FUNCTION(int8, int8_t, int32, "%" PRId8)
+_CONFIG_GEN_FUNCTION(uint8, uint8_t, uint32, "%" PRIu8)
+_CONFIG_GEN_FUNCTION(int16, int16_t, int32, "%" PRId16)
+_CONFIG_GEN_FUNCTION(uint16, uint16_t, uint32, "%" PRIu16)
+_CONFIG_GEN_FUNCTION(int32, int32_t, int32, "%" PRId32)
+_CONFIG_GEN_FUNCTION(uint32, uint32_t, uint32, "%" PRIu32)
+_CONFIG_GEN_FUNCTION(int64, int64_t, int64, "%" PRId64)
+_CONFIG_GEN_FUNCTION(uint64, uint64_t, uint64, "%" PRIu64)
+_CONFIG_GEN_FUNCTION(double, double, double, "%lf")
+
+void cfg_append(char *s)
+{
     fprintf(stderr, "write cfg to file %s : %s\n", config_filename, s);
-	FILE *fd;
-	fd = fopen(config_filename,"a");
+    FILE *fd;
+    fd = fopen(config_filename, "a");
     fprintf(fd, "\n#Auto Added by the program\n");
     fprintf(fd, "%s\n", s);
     fclose(fd);
