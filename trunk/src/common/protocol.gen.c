@@ -3917,7 +3917,9 @@ unlink_response_free(struct unlink_response *tmp)
 
 void
 unlink_response_marshal(struct evbuffer *evbuf, const struct unlink_response *tmp){
-  evtag_marshal_int64(evbuf, UNLINK_RESPONSE_INO, tmp->ino);
+  if (tmp->ino_set) {
+    evtag_marshal_int64(evbuf, UNLINK_RESPONSE_INO, tmp->ino);
+  }
 }
 
 int
@@ -3953,8 +3955,6 @@ unlink_response_unmarshal(struct unlink_response *tmp,  struct evbuffer *evbuf)
 int
 unlink_response_complete(struct unlink_response *msg)
 {
-  if (!msg->ino_set)
-    return (-1);
   return (0);
 }
 
