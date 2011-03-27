@@ -184,6 +184,7 @@ static void sfs_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
         uint8_t * buf = alloca(len);
         evbuffer_copyout(response->body, buf, len);
         evhttp_clear_headers(headers);
+        free(headers);
 
         fuse_reply_buf(req, buf, size);
         http_response_free(response);
@@ -199,7 +200,7 @@ void sfs_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size, 
     logging(LOG_DEUBG, "write (%lu, size=%ld, off=%"PRIu64")", ino, size, off); 
     int err = 0;
 
-    struct file_stat * stat = (struct file_stat * ) (fi->fh);
+    struct file_stat *stat = (struct file_stat *)(unsigned long)(fi->fh);
     logging(LOG_DEUBG, "ready to write content on pos [%d, %d]", stat->pos_arr[0], stat->pos_arr[1]);
 
     buffered_write(stat, off, (uint64_t)size, buf);
@@ -259,7 +260,7 @@ void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
     logging(LOG_DEUBG, "flush(ino= %lu)", ino);
 
     int err = 0;
-    struct file_stat * stat =  (struct file_stat * )fi->fh;
+    struct file_stat *stat = (struct file_stat *)(unsigned long)(fi->fh);
     int sizenow = buffered_write_flush(stat);
 
     //do stat
@@ -336,6 +337,19 @@ static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
 }
 
 
+
+void sfs_release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
+    struct file_stat *stat = (struct file_stat *)(unsigned long)(fi->fh);
+
+    if (stat!=NULL) {
+        file_stat_free(stat);
+    }
+    fuse_reply_err(req,0);
+}
+
+
+
+
 void sfs_statfs(fuse_req_t req, fuse_ino_t ino) {
     uint32_t totalspace,availspace;
     uint32_t inodes;
@@ -380,6 +394,7 @@ static struct fuse_lowlevel_ops sfs_ll_op = {
 	.unlink     = sfs_ll_unlink,
 	.rmdir      = sfs_ll_unlink,
 	.statfs     = sfs_statfs,
+	.release    = sfs_release,
 };
 
 
