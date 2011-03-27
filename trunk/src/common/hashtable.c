@@ -27,7 +27,7 @@ Hashtable * hashtable_new(HashFunc hash_func, EqualFunc hash_equal_func, int buc
     Hashtable * ht = (Hashtable *)malloc(sizeof(Hashtable));
     ht -> bucket_cnt = bucket_cnt;
     ht -> size = 0;
-    ht -> buckets = malloc(bucket_cnt * sizeof(void *));
+    ht -> buckets = calloc(sizeof(void *), bucket_cnt);
     ht -> hash_func = hash_func;
     ht -> key_equal_func = hash_equal_func;
     return ht;

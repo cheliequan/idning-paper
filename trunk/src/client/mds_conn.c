@@ -164,7 +164,7 @@ int lookup_send_request(uint64_t parent_ino, const char * name , struct file_sta
             response, (unmarshal_func)lookup_response_unmarshal
             );
 
-    struct file_stat * stat = file_stat_new();
+    struct file_stat * stat ;
     EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
     o_stat->size = stat->size;
     o_stat->ino = stat->ino;

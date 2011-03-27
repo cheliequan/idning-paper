@@ -52,7 +52,7 @@ u:
 m: u
 	./client/mount.out /tmp/a -d 
 v: u
-	valgrind --tool=memcheck --leak-check=full ./client/mount.out /tmp/a -d 
+	valgrind --tool=memcheck --leak-check=full -v ./client/mount.out /tmp/a -d 
 
 ARG=--window-with-profile=tmp --working-directory=/home/ning/idning-paper/src --hide-menubar
 
