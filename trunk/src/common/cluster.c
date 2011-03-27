@@ -122,7 +122,7 @@ int ping_send_request()
     printf("get pong version is : %d \n", pong_version);
     if (pong_version == cluster_version){
         logging(LOG_INFO, "cluster not change!");
-        return 0;
+        goto done;
     }
     logging(LOG_INFO, "cluster changed!");
     int cnt = EVTAG_ARRAY_LEN(pong, machines);
@@ -142,6 +142,11 @@ int ping_send_request()
     }
     cluster_printf("after pong::");
     cluster_dump();
+
+done:
+    ping_free(ping);
+    pong_free(pong);
+
     return pong_mid;
 }
 

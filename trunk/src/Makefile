@@ -47,11 +47,12 @@ gcov:
 	gcov client/osd_conn.c -o client
 	gcov client/mds_conn.c -o client
 
-umount:
+u:
 	-sudo umount /tmp/a -l
-m:
-	-sudo umount /tmp/a -l
+m: u
 	./client/mount.out /tmp/a -d 
+v: u
+	valgrind --tool=memcheck --leak-check=full ./client/mount.out /tmp/a -d 
 
 ARG=--window-with-profile=tmp --working-directory=/home/ning/idning-paper/src --hide-menubar
 
