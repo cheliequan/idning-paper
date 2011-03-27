@@ -203,8 +203,8 @@ fsnode * fs_mknod(uint64_t parent_ino, char * name, int type, int mode){
 
 
 void fs_statfs(int *total_space, int * avail_space, int *inode_cnt){
-    *total_space = 100000000;
-    *avail_space = 10000000;
+    *total_space = 1024;
+    *avail_space = 1024;
     *inode_cnt = 8888;
 }
 

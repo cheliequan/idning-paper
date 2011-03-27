@@ -338,6 +338,7 @@ void sfs_statfs(fuse_req_t req, fuse_ino_t ino) {
 
     (void)ino;
     statfs_send_request(&totalspace, &availspace, & inodes);
+    logging(LOG_DEUBG , "sfs_statfs get : %d , %d, %d ", totalspace, availspace, inodes);
 
     stfsbuf.f_namemax = 1000000;
     stfsbuf.f_frsize = bsize; 

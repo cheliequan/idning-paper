@@ -33,6 +33,7 @@
 #include "protocol.gen.h"
 #include "protocol.h"
 #include "random.h"
+#include "connection_pool.h"
 
 #endif /* _SFS_COMMON_H_ */
 

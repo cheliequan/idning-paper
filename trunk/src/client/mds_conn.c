@@ -1,6 +1,8 @@
 #include "sfs_common.h"
 #include "mds_conn.h"
 
+ConnectionPool * conn_pool = NULL;
+
 struct evrpc_pool *pool = NULL;
 
 static void rpc_request_gen_cb(struct evhttp_request *req, void *arg);
@@ -28,9 +30,9 @@ static void setattr_cb(struct evrpc_status *status, struct setattr_request *requ
     event_loopexit(NULL);
 }
 
-static void statfs_cb(struct evrpc_status *status, struct statfs_request *request , struct statfs_response* response , void *arg){
-    event_loopexit(NULL);
-}
+/*static void statfs_cb(struct evrpc_status *status, struct statfs_request *request , struct statfs_response* response , void *arg){*/
+    /*event_loopexit(NULL);*/
+/*}*/
 
 int setattr_send_request(struct file_stat * stat_arr)
 {
@@ -166,10 +168,10 @@ int unlink_send_request(uint64_t parent_ino, const char * name )
 {
     DBG();
     struct unlink_request* req = unlink_request_new();
-
     struct unlink_response * response = unlink_response_new();
     EVTAG_ASSIGN(req, parent_ino, parent_ino);
     EVTAG_ASSIGN(req, name, name);
+
 
     EVRPC_MAKE_REQUEST(rpc_unlink, pool, req, response,  unlink_cb, NULL);
     event_dispatch();
@@ -190,16 +192,18 @@ int statfs_send_request(int * total_space, int * avail_space, int * inode_cnt)
     EVTAG_ASSIGN(req, nothing, 1);
 
 
-    struct evhttp_connection *evcon = evhttp_connection_new("127.0.0.1", 9528);
+    struct evhttp_connection *evcon = connection_pool_get_or_create_conn(conn_pool, "127.0.0.1", 9528);
     struct evhttp_request *evreq = evhttp_request_new(rpc_request_gen_cb, NULL);
 
     statfs_request_marshal(evreq->output_buffer, req);
     if ( evhttp_make_request(evcon, evreq, EVHTTP_REQ_POST, "/.rpc.rpc_statfs"))
-        logging(LOG_ERROR, "error on statfs_response_unmarshal");
+        logging(LOG_ERROR, "error on make_request");
 
     /*EVRPC_MAKE_REQUEST(rpc_statfs, pool, req, response,  statfs_cb, NULL);*/
 
     event_dispatch();
+    logging(LOG_DEUBG, "evbuffer_get_length(evreq->output_buffer): %d", evbuffer_get_length(evreq->output_buffer));
+    logging(LOG_DEUBG, "evbuffer_get_length(evreq->input_buffer): %d", evbuffer_get_length(evreq->input_buffer));
     if (statfs_response_unmarshal(response, evreq -> input_buffer)){
         logging(LOG_ERROR, "error on statfs_response_unmarshal");
     }
@@ -208,10 +212,10 @@ int statfs_send_request(int * total_space, int * avail_space, int * inode_cnt)
     EVTAG_GET(response, avail_space, avail_space);
     EVTAG_GET(response, inode_cnt, inode_cnt);
 
+
+    connection_pool_insert(conn_pool, "127.0.0.1", 9528, evcon);
     return 0;
 }
-
-
 
 static void rpc_request_gen_cb(struct evhttp_request *req, void *arg)
 {
@@ -219,20 +223,37 @@ static void rpc_request_gen_cb(struct evhttp_request *req, void *arg)
         fprintf(stderr, "FAILED (response code)\n");
         exit(1);
     }
-    event_loopexit(NULL);
-}
 
+    logging(LOG_DEUBG, "evbuffer_get_length(evreq->output_buffer): %d", evbuffer_get_length(req->output_buffer));
+    logging(LOG_DEUBG, "evbuffer_get_length(evreq->input_buffer): %d", evbuffer_get_length(req->input_buffer));
+    evbuffer_copyout(req->input_buffer, tmp, evbuffer_get_length(req->input_buffer));
+
+    event_loopexit(NULL);
+
+    /*struct statfs_response * response =  statfs_response_new();*/
+    /*if (statfs_response_unmarshal(response, req -> input_buffer)){*/
+        /*logging(LOG_ERROR, " in error on statfs_response_unmarshal");*/
+    /*}*/
+    /*logging(LOG_DEUBG, "yy %d", response->total_space);*/
+    /*logging(LOG_DEUBG, "yy %d", response->avail_space);*/
+    /*logging(LOG_DEUBG, "yy %d", response->inode_cnt);*/
+    
+
+
+}
 
 void mds_conn_init(){
     DBG();
     event_init();
     rpc_client_setup("client", 0, MACHINE_CLIENT);
 
-
     struct machine * mds = cluster_get_machine_of_type(MACHINE_MDS);
     pool = evrpc_pool_new(NULL);
     struct evhttp_connection *evcon = evhttp_connection_new(mds->ip, mds->port);
     evrpc_pool_add_connection(pool, evcon);
+
+    
+    conn_pool = connection_pool_new();
 
 }
 

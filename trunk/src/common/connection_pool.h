@@ -30,6 +30,7 @@ ConnectionPool * connection_pool_free(ConnectionPool * pool);
 void connection_pool_insert(ConnectionPool * pool, char * host, int port, struct evhttp_connection * conn);
 
 struct evhttp_connection * connection_pool_get_free_conn(ConnectionPool * pool , char * host, int port);
+struct evhttp_connection * connection_pool_get_or_create_conn(ConnectionPool * pool , char * host, int port);
 
 
 #endif /* _CONN_POLL*/

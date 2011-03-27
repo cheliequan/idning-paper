@@ -10,8 +10,8 @@
 #include "protocol.gen.h"
 #include "protocol.h"
 #include "log.h"
-#include "cluster.h"
 
+#include "cluster.h"
 
 #define MAX_MACHINE_CNT 256
 
