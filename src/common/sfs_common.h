@@ -11,7 +11,7 @@
 #include <string.h>
 #include <sys/queue.h>
 #include <sys/stat.h>
-#include <sys/stat.h> 
+#include <sys/stat.h>
 #include <sys/statvfs.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -36,5 +36,3 @@
 #include "connection_pool.h"
 
 #endif /* _SFS_COMMON_H_ */
-
-

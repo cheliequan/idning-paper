@@ -1,18 +1,16 @@
 #include "sfs_common.h"
 
-
-static void
-rpc_setup()
+static void rpc_setup()
 {
     struct evhttp *http = NULL;
     struct evrpc_base *base = NULL;
 
-    char *listen_host = cfg_getstr("CMGR_LISTEN_HOST","*");
+    char *listen_host = cfg_getstr("CMGR_LISTEN_HOST", "*");
     int port = cfg_getint32("CMGR_LISTEN_PORT", 9000);
 
     http = evhttp_start(listen_host, port);
-    /*http = evhttp_start("192.168.1.102", port);*/
-    if (!http){
+    /*http = evhttp_start("192.168.1.102", port); */
+    if (!http) {
         perror("can't start server!");
         exit(-1);
     }
@@ -24,11 +22,12 @@ rpc_setup()
 
 }
 
-void usage(const char* appname) {
-    
+void usage(const char *appname)
+{
+
 }
 
-int main(int argc, char ** argv)
+int main(int argc, char **argv)
 {
     event_init();
     init_app(argc, argv, "cmgr");
@@ -37,6 +36,3 @@ int main(int argc, char ** argv)
     event_dispatch();
     return 0;
 }
-
-
-
