@@ -68,20 +68,10 @@ int stat_send_request(uint64_t * ino_arr, int len, struct file_stat * stat_arr)
         ret = -1;
         goto done;
     }
+    struct file_stat * stat ;
     for (i=0; i< len; i++){
-        struct file_stat * stat = stat_arr +i;
         EVTAG_ARRAY_GET(response, stat_arr, i, &stat);
-
-
         file_stat_copy(stat_arr+i, stat);
-
-        /*stat_arr[i].size = stat-> size;*/
-        /*stat_arr[i].ino = stat-> ino;*/
-        /*stat_arr[i].type = stat-> type;*/
-        /*stat_arr[i].mode = stat-> mode;*/
-
-        /*stat_arr[i].pos_arr = stat-> pos_arr; //  FIXME, 如果后面free response，这就会出错.*/
-
     }
 done:
     stat_request_free(req);
@@ -142,13 +132,6 @@ int mknod_send_request(uint64_t parent_ino, const char * name, int type, int mod
     EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
     file_stat_copy(o_stat, stat);
 
-    //o_stat->pos_arr = stat-> pos_arr; //  FIXME, 如果后面free response，这就会出错.
-
-    //int pos1 = o_stat->pos_arr[0];
-    //int pos2 = o_stat->pos_arr[1];
-    //logging(LOG_DEUBG, "pos: [%d, %d]", pos1, pos2);
-
-    /*EVTAG_ARRAY_GET(response, stat_arr, 0, &o_stat);*/
     mknod_request_free(req);
     mknod_response_free(response);
     return 0;

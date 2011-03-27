@@ -57,8 +57,10 @@ struct evhttp_connection * connection_pool_get_free_conn(ConnectionPool * pool ,
     for (pl = head->next; pl!=head; pl=pl->next){
         p = dlist_data(pl, struct PoolEntry, dlist);
         dlist_remove(pl);
-        //FIXME free something
-        return p->conn;
+        struct evhttp_connection * conn = p->conn;
+        free(p);
+
+        return conn;
     }
     logging(LOG_DEUBG, "connection_pool_get_free_conn on %s:%d return NULL!!!!!", host, port);
     return NULL;
