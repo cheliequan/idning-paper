@@ -14,36 +14,14 @@ static void general_req(char * ip, int port, const char *rpcname,
 
 static void rpc_request_gen_cb(struct evhttp_request *req, void *arg);
 
-/*static void stat_cb(struct evrpc_status *status, struct stat_request *request , struct stat_response * response , void *arg) {*/
-    /*event_loopexit(NULL);*/
-/*}*/
+///////////////////
 
-/*static void ls_cb(struct evrpc_status *status, struct ls_request *request , struct ls_response * response , void *arg){*/
-    /*event_loopexit(NULL);*/
-/*}*/
-/*static void mknod_cb(struct evrpc_status *status, struct mknod_request *request , struct mknod_response * response , void *arg){*/
-    /*event_loopexit(NULL);*/
-/*}*/
-
-/*static void lookup_cb(struct evrpc_status *status, struct lookup_request *request , struct lookup_response * response , void *arg){*/
-    /*event_loopexit(NULL);*/
-/*}*/
-
-/*static void unlink_cb(struct evrpc_status *status, struct unlink_request *request , struct unlink_response * response , void *arg){*/
-    /*event_loopexit(NULL);*/
-/*}*/
-
-/*static void setattr_cb(struct evrpc_status *status, struct setattr_request *request , struct setattr_response * response , void *arg){*/
-    /*event_loopexit(NULL);*/
-/*}*/
-
-/*static void statfs_cb(struct evrpc_status *status, struct statfs_request *request , struct statfs_response* response , void *arg){*/
-    /*event_loopexit(NULL);*/
-/*}*/
+static void file_stat_copy(struct file_stat * dst, struct file_stat * src);
 
 int setattr_send_request(struct file_stat * stat_arr)
 {
     DBG();
+    int ret = 0;
     struct setattr_request * req = setattr_request_new();
     struct setattr_response * response = setattr_response_new();
 
@@ -59,14 +37,20 @@ int setattr_send_request(struct file_stat * stat_arr)
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
     if (cnt!=1){
         logging(LOG_ERROR, "setattr_send_request return cnt != 1, cnt= %d", cnt);
-        return -1;
+        ret = -1;
+        goto done;
     }
-    return 0;
+done:
+    setattr_request_free(req);
+    setattr_response_free(response);
+    return ret;
+
 }
 
 int stat_send_request(uint64_t * ino_arr, int len, struct file_stat * stat_arr)
 {
     DBG();
+    int ret = 0 ;
     struct stat_request * req = stat_request_new();
     struct stat_response * response = stat_response_new();
     int i;
@@ -80,20 +64,29 @@ int stat_send_request(uint64_t * ino_arr, int len, struct file_stat * stat_arr)
             );
 
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
-    if (cnt!=len)
-        return -1;
+    if (cnt!=len){
+        ret = -1;
+        goto done;
+    }
     for (i=0; i< len; i++){
         struct file_stat * stat = stat_arr +i;
         EVTAG_ARRAY_GET(response, stat_arr, i, &stat);
-        stat_arr[i].size = stat-> size;
-        stat_arr[i].ino = stat-> ino;
-        stat_arr[i].type = stat-> type;
-        stat_arr[i].mode = stat-> mode;
 
-        stat_arr[i].pos_arr = stat-> pos_arr; //  FIXME, 如果后面free response，这就会出错.
+
+        file_stat_copy(stat_arr+i, stat);
+
+        /*stat_arr[i].size = stat-> size;*/
+        /*stat_arr[i].ino = stat-> ino;*/
+        /*stat_arr[i].type = stat-> type;*/
+        /*stat_arr[i].mode = stat-> mode;*/
+
+        /*stat_arr[i].pos_arr = stat-> pos_arr; //  FIXME, 如果后面free response，这就会出错.*/
 
     }
-    return 0;
+done:
+    stat_request_free(req);
+    stat_response_free(response);
+    return ret;
 }
 
 
@@ -122,6 +115,9 @@ int ls_send_request(uint64_t ino, struct file_stat * stat_arr)
         stat_arr[i].type = stat-> type;
         stat_arr[i].mode = stat-> mode;
     }
+    ls_request_free(req);
+    ls_response_free(response);
+
     return cnt;
 }
 
@@ -142,22 +138,34 @@ int mknod_send_request(uint64_t parent_ino, const char * name, int type, int mod
             response, (unmarshal_func)mknod_response_unmarshal
             );
 
-    struct file_stat * stat = file_stat_new();
+    struct file_stat * stat ;
     EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
-    o_stat->size = stat->size;
-    o_stat->ino = stat->ino;
+    file_stat_copy(o_stat, stat);
 
-    o_stat->pos_arr = stat-> pos_arr; //  FIXME, 如果后面free response，这就会出错.
+    //o_stat->pos_arr = stat-> pos_arr; //  FIXME, 如果后面free response，这就会出错.
 
-    int pos1 = o_stat->pos_arr[0];
-    int pos2 = o_stat->pos_arr[1];
-    logging(LOG_DEUBG, "pos: [%d, %d]", pos1, pos2);
+    //int pos1 = o_stat->pos_arr[0];
+    //int pos2 = o_stat->pos_arr[1];
+    //logging(LOG_DEUBG, "pos: [%d, %d]", pos1, pos2);
 
-    EVTAG_ARRAY_GET(response, stat_arr, 0, &o_stat);
+    /*EVTAG_ARRAY_GET(response, stat_arr, 0, &o_stat);*/
+    mknod_request_free(req);
+    mknod_response_free(response);
     return 0;
 }
 
-
+static void file_stat_copy(struct file_stat * dst, struct file_stat * src){
+    dst->size = src->size;
+    dst->ino = src->ino;
+    dst->type = src->type;
+    dst->mode = src->mode;
+    int len = EVTAG_ARRAY_LEN(src, pos_arr);
+    int i =0, pos;
+    for (i=0; i<len; i++){
+        EVTAG_ARRAY_GET(src, pos_arr, i, &pos);
+        EVTAG_ARRAY_ADD_VALUE(dst, pos_arr, pos);
+    }
+}
 
 int lookup_send_request(uint64_t parent_ino, const char * name , struct file_stat *o_stat )
 {
@@ -178,6 +186,9 @@ int lookup_send_request(uint64_t parent_ino, const char * name , struct file_sta
     o_stat->size = stat->size;
     o_stat->ino = stat->ino;
 
+    lookup_request_free(req);
+    lookup_response_free(response);
+
     return 0;
 }
 
@@ -196,7 +207,8 @@ int unlink_send_request(uint64_t parent_ino, const char * name )
             req, (marshal_func)unlink_request_marshal,
             response, (unmarshal_func)unlink_response_unmarshal
             );
-
+    unlink_request_free(req);
+    unlink_response_free(response);
     return 0;
 }
 
@@ -220,6 +232,8 @@ int statfs_send_request(int * total_space, int * avail_space, int * inode_cnt)
     EVTAG_GET(response, total_space, total_space);
     EVTAG_GET(response, avail_space, avail_space);
     EVTAG_GET(response, inode_cnt, inode_cnt);
+    statfs_request_free(req);
+    statfs_response_free(response);
     return 0;
 }
 
@@ -240,8 +254,7 @@ static void general_req(char * ip, int port, const char *rpcname,
         logging(LOG_ERROR, "error on statfs_response_unmarshal");
     }
     connection_pool_insert(conn_pool, ip, port, evcon);
-
-
+    evhttp_request_free(evreq);
 }
 
 static void rpc_request_gen_cb(struct evhttp_request *req, void *arg)
@@ -250,22 +263,7 @@ static void rpc_request_gen_cb(struct evhttp_request *req, void *arg)
         fprintf(stderr, "FAILED (response code)\n");
         exit(1);
     }
-
-    logging(LOG_DEUBG, "evbuffer_get_length(evreq->output_buffer): %d", evbuffer_get_length(req->output_buffer));
-    logging(LOG_DEUBG, "evbuffer_get_length(evreq->input_buffer): %d", evbuffer_get_length(req->input_buffer));
-
     event_loopexit(NULL);
-
-    /*struct statfs_response * response =  statfs_response_new();*/
-    /*if (statfs_response_unmarshal(response, req -> input_buffer)){*/
-        /*logging(LOG_ERROR, " in error on statfs_response_unmarshal");*/
-    /*}*/
-    /*logging(LOG_DEUBG, "yy %d", response->total_space);*/
-    /*logging(LOG_DEUBG, "yy %d", response->avail_space);*/
-    /*logging(LOG_DEUBG, "yy %d", response->inode_cnt);*/
-    
-
-
 }
 
 void mds_conn_init(){

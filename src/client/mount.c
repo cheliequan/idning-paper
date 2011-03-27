@@ -26,24 +26,25 @@ static int sfs_stat(fuse_ino_t ino, struct stat *stbuf)
 {
     logging(LOG_DEUBG, "stat(%lu)", ino);
     uint64_t arr[1] ;
-    struct file_stat stat_arr[1];
+    struct file_stat * stat = file_stat_new();
     arr[0] = ino;
 
     stbuf->st_ino = ino;
     stbuf->st_uid = 0;
     stbuf->st_gid = 0;
     {
-        stat_send_request(arr, 1, stat_arr);
-        stbuf->st_size = stat_arr[0].size;
+        stat_send_request(arr, 1, stat);
+        stbuf->st_size = stat->size;
         stbuf->st_blksize = 1024*1024*1024;
-        stbuf->st_mode = stat_arr[0].mode | 0777;
-        int pos1 = stat_arr[0].pos_arr[0];
-        int pos2 = stat_arr[0].pos_arr[1];
+        stbuf->st_mode = stat->mode | 0777;
+        int pos1 = stat->pos_arr[0];
+        int pos2 = stat->pos_arr[1];
 
         logging(LOG_DEUBG, "stat (ino = %lu) return {size: %"PRIu64", mode: %04o, pos at [%d, %d] }", 
                 ino, stbuf->st_size, stbuf->st_mode, pos1, pos2);
         stbuf->st_nlink = 1;
     }
+    file_stat_free(stat);
 
 	return 0;
 }
@@ -77,6 +78,8 @@ static void sfs_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
     if (e.ino){ // exists
         sfs_stat(e.ino, &e.attr);
     }
+
+    file_stat_free(stat);
     fuse_reply_entry(req, &e);
 }
 
@@ -149,6 +152,7 @@ static void sfs_ll_open(fuse_req_t req, fuse_ino_t ino,
     stat_send_request(arr, 1, stat);
     fi->fh = (unsigned long )stat;
 
+    /*file_stat_free(stat);  do not free!!*/
     fuse_reply_open(req, fi);
 }
 
@@ -246,6 +250,7 @@ void sfs_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf, int t
 	memset(&stbuf, 0, sizeof(stbuf));
 	if (sfs_stat(ino, &stbuf) == -1)
 		fuse_reply_err(req, ENOENT);
+    file_stat_free(fstat);
     fuse_reply_attr(req, &stbuf, 1.0);
 }
 
@@ -263,16 +268,16 @@ void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi) {
 		fuse_reply_err(req, ENOENT);
 
 
+    struct file_stat * f_stat = file_stat_new();
     if (stbuf.st_size < sizenow){
         //修改文件size
-        struct file_stat * f_stat = file_stat_new();
         f_stat -> ino = ino;
         f_stat -> size = sizenow;
 
         setattr_send_request(f_stat);
     }
 
-
+    file_stat_free(f_stat);
     fuse_reply_err(req,err);
 }
 
@@ -296,6 +301,7 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t m
     if (fuse_reply_create(req, &e, fi) == -ENOENT) {
 
     }
+    // file_stat_free(stat); not freee!!!!!!!!!!!!!
 }
 
 void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mode) {
@@ -314,6 +320,7 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name, mode_t mo
     if (fuse_reply_entry(req, &e) == -ENOENT) {
 
     }
+    file_stat_free(stat);
 }
  
 

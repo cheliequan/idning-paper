@@ -108,8 +108,8 @@ void context_free(struct request_context *ctx)
 
     if (ctx->buffer)
         evbuffer_free(ctx->buffer);
-
     evhttp_uri_free(ctx->uri);
+    evhttp_request_free(ctx->req);
     free(ctx);
 }
 
@@ -133,6 +133,7 @@ static int client_renew_request(struct request_context *ctx)
     }
 
     ctx->req = evhttp_request_new(client_callback, ctx);
+    evhttp_request_own(ctx->req); // means that I will free it myself
 
 
     struct evkeyval *header;
