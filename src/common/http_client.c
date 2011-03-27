@@ -87,7 +87,10 @@ struct request_context *context_new (const char *url, int verb, struct evkeyvalq
     ctx->uri = evhttp_uri_parse(url);
     ctx -> method = verb;
 
-    ctx -> postdata_buffer = data;
+    if (NULL != data){
+        ctx -> postdata_buffer = evbuffer_new();  
+        evbuffer_add_buffer(ctx->postdata_buffer, data);
+    }
     ctx -> req_headers = headers;
 
     if (!ctx->uri)
@@ -108,13 +111,15 @@ void context_free(struct request_context *ctx)
 
     if (ctx->buffer)
         evbuffer_free(ctx->buffer);
+    if (ctx->postdata_buffer)
+        evbuffer_free(ctx->postdata_buffer);
+
     evhttp_uri_free(ctx->uri);
     evhttp_request_free(ctx->req);
     free(ctx);
 }
 
-static int client_renew_request(struct request_context *ctx)
-{
+static int client_renew_request(struct request_context *ctx) {
     /* free connections & request */
     if (ctx->conn)
         evhttp_connection_free(ctx->conn);
@@ -148,7 +153,7 @@ static int client_renew_request(struct request_context *ctx)
                             "Host", ctx->uri->host);
     
     if (ctx->method == EVHTTP_REQ_POST){
-        ctx->req->output_buffer = ctx->postdata_buffer;
+        evbuffer_add_buffer(ctx->req->output_buffer, ctx->postdata_buffer);
         evhttp_make_request(ctx->conn, ctx->req, EVHTTP_REQ_POST, ctx->uri->path ? ctx->uri->path : "/");
 
     }else if (ctx->method == EVHTTP_REQ_GET){
