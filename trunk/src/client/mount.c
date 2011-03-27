@@ -183,6 +183,7 @@ static void sfs_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
         int len = evbuffer_get_length(response->body);
         uint8_t * buf = alloca(len);
         evbuffer_copyout(response->body, buf, len);
+        evhttp_clear_headers(headers);
 
         fuse_reply_buf(req, buf, size);
         http_response_free(response);

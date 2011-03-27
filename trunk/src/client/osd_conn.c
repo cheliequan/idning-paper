@@ -168,6 +168,7 @@ static void flush_write_buf(struct file_stat * stat, struct write_buf * b){
         http_response * response = http_post(url, headers, buf);
         evbuffer_get_length(response->body);
         http_response_free(response);
+        evhttp_clear_headers(headers);
         free(headers);
         evbuffer_free(buf);
     }
