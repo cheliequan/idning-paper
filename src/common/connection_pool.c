@@ -63,3 +63,11 @@ struct evhttp_connection * connection_pool_get_free_conn(ConnectionPool * pool ,
     logging(LOG_DEUBG, "connection_pool_get_free_conn on %s:%d return NULL!!!!!", host, port);
     return NULL;
 }
+struct evhttp_connection * connection_pool_get_or_create_conn(ConnectionPool * pool , char * host, int port){
+    struct evhttp_connection * rst;
+    rst = connection_pool_get_free_conn(pool, host, port);
+    if (NULL == rst)
+        rst= evhttp_connection_new(host, port);
+    return rst;
+}
+

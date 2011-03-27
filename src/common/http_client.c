@@ -15,7 +15,7 @@
 #include <string.h>
 #include <sys/queue.h>
 
-ConnectionPool * conn_pool = NULL;
+static ConnectionPool * conn_pool = NULL;
 
 static http_response * http_response_new(int status_code, struct evbuffer * headers, struct evbuffer * body);
 void http_response_free(http_response * r);

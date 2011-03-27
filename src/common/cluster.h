@@ -1,7 +1,5 @@
-
 #include "protocol.gen.h"
 #include "protocol.h"
-
 
 #ifndef _CLUSTER_H__
 #define _CLUSTER_H__
