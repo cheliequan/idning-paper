@@ -3,8 +3,6 @@
 
 ConnectionPool *conn_pool = NULL;
 
-struct evrpc_pool *pool = NULL;
-
 typedef void (*marshal_func) (struct evbuffer *, void *);
 typedef int (*unmarshal_func) (void *, struct evbuffer *);
 
@@ -13,11 +11,9 @@ static void general_req(char *ip, int port, const char *rpcname,
                         void *resp, unmarshal_func resp_unmarshal);
 
 static void rpc_request_gen_cb(struct evhttp_request *req, void *arg);
-
-///////////////////
-
 static void file_stat_copy(struct file_stat *dst, struct file_stat *src);
 
+///////////////////
 int setattr_send_request(struct file_stat *stat_arr)
 {
     DBG();
@@ -26,8 +22,8 @@ int setattr_send_request(struct file_stat *stat_arr)
     struct setattr_response *response = setattr_response_new();
 
     struct file_stat *t = EVTAG_ARRAY_ADD(req, stat_arr);
-    EVTAG_ASSIGN(t, ino, stat_arr->ino);    // 不然它不认..
-    EVTAG_ASSIGN(t, size, stat_arr->size);  // 不然它不认..
+    EVTAG_ASSIGN(t, ino, stat_arr->ino);    
+    EVTAG_ASSIGN(t, size, stat_arr->size);  
 
     general_req("127.0.0.1", 9528, "/.rpc.rpc_setattr",
                 req, (marshal_func) setattr_request_marshal,
@@ -244,9 +240,6 @@ void mds_conn_init()
     rpc_client_setup("client", 0, MACHINE_CLIENT);
 
     struct machine *mds = cluster_get_machine_of_type(MACHINE_MDS);
-    pool = evrpc_pool_new(NULL);
-    struct evhttp_connection *evcon = evhttp_connection_new(mds->ip, mds->port);
-    evrpc_pool_add_connection(pool, evcon);
 
     conn_pool = connection_pool_new();
 
