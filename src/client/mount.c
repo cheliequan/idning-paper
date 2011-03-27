@@ -332,7 +332,7 @@ void sfs_statfs(fuse_req_t req, fuse_ino_t ino) {
     uint32_t totalspace,availspace;
     uint32_t inodes;
 
-    uint32_t bsize = 0x10000;
+    uint32_t bsize = 1024;
     struct statvfs stfsbuf;
     memset(&stfsbuf,0,sizeof(stfsbuf));
 
@@ -340,7 +340,7 @@ void sfs_statfs(fuse_req_t req, fuse_ino_t ino) {
     statfs_send_request(&totalspace, &availspace, & inodes);
     logging(LOG_DEUBG , "sfs_statfs get : %d , %d, %d ", totalspace, availspace, inodes);
 
-    stfsbuf.f_namemax = 1000000;
+    stfsbuf.f_namemax = 1024*1024;
     stfsbuf.f_frsize = bsize; 
     stfsbuf.f_bsize = bsize;  
 

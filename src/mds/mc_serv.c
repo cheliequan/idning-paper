@@ -112,9 +112,9 @@ statfs_handler(EVRPC_STRUCT(rpc_statfs)* rpc, void *arg)
 
     fs_statfs( &total_space, &avail_space, &inode_cnt);
 
-    EVTAG_ASSIGN(response, total_space, 1);
-    EVTAG_ASSIGN(response, avail_space, 1);
-    EVTAG_ASSIGN(response, inode_cnt, 8);
+    EVTAG_ASSIGN(response, total_space, total_space);
+    EVTAG_ASSIGN(response, avail_space, avail_space);
+    EVTAG_ASSIGN(response, inode_cnt, inode_cnt);
 
     EVRPC_REQUEST_DONE(rpc);
 }

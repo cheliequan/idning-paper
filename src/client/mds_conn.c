@@ -194,6 +194,7 @@ int statfs_send_request(int * total_space, int * avail_space, int * inode_cnt)
 
     struct evhttp_connection *evcon = connection_pool_get_or_create_conn(conn_pool, "127.0.0.1", 9528);
     struct evhttp_request *evreq = evhttp_request_new(rpc_request_gen_cb, NULL);
+    evhttp_request_own(evreq); // this means that I should free it my self
 
     statfs_request_marshal(evreq->output_buffer, req);
     if ( evhttp_make_request(evcon, evreq, EVHTTP_REQ_POST, "/.rpc.rpc_statfs"))
@@ -226,7 +227,6 @@ static void rpc_request_gen_cb(struct evhttp_request *req, void *arg)
 
     logging(LOG_DEUBG, "evbuffer_get_length(evreq->output_buffer): %d", evbuffer_get_length(req->output_buffer));
     logging(LOG_DEUBG, "evbuffer_get_length(evreq->input_buffer): %d", evbuffer_get_length(req->input_buffer));
-    evbuffer_copyout(req->input_buffer, tmp, evbuffer_get_length(req->input_buffer));
 
     event_loopexit(NULL);
 
