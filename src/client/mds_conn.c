@@ -14,28 +14,28 @@ static void general_req(char * ip, int port, const char *rpcname,
 
 static void rpc_request_gen_cb(struct evhttp_request *req, void *arg);
 
-static void stat_cb(struct evrpc_status *status, struct stat_request *request , struct stat_response * response , void *arg) {
-    event_loopexit(NULL);
-}
+/*static void stat_cb(struct evrpc_status *status, struct stat_request *request , struct stat_response * response , void *arg) {*/
+    /*event_loopexit(NULL);*/
+/*}*/
 
-static void ls_cb(struct evrpc_status *status, struct ls_request *request , struct ls_response * response , void *arg){
-    event_loopexit(NULL);
-}
-static void mknod_cb(struct evrpc_status *status, struct mknod_request *request , struct mknod_response * response , void *arg){
-    event_loopexit(NULL);
-}
+/*static void ls_cb(struct evrpc_status *status, struct ls_request *request , struct ls_response * response , void *arg){*/
+    /*event_loopexit(NULL);*/
+/*}*/
+/*static void mknod_cb(struct evrpc_status *status, struct mknod_request *request , struct mknod_response * response , void *arg){*/
+    /*event_loopexit(NULL);*/
+/*}*/
 
-static void lookup_cb(struct evrpc_status *status, struct lookup_request *request , struct lookup_response * response , void *arg){
-    event_loopexit(NULL);
-}
+/*static void lookup_cb(struct evrpc_status *status, struct lookup_request *request , struct lookup_response * response , void *arg){*/
+    /*event_loopexit(NULL);*/
+/*}*/
 
-static void unlink_cb(struct evrpc_status *status, struct unlink_request *request , struct unlink_response * response , void *arg){
-    event_loopexit(NULL);
-}
+/*static void unlink_cb(struct evrpc_status *status, struct unlink_request *request , struct unlink_response * response , void *arg){*/
+    /*event_loopexit(NULL);*/
+/*}*/
 
-static void setattr_cb(struct evrpc_status *status, struct setattr_request *request , struct setattr_response * response , void *arg){
-    event_loopexit(NULL);
-}
+/*static void setattr_cb(struct evrpc_status *status, struct setattr_request *request , struct setattr_response * response , void *arg){*/
+    /*event_loopexit(NULL);*/
+/*}*/
 
 /*static void statfs_cb(struct evrpc_status *status, struct statfs_request *request , struct statfs_response* response , void *arg){*/
     /*event_loopexit(NULL);*/
@@ -51,8 +51,11 @@ int setattr_send_request(struct file_stat * stat_arr)
     EVTAG_ASSIGN(t, ino, stat_arr->ino); // 不然它不认..
     EVTAG_ASSIGN(t, size , stat_arr->size); // 不然它不认..
 
-    EVRPC_MAKE_REQUEST(rpc_setattr, pool, req, response,  setattr_cb, NULL);
-    event_dispatch();
+    general_req("127.0.0.1", 9528, "/.rpc.rpc_setattr",
+            req, (marshal_func)setattr_request_marshal,
+            response, (unmarshal_func)setattr_response_unmarshal
+            );
+
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
     if (cnt!=1){
         logging(LOG_ERROR, "setattr_send_request return cnt != 1, cnt= %d", cnt);
@@ -71,8 +74,11 @@ int stat_send_request(uint64_t * ino_arr, int len, struct file_stat * stat_arr)
         EVTAG_ARRAY_ADD_VALUE(req, ino_arr, ino_arr[i]);
     }
 
-    EVRPC_MAKE_REQUEST(rpc_stat, pool, req, response,  stat_cb, NULL);
-    event_dispatch();
+    general_req("127.0.0.1", 9528, "/.rpc.rpc_stat",
+            req, (marshal_func)stat_request_marshal,
+            response, (unmarshal_func)stat_response_unmarshal
+            );
+
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
     if (cnt!=len)
         return -1;
@@ -100,9 +106,11 @@ int ls_send_request(uint64_t ino, struct file_stat * stat_arr)
 
     EVTAG_ARRAY_ADD_VALUE(req, ino_arr, ino);
 
-    EVRPC_MAKE_REQUEST(rpc_ls, pool, req, response,  ls_cb, NULL);
-    event_dispatch();
 
+    general_req("127.0.0.1", 9528, "/.rpc.rpc_ls",
+            req, (marshal_func)ls_request_marshal,
+            response, (unmarshal_func)ls_response_unmarshal
+            );
     int i;
     struct file_stat * stat = file_stat_new();
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
@@ -129,8 +137,10 @@ int mknod_send_request(uint64_t parent_ino, const char * name, int type, int mod
     EVTAG_ASSIGN(req, mode, mode);
 
 
-    EVRPC_MAKE_REQUEST(rpc_mknod, pool, req, response,  mknod_cb, NULL);
-    event_dispatch();
+    general_req("127.0.0.1", 9528, "/.rpc.rpc_mknod",
+            req, (marshal_func)mknod_request_marshal,
+            response, (unmarshal_func)mknod_response_unmarshal
+            );
 
     struct file_stat * stat = file_stat_new();
     EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
@@ -158,8 +168,10 @@ int lookup_send_request(uint64_t parent_ino, const char * name , struct file_sta
     EVTAG_ASSIGN(req, parent_ino, parent_ino);
     EVTAG_ASSIGN(req, name, name);
 
-    EVRPC_MAKE_REQUEST(rpc_lookup, pool, req, response,  lookup_cb, NULL);
-    event_dispatch();
+    general_req("127.0.0.1", 9528, "/.rpc.rpc_lookup",
+            req, (marshal_func)lookup_request_marshal,
+            response, (unmarshal_func)lookup_response_unmarshal
+            );
 
     struct file_stat * stat = file_stat_new();
     EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
@@ -180,8 +192,10 @@ int unlink_send_request(uint64_t parent_ino, const char * name )
     EVTAG_ASSIGN(req, name, name);
 
 
-    EVRPC_MAKE_REQUEST(rpc_unlink, pool, req, response,  unlink_cb, NULL);
-    event_dispatch();
+    general_req("127.0.0.1", 9528, "/.rpc.rpc_unlink",
+            req, (marshal_func)unlink_request_marshal,
+            response, (unmarshal_func)unlink_response_unmarshal
+            );
 
     return 0;
 }
@@ -201,30 +215,11 @@ int statfs_send_request(int * total_space, int * avail_space, int * inode_cnt)
     general_req("127.0.0.1", 9528, "/.rpc.rpc_statfs",
             req, (marshal_func)statfs_request_marshal,
             response, (unmarshal_func)statfs_response_unmarshal
-
             );
-
-    //struct evhttp_connection *evcon = connection_pool_get_or_create_conn(conn_pool, "127.0.0.1", 9528);
-    //struct evhttp_request *evreq = evhttp_request_new(rpc_request_gen_cb, NULL);
-    //evhttp_request_own(evreq); // this means that I should free it my self
-
-    //statfs_request_marshal(evreq->output_buffer, req);
-    //if ( evhttp_make_request(evcon, evreq, EVHTTP_REQ_POST, "/.rpc.rpc_statfs"))
-    //    logging(LOG_ERROR, "error on make_request");
-
-    ///*EVRPC_MAKE_REQUEST(rpc_statfs, pool, req, response,  statfs_cb, NULL);*/
-
-    //event_dispatch();
-    //if (statfs_response_unmarshal(response, evreq -> input_buffer)){
-    //    logging(LOG_ERROR, "error on statfs_response_unmarshal");
-    //}
 
     EVTAG_GET(response, total_space, total_space);
     EVTAG_GET(response, avail_space, avail_space);
     EVTAG_GET(response, inode_cnt, inode_cnt);
-
-
-    //connection_pool_insert(conn_pool, "127.0.0.1", 9528, evcon);
     return 0;
 }
 

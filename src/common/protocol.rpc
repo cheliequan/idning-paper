@@ -86,7 +86,7 @@ struct unlink_request {
 }
 
 struct unlink_response {
-    int64 ino                             = 1;
+    optional int64 ino                             = 1;
 }
 
 
