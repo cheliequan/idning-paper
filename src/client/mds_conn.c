@@ -5,6 +5,13 @@ ConnectionPool * conn_pool = NULL;
 
 struct evrpc_pool *pool = NULL;
 
+typedef void (*marshal_func)(struct evbuffer *, void *);
+typedef int (*unmarshal_func)(void * , struct evbuffer *);
+
+static void general_req(char * ip, int port, const char *rpcname,
+    void * req, marshal_func req_marshal,
+    void * resp, unmarshal_func resp_unmarshal );
+
 static void rpc_request_gen_cb(struct evhttp_request *req, void *arg);
 
 static void stat_cb(struct evrpc_status *status, struct stat_request *request , struct stat_response * response , void *arg) {
@@ -191,31 +198,55 @@ int statfs_send_request(int * total_space, int * avail_space, int * inode_cnt)
 
     EVTAG_ASSIGN(req, nothing, 1);
 
+    general_req("127.0.0.1", 9528, "/.rpc.rpc_statfs",
+            req, (marshal_func)statfs_request_marshal,
+            response, (unmarshal_func)statfs_response_unmarshal
 
-    struct evhttp_connection *evcon = connection_pool_get_or_create_conn(conn_pool, "127.0.0.1", 9528);
-    struct evhttp_request *evreq = evhttp_request_new(rpc_request_gen_cb, NULL);
-    evhttp_request_own(evreq); // this means that I should free it my self
+            );
 
-    statfs_request_marshal(evreq->output_buffer, req);
-    if ( evhttp_make_request(evcon, evreq, EVHTTP_REQ_POST, "/.rpc.rpc_statfs"))
-        logging(LOG_ERROR, "error on make_request");
+    //struct evhttp_connection *evcon = connection_pool_get_or_create_conn(conn_pool, "127.0.0.1", 9528);
+    //struct evhttp_request *evreq = evhttp_request_new(rpc_request_gen_cb, NULL);
+    //evhttp_request_own(evreq); // this means that I should free it my self
 
-    /*EVRPC_MAKE_REQUEST(rpc_statfs, pool, req, response,  statfs_cb, NULL);*/
+    //statfs_request_marshal(evreq->output_buffer, req);
+    //if ( evhttp_make_request(evcon, evreq, EVHTTP_REQ_POST, "/.rpc.rpc_statfs"))
+    //    logging(LOG_ERROR, "error on make_request");
 
-    event_dispatch();
-    logging(LOG_DEUBG, "evbuffer_get_length(evreq->output_buffer): %d", evbuffer_get_length(evreq->output_buffer));
-    logging(LOG_DEUBG, "evbuffer_get_length(evreq->input_buffer): %d", evbuffer_get_length(evreq->input_buffer));
-    if (statfs_response_unmarshal(response, evreq -> input_buffer)){
-        logging(LOG_ERROR, "error on statfs_response_unmarshal");
-    }
+    ///*EVRPC_MAKE_REQUEST(rpc_statfs, pool, req, response,  statfs_cb, NULL);*/
+
+    //event_dispatch();
+    //if (statfs_response_unmarshal(response, evreq -> input_buffer)){
+    //    logging(LOG_ERROR, "error on statfs_response_unmarshal");
+    //}
 
     EVTAG_GET(response, total_space, total_space);
     EVTAG_GET(response, avail_space, avail_space);
     EVTAG_GET(response, inode_cnt, inode_cnt);
 
 
-    connection_pool_insert(conn_pool, "127.0.0.1", 9528, evcon);
+    //connection_pool_insert(conn_pool, "127.0.0.1", 9528, evcon);
     return 0;
+}
+
+static void general_req(char * ip, int port, const char *rpcname,
+    void * req, marshal_func req_marshal,
+    void * resp, unmarshal_func resp_unmarshal )
+{
+    struct evhttp_connection *evcon = connection_pool_get_or_create_conn(conn_pool, ip, port);
+    struct evhttp_request *evreq = evhttp_request_new(rpc_request_gen_cb, NULL);
+    evhttp_request_own(evreq); // this means that I should free it my self
+
+    req_marshal(evreq->output_buffer, req);
+    if ( evhttp_make_request(evcon, evreq, EVHTTP_REQ_POST, rpcname))
+        logging(LOG_ERROR, "error on make_request");
+
+    event_dispatch();
+    if (resp_unmarshal(resp, evreq -> input_buffer)){
+        logging(LOG_ERROR, "error on statfs_response_unmarshal");
+    }
+    connection_pool_insert(conn_pool, ip, port, evcon);
+
+
 }
 
 static void rpc_request_gen_cb(struct evhttp_request *req, void *arg)
