@@ -37,7 +37,7 @@ void test_post(char *str)
 {
     char *p;
     struct evbuffer *buffer = evbuffer_new();
-    evbuffer_add_printf(buffer, str);
+    evbuffer_add_printf(buffer, "%s", str);
     http_response *response = http_post("http://127.0.0.1:6006/put/999999", NULL, buffer);  // xiaonei.com/home
     printf("%d\n", response->status_code);
 

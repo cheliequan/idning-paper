@@ -9,6 +9,7 @@
 #include "protocol.gen.h"
 #include "protocol.h"
 #include "log.h"
+#include "cfg.h"
 
 #include "cluster.h"
 
@@ -61,7 +62,8 @@ void ping_handler(EVRPC_STRUCT(rpc_ping) * rpc, void *arg)
     //char * self_ip = ping->self_ip;
     char *remote_ip;            //= rpc->http_req->evcon->address;
     int remote_port;            //= rpc->http_req->evcon->address;
-    evhttp_connection_get_peer(rpc->http_req->evcon, &remote_ip, &remote_port);
+    uint16_t tmp_port;
+    evhttp_connection_get_peer(rpc->http_req->evcon, &remote_ip, &tmp_port);
     remote_port = ping->self_port;
     int type = ping->self_type;
     int mid = ping->mid;

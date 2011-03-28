@@ -53,14 +53,11 @@ typedef struct _fsnode {
 //#define TYPE_SOCKET           's'
 //#define TYPE_UNKNOWN          '?'
 
-static fsnode *root;
 
 #define NODEHASHBITS (22)
 #define NODEHASHSIZE (1<<NODEHASHBITS)
 #define NODEHASHPOS(nodeid) ((nodeid)&(NODEHASHSIZE-1))
 
-static fsnode *nodehash[NODEHASHSIZE];
-static uint64_t version;
 
 fsnode *fsnode_new();
 
