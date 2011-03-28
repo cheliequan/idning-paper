@@ -99,13 +99,13 @@ struct statfs_response {
     int avail_space                     = 2;
     int inode_cnt                       = 3;
 }
-
+/************       mkfs    ***************/
 struct mkfs_request {
-    optional int nothing                = 1;
+    array int pos_arr                   = 1;
 }
 
 struct mkfs_response {
-    optional int nothing                = 1;
+    optional int rst                    = 1;
 }
 
 
