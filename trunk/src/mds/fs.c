@@ -126,6 +126,10 @@ int fs_stat(uint64_t ino, struct file_stat *st)
 {
     logging(LOG_DEUBG, "fs_stat(%" PRIu64 ")", ino);
     fsnode *n = fsnode_hash_find(ino);
+    if (n == NULL){
+        st->ino=0;
+        return 1;
+    }
     st->ino = ino;
     st->size = n->data.fdata.length;
     st->mode = n->mode;
@@ -214,7 +218,7 @@ fsnode *fs_mknod(uint64_t parent_ino, char *name, int type, int mode)
 /*
  * make root of a whole fs, call by mkfs.sfs
  * */
-int fs_mkfs()
+int fs_mkfs(int mds1, int mds2)
 {
     DBG();
 
@@ -226,6 +230,9 @@ int fs_mkfs()
     root->nlen = strlen(root->name);
     root->parent = root;
     root->data.ddata.children = NULL;
+
+    root -> pos_arr[0] = mds1;
+    root -> pos_arr[1] = mds2;
 
     fsnode_hash_insert(root);
 

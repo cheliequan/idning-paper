@@ -1,5 +1,6 @@
 #include "sfs_common.h"
 #include "mds_conn.h"
+#include "attr_cache.h"
 
 ConnectionPool *conn_pool = NULL;
 
@@ -43,8 +44,7 @@ int setattr_send_request(struct file_stat *stat_arr)
 
 }
 
-int stat_send_request(uint64_t * ino_arr, int len, struct file_stat *stat_arr)
-{
+int stat_send_request_to(uint64_t * ino_arr, int len, struct file_stat *stat_arr, char * ip, int port){
     DBG();
     int ret = 0;
     struct stat_request *req = stat_request_new();
@@ -54,7 +54,7 @@ int stat_send_request(uint64_t * ino_arr, int len, struct file_stat *stat_arr)
         EVTAG_ARRAY_ADD_VALUE(req, ino_arr, ino_arr[i]);
     }
 
-    general_req("127.0.0.1", 9528, "/.rpc.rpc_stat",
+    general_req(ip, port, "/.rpc.rpc_stat",
                 req, (marshal_func) stat_request_marshal,
                 response, (unmarshal_func) stat_response_unmarshal);
 
@@ -66,12 +66,24 @@ int stat_send_request(uint64_t * ino_arr, int len, struct file_stat *stat_arr)
     struct file_stat *stat;
     for (i = 0; i < len; i++) {
         EVTAG_ARRAY_GET(response, stat_arr, i, &stat);
+        if (stat->ino == 0){
+            ret = -1;
+            goto done;
+        }
         file_stat_copy(stat_arr + i, stat);
     }
   done:
     stat_request_free(req);
     stat_response_free(response);
     return ret;
+}
+int stat_send_request(uint64_t * ino_arr, int len, struct file_stat *stat_arr)
+{
+    // it MUST be int the attr_cache
+    struct file_stat * cached = attr_cache_lookup(ino_arr[0]);
+    file_stat_copy(stat_arr, cached);
+    return 0;
+
 }
 
 //seams same as stat_send_request
@@ -209,24 +221,30 @@ int statfs_send_request(int *total_space, int *avail_space, int *inode_cnt)
     return 0;
 }
 
-int mkfs_send_request()
+int mkfs_send_request(int mds1, int mds2)
 {
-//    DBG();
-//    struct mkfs_request *req = mkfs_request_new();
-//    struct mkfs_response *response = mkfs_response_new();
-//
-//
-//    EVTAG_ARRAY_ADD_VALUE(req, pos_arr, 1);
-//
-//    general_req("127.0.0.1", 9528, "/.rpc.rpc_statfs",
-//                req, (marshal_func) statfs_request_marshal,
-//                response, (unmarshal_func) statfs_response_unmarshal);
-//
-//    EVTAG_GET(response, total_space, total_space);
-//    EVTAG_GET(response, avail_space, avail_space);
-//    EVTAG_GET(response, inode_cnt, inode_cnt);
-//    statfs_request_free(req);
-//    statfs_response_free(response);
+   DBG();
+   struct mkfs_request *req = mkfs_request_new();
+   struct mkfs_response *response = mkfs_response_new();
+
+
+   EVTAG_ARRAY_ADD_VALUE(req, pos_arr, mds1);
+   EVTAG_ARRAY_ADD_VALUE(req, pos_arr, mds2);
+
+   struct machine * m = cluster_get_machine_by_mid(mds1);
+
+   general_req(m->ip, m->port, "/.rpc.rpc_mkfs",
+               req, (marshal_func) mkfs_request_marshal,
+               response, (unmarshal_func) mkfs_response_unmarshal);
+
+   m = cluster_get_machine_by_mid(mds2);
+
+   general_req(m->ip, m->port, "/.rpc.rpc_mkfs",
+               req, (marshal_func) mkfs_request_marshal,
+               response, (unmarshal_func) mkfs_response_unmarshal);
+
+   mkfs_request_free(req);
+   mkfs_response_free(response);
     return 0;
 }
 

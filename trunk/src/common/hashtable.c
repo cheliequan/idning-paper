@@ -156,6 +156,34 @@ void hash_int_str_foreach(void *key, void *value, void *user_data)
 
 }
 
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+int equal_int64(void *v1, void *v2)
+{
+    return *((const int64_t *)v1) == *((const int64_t *)v2);
+}
+
+uint32_t hash_int64(const void *v)
+{
+    uint64_t key = *((const int64_t *)v);
+    key = (~key) + (key << 18); // key = (key << 18) - key - 1;
+    key = key ^ (key >> 31);
+    key = key * 21; // key = (key + (key << 2)) + (key << 4);
+    key = key ^ (key >> 11);
+    key = key + (key << 6);
+    key = key ^ (key >> 22);
+    return (int) key;
+}
+
+void foreach_int64_str(void *key, void *value, void *user_data)
+{
+    printf("%"PRIi64" => %s\n", *(int64_t *)key, (char *)value);
+
+}
+//////////////////////////////////////////////////////////////////////////////////////////////
+
 void hash_str_str_foreach(void *key, void *value, void *user_data)
 {
     printf("%s => %s\n", (char *)key, (char *)value);

@@ -185,7 +185,7 @@ void cluster_printf(char *hint)
     int i;
 
     for (i = 0; i < machine_cnt; i++) {
-        sprintf(p, "%s\t:%s:%d\t\t(%d)\n", cluster_type_str(machines[i].type)
+        sprintf(p, "%5s%20s:%-6d(%d)\n", cluster_type_str(machines[i].type)
                 , machines[i].ip, machines[i].port, machines[i].mid);
         while (*p)
             p++;
