@@ -128,8 +128,9 @@ static void sfs_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     logging(LOG_DEUBG, "readdir(ino = %lu)", ino);
     (void)fi;
 
-    struct file_stat stat_arr[100]; //FIXME: 100...
-    int cnt = ls_send_request(ino, &stat_arr);
+    struct file_stat * stat_arr; 
+    int cnt;
+    ls_send_request(ino, &stat_arr, &cnt);
     int i;
     struct dirbuf b;
     memset(&b, 0, sizeof(b));
@@ -143,6 +144,8 @@ static void sfs_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
 
     reply_buf_limited(req, b.p, b.size, off, size);
     free(b.p);
+    if(stat_arr)
+        free(stat_arr);
 }
 
 static void sfs_ll_open(fuse_req_t req, fuse_ino_t ino,

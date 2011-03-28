@@ -75,7 +75,7 @@ int stat_send_request(uint64_t * ino_arr, int len, struct file_stat *stat_arr)
 }
 
 //seams same as stat_send_request
-int ls_send_request(uint64_t ino, struct file_stat *stat_arr)
+int ls_send_request(uint64_t ino, struct file_stat **o_stat_arr, int * o_cnt)
 {
     DBG();
     struct ls_request *req = ls_request_new();
@@ -86,9 +86,13 @@ int ls_send_request(uint64_t ino, struct file_stat *stat_arr)
     general_req("127.0.0.1", 9528, "/.rpc.rpc_ls",
                 req, (marshal_func) ls_request_marshal,
                 response, (unmarshal_func) ls_response_unmarshal);
-    int i;
-    struct file_stat *stat = file_stat_new();
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
+
+    int i;
+    struct file_stat * stat_arr = calloc(sizeof(struct file_stat), cnt);
+
+    struct file_stat *stat = file_stat_new();
+    
     for (i = 0; i < cnt; i++) {
         EVTAG_ARRAY_GET(response, stat_arr, i, &stat);
         stat_arr[i].size = stat->size;
@@ -99,6 +103,9 @@ int ls_send_request(uint64_t ino, struct file_stat *stat_arr)
     }
     ls_request_free(req);
     ls_response_free(response);
+
+    * o_stat_arr = stat_arr;
+    * o_cnt = cnt;
 
     return cnt;
 }
@@ -239,7 +246,7 @@ void mds_conn_init()
     event_init();
     rpc_client_setup("client", 0, MACHINE_CLIENT);
 
-    struct machine *mds = cluster_get_machine_of_type(MACHINE_MDS);
+    //struct machine *mds = cluster_get_machine_of_type(MACHINE_MDS);
 
     conn_pool = connection_pool_new();
 

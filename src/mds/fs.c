@@ -1,5 +1,8 @@
 #include "fs.h"
 static uint64_t cur_ino = 3;
+static fsnode *root;
+static fsnode *nodehash[NODEHASHSIZE];
+static uint64_t version;
 
 void fsnode_tree_insert(fsnode * p, fsnode * n)
 {
@@ -130,6 +133,7 @@ int fs_setattr(uint64_t ino, struct file_stat *st)
 
     fsnode *n = fsnode_hash_find(ino);
     n->data.fdata.length = st->size;
+    version ++;
     return 0;
 }
 
@@ -192,6 +196,7 @@ fsnode *fs_unlink(uint64_t parent_ino, char *name)
     fsnode_tree_remove(s);
     fsnode_hash_remove(s);
     free(s);
+    version ++;
     return NULL;
 }
 
@@ -217,6 +222,7 @@ fsnode *fs_mknod(uint64_t parent_ino, char *name, int type, int mode)
 
     fsnode_hash_insert(n);
     fsnode_tree_insert(n->parent, n);
+    version ++;
     return n;
 }
 

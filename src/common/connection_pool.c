@@ -1,3 +1,4 @@
+#include <evhttp.h>
 #include "connection_pool.h"
 #include "dlist.h"
 #include "log.h"

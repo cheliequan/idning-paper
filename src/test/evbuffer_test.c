@@ -20,7 +20,7 @@ void test_post(char *str)
     printf("len(b1): %d \n", evbuffer_get_length(b1));
     printf("len(b2): %d \n", evbuffer_get_length(b2));
 
-    evbuffer_add_printf(b1, str);
+    evbuffer_add_printf(b1, "%s", str);
     evbuffer_add_buffer(b2, b1);
     printf("len(b1): %d \n", evbuffer_get_length(b1));
     printf("len(b2): %d \n", evbuffer_get_length(b2));
