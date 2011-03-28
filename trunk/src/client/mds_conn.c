@@ -95,11 +95,7 @@ int ls_send_request(uint64_t ino, struct file_stat **o_stat_arr, int * o_cnt)
     
     for (i = 0; i < cnt; i++) {
         EVTAG_ARRAY_GET(response, stat_arr, i, &stat);
-        stat_arr[i].size = stat->size;
-        stat_arr[i].ino = stat->ino;
-        stat_arr[i].name = strdup(stat->name);
-        stat_arr[i].type = stat->type;
-        stat_arr[i].mode = stat->mode;
+        file_stat_copy(stat_arr+i, stat);
     }
     ls_request_free(req);
     ls_response_free(response);
@@ -141,6 +137,9 @@ static void file_stat_copy(struct file_stat *dst, struct file_stat *src)
     dst->ino = src->ino;
     dst->type = src->type;
     dst->mode = src->mode;
+    if (src->name)
+        dst->name = strdup(src->name); //FIXME : free me!
+
     int len = EVTAG_ARRAY_LEN(src, pos_arr);
     int i = 0, pos;
     for (i = 0; i < len; i++) {
