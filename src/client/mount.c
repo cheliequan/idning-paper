@@ -5,6 +5,7 @@
 
 #include "osd_conn.h"
 #include "mds_conn.h"
+#include "attr_cache.h"
 
 void sig_handler(int signum)
 {
@@ -392,7 +393,9 @@ void sfs_statfs(fuse_req_t req, fuse_ino_t ino)
 }
 
 #define RST_FOUND 0
-void sfs_mkfs(){
+
+
+int find_root(){
     DBG();
 
     int *mds;
@@ -404,15 +407,38 @@ void sfs_mkfs(){
     for (i = 0; i < mds_cnt; i++){
         struct file_stat *stat = file_stat_new();
         EVTAG_ARRAY_ADD_VALUE(stat, pos_arr, mds[i]);
+        struct machine * m = cluster_get_machine_by_mid(mds[i]);
 
-        if(stat_send_request(ino_arr, 1, stat) == RST_FOUND){
-            logging(LOG_WARN, "fs is not null!!! can't do mkfs");
-            return ;
+        if(stat_send_request_to(ino_arr, 1, stat, m->ip, m->port) == RST_FOUND){
+            logging(LOG_INFO, "get inode %"PRIu64" at mds (%d)", 1, mds[i] );
+            attr_cache_add(stat); //no free
+
+            return 1;
         }
         file_stat_free(stat);
     }
+    return 0;
+}
+
+void sfs_mkfs(){
+    DBG();
+
+    int *mds;
+    int mds_cnt;
+    cluster_get_mds_arr(&mds, &mds_cnt);
+    if (mds_cnt <= 1){
+        logging(LOG_WARN, "we need at least 2 mds !, fs not mk");
+        return;
+    }
+    if(find_root()){
+        logging(LOG_WARN, "fs is not null!!! can't do mkfs");
+        return ;
+    }
+    mkfs_send_request(mds[0], mds[1]);
 }
 #undef RST_FOUND
+
+
 
 static struct fuse_lowlevel_ops sfs_ll_op = {
     .lookup = sfs_ll_lookup,
@@ -441,6 +467,10 @@ int main(int argc, char *argv[])
 {
     init_app(argc, argv, "client");
     mds_conn_init();
+    if (!find_root()){
+        sfs_mkfs();
+        find_root();
+    }
     http_client_init();
     init_sig_handler();
 

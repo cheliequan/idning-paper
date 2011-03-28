@@ -36,16 +36,23 @@ static void stat_handler(EVRPC_STRUCT(rpc_stat) * rpc, void *arg)
         logging(LOG_DEUBG, "stat(%" PRIu64 ")", ino);
 
         struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
-        fs_stat(ino, t);
-        EVTAG_ASSIGN(t, ino, t->ino);
-        EVTAG_ASSIGN(t, size, t->size);
-        EVTAG_ASSIGN(t, type, t->type);
-        EVTAG_ASSIGN(t, mode, t->mode);
+        if( 0 == fs_stat(ino, t)){
+            EVTAG_ASSIGN(t, ino, t->ino);
+            EVTAG_ASSIGN(t, size, t->size);
+            EVTAG_ASSIGN(t, type, t->type);
+            EVTAG_ASSIGN(t, mode, t->mode);
 
-        logging(LOG_DEUBG,
-                "stat(%" PRIu64 ") return {ino: %" PRIu64 ", size: %" PRIu64
-                ", type : %d, mode : %04o, pos [%d, %d]}", ino, t->ino, t->size,
-                t->type, t->mode, t->pos_arr[0], t->pos_arr[1]);
+            logging(LOG_DEUBG,
+                    "stat(%" PRIu64 ") return {ino: %" PRIu64 ", size: %" PRIu64
+                    ", type : %d, mode : %04o, pos [%d, %d]}", ino, t->ino, t->size,
+                    t->type, t->mode, t->pos_arr[0], t->pos_arr[1]);
+        }else{
+            EVTAG_ASSIGN(t, ino, 0);
+            EVTAG_ASSIGN(t, size, 0);
+            EVTAG_ASSIGN(t, type, 0);
+            EVTAG_ASSIGN(t, mode, 0);
+            logging(LOG_DEUBG, "stat(%" PRIu64 ") , not Found ", ino );
+        }
     }
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -194,6 +201,24 @@ static void unlink_handler(EVRPC_STRUCT(rpc_unlink) * rpc, void *arg)
     EVRPC_REQUEST_DONE(rpc);
 }
 
+
+
+static void mkfs_handler(EVRPC_STRUCT(rpc_mkfs) * rpc, void *arg)
+{
+    DBG();
+
+    struct mkfs_request * request = rpc->request;
+    struct mkfs_response * response = rpc->reply;
+
+    int mds1, mds2;
+    EVTAG_ARRAY_GET(request, pos_arr, 0, &mds1);
+    EVTAG_ARRAY_GET(request, pos_arr, 1, &mds2);
+
+    logging(LOG_DEUBG, "mkfs (mds1=%d, mds2=%d)", mds1, mds2);
+    fs_mkfs(mds1, mds2);
+    EVRPC_REQUEST_DONE(rpc);
+}
+
 static void rpc_setup()
 {
     struct evhttp *http = NULL;
@@ -228,6 +253,8 @@ static void rpc_setup()
 
     EVRPC_REGISTER(base, rpc_statfs, statfs_request, statfs_response,
                    statfs_handler, NULL);
+    EVRPC_REGISTER(base, rpc_mkfs, mkfs_request, mkfs_response,
+                   mkfs_handler, NULL);
 
 }
 
