@@ -209,6 +209,27 @@ int statfs_send_request(int *total_space, int *avail_space, int *inode_cnt)
     return 0;
 }
 
+int mkfs_send_request()
+{
+//    DBG();
+//    struct mkfs_request *req = mkfs_request_new();
+//    struct mkfs_response *response = mkfs_response_new();
+//
+//
+//    EVTAG_ARRAY_ADD_VALUE(req, pos_arr, 1);
+//
+//    general_req("127.0.0.1", 9528, "/.rpc.rpc_statfs",
+//                req, (marshal_func) statfs_request_marshal,
+//                response, (unmarshal_func) statfs_response_unmarshal);
+//
+//    EVTAG_GET(response, total_space, total_space);
+//    EVTAG_GET(response, avail_space, avail_space);
+//    EVTAG_GET(response, inode_cnt, inode_cnt);
+//    statfs_request_free(req);
+//    statfs_response_free(response);
+    return 0;
+}
+
 static void general_req(char *ip, int port, const char *rpcname,
                         void *req, marshal_func req_marshal,
                         void *resp, unmarshal_func resp_unmarshal)

@@ -391,6 +391,29 @@ void sfs_statfs(fuse_req_t req, fuse_ino_t ino)
     fuse_reply_statfs(req, &stfsbuf);
 }
 
+#define RST_FOUND 0
+void sfs_mkfs(){
+    DBG();
+
+    int *mds;
+    int mds_cnt;
+    int i;
+    int64_t ino_arr[1] = {1};
+
+    cluster_get_mds_arr(&mds, &mds_cnt);
+    for (i = 0; i < mds_cnt; i++){
+        struct file_stat *stat = file_stat_new();
+        EVTAG_ARRAY_ADD_VALUE(stat, pos_arr, mds[i]);
+
+        if(stat_send_request(ino_arr, 1, stat) == RST_FOUND){
+            logging(LOG_WARN, "fs is not null!!! can't do mkfs");
+            return ;
+        }
+        file_stat_free(stat);
+    }
+}
+#undef RST_FOUND
+
 static struct fuse_lowlevel_ops sfs_ll_op = {
     .lookup = sfs_ll_lookup,
     .getattr = sfs_ll_getattr,
@@ -420,6 +443,8 @@ int main(int argc, char *argv[])
     mds_conn_init();
     http_client_init();
     init_sig_handler();
+
+
 
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
     struct fuse_chan *ch;

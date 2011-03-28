@@ -200,15 +200,17 @@ void cluster_init()
     cluster_dump();
 }
 
-struct machine *cluster_get_machine_of_type(int type)
+
+void cluster_get_mds_arr(int ** o_arr, int * o_cnt)
 {
-    logging(LOG_DEUBG, "cluster_get_machine_of_type(%d)", type);
-    int i;
-    for (i = 0; i < machine_cnt; i++) {
-        if (machines[i].type == type)
-            return machines + i;
-    }
-    return NULL;
+    *o_arr = mds_arr;
+    *o_cnt = mds_cnt;
+}
+
+void cluster_get_osd_arr(int ** o_arr, int * o_cnt)
+{
+    *o_arr = osd_arr;
+    *o_cnt = osd_cnt;
 }
 
 struct machine *cluster_get_machine_by_mid(int mid)

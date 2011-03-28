@@ -15,289 +15,308 @@
 #define __func__ _EVENT___func__
 #endif
 
+
 #include "protocol.gen.h"
 
 void event_warn(const char *fmt, ...);
 void event_warnx(const char *fmt, ...);
+
 
 /*
  * Implementation of ping
  */
 
 static struct ping_access_ __ping_base = {
-    ping_version_assign,
-    ping_version_get,
-    ping_self_ip_assign,
-    ping_self_ip_get,
-    ping_self_port_assign,
-    ping_self_port_get,
-    ping_self_type_assign,
-    ping_self_type_get,
-    ping_mid_assign,
-    ping_mid_get,
+  ping_version_assign,
+  ping_version_get,
+  ping_self_ip_assign,
+  ping_self_ip_get,
+  ping_self_port_assign,
+  ping_self_port_get,
+  ping_self_type_assign,
+  ping_self_type_get,
+  ping_mid_assign,
+  ping_mid_get,
 };
 
-struct ping *ping_new(void)
+struct ping *
+ping_new(void)
 {
-    return ping_new_with_arg(NULL);
+  return ping_new_with_arg(NULL);
 }
 
-struct ping *ping_new_with_arg(void *unused)
+struct ping *
+ping_new_with_arg(void *unused)
 {
-    struct ping *tmp;
-    if ((tmp = malloc(sizeof(struct ping))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__ping_base;
+  struct ping *tmp;
+  if ((tmp = malloc(sizeof(struct ping))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__ping_base;
 
-    tmp->version = 0;
-    tmp->version_set = 0;
+  tmp->version = 0;
+  tmp->version_set = 0;
 
-    tmp->self_ip = NULL;
-    tmp->self_ip_set = 0;
+  tmp->self_ip = NULL;
+  tmp->self_ip_set = 0;
 
-    tmp->self_port = 0;
-    tmp->self_port_set = 0;
+  tmp->self_port = 0;
+  tmp->self_port_set = 0;
 
-    tmp->self_type = 0;
-    tmp->self_type_set = 0;
+  tmp->self_type = 0;
+  tmp->self_type_set = 0;
 
-    tmp->mid = 0;
-    tmp->mid_set = 0;
+  tmp->mid = 0;
+  tmp->mid_set = 0;
 
-    return (tmp);
+  return (tmp);
 }
 
-int ping_version_assign(struct ping *msg, const ev_uint32_t value)
+
+
+
+
+
+int
+ping_version_assign(struct ping *msg, const ev_uint32_t value)
 {
-    msg->version_set = 1;
-    msg->version = value;
-    return (0);
-}
-
-int ping_self_ip_assign(struct ping *msg, const char *value)
-{
-    if (msg->self_ip != NULL)
-        free(msg->self_ip);
-    if ((msg->self_ip = strdup(value)) == NULL)
-        return (-1);
-    msg->self_ip_set = 1;
-    return (0);
-}
-
-int ping_self_port_assign(struct ping *msg, const ev_uint32_t value)
-{
-    msg->self_port_set = 1;
-    msg->self_port = value;
-    return (0);
-}
-
-int ping_self_type_assign(struct ping *msg, const ev_uint32_t value)
-{
-    msg->self_type_set = 1;
-    msg->self_type = value;
-    return (0);
-}
-
-int ping_mid_assign(struct ping *msg, const ev_uint32_t value)
-{
-    msg->mid_set = 1;
-    msg->mid = value;
-    return (0);
-}
-
-int ping_version_get(struct ping *msg, ev_uint32_t * value)
-{
-    if (msg->version_set != 1)
-        return (-1);
-    *value = msg->version;
-    return (0);
-}
-
-int ping_self_ip_get(struct ping *msg, char **value)
-{
-    if (msg->self_ip_set != 1)
-        return (-1);
-    *value = msg->self_ip;
-    return (0);
-}
-
-int ping_self_port_get(struct ping *msg, ev_uint32_t * value)
-{
-    if (msg->self_port_set != 1)
-        return (-1);
-    *value = msg->self_port;
-    return (0);
-}
-
-int ping_self_type_get(struct ping *msg, ev_uint32_t * value)
-{
-    if (msg->self_type_set != 1)
-        return (-1);
-    *value = msg->self_type;
-    return (0);
-}
-
-int ping_mid_get(struct ping *msg, ev_uint32_t * value)
-{
-    if (msg->mid_set != 1)
-        return (-1);
-    *value = msg->mid;
-    return (0);
-}
-
-void ping_clear(struct ping *tmp)
-{
-    tmp->version_set = 0;
-    if (tmp->self_ip_set == 1) {
-        free(tmp->self_ip);
-        tmp->self_ip = NULL;
-        tmp->self_ip_set = 0;
-    }
-    tmp->self_port_set = 0;
-    tmp->self_type_set = 0;
-    tmp->mid_set = 0;
-}
-
-void ping_free(struct ping *tmp)
-{
-    if (tmp->self_ip != NULL)
-        free(tmp->self_ip);
-    free(tmp);
-}
-
-void ping_marshal(struct evbuffer *evbuf, const struct ping *tmp)
-{
-    evtag_marshal_int(evbuf, PING_VERSION, tmp->version);
-    evtag_marshal_string(evbuf, PING_SELF_IP, tmp->self_ip);
-    evtag_marshal_int(evbuf, PING_SELF_PORT, tmp->self_port);
-    evtag_marshal_int(evbuf, PING_SELF_TYPE, tmp->self_type);
-    evtag_marshal_int(evbuf, PING_MID, tmp->mid);
-}
-
-int ping_unmarshal(struct ping *tmp, struct evbuffer *evbuf)
-{
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
-
-        case PING_VERSION:
-
-            if (tmp->version_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, PING_VERSION, &tmp->version) == -1) {
-                event_warnx("%s: failed to unmarshal version", __func__);
-                return (-1);
-            }
-            tmp->version_set = 1;
-            break;
-
-        case PING_SELF_IP:
-
-            if (tmp->self_ip_set)
-                return (-1);
-            if (evtag_unmarshal_string(evbuf, PING_SELF_IP, &tmp->self_ip) ==
-                -1) {
-                event_warnx("%s: failed to unmarshal self_ip", __func__);
-                return (-1);
-            }
-            tmp->self_ip_set = 1;
-            break;
-
-        case PING_SELF_PORT:
-
-            if (tmp->self_port_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, PING_SELF_PORT, &tmp->self_port) ==
-                -1) {
-                event_warnx("%s: failed to unmarshal self_port", __func__);
-                return (-1);
-            }
-            tmp->self_port_set = 1;
-            break;
-
-        case PING_SELF_TYPE:
-
-            if (tmp->self_type_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, PING_SELF_TYPE, &tmp->self_type) ==
-                -1) {
-                event_warnx("%s: failed to unmarshal self_type", __func__);
-                return (-1);
-            }
-            tmp->self_type_set = 1;
-            break;
-
-        case PING_MID:
-
-            if (tmp->mid_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, PING_MID, &tmp->mid) == -1) {
-                event_warnx("%s: failed to unmarshal mid", __func__);
-                return (-1);
-            }
-            tmp->mid_set = 1;
-            break;
-
-        default:
-            return -1;
-        }
-    }
-
-    if (ping_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int ping_complete(struct ping *msg)
-{
-    if (!msg->version_set)
-        return (-1);
-    if (!msg->self_ip_set)
-        return (-1);
-    if (!msg->self_port_set)
-        return (-1);
-    if (!msg->self_type_set)
-        return (-1);
-    if (!msg->mid_set)
-        return (-1);
-    return (0);
+  msg->version_set = 1;
+  msg->version = value;
+  return (0);
 }
 
 int
-evtag_unmarshal_ping(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                     struct ping *msg)
+ping_self_ip_assign(struct ping *msg,
+    const char * value)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  if (msg->self_ip != NULL)
+    free(msg->self_ip);
+  if ((msg->self_ip = strdup(value)) == NULL)
+    return (-1);
+  msg->self_ip_set = 1;
+  return (0);
+}
 
-    struct evbuffer *tmp = evbuffer_new();
+int
+ping_self_port_assign(struct ping *msg, const ev_uint32_t value)
+{
+  msg->self_port_set = 1;
+  msg->self_port = value;
+  return (0);
+}
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+int
+ping_self_type_assign(struct ping *msg, const ev_uint32_t value)
+{
+  msg->self_type_set = 1;
+  msg->self_type = value;
+  return (0);
+}
 
-    if (ping_unmarshal(msg, tmp) == -1)
-        goto error;
+int
+ping_mid_assign(struct ping *msg, const ev_uint32_t value)
+{
+  msg->mid_set = 1;
+  msg->mid = value;
+  return (0);
+}
 
-    res = 0;
+int
+ping_version_get(struct ping *msg, ev_uint32_t *value)
+{
+  if (msg->version_set != 1)
+    return (-1);
+  *value = msg->version;
+  return (0);
+}
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+int
+ping_self_ip_get(struct ping *msg, char * *value)
+{
+  if (msg->self_ip_set != 1)
+    return (-1);
+  *value = msg->self_ip;
+  return (0);
+}
+
+int
+ping_self_port_get(struct ping *msg, ev_uint32_t *value)
+{
+  if (msg->self_port_set != 1)
+    return (-1);
+  *value = msg->self_port;
+  return (0);
+}
+
+int
+ping_self_type_get(struct ping *msg, ev_uint32_t *value)
+{
+  if (msg->self_type_set != 1)
+    return (-1);
+  *value = msg->self_type;
+  return (0);
+}
+
+int
+ping_mid_get(struct ping *msg, ev_uint32_t *value)
+{
+  if (msg->mid_set != 1)
+    return (-1);
+  *value = msg->mid;
+  return (0);
 }
 
 void
-evtag_marshal_ping(struct evbuffer *evbuf, ev_uint32_t tag,
-                   const struct ping *msg)
+ping_clear(struct ping *tmp)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    ping_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  tmp->version_set = 0;
+  if (tmp->self_ip_set == 1) {
+    free(tmp->self_ip);
+    tmp->self_ip = NULL;
+    tmp->self_ip_set = 0;
+  }
+  tmp->self_port_set = 0;
+  tmp->self_type_set = 0;
+  tmp->mid_set = 0;
+}
+
+void
+ping_free(struct ping *tmp)
+{
+  if (tmp->self_ip != NULL)
+      free (tmp->self_ip);
+  free(tmp);
+}
+
+void
+ping_marshal(struct evbuffer *evbuf, const struct ping *tmp){
+  evtag_marshal_int(evbuf, PING_VERSION, tmp->version);
+  evtag_marshal_string(evbuf, PING_SELF_IP, tmp->self_ip);
+  evtag_marshal_int(evbuf, PING_SELF_PORT, tmp->self_port);
+  evtag_marshal_int(evbuf, PING_SELF_TYPE, tmp->self_type);
+  evtag_marshal_int(evbuf, PING_MID, tmp->mid);
+}
+
+int
+ping_unmarshal(struct ping *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case PING_VERSION:
+
+        if (tmp->version_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, PING_VERSION, &tmp->version) == -1) {
+          event_warnx("%s: failed to unmarshal version", __func__);
+          return (-1);
+        }
+        tmp->version_set = 1;
+        break;
+
+      case PING_SELF_IP:
+
+        if (tmp->self_ip_set)
+          return (-1);
+        if (evtag_unmarshal_string(evbuf, PING_SELF_IP, &tmp->self_ip) == -1) {
+          event_warnx("%s: failed to unmarshal self_ip", __func__);
+          return (-1);
+        }
+        tmp->self_ip_set = 1;
+        break;
+
+      case PING_SELF_PORT:
+
+        if (tmp->self_port_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, PING_SELF_PORT, &tmp->self_port) == -1) {
+          event_warnx("%s: failed to unmarshal self_port", __func__);
+          return (-1);
+        }
+        tmp->self_port_set = 1;
+        break;
+
+      case PING_SELF_TYPE:
+
+        if (tmp->self_type_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, PING_SELF_TYPE, &tmp->self_type) == -1) {
+          event_warnx("%s: failed to unmarshal self_type", __func__);
+          return (-1);
+        }
+        tmp->self_type_set = 1;
+        break;
+
+      case PING_MID:
+
+        if (tmp->mid_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, PING_MID, &tmp->mid) == -1) {
+          event_warnx("%s: failed to unmarshal mid", __func__);
+          return (-1);
+        }
+        tmp->mid_set = 1;
+        break;
+
+      default:
+        return -1;
+    }
+  }
+
+  if (ping_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+ping_complete(struct ping *msg)
+{
+  if (!msg->version_set)
+    return (-1);
+  if (!msg->self_ip_set)
+    return (-1);
+  if (!msg->self_port_set)
+    return (-1);
+  if (!msg->self_type_set)
+    return (-1);
+  if (!msg->mid_set)
+    return (-1);
+  return (0);
+}
+
+int
+evtag_unmarshal_ping(struct evbuffer *evbuf, ev_uint32_t need_tag, struct ping *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (ping_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
+}
+
+void
+evtag_marshal_ping(struct evbuffer *evbuf, ev_uint32_t tag, const struct ping *msg)
+{
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  ping_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -305,241 +324,258 @@ evtag_marshal_ping(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct machine_access_ __machine_base = {
-    machine_mid_assign,
-    machine_mid_get,
-    machine_ip_assign,
-    machine_ip_get,
-    machine_port_assign,
-    machine_port_get,
-    machine_type_assign,
-    machine_type_get,
+  machine_mid_assign,
+  machine_mid_get,
+  machine_ip_assign,
+  machine_ip_get,
+  machine_port_assign,
+  machine_port_get,
+  machine_type_assign,
+  machine_type_get,
 };
 
-struct machine *machine_new(void)
+struct machine *
+machine_new(void)
 {
-    return machine_new_with_arg(NULL);
+  return machine_new_with_arg(NULL);
 }
 
-struct machine *machine_new_with_arg(void *unused)
+struct machine *
+machine_new_with_arg(void *unused)
 {
-    struct machine *tmp;
-    if ((tmp = malloc(sizeof(struct machine))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__machine_base;
+  struct machine *tmp;
+  if ((tmp = malloc(sizeof(struct machine))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__machine_base;
 
-    tmp->mid = 0;
-    tmp->mid_set = 0;
+  tmp->mid = 0;
+  tmp->mid_set = 0;
 
-    tmp->ip = NULL;
-    tmp->ip_set = 0;
+  tmp->ip = NULL;
+  tmp->ip_set = 0;
 
-    tmp->port = 0;
-    tmp->port_set = 0;
+  tmp->port = 0;
+  tmp->port_set = 0;
 
-    tmp->type = 0;
-    tmp->type_set = 0;
+  tmp->type = 0;
+  tmp->type_set = 0;
 
-    return (tmp);
+  return (tmp);
 }
 
-int machine_mid_assign(struct machine *msg, const ev_uint32_t value)
+
+
+
+
+int
+machine_mid_assign(struct machine *msg, const ev_uint32_t value)
 {
-    msg->mid_set = 1;
-    msg->mid = value;
-    return (0);
-}
-
-int machine_ip_assign(struct machine *msg, const char *value)
-{
-    if (msg->ip != NULL)
-        free(msg->ip);
-    if ((msg->ip = strdup(value)) == NULL)
-        return (-1);
-    msg->ip_set = 1;
-    return (0);
-}
-
-int machine_port_assign(struct machine *msg, const ev_uint32_t value)
-{
-    msg->port_set = 1;
-    msg->port = value;
-    return (0);
-}
-
-int machine_type_assign(struct machine *msg, const ev_uint32_t value)
-{
-    msg->type_set = 1;
-    msg->type = value;
-    return (0);
-}
-
-int machine_mid_get(struct machine *msg, ev_uint32_t * value)
-{
-    if (msg->mid_set != 1)
-        return (-1);
-    *value = msg->mid;
-    return (0);
-}
-
-int machine_ip_get(struct machine *msg, char **value)
-{
-    if (msg->ip_set != 1)
-        return (-1);
-    *value = msg->ip;
-    return (0);
-}
-
-int machine_port_get(struct machine *msg, ev_uint32_t * value)
-{
-    if (msg->port_set != 1)
-        return (-1);
-    *value = msg->port;
-    return (0);
-}
-
-int machine_type_get(struct machine *msg, ev_uint32_t * value)
-{
-    if (msg->type_set != 1)
-        return (-1);
-    *value = msg->type;
-    return (0);
-}
-
-void machine_clear(struct machine *tmp)
-{
-    tmp->mid_set = 0;
-    if (tmp->ip_set == 1) {
-        free(tmp->ip);
-        tmp->ip = NULL;
-        tmp->ip_set = 0;
-    }
-    tmp->port_set = 0;
-    tmp->type_set = 0;
-}
-
-void machine_free(struct machine *tmp)
-{
-    if (tmp->ip != NULL)
-        free(tmp->ip);
-    free(tmp);
-}
-
-void machine_marshal(struct evbuffer *evbuf, const struct machine *tmp)
-{
-    evtag_marshal_int(evbuf, MACHINE_MID, tmp->mid);
-    evtag_marshal_string(evbuf, MACHINE_IP, tmp->ip);
-    evtag_marshal_int(evbuf, MACHINE_PORT, tmp->port);
-    evtag_marshal_int(evbuf, MACHINE_TYPE, tmp->type);
-}
-
-int machine_unmarshal(struct machine *tmp, struct evbuffer *evbuf)
-{
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
-
-        case MACHINE_MID:
-
-            if (tmp->mid_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, MACHINE_MID, &tmp->mid) == -1) {
-                event_warnx("%s: failed to unmarshal mid", __func__);
-                return (-1);
-            }
-            tmp->mid_set = 1;
-            break;
-
-        case MACHINE_IP:
-
-            if (tmp->ip_set)
-                return (-1);
-            if (evtag_unmarshal_string(evbuf, MACHINE_IP, &tmp->ip) == -1) {
-                event_warnx("%s: failed to unmarshal ip", __func__);
-                return (-1);
-            }
-            tmp->ip_set = 1;
-            break;
-
-        case MACHINE_PORT:
-
-            if (tmp->port_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, MACHINE_PORT, &tmp->port) == -1) {
-                event_warnx("%s: failed to unmarshal port", __func__);
-                return (-1);
-            }
-            tmp->port_set = 1;
-            break;
-
-        case MACHINE_TYPE:
-
-            if (tmp->type_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, MACHINE_TYPE, &tmp->type) == -1) {
-                event_warnx("%s: failed to unmarshal type", __func__);
-                return (-1);
-            }
-            tmp->type_set = 1;
-            break;
-
-        default:
-            return -1;
-        }
-    }
-
-    if (machine_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int machine_complete(struct machine *msg)
-{
-    if (!msg->mid_set)
-        return (-1);
-    if (!msg->ip_set)
-        return (-1);
-    if (!msg->port_set)
-        return (-1);
-    if (!msg->type_set)
-        return (-1);
-    return (0);
+  msg->mid_set = 1;
+  msg->mid = value;
+  return (0);
 }
 
 int
-evtag_unmarshal_machine(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                        struct machine *msg)
+machine_ip_assign(struct machine *msg,
+    const char * value)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  if (msg->ip != NULL)
+    free(msg->ip);
+  if ((msg->ip = strdup(value)) == NULL)
+    return (-1);
+  msg->ip_set = 1;
+  return (0);
+}
 
-    struct evbuffer *tmp = evbuffer_new();
+int
+machine_port_assign(struct machine *msg, const ev_uint32_t value)
+{
+  msg->port_set = 1;
+  msg->port = value;
+  return (0);
+}
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+int
+machine_type_assign(struct machine *msg, const ev_uint32_t value)
+{
+  msg->type_set = 1;
+  msg->type = value;
+  return (0);
+}
 
-    if (machine_unmarshal(msg, tmp) == -1)
-        goto error;
+int
+machine_mid_get(struct machine *msg, ev_uint32_t *value)
+{
+  if (msg->mid_set != 1)
+    return (-1);
+  *value = msg->mid;
+  return (0);
+}
 
-    res = 0;
+int
+machine_ip_get(struct machine *msg, char * *value)
+{
+  if (msg->ip_set != 1)
+    return (-1);
+  *value = msg->ip;
+  return (0);
+}
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+int
+machine_port_get(struct machine *msg, ev_uint32_t *value)
+{
+  if (msg->port_set != 1)
+    return (-1);
+  *value = msg->port;
+  return (0);
+}
+
+int
+machine_type_get(struct machine *msg, ev_uint32_t *value)
+{
+  if (msg->type_set != 1)
+    return (-1);
+  *value = msg->type;
+  return (0);
 }
 
 void
-evtag_marshal_machine(struct evbuffer *evbuf, ev_uint32_t tag,
-                      const struct machine *msg)
+machine_clear(struct machine *tmp)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    machine_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  tmp->mid_set = 0;
+  if (tmp->ip_set == 1) {
+    free(tmp->ip);
+    tmp->ip = NULL;
+    tmp->ip_set = 0;
+  }
+  tmp->port_set = 0;
+  tmp->type_set = 0;
+}
+
+void
+machine_free(struct machine *tmp)
+{
+  if (tmp->ip != NULL)
+      free (tmp->ip);
+  free(tmp);
+}
+
+void
+machine_marshal(struct evbuffer *evbuf, const struct machine *tmp){
+  evtag_marshal_int(evbuf, MACHINE_MID, tmp->mid);
+  evtag_marshal_string(evbuf, MACHINE_IP, tmp->ip);
+  evtag_marshal_int(evbuf, MACHINE_PORT, tmp->port);
+  evtag_marshal_int(evbuf, MACHINE_TYPE, tmp->type);
+}
+
+int
+machine_unmarshal(struct machine *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case MACHINE_MID:
+
+        if (tmp->mid_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, MACHINE_MID, &tmp->mid) == -1) {
+          event_warnx("%s: failed to unmarshal mid", __func__);
+          return (-1);
+        }
+        tmp->mid_set = 1;
+        break;
+
+      case MACHINE_IP:
+
+        if (tmp->ip_set)
+          return (-1);
+        if (evtag_unmarshal_string(evbuf, MACHINE_IP, &tmp->ip) == -1) {
+          event_warnx("%s: failed to unmarshal ip", __func__);
+          return (-1);
+        }
+        tmp->ip_set = 1;
+        break;
+
+      case MACHINE_PORT:
+
+        if (tmp->port_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, MACHINE_PORT, &tmp->port) == -1) {
+          event_warnx("%s: failed to unmarshal port", __func__);
+          return (-1);
+        }
+        tmp->port_set = 1;
+        break;
+
+      case MACHINE_TYPE:
+
+        if (tmp->type_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, MACHINE_TYPE, &tmp->type) == -1) {
+          event_warnx("%s: failed to unmarshal type", __func__);
+          return (-1);
+        }
+        tmp->type_set = 1;
+        break;
+
+      default:
+        return -1;
+    }
+  }
+
+  if (machine_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+machine_complete(struct machine *msg)
+{
+  if (!msg->mid_set)
+    return (-1);
+  if (!msg->ip_set)
+    return (-1);
+  if (!msg->port_set)
+    return (-1);
+  if (!msg->type_set)
+    return (-1);
+  return (0);
+}
+
+int
+evtag_unmarshal_machine(struct evbuffer *evbuf, ev_uint32_t need_tag, struct machine *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (machine_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
+}
+
+void
+evtag_marshal_machine(struct evbuffer *evbuf, ev_uint32_t tag, const struct machine *msg)
+{
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  machine_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -547,297 +583,309 @@ evtag_marshal_machine(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct pong_access_ __pong_base = {
-    pong_version_assign,
-    pong_version_get,
-    pong_mid_assign,
-    pong_mid_get,
-    pong_machines_assign,
-    pong_machines_get,
-    pong_machines_add,
+  pong_version_assign,
+  pong_version_get,
+  pong_mid_assign,
+  pong_mid_get,
+  pong_machines_assign,
+  pong_machines_get,
+  pong_machines_add,
 };
 
-struct pong *pong_new(void)
+struct pong *
+pong_new(void)
 {
-    return pong_new_with_arg(NULL);
+  return pong_new_with_arg(NULL);
 }
 
-struct pong *pong_new_with_arg(void *unused)
+struct pong *
+pong_new_with_arg(void *unused)
 {
-    struct pong *tmp;
-    if ((tmp = malloc(sizeof(struct pong))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__pong_base;
-
-    tmp->version = 0;
-    tmp->version_set = 0;
-
-    tmp->mid = 0;
-    tmp->mid_set = 0;
-
-    tmp->machines = NULL;
-    tmp->machines_length = 0;
-    tmp->machines_num_allocated = 0;
-    tmp->machines_set = 0;
-
-    return (tmp);
-}
-
-static int pong_machines_expand_to_hold_more(struct pong *msg)
-{
-    int tobe_allocated = msg->machines_num_allocated;
-    struct machine **new_d_ata = NULL;
-    tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
-    new_d_ata = (struct machine **)realloc(msg->machines,
-                                           tobe_allocated *
-                                           sizeof(struct machine *));
-    if (new_d_ata == NULL)
-        return -1;
-    msg->machines = new_d_ata;
-    msg->machines_num_allocated = tobe_allocated;
-    return 0;
-}
-
-struct machine *pong_machines_add(struct pong *msg)
-{
-    if (++msg->machines_length >= msg->machines_num_allocated) {
-        if (pong_machines_expand_to_hold_more(msg) < 0)
-            goto error;
-    }
-    msg->machines[msg->machines_length - 1] = machine_new();
-    if (msg->machines[msg->machines_length - 1] == NULL)
-        goto error;
-    msg->machines_set = 1;
-    return (msg->machines[msg->machines_length - 1]);
-  error:
-    --msg->machines_length;
+  struct pong *tmp;
+  if ((tmp = malloc(sizeof(struct pong))) == NULL) {
+    event_warn("%s: malloc", __func__);
     return (NULL);
+  }
+  tmp->base = &__pong_base;
+
+  tmp->version = 0;
+  tmp->version_set = 0;
+
+  tmp->mid = 0;
+  tmp->mid_set = 0;
+
+  tmp->machines = NULL;
+  tmp->machines_length = 0;
+  tmp->machines_num_allocated = 0;
+  tmp->machines_set = 0;
+
+  return (tmp);
 }
 
-int pong_version_assign(struct pong *msg, const ev_uint32_t value)
+
+
+static int
+pong_machines_expand_to_hold_more(struct pong *msg)
 {
-    msg->version_set = 1;
-    msg->version = value;
-    return (0);
-}
+  int tobe_allocated = msg->machines_num_allocated;
+  struct machine** new_d_ata = NULL;
+  tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
+  new_d_ata = (struct machine**) realloc(msg->machines,
+      tobe_allocated * sizeof(struct machine*));
+  if (new_d_ata == NULL)
+    return -1;
+  msg->machines = new_d_ata;
+  msg->machines_num_allocated = tobe_allocated;
+  return 0;}
 
-int pong_mid_assign(struct pong *msg, const ev_uint32_t value)
+struct machine* 
+pong_machines_add(struct pong *msg)
 {
-    msg->mid_set = 1;
-    msg->mid = value;
-    return (0);
-}
-
-int pong_machines_assign(struct pong *msg, int off, const struct machine *value)
-{
-    if (!msg->machines_set || off < 0 || off >= msg->machines_length)
-        return (-1);
-
-    {
-        int had_error = 0;
-        struct evbuffer *tmp = NULL;
-        machine_clear(msg->machines[off]);
-        if ((tmp = evbuffer_new()) == NULL) {
-            event_warn("%s: evbuffer_new()", __func__);
-            had_error = 1;
-            goto done;
-        }
-        machine_marshal(tmp, value);
-        if (machine_unmarshal(msg->machines[off], tmp) == -1) {
-            event_warnx("%s: machine_unmarshal", __func__);
-            had_error = 1;
-            goto done;
-        }
-      done:if (tmp != NULL)
-            evbuffer_free(tmp);
-        if (had_error) {
-            machine_clear(msg->machines[off]);
-            return (-1);
-        }
-    }
-    return (0);
-}
-
-int pong_version_get(struct pong *msg, ev_uint32_t * value)
-{
-    if (msg->version_set != 1)
-        return (-1);
-    *value = msg->version;
-    return (0);
-}
-
-int pong_mid_get(struct pong *msg, ev_uint32_t * value)
-{
-    if (msg->mid_set != 1)
-        return (-1);
-    *value = msg->mid;
-    return (0);
-}
-
-int pong_machines_get(struct pong *msg, int offset, struct machine **value)
-{
-    if (!msg->machines_set || offset < 0 || offset >= msg->machines_length)
-        return (-1);
-    *value = msg->machines[offset];
-    return (0);
-}
-
-void pong_clear(struct pong *tmp)
-{
-    tmp->version_set = 0;
-    tmp->mid_set = 0;
-    if (tmp->machines_set == 1) {
-        int i;
-        for (i = 0; i < tmp->machines_length; ++i) {
-            machine_free(tmp->machines[i]);
-        }
-        free(tmp->machines);
-        tmp->machines = NULL;
-        tmp->machines_set = 0;
-        tmp->machines_length = 0;
-        tmp->machines_num_allocated = 0;
-    }
-}
-
-void pong_free(struct pong *tmp)
-{
-    if (tmp->machines_set == 1) {
-        int i;
-        for (i = 0; i < tmp->machines_length; ++i) {
-            machine_free(tmp->machines[i]);
-        }
-        free(tmp->machines);
-        tmp->machines = NULL;
-        tmp->machines_set = 0;
-        tmp->machines_length = 0;
-        tmp->machines_num_allocated = 0;
-    }
-    free(tmp->machines);
-    free(tmp);
-}
-
-void pong_marshal(struct evbuffer *evbuf, const struct pong *tmp)
-{
-    evtag_marshal_int(evbuf, PONG_VERSION, tmp->version);
-    if (tmp->mid_set) {
-        evtag_marshal_int(evbuf, PONG_MID, tmp->mid);
-    }
-    if (tmp->machines_set) {
-        {
-            int i;
-            for (i = 0; i < tmp->machines_length; ++i) {
-                evtag_marshal_machine(evbuf, PONG_MACHINES, tmp->machines[i]);
-            }
-        }
-    }
-}
-
-int pong_unmarshal(struct pong *tmp, struct evbuffer *evbuf)
-{
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
-
-        case PONG_VERSION:
-
-            if (tmp->version_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, PONG_VERSION, &tmp->version) == -1) {
-                event_warnx("%s: failed to unmarshal version", __func__);
-                return (-1);
-            }
-            tmp->version_set = 1;
-            break;
-
-        case PONG_MID:
-
-            if (tmp->mid_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, PONG_MID, &tmp->mid) == -1) {
-                event_warnx("%s: failed to unmarshal mid", __func__);
-                return (-1);
-            }
-            tmp->mid_set = 1;
-            break;
-
-        case PONG_MACHINES:
-
-            if (tmp->machines_length >= tmp->machines_num_allocated &&
-                pong_machines_expand_to_hold_more(tmp) < 0) {
-                puts("HEY NOW");
-                return (-1);
-            }
-            tmp->machines[tmp->machines_length] = machine_new();
-            if (tmp->machines[tmp->machines_length] == NULL)
-                return (-1);
-            if (evtag_unmarshal_machine
-                (evbuf, PONG_MACHINES,
-                 tmp->machines[tmp->machines_length]) == -1) {
-                event_warnx("%s: failed to unmarshal machines", __func__);
-                return (-1);
-            }
-            ++tmp->machines_length;
-            tmp->machines_set = 1;
-            break;
-
-        default:
-            return -1;
-        }
-    }
-
-    if (pong_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int pong_complete(struct pong *msg)
-{
-    if (!msg->version_set)
-        return (-1);
-    {
-        int i;
-        for (i = 0; i < msg->machines_length; ++i) {
-            if (msg->machines_set && machine_complete(msg->machines[i]) == -1)
-                return (-1);
-        }
-    }
-    return (0);
+  if (++msg->machines_length >= msg->machines_num_allocated) {
+    if (pong_machines_expand_to_hold_more(msg)<0)
+      goto error;
+  }
+  msg->machines[msg->machines_length - 1] = machine_new();
+  if (msg->machines[msg->machines_length - 1] == NULL)
+    goto error;
+  msg->machines_set = 1;
+  return (msg->machines[msg->machines_length - 1]);
+error:
+  --msg->machines_length;
+  return (NULL);
 }
 
 int
-evtag_unmarshal_pong(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                     struct pong *msg)
+pong_version_assign(struct pong *msg, const ev_uint32_t value)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  msg->version_set = 1;
+  msg->version = value;
+  return (0);
+}
 
-    struct evbuffer *tmp = evbuffer_new();
+int
+pong_mid_assign(struct pong *msg, const ev_uint32_t value)
+{
+  msg->mid_set = 1;
+  msg->mid = value;
+  return (0);
+}
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+int
+pong_machines_assign(struct pong *msg, int off,
+    const struct machine* value)
+{
+  if (!msg->machines_set || off < 0 || off >= msg->machines_length)
+    return (-1);
 
-    if (pong_unmarshal(msg, tmp) == -1)
-        goto error;
+  {
+    int had_error = 0;
+    struct evbuffer *tmp = NULL;
+    machine_clear(msg->machines[off]);
+    if ((tmp = evbuffer_new()) == NULL) {
+      event_warn("%s: evbuffer_new()", __func__);
+      had_error = 1;
+      goto done;
+    }
+    machine_marshal(tmp, value);
+    if (machine_unmarshal(msg->machines[off], tmp) == -1) {
+      event_warnx("%s: machine_unmarshal", __func__);
+      had_error = 1;
+      goto done;
+    }
+    done:if (tmp != NULL)
+      evbuffer_free(tmp);
+    if (had_error) {
+      machine_clear(msg->machines[off]);
+      return (-1);
+    }
+  }
+  return (0);
+}
 
-    res = 0;
+int
+pong_version_get(struct pong *msg, ev_uint32_t *value)
+{
+  if (msg->version_set != 1)
+    return (-1);
+  *value = msg->version;
+  return (0);
+}
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+int
+pong_mid_get(struct pong *msg, ev_uint32_t *value)
+{
+  if (msg->mid_set != 1)
+    return (-1);
+  *value = msg->mid;
+  return (0);
+}
+
+int
+pong_machines_get(struct pong *msg, int offset,
+    struct machine* *value)
+{
+  if (!msg->machines_set || offset < 0 || offset >= msg->machines_length)
+    return (-1);
+  *value = msg->machines[offset];
+  return (0);
 }
 
 void
-evtag_marshal_pong(struct evbuffer *evbuf, ev_uint32_t tag,
-                   const struct pong *msg)
+pong_clear(struct pong *tmp)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    pong_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  tmp->version_set = 0;
+  tmp->mid_set = 0;
+  if (tmp->machines_set == 1) {
+    int i;
+    for (i = 0; i < tmp->machines_length; ++i) {
+      machine_free(tmp->machines[i]);
+    }
+    free(tmp->machines);
+    tmp->machines = NULL;
+    tmp->machines_set = 0;
+    tmp->machines_length = 0;
+    tmp->machines_num_allocated = 0;
+  }
+}
+
+void
+pong_free(struct pong *tmp)
+{
+  if (tmp->machines_set == 1) {
+    int i;
+    for (i = 0; i < tmp->machines_length; ++i) {
+      machine_free(tmp->machines[i]);
+    }
+    free(tmp->machines);
+    tmp->machines = NULL;
+    tmp->machines_set = 0;
+    tmp->machines_length = 0;
+    tmp->machines_num_allocated = 0;
+  }
+  free(tmp->machines);
+  free(tmp);
+}
+
+void
+pong_marshal(struct evbuffer *evbuf, const struct pong *tmp){
+  evtag_marshal_int(evbuf, PONG_VERSION, tmp->version);
+  if (tmp->mid_set) {
+    evtag_marshal_int(evbuf, PONG_MID, tmp->mid);
+  }
+  if (tmp->machines_set) {
+    {
+      int i;
+      for (i = 0; i < tmp->machines_length; ++i) {
+    evtag_marshal_machine(evbuf, PONG_MACHINES, tmp->machines[i]);
+      }
+    }
+  }
+}
+
+int
+pong_unmarshal(struct pong *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case PONG_VERSION:
+
+        if (tmp->version_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, PONG_VERSION, &tmp->version) == -1) {
+          event_warnx("%s: failed to unmarshal version", __func__);
+          return (-1);
+        }
+        tmp->version_set = 1;
+        break;
+
+      case PONG_MID:
+
+        if (tmp->mid_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, PONG_MID, &tmp->mid) == -1) {
+          event_warnx("%s: failed to unmarshal mid", __func__);
+          return (-1);
+        }
+        tmp->mid_set = 1;
+        break;
+
+      case PONG_MACHINES:
+
+        if (tmp->machines_length >= tmp->machines_num_allocated &&
+            pong_machines_expand_to_hold_more(tmp) < 0) {
+          puts("HEY NOW");
+          return (-1);
+        }
+        tmp->machines[tmp->machines_length] = machine_new();
+        if (tmp->machines[tmp->machines_length] == NULL)
+          return (-1);
+        if (evtag_unmarshal_machine(evbuf, PONG_MACHINES, tmp->machines[tmp->machines_length]) == -1) {
+          event_warnx("%s: failed to unmarshal machines", __func__);
+          return (-1);
+        }
+        ++tmp->machines_length;
+        tmp->machines_set = 1;
+        break;
+
+      default:
+        return -1;
+    }
+  }
+
+  if (pong_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+pong_complete(struct pong *msg)
+{
+  if (!msg->version_set)
+    return (-1);
+  {
+    int i;
+    for (i = 0; i < msg->machines_length; ++i) {
+      if (msg->machines_set && machine_complete(msg->machines[i]) == -1)
+        return (-1);
+    }
+  }
+  return (0);
+}
+
+int
+evtag_unmarshal_pong(struct evbuffer *evbuf, ev_uint32_t need_tag, struct pong *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (pong_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
+}
+
+void
+evtag_marshal_pong(struct evbuffer *evbuf, ev_uint32_t tag, const struct pong *msg)
+{
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  pong_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -845,515 +893,546 @@ evtag_marshal_pong(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct file_stat_access_ __file_stat_base = {
-    file_stat_ino_assign,
-    file_stat_ino_get,
-    file_stat_size_assign,
-    file_stat_size_get,
-    file_stat_type_assign,
-    file_stat_type_get,
-    file_stat_name_assign,
-    file_stat_name_get,
-    file_stat_mode_assign,
-    file_stat_mode_get,
-    file_stat_nlink_assign,
-    file_stat_nlink_get,
-    file_stat_atime_assign,
-    file_stat_atime_get,
-    file_stat_mtime_assign,
-    file_stat_mtime_get,
-    file_stat_ctime_assign,
-    file_stat_ctime_get,
-    file_stat_pos_arr_assign,
-    file_stat_pos_arr_get,
-    file_stat_pos_arr_add,
+  file_stat_ino_assign,
+  file_stat_ino_get,
+  file_stat_size_assign,
+  file_stat_size_get,
+  file_stat_type_assign,
+  file_stat_type_get,
+  file_stat_name_assign,
+  file_stat_name_get,
+  file_stat_mode_assign,
+  file_stat_mode_get,
+  file_stat_nlink_assign,
+  file_stat_nlink_get,
+  file_stat_atime_assign,
+  file_stat_atime_get,
+  file_stat_mtime_assign,
+  file_stat_mtime_get,
+  file_stat_ctime_assign,
+  file_stat_ctime_get,
+  file_stat_pos_arr_assign,
+  file_stat_pos_arr_get,
+  file_stat_pos_arr_add,
 };
 
-struct file_stat *file_stat_new(void)
+struct file_stat *
+file_stat_new(void)
 {
-    return file_stat_new_with_arg(NULL);
+  return file_stat_new_with_arg(NULL);
 }
 
-struct file_stat *file_stat_new_with_arg(void *unused)
+struct file_stat *
+file_stat_new_with_arg(void *unused)
 {
-    struct file_stat *tmp;
-    if ((tmp = malloc(sizeof(struct file_stat))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__file_stat_base;
-
-    tmp->ino = 0;
-    tmp->ino_set = 0;
-
-    tmp->size = 0;
-    tmp->size_set = 0;
-
-    tmp->type = 0;
-    tmp->type_set = 0;
-
-    tmp->name = NULL;
-    tmp->name_set = 0;
-
-    tmp->mode = 0;
-    tmp->mode_set = 0;
-
-    tmp->nlink = 0;
-    tmp->nlink_set = 0;
-
-    tmp->atime = 0;
-    tmp->atime_set = 0;
-
-    tmp->mtime = 0;
-    tmp->mtime_set = 0;
-
-    tmp->ctime = 0;
-    tmp->ctime_set = 0;
-
-    tmp->pos_arr = NULL;
-    tmp->pos_arr_length = 0;
-    tmp->pos_arr_num_allocated = 0;
-    tmp->pos_arr_set = 0;
-
-    return (tmp);
-}
-
-static int file_stat_pos_arr_expand_to_hold_more(struct file_stat *msg)
-{
-    int tobe_allocated = msg->pos_arr_num_allocated;
-    ev_uint32_t *new_d_ata = NULL;
-    tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
-    new_d_ata = (ev_uint32_t *) realloc(msg->pos_arr,
-                                        tobe_allocated * sizeof(ev_uint32_t));
-    if (new_d_ata == NULL)
-        return -1;
-    msg->pos_arr = new_d_ata;
-    msg->pos_arr_num_allocated = tobe_allocated;
-    return 0;
-}
-
-ev_uint32_t *file_stat_pos_arr_add(struct file_stat * msg,
-                                   const ev_uint32_t value)
-{
-    if (++msg->pos_arr_length >= msg->pos_arr_num_allocated) {
-        if (file_stat_pos_arr_expand_to_hold_more(msg) < 0)
-            goto error;
-    }
-    msg->pos_arr[msg->pos_arr_length - 1] = value;
-    msg->pos_arr_set = 1;
-    return &(msg->pos_arr[msg->pos_arr_length - 1]);
-  error:
-    --msg->pos_arr_length;
+  struct file_stat *tmp;
+  if ((tmp = malloc(sizeof(struct file_stat))) == NULL) {
+    event_warn("%s: malloc", __func__);
     return (NULL);
+  }
+  tmp->base = &__file_stat_base;
+
+  tmp->ino = 0;
+  tmp->ino_set = 0;
+
+  tmp->size = 0;
+  tmp->size_set = 0;
+
+  tmp->type = 0;
+  tmp->type_set = 0;
+
+  tmp->name = NULL;
+  tmp->name_set = 0;
+
+  tmp->mode = 0;
+  tmp->mode_set = 0;
+
+  tmp->nlink = 0;
+  tmp->nlink_set = 0;
+
+  tmp->atime = 0;
+  tmp->atime_set = 0;
+
+  tmp->mtime = 0;
+  tmp->mtime_set = 0;
+
+  tmp->ctime = 0;
+  tmp->ctime_set = 0;
+
+  tmp->pos_arr = NULL;
+  tmp->pos_arr_length = 0;
+  tmp->pos_arr_num_allocated = 0;
+  tmp->pos_arr_set = 0;
+
+  return (tmp);
 }
 
-int file_stat_ino_assign(struct file_stat *msg, const ev_uint64_t value)
+
+
+
+
+
+
+
+
+
+static int
+file_stat_pos_arr_expand_to_hold_more(struct file_stat *msg)
 {
-    msg->ino_set = 1;
-    msg->ino = value;
-    return (0);
+  int tobe_allocated = msg->pos_arr_num_allocated;
+  ev_uint32_t* new_d_ata = NULL;
+  tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
+  new_d_ata = (ev_uint32_t*) realloc(msg->pos_arr,
+      tobe_allocated * sizeof(ev_uint32_t));
+  if (new_d_ata == NULL)
+    return -1;
+  msg->pos_arr = new_d_ata;
+  msg->pos_arr_num_allocated = tobe_allocated;
+  return 0;}
+
+ev_uint32_t *
+file_stat_pos_arr_add(struct file_stat *msg, const ev_uint32_t value)
+{
+  if (++msg->pos_arr_length >= msg->pos_arr_num_allocated) {
+    if (file_stat_pos_arr_expand_to_hold_more(msg)<0)
+      goto error;
+  }
+  msg->pos_arr[msg->pos_arr_length - 1] = value;
+  msg->pos_arr_set = 1;
+  return &(msg->pos_arr[msg->pos_arr_length - 1]);
+error:
+  --msg->pos_arr_length;
+  return (NULL);
 }
 
-int file_stat_size_assign(struct file_stat *msg, const ev_uint64_t value)
+int
+file_stat_ino_assign(struct file_stat *msg, const ev_uint64_t value)
 {
-    msg->size_set = 1;
-    msg->size = value;
-    return (0);
+  msg->ino_set = 1;
+  msg->ino = value;
+  return (0);
 }
 
-int file_stat_type_assign(struct file_stat *msg, const ev_uint32_t value)
+int
+file_stat_size_assign(struct file_stat *msg, const ev_uint64_t value)
 {
-    msg->type_set = 1;
-    msg->type = value;
-    return (0);
+  msg->size_set = 1;
+  msg->size = value;
+  return (0);
 }
 
-int file_stat_name_assign(struct file_stat *msg, const char *value)
+int
+file_stat_type_assign(struct file_stat *msg, const ev_uint32_t value)
 {
-    if (msg->name != NULL)
-        free(msg->name);
-    if ((msg->name = strdup(value)) == NULL)
-        return (-1);
-    msg->name_set = 1;
-    return (0);
+  msg->type_set = 1;
+  msg->type = value;
+  return (0);
 }
 
-int file_stat_mode_assign(struct file_stat *msg, const ev_uint32_t value)
+int
+file_stat_name_assign(struct file_stat *msg,
+    const char * value)
 {
-    msg->mode_set = 1;
-    msg->mode = value;
-    return (0);
+  if (msg->name != NULL)
+    free(msg->name);
+  if ((msg->name = strdup(value)) == NULL)
+    return (-1);
+  msg->name_set = 1;
+  return (0);
 }
 
-int file_stat_nlink_assign(struct file_stat *msg, const ev_uint32_t value)
+int
+file_stat_mode_assign(struct file_stat *msg, const ev_uint32_t value)
 {
-    msg->nlink_set = 1;
-    msg->nlink = value;
-    return (0);
+  msg->mode_set = 1;
+  msg->mode = value;
+  return (0);
 }
 
-int file_stat_atime_assign(struct file_stat *msg, const ev_uint32_t value)
+int
+file_stat_nlink_assign(struct file_stat *msg, const ev_uint32_t value)
 {
-    msg->atime_set = 1;
-    msg->atime = value;
-    return (0);
+  msg->nlink_set = 1;
+  msg->nlink = value;
+  return (0);
 }
 
-int file_stat_mtime_assign(struct file_stat *msg, const ev_uint32_t value)
+int
+file_stat_atime_assign(struct file_stat *msg, const ev_uint32_t value)
 {
-    msg->mtime_set = 1;
-    msg->mtime = value;
-    return (0);
+  msg->atime_set = 1;
+  msg->atime = value;
+  return (0);
 }
 
-int file_stat_ctime_assign(struct file_stat *msg, const ev_uint32_t value)
+int
+file_stat_mtime_assign(struct file_stat *msg, const ev_uint32_t value)
 {
-    msg->ctime_set = 1;
-    msg->ctime = value;
-    return (0);
+  msg->mtime_set = 1;
+  msg->mtime = value;
+  return (0);
+}
+
+int
+file_stat_ctime_assign(struct file_stat *msg, const ev_uint32_t value)
+{
+  msg->ctime_set = 1;
+  msg->ctime = value;
+  return (0);
 }
 
 int
 file_stat_pos_arr_assign(struct file_stat *msg, int off,
-                         const ev_uint32_t value)
+    const ev_uint32_t value)
 {
-    if (!msg->pos_arr_set || off < 0 || off >= msg->pos_arr_length)
-        return (-1);
+  if (!msg->pos_arr_set || off < 0 || off >= msg->pos_arr_length)
+    return (-1);
 
-    {
-        msg->pos_arr[off] = value;
-    }
-    return (0);
-}
-
-int file_stat_ino_get(struct file_stat *msg, ev_uint64_t * value)
-{
-    if (msg->ino_set != 1)
-        return (-1);
-    *value = msg->ino;
-    return (0);
-}
-
-int file_stat_size_get(struct file_stat *msg, ev_uint64_t * value)
-{
-    if (msg->size_set != 1)
-        return (-1);
-    *value = msg->size;
-    return (0);
-}
-
-int file_stat_type_get(struct file_stat *msg, ev_uint32_t * value)
-{
-    if (msg->type_set != 1)
-        return (-1);
-    *value = msg->type;
-    return (0);
-}
-
-int file_stat_name_get(struct file_stat *msg, char **value)
-{
-    if (msg->name_set != 1)
-        return (-1);
-    *value = msg->name;
-    return (0);
-}
-
-int file_stat_mode_get(struct file_stat *msg, ev_uint32_t * value)
-{
-    if (msg->mode_set != 1)
-        return (-1);
-    *value = msg->mode;
-    return (0);
-}
-
-int file_stat_nlink_get(struct file_stat *msg, ev_uint32_t * value)
-{
-    if (msg->nlink_set != 1)
-        return (-1);
-    *value = msg->nlink;
-    return (0);
-}
-
-int file_stat_atime_get(struct file_stat *msg, ev_uint32_t * value)
-{
-    if (msg->atime_set != 1)
-        return (-1);
-    *value = msg->atime;
-    return (0);
-}
-
-int file_stat_mtime_get(struct file_stat *msg, ev_uint32_t * value)
-{
-    if (msg->mtime_set != 1)
-        return (-1);
-    *value = msg->mtime;
-    return (0);
-}
-
-int file_stat_ctime_get(struct file_stat *msg, ev_uint32_t * value)
-{
-    if (msg->ctime_set != 1)
-        return (-1);
-    *value = msg->ctime;
-    return (0);
+  {
+    msg->pos_arr[off] = value;
+  }
+  return (0);
 }
 
 int
-file_stat_pos_arr_get(struct file_stat *msg, int offset, ev_uint32_t * value)
+file_stat_ino_get(struct file_stat *msg, ev_uint64_t *value)
 {
-    if (!msg->pos_arr_set || offset < 0 || offset >= msg->pos_arr_length)
-        return (-1);
-    *value = msg->pos_arr[offset];
-    return (0);
-}
-
-void file_stat_clear(struct file_stat *tmp)
-{
-    tmp->ino_set = 0;
-    tmp->size_set = 0;
-    tmp->type_set = 0;
-    if (tmp->name_set == 1) {
-        free(tmp->name);
-        tmp->name = NULL;
-        tmp->name_set = 0;
-    }
-    tmp->mode_set = 0;
-    tmp->nlink_set = 0;
-    tmp->atime_set = 0;
-    tmp->mtime_set = 0;
-    tmp->ctime_set = 0;
-    if (tmp->pos_arr_set == 1) {
-        free(tmp->pos_arr);
-        tmp->pos_arr = NULL;
-        tmp->pos_arr_set = 0;
-        tmp->pos_arr_length = 0;
-        tmp->pos_arr_num_allocated = 0;
-    }
-}
-
-void file_stat_free(struct file_stat *tmp)
-{
-    if (tmp->name != NULL)
-        free(tmp->name);
-    if (tmp->pos_arr_set == 1) {
-        free(tmp->pos_arr);
-        tmp->pos_arr = NULL;
-        tmp->pos_arr_set = 0;
-        tmp->pos_arr_length = 0;
-        tmp->pos_arr_num_allocated = 0;
-    }
-    free(tmp->pos_arr);
-    free(tmp);
-}
-
-void file_stat_marshal(struct evbuffer *evbuf, const struct file_stat *tmp)
-{
-    evtag_marshal_int64(evbuf, FILE_STAT_INO, tmp->ino);
-    evtag_marshal_int64(evbuf, FILE_STAT_SIZE, tmp->size);
-    if (tmp->type_set) {
-        evtag_marshal_int(evbuf, FILE_STAT_TYPE, tmp->type);
-    }
-    if (tmp->name_set) {
-        evtag_marshal_string(evbuf, FILE_STAT_NAME, tmp->name);
-    }
-    if (tmp->mode_set) {
-        evtag_marshal_int(evbuf, FILE_STAT_MODE, tmp->mode);
-    }
-    if (tmp->nlink_set) {
-        evtag_marshal_int(evbuf, FILE_STAT_NLINK, tmp->nlink);
-    }
-    if (tmp->atime_set) {
-        evtag_marshal_int(evbuf, FILE_STAT_ATIME, tmp->atime);
-    }
-    if (tmp->mtime_set) {
-        evtag_marshal_int(evbuf, FILE_STAT_MTIME, tmp->mtime);
-    }
-    if (tmp->ctime_set) {
-        evtag_marshal_int(evbuf, FILE_STAT_CTIME, tmp->ctime);
-    }
-    if (tmp->pos_arr_set) {
-        {
-            int i;
-            for (i = 0; i < tmp->pos_arr_length; ++i) {
-                evtag_marshal_int(evbuf, FILE_STAT_POS_ARR, tmp->pos_arr[i]);
-            }
-        }
-    }
-}
-
-int file_stat_unmarshal(struct file_stat *tmp, struct evbuffer *evbuf)
-{
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
-
-        case FILE_STAT_INO:
-
-            if (tmp->ino_set)
-                return (-1);
-            if (evtag_unmarshal_int64(evbuf, FILE_STAT_INO, &tmp->ino) == -1) {
-                event_warnx("%s: failed to unmarshal ino", __func__);
-                return (-1);
-            }
-            tmp->ino_set = 1;
-            break;
-
-        case FILE_STAT_SIZE:
-
-            if (tmp->size_set)
-                return (-1);
-            if (evtag_unmarshal_int64(evbuf, FILE_STAT_SIZE, &tmp->size) == -1) {
-                event_warnx("%s: failed to unmarshal size", __func__);
-                return (-1);
-            }
-            tmp->size_set = 1;
-            break;
-
-        case FILE_STAT_TYPE:
-
-            if (tmp->type_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, FILE_STAT_TYPE, &tmp->type) == -1) {
-                event_warnx("%s: failed to unmarshal type", __func__);
-                return (-1);
-            }
-            tmp->type_set = 1;
-            break;
-
-        case FILE_STAT_NAME:
-
-            if (tmp->name_set)
-                return (-1);
-            if (evtag_unmarshal_string(evbuf, FILE_STAT_NAME, &tmp->name) == -1) {
-                event_warnx("%s: failed to unmarshal name", __func__);
-                return (-1);
-            }
-            tmp->name_set = 1;
-            break;
-
-        case FILE_STAT_MODE:
-
-            if (tmp->mode_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, FILE_STAT_MODE, &tmp->mode) == -1) {
-                event_warnx("%s: failed to unmarshal mode", __func__);
-                return (-1);
-            }
-            tmp->mode_set = 1;
-            break;
-
-        case FILE_STAT_NLINK:
-
-            if (tmp->nlink_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, FILE_STAT_NLINK, &tmp->nlink) == -1) {
-                event_warnx("%s: failed to unmarshal nlink", __func__);
-                return (-1);
-            }
-            tmp->nlink_set = 1;
-            break;
-
-        case FILE_STAT_ATIME:
-
-            if (tmp->atime_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, FILE_STAT_ATIME, &tmp->atime) == -1) {
-                event_warnx("%s: failed to unmarshal atime", __func__);
-                return (-1);
-            }
-            tmp->atime_set = 1;
-            break;
-
-        case FILE_STAT_MTIME:
-
-            if (tmp->mtime_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, FILE_STAT_MTIME, &tmp->mtime) == -1) {
-                event_warnx("%s: failed to unmarshal mtime", __func__);
-                return (-1);
-            }
-            tmp->mtime_set = 1;
-            break;
-
-        case FILE_STAT_CTIME:
-
-            if (tmp->ctime_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, FILE_STAT_CTIME, &tmp->ctime) == -1) {
-                event_warnx("%s: failed to unmarshal ctime", __func__);
-                return (-1);
-            }
-            tmp->ctime_set = 1;
-            break;
-
-        case FILE_STAT_POS_ARR:
-
-            if (tmp->pos_arr_length >= tmp->pos_arr_num_allocated &&
-                file_stat_pos_arr_expand_to_hold_more(tmp) < 0) {
-                puts("HEY NOW");
-                return (-1);
-            }
-            if (evtag_unmarshal_int
-                (evbuf, FILE_STAT_POS_ARR,
-                 &tmp->pos_arr[tmp->pos_arr_length]) == -1) {
-                event_warnx("%s: failed to unmarshal pos_arr", __func__);
-                return (-1);
-            }
-            ++tmp->pos_arr_length;
-            tmp->pos_arr_set = 1;
-            break;
-
-        default:
-            return -1;
-        }
-    }
-
-    if (file_stat_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int file_stat_complete(struct file_stat *msg)
-{
-    if (!msg->ino_set)
-        return (-1);
-    if (!msg->size_set)
-        return (-1);
-    return (0);
+  if (msg->ino_set != 1)
+    return (-1);
+  *value = msg->ino;
+  return (0);
 }
 
 int
-evtag_unmarshal_file_stat(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                          struct file_stat *msg)
+file_stat_size_get(struct file_stat *msg, ev_uint64_t *value)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  if (msg->size_set != 1)
+    return (-1);
+  *value = msg->size;
+  return (0);
+}
 
-    struct evbuffer *tmp = evbuffer_new();
+int
+file_stat_type_get(struct file_stat *msg, ev_uint32_t *value)
+{
+  if (msg->type_set != 1)
+    return (-1);
+  *value = msg->type;
+  return (0);
+}
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+int
+file_stat_name_get(struct file_stat *msg, char * *value)
+{
+  if (msg->name_set != 1)
+    return (-1);
+  *value = msg->name;
+  return (0);
+}
 
-    if (file_stat_unmarshal(msg, tmp) == -1)
-        goto error;
+int
+file_stat_mode_get(struct file_stat *msg, ev_uint32_t *value)
+{
+  if (msg->mode_set != 1)
+    return (-1);
+  *value = msg->mode;
+  return (0);
+}
 
-    res = 0;
+int
+file_stat_nlink_get(struct file_stat *msg, ev_uint32_t *value)
+{
+  if (msg->nlink_set != 1)
+    return (-1);
+  *value = msg->nlink;
+  return (0);
+}
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+int
+file_stat_atime_get(struct file_stat *msg, ev_uint32_t *value)
+{
+  if (msg->atime_set != 1)
+    return (-1);
+  *value = msg->atime;
+  return (0);
+}
+
+int
+file_stat_mtime_get(struct file_stat *msg, ev_uint32_t *value)
+{
+  if (msg->mtime_set != 1)
+    return (-1);
+  *value = msg->mtime;
+  return (0);
+}
+
+int
+file_stat_ctime_get(struct file_stat *msg, ev_uint32_t *value)
+{
+  if (msg->ctime_set != 1)
+    return (-1);
+  *value = msg->ctime;
+  return (0);
+}
+
+int
+file_stat_pos_arr_get(struct file_stat *msg, int offset,
+    ev_uint32_t *value)
+{
+  if (!msg->pos_arr_set || offset < 0 || offset >= msg->pos_arr_length)
+    return (-1);
+  *value = msg->pos_arr[offset];
+  return (0);
 }
 
 void
-evtag_marshal_file_stat(struct evbuffer *evbuf, ev_uint32_t tag,
-                        const struct file_stat *msg)
+file_stat_clear(struct file_stat *tmp)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    file_stat_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  tmp->ino_set = 0;
+  tmp->size_set = 0;
+  tmp->type_set = 0;
+  if (tmp->name_set == 1) {
+    free(tmp->name);
+    tmp->name = NULL;
+    tmp->name_set = 0;
+  }
+  tmp->mode_set = 0;
+  tmp->nlink_set = 0;
+  tmp->atime_set = 0;
+  tmp->mtime_set = 0;
+  tmp->ctime_set = 0;
+  if (tmp->pos_arr_set == 1) {
+    free(tmp->pos_arr);
+    tmp->pos_arr = NULL;
+    tmp->pos_arr_set = 0;
+    tmp->pos_arr_length = 0;
+    tmp->pos_arr_num_allocated = 0;
+  }
+}
+
+void
+file_stat_free(struct file_stat *tmp)
+{
+  if (tmp->name != NULL)
+      free (tmp->name);
+  if (tmp->pos_arr_set == 1) {
+    free(tmp->pos_arr);
+    tmp->pos_arr = NULL;
+    tmp->pos_arr_set = 0;
+    tmp->pos_arr_length = 0;
+    tmp->pos_arr_num_allocated = 0;
+  }
+  free(tmp->pos_arr);
+  free(tmp);
+}
+
+void
+file_stat_marshal(struct evbuffer *evbuf, const struct file_stat *tmp){
+  evtag_marshal_int64(evbuf, FILE_STAT_INO, tmp->ino);
+  evtag_marshal_int64(evbuf, FILE_STAT_SIZE, tmp->size);
+  if (tmp->type_set) {
+    evtag_marshal_int(evbuf, FILE_STAT_TYPE, tmp->type);
+  }
+  if (tmp->name_set) {
+    evtag_marshal_string(evbuf, FILE_STAT_NAME, tmp->name);
+  }
+  if (tmp->mode_set) {
+    evtag_marshal_int(evbuf, FILE_STAT_MODE, tmp->mode);
+  }
+  if (tmp->nlink_set) {
+    evtag_marshal_int(evbuf, FILE_STAT_NLINK, tmp->nlink);
+  }
+  if (tmp->atime_set) {
+    evtag_marshal_int(evbuf, FILE_STAT_ATIME, tmp->atime);
+  }
+  if (tmp->mtime_set) {
+    evtag_marshal_int(evbuf, FILE_STAT_MTIME, tmp->mtime);
+  }
+  if (tmp->ctime_set) {
+    evtag_marshal_int(evbuf, FILE_STAT_CTIME, tmp->ctime);
+  }
+  if (tmp->pos_arr_set) {
+    {
+      int i;
+      for (i = 0; i < tmp->pos_arr_length; ++i) {
+    evtag_marshal_int(evbuf, FILE_STAT_POS_ARR, tmp->pos_arr[i]);
+      }
+    }
+  }
+}
+
+int
+file_stat_unmarshal(struct file_stat *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case FILE_STAT_INO:
+
+        if (tmp->ino_set)
+          return (-1);
+        if (evtag_unmarshal_int64(evbuf, FILE_STAT_INO, &tmp->ino) == -1) {
+          event_warnx("%s: failed to unmarshal ino", __func__);
+          return (-1);
+        }
+        tmp->ino_set = 1;
+        break;
+
+      case FILE_STAT_SIZE:
+
+        if (tmp->size_set)
+          return (-1);
+        if (evtag_unmarshal_int64(evbuf, FILE_STAT_SIZE, &tmp->size) == -1) {
+          event_warnx("%s: failed to unmarshal size", __func__);
+          return (-1);
+        }
+        tmp->size_set = 1;
+        break;
+
+      case FILE_STAT_TYPE:
+
+        if (tmp->type_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, FILE_STAT_TYPE, &tmp->type) == -1) {
+          event_warnx("%s: failed to unmarshal type", __func__);
+          return (-1);
+        }
+        tmp->type_set = 1;
+        break;
+
+      case FILE_STAT_NAME:
+
+        if (tmp->name_set)
+          return (-1);
+        if (evtag_unmarshal_string(evbuf, FILE_STAT_NAME, &tmp->name) == -1) {
+          event_warnx("%s: failed to unmarshal name", __func__);
+          return (-1);
+        }
+        tmp->name_set = 1;
+        break;
+
+      case FILE_STAT_MODE:
+
+        if (tmp->mode_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, FILE_STAT_MODE, &tmp->mode) == -1) {
+          event_warnx("%s: failed to unmarshal mode", __func__);
+          return (-1);
+        }
+        tmp->mode_set = 1;
+        break;
+
+      case FILE_STAT_NLINK:
+
+        if (tmp->nlink_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, FILE_STAT_NLINK, &tmp->nlink) == -1) {
+          event_warnx("%s: failed to unmarshal nlink", __func__);
+          return (-1);
+        }
+        tmp->nlink_set = 1;
+        break;
+
+      case FILE_STAT_ATIME:
+
+        if (tmp->atime_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, FILE_STAT_ATIME, &tmp->atime) == -1) {
+          event_warnx("%s: failed to unmarshal atime", __func__);
+          return (-1);
+        }
+        tmp->atime_set = 1;
+        break;
+
+      case FILE_STAT_MTIME:
+
+        if (tmp->mtime_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, FILE_STAT_MTIME, &tmp->mtime) == -1) {
+          event_warnx("%s: failed to unmarshal mtime", __func__);
+          return (-1);
+        }
+        tmp->mtime_set = 1;
+        break;
+
+      case FILE_STAT_CTIME:
+
+        if (tmp->ctime_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, FILE_STAT_CTIME, &tmp->ctime) == -1) {
+          event_warnx("%s: failed to unmarshal ctime", __func__);
+          return (-1);
+        }
+        tmp->ctime_set = 1;
+        break;
+
+      case FILE_STAT_POS_ARR:
+
+        if (tmp->pos_arr_length >= tmp->pos_arr_num_allocated &&
+            file_stat_pos_arr_expand_to_hold_more(tmp) < 0) {
+          puts("HEY NOW");
+          return (-1);
+        }
+        if (evtag_unmarshal_int(evbuf, FILE_STAT_POS_ARR, &tmp->pos_arr[tmp->pos_arr_length]) == -1) {
+          event_warnx("%s: failed to unmarshal pos_arr", __func__);
+          return (-1);
+        }
+        ++tmp->pos_arr_length;
+        tmp->pos_arr_set = 1;
+        break;
+
+      default:
+        return -1;
+    }
+  }
+
+  if (file_stat_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+file_stat_complete(struct file_stat *msg)
+{
+  if (!msg->ino_set)
+    return (-1);
+  if (!msg->size_set)
+    return (-1);
+  return (0);
+}
+
+int
+evtag_unmarshal_file_stat(struct evbuffer *evbuf, ev_uint32_t need_tag, struct file_stat *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (file_stat_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
+}
+
+void
+evtag_marshal_file_stat(struct evbuffer *evbuf, ev_uint32_t tag, const struct file_stat *msg)
+{
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  file_stat_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -1361,194 +1440,194 @@ evtag_marshal_file_stat(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct stat_request_access_ __stat_request_base = {
-    stat_request_ino_arr_assign,
-    stat_request_ino_arr_get,
-    stat_request_ino_arr_add,
+  stat_request_ino_arr_assign,
+  stat_request_ino_arr_get,
+  stat_request_ino_arr_add,
 };
 
-struct stat_request *stat_request_new(void)
+struct stat_request *
+stat_request_new(void)
 {
-    return stat_request_new_with_arg(NULL);
+  return stat_request_new_with_arg(NULL);
 }
 
-struct stat_request *stat_request_new_with_arg(void *unused)
+struct stat_request *
+stat_request_new_with_arg(void *unused)
 {
-    struct stat_request *tmp;
-    if ((tmp = malloc(sizeof(struct stat_request))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__stat_request_base;
-
-    tmp->ino_arr = NULL;
-    tmp->ino_arr_length = 0;
-    tmp->ino_arr_num_allocated = 0;
-    tmp->ino_arr_set = 0;
-
-    return (tmp);
-}
-
-static int stat_request_ino_arr_expand_to_hold_more(struct stat_request *msg)
-{
-    int tobe_allocated = msg->ino_arr_num_allocated;
-    ev_uint64_t *new_d_ata = NULL;
-    tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
-    new_d_ata = (ev_uint64_t *) realloc(msg->ino_arr,
-                                        tobe_allocated * sizeof(ev_uint64_t));
-    if (new_d_ata == NULL)
-        return -1;
-    msg->ino_arr = new_d_ata;
-    msg->ino_arr_num_allocated = tobe_allocated;
-    return 0;
-}
-
-ev_uint64_t *stat_request_ino_arr_add(struct stat_request * msg,
-                                      const ev_uint64_t value)
-{
-    if (++msg->ino_arr_length >= msg->ino_arr_num_allocated) {
-        if (stat_request_ino_arr_expand_to_hold_more(msg) < 0)
-            goto error;
-    }
-    msg->ino_arr[msg->ino_arr_length - 1] = value;
-    msg->ino_arr_set = 1;
-    return &(msg->ino_arr[msg->ino_arr_length - 1]);
-  error:
-    --msg->ino_arr_length;
+  struct stat_request *tmp;
+  if ((tmp = malloc(sizeof(struct stat_request))) == NULL) {
+    event_warn("%s: malloc", __func__);
     return (NULL);
+  }
+  tmp->base = &__stat_request_base;
+
+  tmp->ino_arr = NULL;
+  tmp->ino_arr_length = 0;
+  tmp->ino_arr_num_allocated = 0;
+  tmp->ino_arr_set = 0;
+
+  return (tmp);
+}
+
+static int
+stat_request_ino_arr_expand_to_hold_more(struct stat_request *msg)
+{
+  int tobe_allocated = msg->ino_arr_num_allocated;
+  ev_uint64_t* new_d_ata = NULL;
+  tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
+  new_d_ata = (ev_uint64_t*) realloc(msg->ino_arr,
+      tobe_allocated * sizeof(ev_uint64_t));
+  if (new_d_ata == NULL)
+    return -1;
+  msg->ino_arr = new_d_ata;
+  msg->ino_arr_num_allocated = tobe_allocated;
+  return 0;}
+
+ev_uint64_t *
+stat_request_ino_arr_add(struct stat_request *msg, const ev_uint64_t value)
+{
+  if (++msg->ino_arr_length >= msg->ino_arr_num_allocated) {
+    if (stat_request_ino_arr_expand_to_hold_more(msg)<0)
+      goto error;
+  }
+  msg->ino_arr[msg->ino_arr_length - 1] = value;
+  msg->ino_arr_set = 1;
+  return &(msg->ino_arr[msg->ino_arr_length - 1]);
+error:
+  --msg->ino_arr_length;
+  return (NULL);
 }
 
 int
 stat_request_ino_arr_assign(struct stat_request *msg, int off,
-                            const ev_uint64_t value)
+    const ev_uint64_t value)
 {
-    if (!msg->ino_arr_set || off < 0 || off >= msg->ino_arr_length)
-        return (-1);
+  if (!msg->ino_arr_set || off < 0 || off >= msg->ino_arr_length)
+    return (-1);
 
-    {
-        msg->ino_arr[off] = value;
-    }
-    return (0);
+  {
+    msg->ino_arr[off] = value;
+  }
+  return (0);
 }
 
 int
 stat_request_ino_arr_get(struct stat_request *msg, int offset,
-                         ev_uint64_t * value)
+    ev_uint64_t *value)
 {
-    if (!msg->ino_arr_set || offset < 0 || offset >= msg->ino_arr_length)
-        return (-1);
-    *value = msg->ino_arr[offset];
-    return (0);
-}
-
-void stat_request_clear(struct stat_request *tmp)
-{
-    if (tmp->ino_arr_set == 1) {
-        free(tmp->ino_arr);
-        tmp->ino_arr = NULL;
-        tmp->ino_arr_set = 0;
-        tmp->ino_arr_length = 0;
-        tmp->ino_arr_num_allocated = 0;
-    }
-}
-
-void stat_request_free(struct stat_request *tmp)
-{
-    if (tmp->ino_arr_set == 1) {
-        free(tmp->ino_arr);
-        tmp->ino_arr = NULL;
-        tmp->ino_arr_set = 0;
-        tmp->ino_arr_length = 0;
-        tmp->ino_arr_num_allocated = 0;
-    }
-    free(tmp->ino_arr);
-    free(tmp);
+  if (!msg->ino_arr_set || offset < 0 || offset >= msg->ino_arr_length)
+    return (-1);
+  *value = msg->ino_arr[offset];
+  return (0);
 }
 
 void
-stat_request_marshal(struct evbuffer *evbuf, const struct stat_request *tmp)
+stat_request_clear(struct stat_request *tmp)
 {
-    if (tmp->ino_arr_set) {
-        {
-            int i;
-            for (i = 0; i < tmp->ino_arr_length; ++i) {
-                evtag_marshal_int64(evbuf, STAT_REQUEST_INO_ARR,
-                                    tmp->ino_arr[i]);
-            }
-        }
-    }
+  if (tmp->ino_arr_set == 1) {
+    free(tmp->ino_arr);
+    tmp->ino_arr = NULL;
+    tmp->ino_arr_set = 0;
+    tmp->ino_arr_length = 0;
+    tmp->ino_arr_num_allocated = 0;
+  }
 }
 
-int stat_request_unmarshal(struct stat_request *tmp, struct evbuffer *evbuf)
+void
+stat_request_free(struct stat_request *tmp)
 {
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
-
-        case STAT_REQUEST_INO_ARR:
-
-            if (tmp->ino_arr_length >= tmp->ino_arr_num_allocated &&
-                stat_request_ino_arr_expand_to_hold_more(tmp) < 0) {
-                puts("HEY NOW");
-                return (-1);
-            }
-            if (evtag_unmarshal_int64
-                (evbuf, STAT_REQUEST_INO_ARR,
-                 &tmp->ino_arr[tmp->ino_arr_length]) == -1) {
-                event_warnx("%s: failed to unmarshal ino_arr", __func__);
-                return (-1);
-            }
-            ++tmp->ino_arr_length;
-            tmp->ino_arr_set = 1;
-            break;
-
-        default:
-            return -1;
-        }
-    }
-
-    if (stat_request_complete(tmp) == -1)
-        return (-1);
-    return (0);
+  if (tmp->ino_arr_set == 1) {
+    free(tmp->ino_arr);
+    tmp->ino_arr = NULL;
+    tmp->ino_arr_set = 0;
+    tmp->ino_arr_length = 0;
+    tmp->ino_arr_num_allocated = 0;
+  }
+  free(tmp->ino_arr);
+  free(tmp);
 }
 
-int stat_request_complete(struct stat_request *msg)
-{
-    return (0);
+void
+stat_request_marshal(struct evbuffer *evbuf, const struct stat_request *tmp){
+  if (tmp->ino_arr_set) {
+    {
+      int i;
+      for (i = 0; i < tmp->ino_arr_length; ++i) {
+    evtag_marshal_int64(evbuf, STAT_REQUEST_INO_ARR, tmp->ino_arr[i]);
+      }
+    }
+  }
 }
 
 int
-evtag_unmarshal_stat_request(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                             struct stat_request *msg)
+stat_request_unmarshal(struct stat_request *tmp,  struct evbuffer *evbuf)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
 
-    struct evbuffer *tmp = evbuffer_new();
+      case STAT_REQUEST_INO_ARR:
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+        if (tmp->ino_arr_length >= tmp->ino_arr_num_allocated &&
+            stat_request_ino_arr_expand_to_hold_more(tmp) < 0) {
+          puts("HEY NOW");
+          return (-1);
+        }
+        if (evtag_unmarshal_int64(evbuf, STAT_REQUEST_INO_ARR, &tmp->ino_arr[tmp->ino_arr_length]) == -1) {
+          event_warnx("%s: failed to unmarshal ino_arr", __func__);
+          return (-1);
+        }
+        ++tmp->ino_arr_length;
+        tmp->ino_arr_set = 1;
+        break;
 
-    if (stat_request_unmarshal(msg, tmp) == -1)
-        goto error;
+      default:
+        return -1;
+    }
+  }
 
-    res = 0;
+  if (stat_request_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+int
+stat_request_complete(struct stat_request *msg)
+{
+  return (0);
+}
+
+int
+evtag_unmarshal_stat_request(struct evbuffer *evbuf, ev_uint32_t need_tag, struct stat_request *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (stat_request_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
 }
 
 void
-evtag_marshal_stat_request(struct evbuffer *evbuf, ev_uint32_t tag,
-                           const struct stat_request *msg)
+evtag_marshal_stat_request(struct evbuffer *evbuf, ev_uint32_t tag, const struct stat_request *msg)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    stat_request_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  stat_request_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -1556,233 +1635,233 @@ evtag_marshal_stat_request(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct stat_response_access_ __stat_response_base = {
-    stat_response_stat_arr_assign,
-    stat_response_stat_arr_get,
-    stat_response_stat_arr_add,
+  stat_response_stat_arr_assign,
+  stat_response_stat_arr_get,
+  stat_response_stat_arr_add,
 };
 
-struct stat_response *stat_response_new(void)
+struct stat_response *
+stat_response_new(void)
 {
-    return stat_response_new_with_arg(NULL);
+  return stat_response_new_with_arg(NULL);
 }
 
-struct stat_response *stat_response_new_with_arg(void *unused)
+struct stat_response *
+stat_response_new_with_arg(void *unused)
 {
-    struct stat_response *tmp;
-    if ((tmp = malloc(sizeof(struct stat_response))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__stat_response_base;
-
-    tmp->stat_arr = NULL;
-    tmp->stat_arr_length = 0;
-    tmp->stat_arr_num_allocated = 0;
-    tmp->stat_arr_set = 0;
-
-    return (tmp);
-}
-
-static int stat_response_stat_arr_expand_to_hold_more(struct stat_response *msg)
-{
-    int tobe_allocated = msg->stat_arr_num_allocated;
-    struct file_stat **new_d_ata = NULL;
-    tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
-    new_d_ata = (struct file_stat **)realloc(msg->stat_arr,
-                                             tobe_allocated *
-                                             sizeof(struct file_stat *));
-    if (new_d_ata == NULL)
-        return -1;
-    msg->stat_arr = new_d_ata;
-    msg->stat_arr_num_allocated = tobe_allocated;
-    return 0;
-}
-
-struct file_stat *stat_response_stat_arr_add(struct stat_response *msg)
-{
-    if (++msg->stat_arr_length >= msg->stat_arr_num_allocated) {
-        if (stat_response_stat_arr_expand_to_hold_more(msg) < 0)
-            goto error;
-    }
-    msg->stat_arr[msg->stat_arr_length - 1] = file_stat_new();
-    if (msg->stat_arr[msg->stat_arr_length - 1] == NULL)
-        goto error;
-    msg->stat_arr_set = 1;
-    return (msg->stat_arr[msg->stat_arr_length - 1]);
-  error:
-    --msg->stat_arr_length;
+  struct stat_response *tmp;
+  if ((tmp = malloc(sizeof(struct stat_response))) == NULL) {
+    event_warn("%s: malloc", __func__);
     return (NULL);
+  }
+  tmp->base = &__stat_response_base;
+
+  tmp->stat_arr = NULL;
+  tmp->stat_arr_length = 0;
+  tmp->stat_arr_num_allocated = 0;
+  tmp->stat_arr_set = 0;
+
+  return (tmp);
+}
+
+static int
+stat_response_stat_arr_expand_to_hold_more(struct stat_response *msg)
+{
+  int tobe_allocated = msg->stat_arr_num_allocated;
+  struct file_stat** new_d_ata = NULL;
+  tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
+  new_d_ata = (struct file_stat**) realloc(msg->stat_arr,
+      tobe_allocated * sizeof(struct file_stat*));
+  if (new_d_ata == NULL)
+    return -1;
+  msg->stat_arr = new_d_ata;
+  msg->stat_arr_num_allocated = tobe_allocated;
+  return 0;}
+
+struct file_stat* 
+stat_response_stat_arr_add(struct stat_response *msg)
+{
+  if (++msg->stat_arr_length >= msg->stat_arr_num_allocated) {
+    if (stat_response_stat_arr_expand_to_hold_more(msg)<0)
+      goto error;
+  }
+  msg->stat_arr[msg->stat_arr_length - 1] = file_stat_new();
+  if (msg->stat_arr[msg->stat_arr_length - 1] == NULL)
+    goto error;
+  msg->stat_arr_set = 1;
+  return (msg->stat_arr[msg->stat_arr_length - 1]);
+error:
+  --msg->stat_arr_length;
+  return (NULL);
 }
 
 int
 stat_response_stat_arr_assign(struct stat_response *msg, int off,
-                              const struct file_stat *value)
+    const struct file_stat* value)
 {
-    if (!msg->stat_arr_set || off < 0 || off >= msg->stat_arr_length)
-        return (-1);
+  if (!msg->stat_arr_set || off < 0 || off >= msg->stat_arr_length)
+    return (-1);
 
-    {
-        int had_error = 0;
-        struct evbuffer *tmp = NULL;
-        file_stat_clear(msg->stat_arr[off]);
-        if ((tmp = evbuffer_new()) == NULL) {
-            event_warn("%s: evbuffer_new()", __func__);
-            had_error = 1;
-            goto done;
-        }
-        file_stat_marshal(tmp, value);
-        if (file_stat_unmarshal(msg->stat_arr[off], tmp) == -1) {
-            event_warnx("%s: file_stat_unmarshal", __func__);
-            had_error = 1;
-            goto done;
-        }
-      done:if (tmp != NULL)
-            evbuffer_free(tmp);
-        if (had_error) {
-            file_stat_clear(msg->stat_arr[off]);
-            return (-1);
-        }
+  {
+    int had_error = 0;
+    struct evbuffer *tmp = NULL;
+    file_stat_clear(msg->stat_arr[off]);
+    if ((tmp = evbuffer_new()) == NULL) {
+      event_warn("%s: evbuffer_new()", __func__);
+      had_error = 1;
+      goto done;
     }
-    return (0);
+    file_stat_marshal(tmp, value);
+    if (file_stat_unmarshal(msg->stat_arr[off], tmp) == -1) {
+      event_warnx("%s: file_stat_unmarshal", __func__);
+      had_error = 1;
+      goto done;
+    }
+    done:if (tmp != NULL)
+      evbuffer_free(tmp);
+    if (had_error) {
+      file_stat_clear(msg->stat_arr[off]);
+      return (-1);
+    }
+  }
+  return (0);
 }
 
 int
 stat_response_stat_arr_get(struct stat_response *msg, int offset,
-                           struct file_stat **value)
+    struct file_stat* *value)
 {
-    if (!msg->stat_arr_set || offset < 0 || offset >= msg->stat_arr_length)
-        return (-1);
-    *value = msg->stat_arr[offset];
-    return (0);
-}
-
-void stat_response_clear(struct stat_response *tmp)
-{
-    if (tmp->stat_arr_set == 1) {
-        int i;
-        for (i = 0; i < tmp->stat_arr_length; ++i) {
-            file_stat_free(tmp->stat_arr[i]);
-        }
-        free(tmp->stat_arr);
-        tmp->stat_arr = NULL;
-        tmp->stat_arr_set = 0;
-        tmp->stat_arr_length = 0;
-        tmp->stat_arr_num_allocated = 0;
-    }
-}
-
-void stat_response_free(struct stat_response *tmp)
-{
-    if (tmp->stat_arr_set == 1) {
-        int i;
-        for (i = 0; i < tmp->stat_arr_length; ++i) {
-            file_stat_free(tmp->stat_arr[i]);
-        }
-        free(tmp->stat_arr);
-        tmp->stat_arr = NULL;
-        tmp->stat_arr_set = 0;
-        tmp->stat_arr_length = 0;
-        tmp->stat_arr_num_allocated = 0;
-    }
-    free(tmp->stat_arr);
-    free(tmp);
+  if (!msg->stat_arr_set || offset < 0 || offset >= msg->stat_arr_length)
+    return (-1);
+  *value = msg->stat_arr[offset];
+  return (0);
 }
 
 void
-stat_response_marshal(struct evbuffer *evbuf, const struct stat_response *tmp)
+stat_response_clear(struct stat_response *tmp)
 {
-    if (tmp->stat_arr_set) {
-        {
-            int i;
-            for (i = 0; i < tmp->stat_arr_length; ++i) {
-                evtag_marshal_file_stat(evbuf, STAT_RESPONSE_STAT_ARR,
-                                        tmp->stat_arr[i]);
-            }
-        }
+  if (tmp->stat_arr_set == 1) {
+    int i;
+    for (i = 0; i < tmp->stat_arr_length; ++i) {
+      file_stat_free(tmp->stat_arr[i]);
     }
+    free(tmp->stat_arr);
+    tmp->stat_arr = NULL;
+    tmp->stat_arr_set = 0;
+    tmp->stat_arr_length = 0;
+    tmp->stat_arr_num_allocated = 0;
+  }
 }
 
-int stat_response_unmarshal(struct stat_response *tmp, struct evbuffer *evbuf)
+void
+stat_response_free(struct stat_response *tmp)
 {
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
-
-        case STAT_RESPONSE_STAT_ARR:
-
-            if (tmp->stat_arr_length >= tmp->stat_arr_num_allocated &&
-                stat_response_stat_arr_expand_to_hold_more(tmp) < 0) {
-                puts("HEY NOW");
-                return (-1);
-            }
-            tmp->stat_arr[tmp->stat_arr_length] = file_stat_new();
-            if (tmp->stat_arr[tmp->stat_arr_length] == NULL)
-                return (-1);
-            if (evtag_unmarshal_file_stat
-                (evbuf, STAT_RESPONSE_STAT_ARR,
-                 tmp->stat_arr[tmp->stat_arr_length]) == -1) {
-                event_warnx("%s: failed to unmarshal stat_arr", __func__);
-                return (-1);
-            }
-            ++tmp->stat_arr_length;
-            tmp->stat_arr_set = 1;
-            break;
-
-        default:
-            return -1;
-        }
+  if (tmp->stat_arr_set == 1) {
+    int i;
+    for (i = 0; i < tmp->stat_arr_length; ++i) {
+      file_stat_free(tmp->stat_arr[i]);
     }
-
-    if (stat_response_complete(tmp) == -1)
-        return (-1);
-    return (0);
+    free(tmp->stat_arr);
+    tmp->stat_arr = NULL;
+    tmp->stat_arr_set = 0;
+    tmp->stat_arr_length = 0;
+    tmp->stat_arr_num_allocated = 0;
+  }
+  free(tmp->stat_arr);
+  free(tmp);
 }
 
-int stat_response_complete(struct stat_response *msg)
-{
+void
+stat_response_marshal(struct evbuffer *evbuf, const struct stat_response *tmp){
+  if (tmp->stat_arr_set) {
     {
-        int i;
-        for (i = 0; i < msg->stat_arr_length; ++i) {
-            if (msg->stat_arr_set && file_stat_complete(msg->stat_arr[i]) == -1)
-                return (-1);
-        }
+      int i;
+      for (i = 0; i < tmp->stat_arr_length; ++i) {
+    evtag_marshal_file_stat(evbuf, STAT_RESPONSE_STAT_ARR, tmp->stat_arr[i]);
+      }
     }
-    return (0);
+  }
 }
 
 int
-evtag_unmarshal_stat_response(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                              struct stat_response *msg)
+stat_response_unmarshal(struct stat_response *tmp,  struct evbuffer *evbuf)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
 
-    struct evbuffer *tmp = evbuffer_new();
+      case STAT_RESPONSE_STAT_ARR:
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+        if (tmp->stat_arr_length >= tmp->stat_arr_num_allocated &&
+            stat_response_stat_arr_expand_to_hold_more(tmp) < 0) {
+          puts("HEY NOW");
+          return (-1);
+        }
+        tmp->stat_arr[tmp->stat_arr_length] = file_stat_new();
+        if (tmp->stat_arr[tmp->stat_arr_length] == NULL)
+          return (-1);
+        if (evtag_unmarshal_file_stat(evbuf, STAT_RESPONSE_STAT_ARR, tmp->stat_arr[tmp->stat_arr_length]) == -1) {
+          event_warnx("%s: failed to unmarshal stat_arr", __func__);
+          return (-1);
+        }
+        ++tmp->stat_arr_length;
+        tmp->stat_arr_set = 1;
+        break;
 
-    if (stat_response_unmarshal(msg, tmp) == -1)
-        goto error;
+      default:
+        return -1;
+    }
+  }
 
-    res = 0;
+  if (stat_response_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+int
+stat_response_complete(struct stat_response *msg)
+{
+  {
+    int i;
+    for (i = 0; i < msg->stat_arr_length; ++i) {
+      if (msg->stat_arr_set && file_stat_complete(msg->stat_arr[i]) == -1)
+        return (-1);
+    }
+  }
+  return (0);
+}
+
+int
+evtag_unmarshal_stat_response(struct evbuffer *evbuf, ev_uint32_t need_tag, struct stat_response *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (stat_response_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
 }
 
 void
-evtag_marshal_stat_response(struct evbuffer *evbuf, ev_uint32_t tag,
-                            const struct stat_response *msg)
+evtag_marshal_stat_response(struct evbuffer *evbuf, ev_uint32_t tag, const struct stat_response *msg)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    stat_response_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  stat_response_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -1790,236 +1869,233 @@ evtag_marshal_stat_response(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct setattr_request_access_ __setattr_request_base = {
-    setattr_request_stat_arr_assign,
-    setattr_request_stat_arr_get,
-    setattr_request_stat_arr_add,
+  setattr_request_stat_arr_assign,
+  setattr_request_stat_arr_get,
+  setattr_request_stat_arr_add,
 };
 
-struct setattr_request *setattr_request_new(void)
+struct setattr_request *
+setattr_request_new(void)
 {
-    return setattr_request_new_with_arg(NULL);
+  return setattr_request_new_with_arg(NULL);
 }
 
-struct setattr_request *setattr_request_new_with_arg(void *unused)
+struct setattr_request *
+setattr_request_new_with_arg(void *unused)
 {
-    struct setattr_request *tmp;
-    if ((tmp = malloc(sizeof(struct setattr_request))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__setattr_request_base;
+  struct setattr_request *tmp;
+  if ((tmp = malloc(sizeof(struct setattr_request))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__setattr_request_base;
 
-    tmp->stat_arr = NULL;
-    tmp->stat_arr_length = 0;
-    tmp->stat_arr_num_allocated = 0;
-    tmp->stat_arr_set = 0;
+  tmp->stat_arr = NULL;
+  tmp->stat_arr_length = 0;
+  tmp->stat_arr_num_allocated = 0;
+  tmp->stat_arr_set = 0;
 
-    return (tmp);
+  return (tmp);
 }
 
 static int
 setattr_request_stat_arr_expand_to_hold_more(struct setattr_request *msg)
 {
-    int tobe_allocated = msg->stat_arr_num_allocated;
-    struct file_stat **new_d_ata = NULL;
-    tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
-    new_d_ata = (struct file_stat **)realloc(msg->stat_arr,
-                                             tobe_allocated *
-                                             sizeof(struct file_stat *));
-    if (new_d_ata == NULL)
-        return -1;
-    msg->stat_arr = new_d_ata;
-    msg->stat_arr_num_allocated = tobe_allocated;
-    return 0;
-}
+  int tobe_allocated = msg->stat_arr_num_allocated;
+  struct file_stat** new_d_ata = NULL;
+  tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
+  new_d_ata = (struct file_stat**) realloc(msg->stat_arr,
+      tobe_allocated * sizeof(struct file_stat*));
+  if (new_d_ata == NULL)
+    return -1;
+  msg->stat_arr = new_d_ata;
+  msg->stat_arr_num_allocated = tobe_allocated;
+  return 0;}
 
-struct file_stat *setattr_request_stat_arr_add(struct setattr_request *msg)
+struct file_stat* 
+setattr_request_stat_arr_add(struct setattr_request *msg)
 {
-    if (++msg->stat_arr_length >= msg->stat_arr_num_allocated) {
-        if (setattr_request_stat_arr_expand_to_hold_more(msg) < 0)
-            goto error;
-    }
-    msg->stat_arr[msg->stat_arr_length - 1] = file_stat_new();
-    if (msg->stat_arr[msg->stat_arr_length - 1] == NULL)
-        goto error;
-    msg->stat_arr_set = 1;
-    return (msg->stat_arr[msg->stat_arr_length - 1]);
-  error:
-    --msg->stat_arr_length;
-    return (NULL);
+  if (++msg->stat_arr_length >= msg->stat_arr_num_allocated) {
+    if (setattr_request_stat_arr_expand_to_hold_more(msg)<0)
+      goto error;
+  }
+  msg->stat_arr[msg->stat_arr_length - 1] = file_stat_new();
+  if (msg->stat_arr[msg->stat_arr_length - 1] == NULL)
+    goto error;
+  msg->stat_arr_set = 1;
+  return (msg->stat_arr[msg->stat_arr_length - 1]);
+error:
+  --msg->stat_arr_length;
+  return (NULL);
 }
 
 int
 setattr_request_stat_arr_assign(struct setattr_request *msg, int off,
-                                const struct file_stat *value)
+    const struct file_stat* value)
 {
-    if (!msg->stat_arr_set || off < 0 || off >= msg->stat_arr_length)
-        return (-1);
+  if (!msg->stat_arr_set || off < 0 || off >= msg->stat_arr_length)
+    return (-1);
 
-    {
-        int had_error = 0;
-        struct evbuffer *tmp = NULL;
-        file_stat_clear(msg->stat_arr[off]);
-        if ((tmp = evbuffer_new()) == NULL) {
-            event_warn("%s: evbuffer_new()", __func__);
-            had_error = 1;
-            goto done;
-        }
-        file_stat_marshal(tmp, value);
-        if (file_stat_unmarshal(msg->stat_arr[off], tmp) == -1) {
-            event_warnx("%s: file_stat_unmarshal", __func__);
-            had_error = 1;
-            goto done;
-        }
-      done:if (tmp != NULL)
-            evbuffer_free(tmp);
-        if (had_error) {
-            file_stat_clear(msg->stat_arr[off]);
-            return (-1);
-        }
+  {
+    int had_error = 0;
+    struct evbuffer *tmp = NULL;
+    file_stat_clear(msg->stat_arr[off]);
+    if ((tmp = evbuffer_new()) == NULL) {
+      event_warn("%s: evbuffer_new()", __func__);
+      had_error = 1;
+      goto done;
     }
-    return (0);
+    file_stat_marshal(tmp, value);
+    if (file_stat_unmarshal(msg->stat_arr[off], tmp) == -1) {
+      event_warnx("%s: file_stat_unmarshal", __func__);
+      had_error = 1;
+      goto done;
+    }
+    done:if (tmp != NULL)
+      evbuffer_free(tmp);
+    if (had_error) {
+      file_stat_clear(msg->stat_arr[off]);
+      return (-1);
+    }
+  }
+  return (0);
 }
 
 int
 setattr_request_stat_arr_get(struct setattr_request *msg, int offset,
-                             struct file_stat **value)
+    struct file_stat* *value)
 {
-    if (!msg->stat_arr_set || offset < 0 || offset >= msg->stat_arr_length)
-        return (-1);
-    *value = msg->stat_arr[offset];
-    return (0);
+  if (!msg->stat_arr_set || offset < 0 || offset >= msg->stat_arr_length)
+    return (-1);
+  *value = msg->stat_arr[offset];
+  return (0);
 }
 
-void setattr_request_clear(struct setattr_request *tmp)
+void
+setattr_request_clear(struct setattr_request *tmp)
 {
-    if (tmp->stat_arr_set == 1) {
-        int i;
-        for (i = 0; i < tmp->stat_arr_length; ++i) {
-            file_stat_free(tmp->stat_arr[i]);
-        }
-        free(tmp->stat_arr);
-        tmp->stat_arr = NULL;
-        tmp->stat_arr_set = 0;
-        tmp->stat_arr_length = 0;
-        tmp->stat_arr_num_allocated = 0;
-    }
-}
-
-void setattr_request_free(struct setattr_request *tmp)
-{
-    if (tmp->stat_arr_set == 1) {
-        int i;
-        for (i = 0; i < tmp->stat_arr_length; ++i) {
-            file_stat_free(tmp->stat_arr[i]);
-        }
-        free(tmp->stat_arr);
-        tmp->stat_arr = NULL;
-        tmp->stat_arr_set = 0;
-        tmp->stat_arr_length = 0;
-        tmp->stat_arr_num_allocated = 0;
+  if (tmp->stat_arr_set == 1) {
+    int i;
+    for (i = 0; i < tmp->stat_arr_length; ++i) {
+      file_stat_free(tmp->stat_arr[i]);
     }
     free(tmp->stat_arr);
-    free(tmp);
+    tmp->stat_arr = NULL;
+    tmp->stat_arr_set = 0;
+    tmp->stat_arr_length = 0;
+    tmp->stat_arr_num_allocated = 0;
+  }
 }
 
 void
-setattr_request_marshal(struct evbuffer *evbuf,
-                        const struct setattr_request *tmp)
+setattr_request_free(struct setattr_request *tmp)
 {
-    if (tmp->stat_arr_set) {
-        {
-            int i;
-            for (i = 0; i < tmp->stat_arr_length; ++i) {
-                evtag_marshal_file_stat(evbuf, SETATTR_REQUEST_STAT_ARR,
-                                        tmp->stat_arr[i]);
-            }
-        }
+  if (tmp->stat_arr_set == 1) {
+    int i;
+    for (i = 0; i < tmp->stat_arr_length; ++i) {
+      file_stat_free(tmp->stat_arr[i]);
     }
+    free(tmp->stat_arr);
+    tmp->stat_arr = NULL;
+    tmp->stat_arr_set = 0;
+    tmp->stat_arr_length = 0;
+    tmp->stat_arr_num_allocated = 0;
+  }
+  free(tmp->stat_arr);
+  free(tmp);
 }
 
-int
-setattr_request_unmarshal(struct setattr_request *tmp, struct evbuffer *evbuf)
-{
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
-
-        case SETATTR_REQUEST_STAT_ARR:
-
-            if (tmp->stat_arr_length >= tmp->stat_arr_num_allocated &&
-                setattr_request_stat_arr_expand_to_hold_more(tmp) < 0) {
-                puts("HEY NOW");
-                return (-1);
-            }
-            tmp->stat_arr[tmp->stat_arr_length] = file_stat_new();
-            if (tmp->stat_arr[tmp->stat_arr_length] == NULL)
-                return (-1);
-            if (evtag_unmarshal_file_stat
-                (evbuf, SETATTR_REQUEST_STAT_ARR,
-                 tmp->stat_arr[tmp->stat_arr_length]) == -1) {
-                event_warnx("%s: failed to unmarshal stat_arr", __func__);
-                return (-1);
-            }
-            ++tmp->stat_arr_length;
-            tmp->stat_arr_set = 1;
-            break;
-
-        default:
-            return -1;
-        }
-    }
-
-    if (setattr_request_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int setattr_request_complete(struct setattr_request *msg)
-{
+void
+setattr_request_marshal(struct evbuffer *evbuf, const struct setattr_request *tmp){
+  if (tmp->stat_arr_set) {
     {
-        int i;
-        for (i = 0; i < msg->stat_arr_length; ++i) {
-            if (msg->stat_arr_set && file_stat_complete(msg->stat_arr[i]) == -1)
-                return (-1);
-        }
+      int i;
+      for (i = 0; i < tmp->stat_arr_length; ++i) {
+    evtag_marshal_file_stat(evbuf, SETATTR_REQUEST_STAT_ARR, tmp->stat_arr[i]);
+      }
     }
-    return (0);
+  }
 }
 
 int
-evtag_unmarshal_setattr_request(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                                struct setattr_request *msg)
+setattr_request_unmarshal(struct setattr_request *tmp,  struct evbuffer *evbuf)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
 
-    struct evbuffer *tmp = evbuffer_new();
+      case SETATTR_REQUEST_STAT_ARR:
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+        if (tmp->stat_arr_length >= tmp->stat_arr_num_allocated &&
+            setattr_request_stat_arr_expand_to_hold_more(tmp) < 0) {
+          puts("HEY NOW");
+          return (-1);
+        }
+        tmp->stat_arr[tmp->stat_arr_length] = file_stat_new();
+        if (tmp->stat_arr[tmp->stat_arr_length] == NULL)
+          return (-1);
+        if (evtag_unmarshal_file_stat(evbuf, SETATTR_REQUEST_STAT_ARR, tmp->stat_arr[tmp->stat_arr_length]) == -1) {
+          event_warnx("%s: failed to unmarshal stat_arr", __func__);
+          return (-1);
+        }
+        ++tmp->stat_arr_length;
+        tmp->stat_arr_set = 1;
+        break;
 
-    if (setattr_request_unmarshal(msg, tmp) == -1)
-        goto error;
+      default:
+        return -1;
+    }
+  }
 
-    res = 0;
+  if (setattr_request_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+int
+setattr_request_complete(struct setattr_request *msg)
+{
+  {
+    int i;
+    for (i = 0; i < msg->stat_arr_length; ++i) {
+      if (msg->stat_arr_set && file_stat_complete(msg->stat_arr[i]) == -1)
+        return (-1);
+    }
+  }
+  return (0);
+}
+
+int
+evtag_unmarshal_setattr_request(struct evbuffer *evbuf, ev_uint32_t need_tag, struct setattr_request *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (setattr_request_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
 }
 
 void
-evtag_marshal_setattr_request(struct evbuffer *evbuf, ev_uint32_t tag,
-                              const struct setattr_request *msg)
+evtag_marshal_setattr_request(struct evbuffer *evbuf, ev_uint32_t tag, const struct setattr_request *msg)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    setattr_request_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  setattr_request_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -2027,236 +2103,233 @@ evtag_marshal_setattr_request(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct setattr_response_access_ __setattr_response_base = {
-    setattr_response_stat_arr_assign,
-    setattr_response_stat_arr_get,
-    setattr_response_stat_arr_add,
+  setattr_response_stat_arr_assign,
+  setattr_response_stat_arr_get,
+  setattr_response_stat_arr_add,
 };
 
-struct setattr_response *setattr_response_new(void)
+struct setattr_response *
+setattr_response_new(void)
 {
-    return setattr_response_new_with_arg(NULL);
+  return setattr_response_new_with_arg(NULL);
 }
 
-struct setattr_response *setattr_response_new_with_arg(void *unused)
+struct setattr_response *
+setattr_response_new_with_arg(void *unused)
 {
-    struct setattr_response *tmp;
-    if ((tmp = malloc(sizeof(struct setattr_response))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__setattr_response_base;
+  struct setattr_response *tmp;
+  if ((tmp = malloc(sizeof(struct setattr_response))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__setattr_response_base;
 
-    tmp->stat_arr = NULL;
-    tmp->stat_arr_length = 0;
-    tmp->stat_arr_num_allocated = 0;
-    tmp->stat_arr_set = 0;
+  tmp->stat_arr = NULL;
+  tmp->stat_arr_length = 0;
+  tmp->stat_arr_num_allocated = 0;
+  tmp->stat_arr_set = 0;
 
-    return (tmp);
+  return (tmp);
 }
 
 static int
 setattr_response_stat_arr_expand_to_hold_more(struct setattr_response *msg)
 {
-    int tobe_allocated = msg->stat_arr_num_allocated;
-    struct file_stat **new_d_ata = NULL;
-    tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
-    new_d_ata = (struct file_stat **)realloc(msg->stat_arr,
-                                             tobe_allocated *
-                                             sizeof(struct file_stat *));
-    if (new_d_ata == NULL)
-        return -1;
-    msg->stat_arr = new_d_ata;
-    msg->stat_arr_num_allocated = tobe_allocated;
-    return 0;
-}
+  int tobe_allocated = msg->stat_arr_num_allocated;
+  struct file_stat** new_d_ata = NULL;
+  tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
+  new_d_ata = (struct file_stat**) realloc(msg->stat_arr,
+      tobe_allocated * sizeof(struct file_stat*));
+  if (new_d_ata == NULL)
+    return -1;
+  msg->stat_arr = new_d_ata;
+  msg->stat_arr_num_allocated = tobe_allocated;
+  return 0;}
 
-struct file_stat *setattr_response_stat_arr_add(struct setattr_response *msg)
+struct file_stat* 
+setattr_response_stat_arr_add(struct setattr_response *msg)
 {
-    if (++msg->stat_arr_length >= msg->stat_arr_num_allocated) {
-        if (setattr_response_stat_arr_expand_to_hold_more(msg) < 0)
-            goto error;
-    }
-    msg->stat_arr[msg->stat_arr_length - 1] = file_stat_new();
-    if (msg->stat_arr[msg->stat_arr_length - 1] == NULL)
-        goto error;
-    msg->stat_arr_set = 1;
-    return (msg->stat_arr[msg->stat_arr_length - 1]);
-  error:
-    --msg->stat_arr_length;
-    return (NULL);
+  if (++msg->stat_arr_length >= msg->stat_arr_num_allocated) {
+    if (setattr_response_stat_arr_expand_to_hold_more(msg)<0)
+      goto error;
+  }
+  msg->stat_arr[msg->stat_arr_length - 1] = file_stat_new();
+  if (msg->stat_arr[msg->stat_arr_length - 1] == NULL)
+    goto error;
+  msg->stat_arr_set = 1;
+  return (msg->stat_arr[msg->stat_arr_length - 1]);
+error:
+  --msg->stat_arr_length;
+  return (NULL);
 }
 
 int
 setattr_response_stat_arr_assign(struct setattr_response *msg, int off,
-                                 const struct file_stat *value)
+    const struct file_stat* value)
 {
-    if (!msg->stat_arr_set || off < 0 || off >= msg->stat_arr_length)
-        return (-1);
+  if (!msg->stat_arr_set || off < 0 || off >= msg->stat_arr_length)
+    return (-1);
 
-    {
-        int had_error = 0;
-        struct evbuffer *tmp = NULL;
-        file_stat_clear(msg->stat_arr[off]);
-        if ((tmp = evbuffer_new()) == NULL) {
-            event_warn("%s: evbuffer_new()", __func__);
-            had_error = 1;
-            goto done;
-        }
-        file_stat_marshal(tmp, value);
-        if (file_stat_unmarshal(msg->stat_arr[off], tmp) == -1) {
-            event_warnx("%s: file_stat_unmarshal", __func__);
-            had_error = 1;
-            goto done;
-        }
-      done:if (tmp != NULL)
-            evbuffer_free(tmp);
-        if (had_error) {
-            file_stat_clear(msg->stat_arr[off]);
-            return (-1);
-        }
+  {
+    int had_error = 0;
+    struct evbuffer *tmp = NULL;
+    file_stat_clear(msg->stat_arr[off]);
+    if ((tmp = evbuffer_new()) == NULL) {
+      event_warn("%s: evbuffer_new()", __func__);
+      had_error = 1;
+      goto done;
     }
-    return (0);
+    file_stat_marshal(tmp, value);
+    if (file_stat_unmarshal(msg->stat_arr[off], tmp) == -1) {
+      event_warnx("%s: file_stat_unmarshal", __func__);
+      had_error = 1;
+      goto done;
+    }
+    done:if (tmp != NULL)
+      evbuffer_free(tmp);
+    if (had_error) {
+      file_stat_clear(msg->stat_arr[off]);
+      return (-1);
+    }
+  }
+  return (0);
 }
 
 int
 setattr_response_stat_arr_get(struct setattr_response *msg, int offset,
-                              struct file_stat **value)
+    struct file_stat* *value)
 {
-    if (!msg->stat_arr_set || offset < 0 || offset >= msg->stat_arr_length)
-        return (-1);
-    *value = msg->stat_arr[offset];
-    return (0);
+  if (!msg->stat_arr_set || offset < 0 || offset >= msg->stat_arr_length)
+    return (-1);
+  *value = msg->stat_arr[offset];
+  return (0);
 }
 
-void setattr_response_clear(struct setattr_response *tmp)
+void
+setattr_response_clear(struct setattr_response *tmp)
 {
-    if (tmp->stat_arr_set == 1) {
-        int i;
-        for (i = 0; i < tmp->stat_arr_length; ++i) {
-            file_stat_free(tmp->stat_arr[i]);
-        }
-        free(tmp->stat_arr);
-        tmp->stat_arr = NULL;
-        tmp->stat_arr_set = 0;
-        tmp->stat_arr_length = 0;
-        tmp->stat_arr_num_allocated = 0;
-    }
-}
-
-void setattr_response_free(struct setattr_response *tmp)
-{
-    if (tmp->stat_arr_set == 1) {
-        int i;
-        for (i = 0; i < tmp->stat_arr_length; ++i) {
-            file_stat_free(tmp->stat_arr[i]);
-        }
-        free(tmp->stat_arr);
-        tmp->stat_arr = NULL;
-        tmp->stat_arr_set = 0;
-        tmp->stat_arr_length = 0;
-        tmp->stat_arr_num_allocated = 0;
+  if (tmp->stat_arr_set == 1) {
+    int i;
+    for (i = 0; i < tmp->stat_arr_length; ++i) {
+      file_stat_free(tmp->stat_arr[i]);
     }
     free(tmp->stat_arr);
-    free(tmp);
+    tmp->stat_arr = NULL;
+    tmp->stat_arr_set = 0;
+    tmp->stat_arr_length = 0;
+    tmp->stat_arr_num_allocated = 0;
+  }
 }
 
 void
-setattr_response_marshal(struct evbuffer *evbuf,
-                         const struct setattr_response *tmp)
+setattr_response_free(struct setattr_response *tmp)
 {
-    if (tmp->stat_arr_set) {
-        {
-            int i;
-            for (i = 0; i < tmp->stat_arr_length; ++i) {
-                evtag_marshal_file_stat(evbuf, SETATTR_RESPONSE_STAT_ARR,
-                                        tmp->stat_arr[i]);
-            }
-        }
+  if (tmp->stat_arr_set == 1) {
+    int i;
+    for (i = 0; i < tmp->stat_arr_length; ++i) {
+      file_stat_free(tmp->stat_arr[i]);
     }
+    free(tmp->stat_arr);
+    tmp->stat_arr = NULL;
+    tmp->stat_arr_set = 0;
+    tmp->stat_arr_length = 0;
+    tmp->stat_arr_num_allocated = 0;
+  }
+  free(tmp->stat_arr);
+  free(tmp);
 }
 
-int
-setattr_response_unmarshal(struct setattr_response *tmp, struct evbuffer *evbuf)
-{
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
-
-        case SETATTR_RESPONSE_STAT_ARR:
-
-            if (tmp->stat_arr_length >= tmp->stat_arr_num_allocated &&
-                setattr_response_stat_arr_expand_to_hold_more(tmp) < 0) {
-                puts("HEY NOW");
-                return (-1);
-            }
-            tmp->stat_arr[tmp->stat_arr_length] = file_stat_new();
-            if (tmp->stat_arr[tmp->stat_arr_length] == NULL)
-                return (-1);
-            if (evtag_unmarshal_file_stat
-                (evbuf, SETATTR_RESPONSE_STAT_ARR,
-                 tmp->stat_arr[tmp->stat_arr_length]) == -1) {
-                event_warnx("%s: failed to unmarshal stat_arr", __func__);
-                return (-1);
-            }
-            ++tmp->stat_arr_length;
-            tmp->stat_arr_set = 1;
-            break;
-
-        default:
-            return -1;
-        }
-    }
-
-    if (setattr_response_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int setattr_response_complete(struct setattr_response *msg)
-{
+void
+setattr_response_marshal(struct evbuffer *evbuf, const struct setattr_response *tmp){
+  if (tmp->stat_arr_set) {
     {
-        int i;
-        for (i = 0; i < msg->stat_arr_length; ++i) {
-            if (msg->stat_arr_set && file_stat_complete(msg->stat_arr[i]) == -1)
-                return (-1);
-        }
+      int i;
+      for (i = 0; i < tmp->stat_arr_length; ++i) {
+    evtag_marshal_file_stat(evbuf, SETATTR_RESPONSE_STAT_ARR, tmp->stat_arr[i]);
+      }
     }
-    return (0);
+  }
 }
 
 int
-evtag_unmarshal_setattr_response(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                                 struct setattr_response *msg)
+setattr_response_unmarshal(struct setattr_response *tmp,  struct evbuffer *evbuf)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
 
-    struct evbuffer *tmp = evbuffer_new();
+      case SETATTR_RESPONSE_STAT_ARR:
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+        if (tmp->stat_arr_length >= tmp->stat_arr_num_allocated &&
+            setattr_response_stat_arr_expand_to_hold_more(tmp) < 0) {
+          puts("HEY NOW");
+          return (-1);
+        }
+        tmp->stat_arr[tmp->stat_arr_length] = file_stat_new();
+        if (tmp->stat_arr[tmp->stat_arr_length] == NULL)
+          return (-1);
+        if (evtag_unmarshal_file_stat(evbuf, SETATTR_RESPONSE_STAT_ARR, tmp->stat_arr[tmp->stat_arr_length]) == -1) {
+          event_warnx("%s: failed to unmarshal stat_arr", __func__);
+          return (-1);
+        }
+        ++tmp->stat_arr_length;
+        tmp->stat_arr_set = 1;
+        break;
 
-    if (setattr_response_unmarshal(msg, tmp) == -1)
-        goto error;
+      default:
+        return -1;
+    }
+  }
 
-    res = 0;
+  if (setattr_response_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+int
+setattr_response_complete(struct setattr_response *msg)
+{
+  {
+    int i;
+    for (i = 0; i < msg->stat_arr_length; ++i) {
+      if (msg->stat_arr_set && file_stat_complete(msg->stat_arr[i]) == -1)
+        return (-1);
+    }
+  }
+  return (0);
+}
+
+int
+evtag_unmarshal_setattr_response(struct evbuffer *evbuf, ev_uint32_t need_tag, struct setattr_response *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (setattr_response_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
 }
 
 void
-evtag_marshal_setattr_response(struct evbuffer *evbuf, ev_uint32_t tag,
-                               const struct setattr_response *msg)
+evtag_marshal_setattr_response(struct evbuffer *evbuf, ev_uint32_t tag, const struct setattr_response *msg)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    setattr_response_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  setattr_response_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -2264,191 +2337,194 @@ evtag_marshal_setattr_response(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct ls_request_access_ __ls_request_base = {
-    ls_request_ino_arr_assign,
-    ls_request_ino_arr_get,
-    ls_request_ino_arr_add,
+  ls_request_ino_arr_assign,
+  ls_request_ino_arr_get,
+  ls_request_ino_arr_add,
 };
 
-struct ls_request *ls_request_new(void)
+struct ls_request *
+ls_request_new(void)
 {
-    return ls_request_new_with_arg(NULL);
+  return ls_request_new_with_arg(NULL);
 }
 
-struct ls_request *ls_request_new_with_arg(void *unused)
+struct ls_request *
+ls_request_new_with_arg(void *unused)
 {
-    struct ls_request *tmp;
-    if ((tmp = malloc(sizeof(struct ls_request))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__ls_request_base;
-
-    tmp->ino_arr = NULL;
-    tmp->ino_arr_length = 0;
-    tmp->ino_arr_num_allocated = 0;
-    tmp->ino_arr_set = 0;
-
-    return (tmp);
-}
-
-static int ls_request_ino_arr_expand_to_hold_more(struct ls_request *msg)
-{
-    int tobe_allocated = msg->ino_arr_num_allocated;
-    ev_uint64_t *new_d_ata = NULL;
-    tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
-    new_d_ata = (ev_uint64_t *) realloc(msg->ino_arr,
-                                        tobe_allocated * sizeof(ev_uint64_t));
-    if (new_d_ata == NULL)
-        return -1;
-    msg->ino_arr = new_d_ata;
-    msg->ino_arr_num_allocated = tobe_allocated;
-    return 0;
-}
-
-ev_uint64_t *ls_request_ino_arr_add(struct ls_request * msg,
-                                    const ev_uint64_t value)
-{
-    if (++msg->ino_arr_length >= msg->ino_arr_num_allocated) {
-        if (ls_request_ino_arr_expand_to_hold_more(msg) < 0)
-            goto error;
-    }
-    msg->ino_arr[msg->ino_arr_length - 1] = value;
-    msg->ino_arr_set = 1;
-    return &(msg->ino_arr[msg->ino_arr_length - 1]);
-  error:
-    --msg->ino_arr_length;
+  struct ls_request *tmp;
+  if ((tmp = malloc(sizeof(struct ls_request))) == NULL) {
+    event_warn("%s: malloc", __func__);
     return (NULL);
+  }
+  tmp->base = &__ls_request_base;
+
+  tmp->ino_arr = NULL;
+  tmp->ino_arr_length = 0;
+  tmp->ino_arr_num_allocated = 0;
+  tmp->ino_arr_set = 0;
+
+  return (tmp);
+}
+
+static int
+ls_request_ino_arr_expand_to_hold_more(struct ls_request *msg)
+{
+  int tobe_allocated = msg->ino_arr_num_allocated;
+  ev_uint64_t* new_d_ata = NULL;
+  tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
+  new_d_ata = (ev_uint64_t*) realloc(msg->ino_arr,
+      tobe_allocated * sizeof(ev_uint64_t));
+  if (new_d_ata == NULL)
+    return -1;
+  msg->ino_arr = new_d_ata;
+  msg->ino_arr_num_allocated = tobe_allocated;
+  return 0;}
+
+ev_uint64_t *
+ls_request_ino_arr_add(struct ls_request *msg, const ev_uint64_t value)
+{
+  if (++msg->ino_arr_length >= msg->ino_arr_num_allocated) {
+    if (ls_request_ino_arr_expand_to_hold_more(msg)<0)
+      goto error;
+  }
+  msg->ino_arr[msg->ino_arr_length - 1] = value;
+  msg->ino_arr_set = 1;
+  return &(msg->ino_arr[msg->ino_arr_length - 1]);
+error:
+  --msg->ino_arr_length;
+  return (NULL);
 }
 
 int
 ls_request_ino_arr_assign(struct ls_request *msg, int off,
-                          const ev_uint64_t value)
+    const ev_uint64_t value)
 {
-    if (!msg->ino_arr_set || off < 0 || off >= msg->ino_arr_length)
-        return (-1);
+  if (!msg->ino_arr_set || off < 0 || off >= msg->ino_arr_length)
+    return (-1);
 
-    {
-        msg->ino_arr[off] = value;
-    }
-    return (0);
+  {
+    msg->ino_arr[off] = value;
+  }
+  return (0);
 }
 
 int
-ls_request_ino_arr_get(struct ls_request *msg, int offset, ev_uint64_t * value)
+ls_request_ino_arr_get(struct ls_request *msg, int offset,
+    ev_uint64_t *value)
 {
-    if (!msg->ino_arr_set || offset < 0 || offset >= msg->ino_arr_length)
-        return (-1);
-    *value = msg->ino_arr[offset];
-    return (0);
-}
-
-void ls_request_clear(struct ls_request *tmp)
-{
-    if (tmp->ino_arr_set == 1) {
-        free(tmp->ino_arr);
-        tmp->ino_arr = NULL;
-        tmp->ino_arr_set = 0;
-        tmp->ino_arr_length = 0;
-        tmp->ino_arr_num_allocated = 0;
-    }
-}
-
-void ls_request_free(struct ls_request *tmp)
-{
-    if (tmp->ino_arr_set == 1) {
-        free(tmp->ino_arr);
-        tmp->ino_arr = NULL;
-        tmp->ino_arr_set = 0;
-        tmp->ino_arr_length = 0;
-        tmp->ino_arr_num_allocated = 0;
-    }
-    free(tmp->ino_arr);
-    free(tmp);
-}
-
-void ls_request_marshal(struct evbuffer *evbuf, const struct ls_request *tmp)
-{
-    if (tmp->ino_arr_set) {
-        {
-            int i;
-            for (i = 0; i < tmp->ino_arr_length; ++i) {
-                evtag_marshal_int64(evbuf, LS_REQUEST_INO_ARR, tmp->ino_arr[i]);
-            }
-        }
-    }
-}
-
-int ls_request_unmarshal(struct ls_request *tmp, struct evbuffer *evbuf)
-{
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
-
-        case LS_REQUEST_INO_ARR:
-
-            if (tmp->ino_arr_length >= tmp->ino_arr_num_allocated &&
-                ls_request_ino_arr_expand_to_hold_more(tmp) < 0) {
-                puts("HEY NOW");
-                return (-1);
-            }
-            if (evtag_unmarshal_int64
-                (evbuf, LS_REQUEST_INO_ARR,
-                 &tmp->ino_arr[tmp->ino_arr_length]) == -1) {
-                event_warnx("%s: failed to unmarshal ino_arr", __func__);
-                return (-1);
-            }
-            ++tmp->ino_arr_length;
-            tmp->ino_arr_set = 1;
-            break;
-
-        default:
-            return -1;
-        }
-    }
-
-    if (ls_request_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int ls_request_complete(struct ls_request *msg)
-{
-    return (0);
-}
-
-int
-evtag_unmarshal_ls_request(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                           struct ls_request *msg)
-{
-    ev_uint32_t tag;
-    int res = -1;
-
-    struct evbuffer *tmp = evbuffer_new();
-
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
-
-    if (ls_request_unmarshal(msg, tmp) == -1)
-        goto error;
-
-    res = 0;
-
-  error:
-    evbuffer_free(tmp);
-    return (res);
+  if (!msg->ino_arr_set || offset < 0 || offset >= msg->ino_arr_length)
+    return (-1);
+  *value = msg->ino_arr[offset];
+  return (0);
 }
 
 void
-evtag_marshal_ls_request(struct evbuffer *evbuf, ev_uint32_t tag,
-                         const struct ls_request *msg)
+ls_request_clear(struct ls_request *tmp)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    ls_request_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  if (tmp->ino_arr_set == 1) {
+    free(tmp->ino_arr);
+    tmp->ino_arr = NULL;
+    tmp->ino_arr_set = 0;
+    tmp->ino_arr_length = 0;
+    tmp->ino_arr_num_allocated = 0;
+  }
+}
+
+void
+ls_request_free(struct ls_request *tmp)
+{
+  if (tmp->ino_arr_set == 1) {
+    free(tmp->ino_arr);
+    tmp->ino_arr = NULL;
+    tmp->ino_arr_set = 0;
+    tmp->ino_arr_length = 0;
+    tmp->ino_arr_num_allocated = 0;
+  }
+  free(tmp->ino_arr);
+  free(tmp);
+}
+
+void
+ls_request_marshal(struct evbuffer *evbuf, const struct ls_request *tmp){
+  if (tmp->ino_arr_set) {
+    {
+      int i;
+      for (i = 0; i < tmp->ino_arr_length; ++i) {
+    evtag_marshal_int64(evbuf, LS_REQUEST_INO_ARR, tmp->ino_arr[i]);
+      }
+    }
+  }
+}
+
+int
+ls_request_unmarshal(struct ls_request *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case LS_REQUEST_INO_ARR:
+
+        if (tmp->ino_arr_length >= tmp->ino_arr_num_allocated &&
+            ls_request_ino_arr_expand_to_hold_more(tmp) < 0) {
+          puts("HEY NOW");
+          return (-1);
+        }
+        if (evtag_unmarshal_int64(evbuf, LS_REQUEST_INO_ARR, &tmp->ino_arr[tmp->ino_arr_length]) == -1) {
+          event_warnx("%s: failed to unmarshal ino_arr", __func__);
+          return (-1);
+        }
+        ++tmp->ino_arr_length;
+        tmp->ino_arr_set = 1;
+        break;
+
+      default:
+        return -1;
+    }
+  }
+
+  if (ls_request_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+ls_request_complete(struct ls_request *msg)
+{
+  return (0);
+}
+
+int
+evtag_unmarshal_ls_request(struct evbuffer *evbuf, ev_uint32_t need_tag, struct ls_request *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (ls_request_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
+}
+
+void
+evtag_marshal_ls_request(struct evbuffer *evbuf, ev_uint32_t tag, const struct ls_request *msg)
+{
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  ls_request_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -2456,232 +2532,233 @@ evtag_marshal_ls_request(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct ls_response_access_ __ls_response_base = {
-    ls_response_stat_arr_assign,
-    ls_response_stat_arr_get,
-    ls_response_stat_arr_add,
+  ls_response_stat_arr_assign,
+  ls_response_stat_arr_get,
+  ls_response_stat_arr_add,
 };
 
-struct ls_response *ls_response_new(void)
+struct ls_response *
+ls_response_new(void)
 {
-    return ls_response_new_with_arg(NULL);
+  return ls_response_new_with_arg(NULL);
 }
 
-struct ls_response *ls_response_new_with_arg(void *unused)
+struct ls_response *
+ls_response_new_with_arg(void *unused)
 {
-    struct ls_response *tmp;
-    if ((tmp = malloc(sizeof(struct ls_response))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__ls_response_base;
-
-    tmp->stat_arr = NULL;
-    tmp->stat_arr_length = 0;
-    tmp->stat_arr_num_allocated = 0;
-    tmp->stat_arr_set = 0;
-
-    return (tmp);
-}
-
-static int ls_response_stat_arr_expand_to_hold_more(struct ls_response *msg)
-{
-    int tobe_allocated = msg->stat_arr_num_allocated;
-    struct file_stat **new_d_ata = NULL;
-    tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
-    new_d_ata = (struct file_stat **)realloc(msg->stat_arr,
-                                             tobe_allocated *
-                                             sizeof(struct file_stat *));
-    if (new_d_ata == NULL)
-        return -1;
-    msg->stat_arr = new_d_ata;
-    msg->stat_arr_num_allocated = tobe_allocated;
-    return 0;
-}
-
-struct file_stat *ls_response_stat_arr_add(struct ls_response *msg)
-{
-    if (++msg->stat_arr_length >= msg->stat_arr_num_allocated) {
-        if (ls_response_stat_arr_expand_to_hold_more(msg) < 0)
-            goto error;
-    }
-    msg->stat_arr[msg->stat_arr_length - 1] = file_stat_new();
-    if (msg->stat_arr[msg->stat_arr_length - 1] == NULL)
-        goto error;
-    msg->stat_arr_set = 1;
-    return (msg->stat_arr[msg->stat_arr_length - 1]);
-  error:
-    --msg->stat_arr_length;
+  struct ls_response *tmp;
+  if ((tmp = malloc(sizeof(struct ls_response))) == NULL) {
+    event_warn("%s: malloc", __func__);
     return (NULL);
+  }
+  tmp->base = &__ls_response_base;
+
+  tmp->stat_arr = NULL;
+  tmp->stat_arr_length = 0;
+  tmp->stat_arr_num_allocated = 0;
+  tmp->stat_arr_set = 0;
+
+  return (tmp);
+}
+
+static int
+ls_response_stat_arr_expand_to_hold_more(struct ls_response *msg)
+{
+  int tobe_allocated = msg->stat_arr_num_allocated;
+  struct file_stat** new_d_ata = NULL;
+  tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
+  new_d_ata = (struct file_stat**) realloc(msg->stat_arr,
+      tobe_allocated * sizeof(struct file_stat*));
+  if (new_d_ata == NULL)
+    return -1;
+  msg->stat_arr = new_d_ata;
+  msg->stat_arr_num_allocated = tobe_allocated;
+  return 0;}
+
+struct file_stat* 
+ls_response_stat_arr_add(struct ls_response *msg)
+{
+  if (++msg->stat_arr_length >= msg->stat_arr_num_allocated) {
+    if (ls_response_stat_arr_expand_to_hold_more(msg)<0)
+      goto error;
+  }
+  msg->stat_arr[msg->stat_arr_length - 1] = file_stat_new();
+  if (msg->stat_arr[msg->stat_arr_length - 1] == NULL)
+    goto error;
+  msg->stat_arr_set = 1;
+  return (msg->stat_arr[msg->stat_arr_length - 1]);
+error:
+  --msg->stat_arr_length;
+  return (NULL);
 }
 
 int
 ls_response_stat_arr_assign(struct ls_response *msg, int off,
-                            const struct file_stat *value)
+    const struct file_stat* value)
 {
-    if (!msg->stat_arr_set || off < 0 || off >= msg->stat_arr_length)
-        return (-1);
+  if (!msg->stat_arr_set || off < 0 || off >= msg->stat_arr_length)
+    return (-1);
 
-    {
-        int had_error = 0;
-        struct evbuffer *tmp = NULL;
-        file_stat_clear(msg->stat_arr[off]);
-        if ((tmp = evbuffer_new()) == NULL) {
-            event_warn("%s: evbuffer_new()", __func__);
-            had_error = 1;
-            goto done;
-        }
-        file_stat_marshal(tmp, value);
-        if (file_stat_unmarshal(msg->stat_arr[off], tmp) == -1) {
-            event_warnx("%s: file_stat_unmarshal", __func__);
-            had_error = 1;
-            goto done;
-        }
-      done:if (tmp != NULL)
-            evbuffer_free(tmp);
-        if (had_error) {
-            file_stat_clear(msg->stat_arr[off]);
-            return (-1);
-        }
+  {
+    int had_error = 0;
+    struct evbuffer *tmp = NULL;
+    file_stat_clear(msg->stat_arr[off]);
+    if ((tmp = evbuffer_new()) == NULL) {
+      event_warn("%s: evbuffer_new()", __func__);
+      had_error = 1;
+      goto done;
     }
-    return (0);
+    file_stat_marshal(tmp, value);
+    if (file_stat_unmarshal(msg->stat_arr[off], tmp) == -1) {
+      event_warnx("%s: file_stat_unmarshal", __func__);
+      had_error = 1;
+      goto done;
+    }
+    done:if (tmp != NULL)
+      evbuffer_free(tmp);
+    if (had_error) {
+      file_stat_clear(msg->stat_arr[off]);
+      return (-1);
+    }
+  }
+  return (0);
 }
 
 int
 ls_response_stat_arr_get(struct ls_response *msg, int offset,
-                         struct file_stat **value)
+    struct file_stat* *value)
 {
-    if (!msg->stat_arr_set || offset < 0 || offset >= msg->stat_arr_length)
-        return (-1);
-    *value = msg->stat_arr[offset];
-    return (0);
-}
-
-void ls_response_clear(struct ls_response *tmp)
-{
-    if (tmp->stat_arr_set == 1) {
-        int i;
-        for (i = 0; i < tmp->stat_arr_length; ++i) {
-            file_stat_free(tmp->stat_arr[i]);
-        }
-        free(tmp->stat_arr);
-        tmp->stat_arr = NULL;
-        tmp->stat_arr_set = 0;
-        tmp->stat_arr_length = 0;
-        tmp->stat_arr_num_allocated = 0;
-    }
-}
-
-void ls_response_free(struct ls_response *tmp)
-{
-    if (tmp->stat_arr_set == 1) {
-        int i;
-        for (i = 0; i < tmp->stat_arr_length; ++i) {
-            file_stat_free(tmp->stat_arr[i]);
-        }
-        free(tmp->stat_arr);
-        tmp->stat_arr = NULL;
-        tmp->stat_arr_set = 0;
-        tmp->stat_arr_length = 0;
-        tmp->stat_arr_num_allocated = 0;
-    }
-    free(tmp->stat_arr);
-    free(tmp);
-}
-
-void ls_response_marshal(struct evbuffer *evbuf, const struct ls_response *tmp)
-{
-    if (tmp->stat_arr_set) {
-        {
-            int i;
-            for (i = 0; i < tmp->stat_arr_length; ++i) {
-                evtag_marshal_file_stat(evbuf, LS_RESPONSE_STAT_ARR,
-                                        tmp->stat_arr[i]);
-            }
-        }
-    }
-}
-
-int ls_response_unmarshal(struct ls_response *tmp, struct evbuffer *evbuf)
-{
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
-
-        case LS_RESPONSE_STAT_ARR:
-
-            if (tmp->stat_arr_length >= tmp->stat_arr_num_allocated &&
-                ls_response_stat_arr_expand_to_hold_more(tmp) < 0) {
-                puts("HEY NOW");
-                return (-1);
-            }
-            tmp->stat_arr[tmp->stat_arr_length] = file_stat_new();
-            if (tmp->stat_arr[tmp->stat_arr_length] == NULL)
-                return (-1);
-            if (evtag_unmarshal_file_stat
-                (evbuf, LS_RESPONSE_STAT_ARR,
-                 tmp->stat_arr[tmp->stat_arr_length]) == -1) {
-                event_warnx("%s: failed to unmarshal stat_arr", __func__);
-                return (-1);
-            }
-            ++tmp->stat_arr_length;
-            tmp->stat_arr_set = 1;
-            break;
-
-        default:
-            return -1;
-        }
-    }
-
-    if (ls_response_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int ls_response_complete(struct ls_response *msg)
-{
-    {
-        int i;
-        for (i = 0; i < msg->stat_arr_length; ++i) {
-            if (msg->stat_arr_set && file_stat_complete(msg->stat_arr[i]) == -1)
-                return (-1);
-        }
-    }
-    return (0);
-}
-
-int
-evtag_unmarshal_ls_response(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                            struct ls_response *msg)
-{
-    ev_uint32_t tag;
-    int res = -1;
-
-    struct evbuffer *tmp = evbuffer_new();
-
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
-
-    if (ls_response_unmarshal(msg, tmp) == -1)
-        goto error;
-
-    res = 0;
-
-  error:
-    evbuffer_free(tmp);
-    return (res);
+  if (!msg->stat_arr_set || offset < 0 || offset >= msg->stat_arr_length)
+    return (-1);
+  *value = msg->stat_arr[offset];
+  return (0);
 }
 
 void
-evtag_marshal_ls_response(struct evbuffer *evbuf, ev_uint32_t tag,
-                          const struct ls_response *msg)
+ls_response_clear(struct ls_response *tmp)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    ls_response_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  if (tmp->stat_arr_set == 1) {
+    int i;
+    for (i = 0; i < tmp->stat_arr_length; ++i) {
+      file_stat_free(tmp->stat_arr[i]);
+    }
+    free(tmp->stat_arr);
+    tmp->stat_arr = NULL;
+    tmp->stat_arr_set = 0;
+    tmp->stat_arr_length = 0;
+    tmp->stat_arr_num_allocated = 0;
+  }
+}
+
+void
+ls_response_free(struct ls_response *tmp)
+{
+  if (tmp->stat_arr_set == 1) {
+    int i;
+    for (i = 0; i < tmp->stat_arr_length; ++i) {
+      file_stat_free(tmp->stat_arr[i]);
+    }
+    free(tmp->stat_arr);
+    tmp->stat_arr = NULL;
+    tmp->stat_arr_set = 0;
+    tmp->stat_arr_length = 0;
+    tmp->stat_arr_num_allocated = 0;
+  }
+  free(tmp->stat_arr);
+  free(tmp);
+}
+
+void
+ls_response_marshal(struct evbuffer *evbuf, const struct ls_response *tmp){
+  if (tmp->stat_arr_set) {
+    {
+      int i;
+      for (i = 0; i < tmp->stat_arr_length; ++i) {
+    evtag_marshal_file_stat(evbuf, LS_RESPONSE_STAT_ARR, tmp->stat_arr[i]);
+      }
+    }
+  }
+}
+
+int
+ls_response_unmarshal(struct ls_response *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case LS_RESPONSE_STAT_ARR:
+
+        if (tmp->stat_arr_length >= tmp->stat_arr_num_allocated &&
+            ls_response_stat_arr_expand_to_hold_more(tmp) < 0) {
+          puts("HEY NOW");
+          return (-1);
+        }
+        tmp->stat_arr[tmp->stat_arr_length] = file_stat_new();
+        if (tmp->stat_arr[tmp->stat_arr_length] == NULL)
+          return (-1);
+        if (evtag_unmarshal_file_stat(evbuf, LS_RESPONSE_STAT_ARR, tmp->stat_arr[tmp->stat_arr_length]) == -1) {
+          event_warnx("%s: failed to unmarshal stat_arr", __func__);
+          return (-1);
+        }
+        ++tmp->stat_arr_length;
+        tmp->stat_arr_set = 1;
+        break;
+
+      default:
+        return -1;
+    }
+  }
+
+  if (ls_response_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+ls_response_complete(struct ls_response *msg)
+{
+  {
+    int i;
+    for (i = 0; i < msg->stat_arr_length; ++i) {
+      if (msg->stat_arr_set && file_stat_complete(msg->stat_arr[i]) == -1)
+        return (-1);
+    }
+  }
+  return (0);
+}
+
+int
+evtag_unmarshal_ls_response(struct evbuffer *evbuf, ev_uint32_t need_tag, struct ls_response *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (ls_response_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
+}
+
+void
+evtag_marshal_ls_response(struct evbuffer *evbuf, ev_uint32_t tag, const struct ls_response *msg)
+{
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  ls_response_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -2689,250 +2766,258 @@ evtag_marshal_ls_response(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct mknod_request_access_ __mknod_request_base = {
-    mknod_request_parent_ino_assign,
-    mknod_request_parent_ino_get,
-    mknod_request_name_assign,
-    mknod_request_name_get,
-    mknod_request_type_assign,
-    mknod_request_type_get,
-    mknod_request_mode_assign,
-    mknod_request_mode_get,
+  mknod_request_parent_ino_assign,
+  mknod_request_parent_ino_get,
+  mknod_request_name_assign,
+  mknod_request_name_get,
+  mknod_request_type_assign,
+  mknod_request_type_get,
+  mknod_request_mode_assign,
+  mknod_request_mode_get,
 };
 
-struct mknod_request *mknod_request_new(void)
+struct mknod_request *
+mknod_request_new(void)
 {
-    return mknod_request_new_with_arg(NULL);
+  return mknod_request_new_with_arg(NULL);
 }
 
-struct mknod_request *mknod_request_new_with_arg(void *unused)
+struct mknod_request *
+mknod_request_new_with_arg(void *unused)
 {
-    struct mknod_request *tmp;
-    if ((tmp = malloc(sizeof(struct mknod_request))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__mknod_request_base;
+  struct mknod_request *tmp;
+  if ((tmp = malloc(sizeof(struct mknod_request))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__mknod_request_base;
 
-    tmp->parent_ino = 0;
-    tmp->parent_ino_set = 0;
+  tmp->parent_ino = 0;
+  tmp->parent_ino_set = 0;
 
-    tmp->name = NULL;
-    tmp->name_set = 0;
+  tmp->name = NULL;
+  tmp->name_set = 0;
 
-    tmp->type = 0;
-    tmp->type_set = 0;
+  tmp->type = 0;
+  tmp->type_set = 0;
 
-    tmp->mode = 0;
-    tmp->mode_set = 0;
+  tmp->mode = 0;
+  tmp->mode_set = 0;
 
-    return (tmp);
+  return (tmp);
+}
+
+
+
+
+
+int
+mknod_request_parent_ino_assign(struct mknod_request *msg, const ev_uint64_t value)
+{
+  msg->parent_ino_set = 1;
+  msg->parent_ino = value;
+  return (0);
 }
 
 int
-mknod_request_parent_ino_assign(struct mknod_request *msg,
-                                const ev_uint64_t value)
+mknod_request_name_assign(struct mknod_request *msg,
+    const char * value)
 {
-    msg->parent_ino_set = 1;
-    msg->parent_ino = value;
-    return (0);
-}
-
-int mknod_request_name_assign(struct mknod_request *msg, const char *value)
-{
-    if (msg->name != NULL)
-        free(msg->name);
-    if ((msg->name = strdup(value)) == NULL)
-        return (-1);
-    msg->name_set = 1;
-    return (0);
+  if (msg->name != NULL)
+    free(msg->name);
+  if ((msg->name = strdup(value)) == NULL)
+    return (-1);
+  msg->name_set = 1;
+  return (0);
 }
 
 int
 mknod_request_type_assign(struct mknod_request *msg, const ev_uint32_t value)
 {
-    msg->type_set = 1;
-    msg->type = value;
-    return (0);
+  msg->type_set = 1;
+  msg->type = value;
+  return (0);
 }
 
 int
 mknod_request_mode_assign(struct mknod_request *msg, const ev_uint32_t value)
 {
-    msg->mode_set = 1;
-    msg->mode = value;
-    return (0);
-}
-
-int mknod_request_parent_ino_get(struct mknod_request *msg, ev_uint64_t * value)
-{
-    if (msg->parent_ino_set != 1)
-        return (-1);
-    *value = msg->parent_ino;
-    return (0);
-}
-
-int mknod_request_name_get(struct mknod_request *msg, char **value)
-{
-    if (msg->name_set != 1)
-        return (-1);
-    *value = msg->name;
-    return (0);
-}
-
-int mknod_request_type_get(struct mknod_request *msg, ev_uint32_t * value)
-{
-    if (msg->type_set != 1)
-        return (-1);
-    *value = msg->type;
-    return (0);
-}
-
-int mknod_request_mode_get(struct mknod_request *msg, ev_uint32_t * value)
-{
-    if (msg->mode_set != 1)
-        return (-1);
-    *value = msg->mode;
-    return (0);
-}
-
-void mknod_request_clear(struct mknod_request *tmp)
-{
-    tmp->parent_ino_set = 0;
-    if (tmp->name_set == 1) {
-        free(tmp->name);
-        tmp->name = NULL;
-        tmp->name_set = 0;
-    }
-    tmp->type_set = 0;
-    tmp->mode_set = 0;
-}
-
-void mknod_request_free(struct mknod_request *tmp)
-{
-    if (tmp->name != NULL)
-        free(tmp->name);
-    free(tmp);
-}
-
-void
-mknod_request_marshal(struct evbuffer *evbuf, const struct mknod_request *tmp)
-{
-    evtag_marshal_int64(evbuf, MKNOD_REQUEST_PARENT_INO, tmp->parent_ino);
-    evtag_marshal_string(evbuf, MKNOD_REQUEST_NAME, tmp->name);
-    evtag_marshal_int(evbuf, MKNOD_REQUEST_TYPE, tmp->type);
-    if (tmp->mode_set) {
-        evtag_marshal_int(evbuf, MKNOD_REQUEST_MODE, tmp->mode);
-    }
-}
-
-int mknod_request_unmarshal(struct mknod_request *tmp, struct evbuffer *evbuf)
-{
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
-
-        case MKNOD_REQUEST_PARENT_INO:
-
-            if (tmp->parent_ino_set)
-                return (-1);
-            if (evtag_unmarshal_int64
-                (evbuf, MKNOD_REQUEST_PARENT_INO, &tmp->parent_ino) == -1) {
-                event_warnx("%s: failed to unmarshal parent_ino", __func__);
-                return (-1);
-            }
-            tmp->parent_ino_set = 1;
-            break;
-
-        case MKNOD_REQUEST_NAME:
-
-            if (tmp->name_set)
-                return (-1);
-            if (evtag_unmarshal_string(evbuf, MKNOD_REQUEST_NAME, &tmp->name) ==
-                -1) {
-                event_warnx("%s: failed to unmarshal name", __func__);
-                return (-1);
-            }
-            tmp->name_set = 1;
-            break;
-
-        case MKNOD_REQUEST_TYPE:
-
-            if (tmp->type_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, MKNOD_REQUEST_TYPE, &tmp->type) ==
-                -1) {
-                event_warnx("%s: failed to unmarshal type", __func__);
-                return (-1);
-            }
-            tmp->type_set = 1;
-            break;
-
-        case MKNOD_REQUEST_MODE:
-
-            if (tmp->mode_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, MKNOD_REQUEST_MODE, &tmp->mode) ==
-                -1) {
-                event_warnx("%s: failed to unmarshal mode", __func__);
-                return (-1);
-            }
-            tmp->mode_set = 1;
-            break;
-
-        default:
-            return -1;
-        }
-    }
-
-    if (mknod_request_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int mknod_request_complete(struct mknod_request *msg)
-{
-    if (!msg->parent_ino_set)
-        return (-1);
-    if (!msg->name_set)
-        return (-1);
-    if (!msg->type_set)
-        return (-1);
-    return (0);
+  msg->mode_set = 1;
+  msg->mode = value;
+  return (0);
 }
 
 int
-evtag_unmarshal_mknod_request(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                              struct mknod_request *msg)
+mknod_request_parent_ino_get(struct mknod_request *msg, ev_uint64_t *value)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  if (msg->parent_ino_set != 1)
+    return (-1);
+  *value = msg->parent_ino;
+  return (0);
+}
 
-    struct evbuffer *tmp = evbuffer_new();
+int
+mknod_request_name_get(struct mknod_request *msg, char * *value)
+{
+  if (msg->name_set != 1)
+    return (-1);
+  *value = msg->name;
+  return (0);
+}
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+int
+mknod_request_type_get(struct mknod_request *msg, ev_uint32_t *value)
+{
+  if (msg->type_set != 1)
+    return (-1);
+  *value = msg->type;
+  return (0);
+}
 
-    if (mknod_request_unmarshal(msg, tmp) == -1)
-        goto error;
-
-    res = 0;
-
-  error:
-    evbuffer_free(tmp);
-    return (res);
+int
+mknod_request_mode_get(struct mknod_request *msg, ev_uint32_t *value)
+{
+  if (msg->mode_set != 1)
+    return (-1);
+  *value = msg->mode;
+  return (0);
 }
 
 void
-evtag_marshal_mknod_request(struct evbuffer *evbuf, ev_uint32_t tag,
-                            const struct mknod_request *msg)
+mknod_request_clear(struct mknod_request *tmp)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    mknod_request_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  tmp->parent_ino_set = 0;
+  if (tmp->name_set == 1) {
+    free(tmp->name);
+    tmp->name = NULL;
+    tmp->name_set = 0;
+  }
+  tmp->type_set = 0;
+  tmp->mode_set = 0;
+}
+
+void
+mknod_request_free(struct mknod_request *tmp)
+{
+  if (tmp->name != NULL)
+      free (tmp->name);
+  free(tmp);
+}
+
+void
+mknod_request_marshal(struct evbuffer *evbuf, const struct mknod_request *tmp){
+  evtag_marshal_int64(evbuf, MKNOD_REQUEST_PARENT_INO, tmp->parent_ino);
+  evtag_marshal_string(evbuf, MKNOD_REQUEST_NAME, tmp->name);
+  evtag_marshal_int(evbuf, MKNOD_REQUEST_TYPE, tmp->type);
+  if (tmp->mode_set) {
+    evtag_marshal_int(evbuf, MKNOD_REQUEST_MODE, tmp->mode);
+  }
+}
+
+int
+mknod_request_unmarshal(struct mknod_request *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case MKNOD_REQUEST_PARENT_INO:
+
+        if (tmp->parent_ino_set)
+          return (-1);
+        if (evtag_unmarshal_int64(evbuf, MKNOD_REQUEST_PARENT_INO, &tmp->parent_ino) == -1) {
+          event_warnx("%s: failed to unmarshal parent_ino", __func__);
+          return (-1);
+        }
+        tmp->parent_ino_set = 1;
+        break;
+
+      case MKNOD_REQUEST_NAME:
+
+        if (tmp->name_set)
+          return (-1);
+        if (evtag_unmarshal_string(evbuf, MKNOD_REQUEST_NAME, &tmp->name) == -1) {
+          event_warnx("%s: failed to unmarshal name", __func__);
+          return (-1);
+        }
+        tmp->name_set = 1;
+        break;
+
+      case MKNOD_REQUEST_TYPE:
+
+        if (tmp->type_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, MKNOD_REQUEST_TYPE, &tmp->type) == -1) {
+          event_warnx("%s: failed to unmarshal type", __func__);
+          return (-1);
+        }
+        tmp->type_set = 1;
+        break;
+
+      case MKNOD_REQUEST_MODE:
+
+        if (tmp->mode_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, MKNOD_REQUEST_MODE, &tmp->mode) == -1) {
+          event_warnx("%s: failed to unmarshal mode", __func__);
+          return (-1);
+        }
+        tmp->mode_set = 1;
+        break;
+
+      default:
+        return -1;
+    }
+  }
+
+  if (mknod_request_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+mknod_request_complete(struct mknod_request *msg)
+{
+  if (!msg->parent_ino_set)
+    return (-1);
+  if (!msg->name_set)
+    return (-1);
+  if (!msg->type_set)
+    return (-1);
+  return (0);
+}
+
+int
+evtag_unmarshal_mknod_request(struct evbuffer *evbuf, ev_uint32_t need_tag, struct mknod_request *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (mknod_request_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
+}
+
+void
+evtag_marshal_mknod_request(struct evbuffer *evbuf, ev_uint32_t tag, const struct mknod_request *msg)
+{
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  mknod_request_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -2940,234 +3025,233 @@ evtag_marshal_mknod_request(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct mknod_response_access_ __mknod_response_base = {
-    mknod_response_stat_arr_assign,
-    mknod_response_stat_arr_get,
-    mknod_response_stat_arr_add,
+  mknod_response_stat_arr_assign,
+  mknod_response_stat_arr_get,
+  mknod_response_stat_arr_add,
 };
 
-struct mknod_response *mknod_response_new(void)
+struct mknod_response *
+mknod_response_new(void)
 {
-    return mknod_response_new_with_arg(NULL);
+  return mknod_response_new_with_arg(NULL);
 }
 
-struct mknod_response *mknod_response_new_with_arg(void *unused)
+struct mknod_response *
+mknod_response_new_with_arg(void *unused)
 {
-    struct mknod_response *tmp;
-    if ((tmp = malloc(sizeof(struct mknod_response))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__mknod_response_base;
+  struct mknod_response *tmp;
+  if ((tmp = malloc(sizeof(struct mknod_response))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__mknod_response_base;
 
-    tmp->stat_arr = NULL;
-    tmp->stat_arr_length = 0;
-    tmp->stat_arr_num_allocated = 0;
-    tmp->stat_arr_set = 0;
+  tmp->stat_arr = NULL;
+  tmp->stat_arr_length = 0;
+  tmp->stat_arr_num_allocated = 0;
+  tmp->stat_arr_set = 0;
 
-    return (tmp);
+  return (tmp);
 }
 
 static int
 mknod_response_stat_arr_expand_to_hold_more(struct mknod_response *msg)
 {
-    int tobe_allocated = msg->stat_arr_num_allocated;
-    struct file_stat **new_d_ata = NULL;
-    tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
-    new_d_ata = (struct file_stat **)realloc(msg->stat_arr,
-                                             tobe_allocated *
-                                             sizeof(struct file_stat *));
-    if (new_d_ata == NULL)
-        return -1;
-    msg->stat_arr = new_d_ata;
-    msg->stat_arr_num_allocated = tobe_allocated;
-    return 0;
-}
+  int tobe_allocated = msg->stat_arr_num_allocated;
+  struct file_stat** new_d_ata = NULL;
+  tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
+  new_d_ata = (struct file_stat**) realloc(msg->stat_arr,
+      tobe_allocated * sizeof(struct file_stat*));
+  if (new_d_ata == NULL)
+    return -1;
+  msg->stat_arr = new_d_ata;
+  msg->stat_arr_num_allocated = tobe_allocated;
+  return 0;}
 
-struct file_stat *mknod_response_stat_arr_add(struct mknod_response *msg)
+struct file_stat* 
+mknod_response_stat_arr_add(struct mknod_response *msg)
 {
-    if (++msg->stat_arr_length >= msg->stat_arr_num_allocated) {
-        if (mknod_response_stat_arr_expand_to_hold_more(msg) < 0)
-            goto error;
-    }
-    msg->stat_arr[msg->stat_arr_length - 1] = file_stat_new();
-    if (msg->stat_arr[msg->stat_arr_length - 1] == NULL)
-        goto error;
-    msg->stat_arr_set = 1;
-    return (msg->stat_arr[msg->stat_arr_length - 1]);
-  error:
-    --msg->stat_arr_length;
-    return (NULL);
+  if (++msg->stat_arr_length >= msg->stat_arr_num_allocated) {
+    if (mknod_response_stat_arr_expand_to_hold_more(msg)<0)
+      goto error;
+  }
+  msg->stat_arr[msg->stat_arr_length - 1] = file_stat_new();
+  if (msg->stat_arr[msg->stat_arr_length - 1] == NULL)
+    goto error;
+  msg->stat_arr_set = 1;
+  return (msg->stat_arr[msg->stat_arr_length - 1]);
+error:
+  --msg->stat_arr_length;
+  return (NULL);
 }
 
 int
 mknod_response_stat_arr_assign(struct mknod_response *msg, int off,
-                               const struct file_stat *value)
+    const struct file_stat* value)
 {
-    if (!msg->stat_arr_set || off < 0 || off >= msg->stat_arr_length)
-        return (-1);
+  if (!msg->stat_arr_set || off < 0 || off >= msg->stat_arr_length)
+    return (-1);
 
-    {
-        int had_error = 0;
-        struct evbuffer *tmp = NULL;
-        file_stat_clear(msg->stat_arr[off]);
-        if ((tmp = evbuffer_new()) == NULL) {
-            event_warn("%s: evbuffer_new()", __func__);
-            had_error = 1;
-            goto done;
-        }
-        file_stat_marshal(tmp, value);
-        if (file_stat_unmarshal(msg->stat_arr[off], tmp) == -1) {
-            event_warnx("%s: file_stat_unmarshal", __func__);
-            had_error = 1;
-            goto done;
-        }
-      done:if (tmp != NULL)
-            evbuffer_free(tmp);
-        if (had_error) {
-            file_stat_clear(msg->stat_arr[off]);
-            return (-1);
-        }
+  {
+    int had_error = 0;
+    struct evbuffer *tmp = NULL;
+    file_stat_clear(msg->stat_arr[off]);
+    if ((tmp = evbuffer_new()) == NULL) {
+      event_warn("%s: evbuffer_new()", __func__);
+      had_error = 1;
+      goto done;
     }
-    return (0);
+    file_stat_marshal(tmp, value);
+    if (file_stat_unmarshal(msg->stat_arr[off], tmp) == -1) {
+      event_warnx("%s: file_stat_unmarshal", __func__);
+      had_error = 1;
+      goto done;
+    }
+    done:if (tmp != NULL)
+      evbuffer_free(tmp);
+    if (had_error) {
+      file_stat_clear(msg->stat_arr[off]);
+      return (-1);
+    }
+  }
+  return (0);
 }
 
 int
 mknod_response_stat_arr_get(struct mknod_response *msg, int offset,
-                            struct file_stat **value)
+    struct file_stat* *value)
 {
-    if (!msg->stat_arr_set || offset < 0 || offset >= msg->stat_arr_length)
-        return (-1);
-    *value = msg->stat_arr[offset];
-    return (0);
-}
-
-void mknod_response_clear(struct mknod_response *tmp)
-{
-    if (tmp->stat_arr_set == 1) {
-        int i;
-        for (i = 0; i < tmp->stat_arr_length; ++i) {
-            file_stat_free(tmp->stat_arr[i]);
-        }
-        free(tmp->stat_arr);
-        tmp->stat_arr = NULL;
-        tmp->stat_arr_set = 0;
-        tmp->stat_arr_length = 0;
-        tmp->stat_arr_num_allocated = 0;
-    }
-}
-
-void mknod_response_free(struct mknod_response *tmp)
-{
-    if (tmp->stat_arr_set == 1) {
-        int i;
-        for (i = 0; i < tmp->stat_arr_length; ++i) {
-            file_stat_free(tmp->stat_arr[i]);
-        }
-        free(tmp->stat_arr);
-        tmp->stat_arr = NULL;
-        tmp->stat_arr_set = 0;
-        tmp->stat_arr_length = 0;
-        tmp->stat_arr_num_allocated = 0;
-    }
-    free(tmp->stat_arr);
-    free(tmp);
+  if (!msg->stat_arr_set || offset < 0 || offset >= msg->stat_arr_length)
+    return (-1);
+  *value = msg->stat_arr[offset];
+  return (0);
 }
 
 void
-mknod_response_marshal(struct evbuffer *evbuf, const struct mknod_response *tmp)
+mknod_response_clear(struct mknod_response *tmp)
 {
-    if (tmp->stat_arr_set) {
-        {
-            int i;
-            for (i = 0; i < tmp->stat_arr_length; ++i) {
-                evtag_marshal_file_stat(evbuf, MKNOD_RESPONSE_STAT_ARR,
-                                        tmp->stat_arr[i]);
-            }
-        }
+  if (tmp->stat_arr_set == 1) {
+    int i;
+    for (i = 0; i < tmp->stat_arr_length; ++i) {
+      file_stat_free(tmp->stat_arr[i]);
     }
+    free(tmp->stat_arr);
+    tmp->stat_arr = NULL;
+    tmp->stat_arr_set = 0;
+    tmp->stat_arr_length = 0;
+    tmp->stat_arr_num_allocated = 0;
+  }
 }
 
-int mknod_response_unmarshal(struct mknod_response *tmp, struct evbuffer *evbuf)
+void
+mknod_response_free(struct mknod_response *tmp)
 {
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
-
-        case MKNOD_RESPONSE_STAT_ARR:
-
-            if (tmp->stat_arr_length >= tmp->stat_arr_num_allocated &&
-                mknod_response_stat_arr_expand_to_hold_more(tmp) < 0) {
-                puts("HEY NOW");
-                return (-1);
-            }
-            tmp->stat_arr[tmp->stat_arr_length] = file_stat_new();
-            if (tmp->stat_arr[tmp->stat_arr_length] == NULL)
-                return (-1);
-            if (evtag_unmarshal_file_stat
-                (evbuf, MKNOD_RESPONSE_STAT_ARR,
-                 tmp->stat_arr[tmp->stat_arr_length]) == -1) {
-                event_warnx("%s: failed to unmarshal stat_arr", __func__);
-                return (-1);
-            }
-            ++tmp->stat_arr_length;
-            tmp->stat_arr_set = 1;
-            break;
-
-        default:
-            return -1;
-        }
+  if (tmp->stat_arr_set == 1) {
+    int i;
+    for (i = 0; i < tmp->stat_arr_length; ++i) {
+      file_stat_free(tmp->stat_arr[i]);
     }
-
-    if (mknod_response_complete(tmp) == -1)
-        return (-1);
-    return (0);
+    free(tmp->stat_arr);
+    tmp->stat_arr = NULL;
+    tmp->stat_arr_set = 0;
+    tmp->stat_arr_length = 0;
+    tmp->stat_arr_num_allocated = 0;
+  }
+  free(tmp->stat_arr);
+  free(tmp);
 }
 
-int mknod_response_complete(struct mknod_response *msg)
-{
+void
+mknod_response_marshal(struct evbuffer *evbuf, const struct mknod_response *tmp){
+  if (tmp->stat_arr_set) {
     {
-        int i;
-        for (i = 0; i < msg->stat_arr_length; ++i) {
-            if (msg->stat_arr_set && file_stat_complete(msg->stat_arr[i]) == -1)
-                return (-1);
-        }
+      int i;
+      for (i = 0; i < tmp->stat_arr_length; ++i) {
+    evtag_marshal_file_stat(evbuf, MKNOD_RESPONSE_STAT_ARR, tmp->stat_arr[i]);
+      }
     }
-    return (0);
+  }
 }
 
 int
-evtag_unmarshal_mknod_response(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                               struct mknod_response *msg)
+mknod_response_unmarshal(struct mknod_response *tmp,  struct evbuffer *evbuf)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
 
-    struct evbuffer *tmp = evbuffer_new();
+      case MKNOD_RESPONSE_STAT_ARR:
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+        if (tmp->stat_arr_length >= tmp->stat_arr_num_allocated &&
+            mknod_response_stat_arr_expand_to_hold_more(tmp) < 0) {
+          puts("HEY NOW");
+          return (-1);
+        }
+        tmp->stat_arr[tmp->stat_arr_length] = file_stat_new();
+        if (tmp->stat_arr[tmp->stat_arr_length] == NULL)
+          return (-1);
+        if (evtag_unmarshal_file_stat(evbuf, MKNOD_RESPONSE_STAT_ARR, tmp->stat_arr[tmp->stat_arr_length]) == -1) {
+          event_warnx("%s: failed to unmarshal stat_arr", __func__);
+          return (-1);
+        }
+        ++tmp->stat_arr_length;
+        tmp->stat_arr_set = 1;
+        break;
 
-    if (mknod_response_unmarshal(msg, tmp) == -1)
-        goto error;
+      default:
+        return -1;
+    }
+  }
 
-    res = 0;
+  if (mknod_response_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+int
+mknod_response_complete(struct mknod_response *msg)
+{
+  {
+    int i;
+    for (i = 0; i < msg->stat_arr_length; ++i) {
+      if (msg->stat_arr_set && file_stat_complete(msg->stat_arr[i]) == -1)
+        return (-1);
+    }
+  }
+  return (0);
+}
+
+int
+evtag_unmarshal_mknod_response(struct evbuffer *evbuf, ev_uint32_t need_tag, struct mknod_response *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (mknod_response_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
 }
 
 void
-evtag_marshal_mknod_response(struct evbuffer *evbuf, ev_uint32_t tag,
-                             const struct mknod_response *msg)
+evtag_marshal_mknod_response(struct evbuffer *evbuf, ev_uint32_t tag, const struct mknod_response *msg)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    mknod_response_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  mknod_response_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -3175,177 +3259,182 @@ evtag_marshal_mknod_response(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct lookup_request_access_ __lookup_request_base = {
-    lookup_request_parent_ino_assign,
-    lookup_request_parent_ino_get,
-    lookup_request_name_assign,
-    lookup_request_name_get,
+  lookup_request_parent_ino_assign,
+  lookup_request_parent_ino_get,
+  lookup_request_name_assign,
+  lookup_request_name_get,
 };
 
-struct lookup_request *lookup_request_new(void)
+struct lookup_request *
+lookup_request_new(void)
 {
-    return lookup_request_new_with_arg(NULL);
+  return lookup_request_new_with_arg(NULL);
 }
 
-struct lookup_request *lookup_request_new_with_arg(void *unused)
+struct lookup_request *
+lookup_request_new_with_arg(void *unused)
 {
-    struct lookup_request *tmp;
-    if ((tmp = malloc(sizeof(struct lookup_request))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__lookup_request_base;
+  struct lookup_request *tmp;
+  if ((tmp = malloc(sizeof(struct lookup_request))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__lookup_request_base;
 
-    tmp->parent_ino = 0;
-    tmp->parent_ino_set = 0;
+  tmp->parent_ino = 0;
+  tmp->parent_ino_set = 0;
 
+  tmp->name = NULL;
+  tmp->name_set = 0;
+
+  return (tmp);
+}
+
+
+
+int
+lookup_request_parent_ino_assign(struct lookup_request *msg, const ev_uint64_t value)
+{
+  msg->parent_ino_set = 1;
+  msg->parent_ino = value;
+  return (0);
+}
+
+int
+lookup_request_name_assign(struct lookup_request *msg,
+    const char * value)
+{
+  if (msg->name != NULL)
+    free(msg->name);
+  if ((msg->name = strdup(value)) == NULL)
+    return (-1);
+  msg->name_set = 1;
+  return (0);
+}
+
+int
+lookup_request_parent_ino_get(struct lookup_request *msg, ev_uint64_t *value)
+{
+  if (msg->parent_ino_set != 1)
+    return (-1);
+  *value = msg->parent_ino;
+  return (0);
+}
+
+int
+lookup_request_name_get(struct lookup_request *msg, char * *value)
+{
+  if (msg->name_set != 1)
+    return (-1);
+  *value = msg->name;
+  return (0);
+}
+
+void
+lookup_request_clear(struct lookup_request *tmp)
+{
+  tmp->parent_ino_set = 0;
+  if (tmp->name_set == 1) {
+    free(tmp->name);
     tmp->name = NULL;
     tmp->name_set = 0;
-
-    return (tmp);
-}
-
-int
-lookup_request_parent_ino_assign(struct lookup_request *msg,
-                                 const ev_uint64_t value)
-{
-    msg->parent_ino_set = 1;
-    msg->parent_ino = value;
-    return (0);
-}
-
-int lookup_request_name_assign(struct lookup_request *msg, const char *value)
-{
-    if (msg->name != NULL)
-        free(msg->name);
-    if ((msg->name = strdup(value)) == NULL)
-        return (-1);
-    msg->name_set = 1;
-    return (0);
-}
-
-int
-lookup_request_parent_ino_get(struct lookup_request *msg, ev_uint64_t * value)
-{
-    if (msg->parent_ino_set != 1)
-        return (-1);
-    *value = msg->parent_ino;
-    return (0);
-}
-
-int lookup_request_name_get(struct lookup_request *msg, char **value)
-{
-    if (msg->name_set != 1)
-        return (-1);
-    *value = msg->name;
-    return (0);
-}
-
-void lookup_request_clear(struct lookup_request *tmp)
-{
-    tmp->parent_ino_set = 0;
-    if (tmp->name_set == 1) {
-        free(tmp->name);
-        tmp->name = NULL;
-        tmp->name_set = 0;
-    }
-}
-
-void lookup_request_free(struct lookup_request *tmp)
-{
-    if (tmp->name != NULL)
-        free(tmp->name);
-    free(tmp);
+  }
 }
 
 void
-lookup_request_marshal(struct evbuffer *evbuf, const struct lookup_request *tmp)
+lookup_request_free(struct lookup_request *tmp)
 {
-    evtag_marshal_int64(evbuf, LOOKUP_REQUEST_PARENT_INO, tmp->parent_ino);
-    evtag_marshal_string(evbuf, LOOKUP_REQUEST_NAME, tmp->name);
+  if (tmp->name != NULL)
+      free (tmp->name);
+  free(tmp);
 }
 
-int lookup_request_unmarshal(struct lookup_request *tmp, struct evbuffer *evbuf)
+void
+lookup_request_marshal(struct evbuffer *evbuf, const struct lookup_request *tmp){
+  evtag_marshal_int64(evbuf, LOOKUP_REQUEST_PARENT_INO, tmp->parent_ino);
+  evtag_marshal_string(evbuf, LOOKUP_REQUEST_NAME, tmp->name);
+}
+
+int
+lookup_request_unmarshal(struct lookup_request *tmp,  struct evbuffer *evbuf)
 {
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
 
-        case LOOKUP_REQUEST_PARENT_INO:
+      case LOOKUP_REQUEST_PARENT_INO:
 
-            if (tmp->parent_ino_set)
-                return (-1);
-            if (evtag_unmarshal_int64
-                (evbuf, LOOKUP_REQUEST_PARENT_INO, &tmp->parent_ino) == -1) {
-                event_warnx("%s: failed to unmarshal parent_ino", __func__);
-                return (-1);
-            }
-            tmp->parent_ino_set = 1;
-            break;
-
-        case LOOKUP_REQUEST_NAME:
-
-            if (tmp->name_set)
-                return (-1);
-            if (evtag_unmarshal_string(evbuf, LOOKUP_REQUEST_NAME, &tmp->name)
-                == -1) {
-                event_warnx("%s: failed to unmarshal name", __func__);
-                return (-1);
-            }
-            tmp->name_set = 1;
-            break;
-
-        default:
-            return -1;
+        if (tmp->parent_ino_set)
+          return (-1);
+        if (evtag_unmarshal_int64(evbuf, LOOKUP_REQUEST_PARENT_INO, &tmp->parent_ino) == -1) {
+          event_warnx("%s: failed to unmarshal parent_ino", __func__);
+          return (-1);
         }
+        tmp->parent_ino_set = 1;
+        break;
+
+      case LOOKUP_REQUEST_NAME:
+
+        if (tmp->name_set)
+          return (-1);
+        if (evtag_unmarshal_string(evbuf, LOOKUP_REQUEST_NAME, &tmp->name) == -1) {
+          event_warnx("%s: failed to unmarshal name", __func__);
+          return (-1);
+        }
+        tmp->name_set = 1;
+        break;
+
+      default:
+        return -1;
     }
+  }
 
-    if (lookup_request_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int lookup_request_complete(struct lookup_request *msg)
-{
-    if (!msg->parent_ino_set)
-        return (-1);
-    if (!msg->name_set)
-        return (-1);
-    return (0);
+  if (lookup_request_complete(tmp) == -1)
+    return (-1);
+  return (0);
 }
 
 int
-evtag_unmarshal_lookup_request(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                               struct lookup_request *msg)
+lookup_request_complete(struct lookup_request *msg)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  if (!msg->parent_ino_set)
+    return (-1);
+  if (!msg->name_set)
+    return (-1);
+  return (0);
+}
 
-    struct evbuffer *tmp = evbuffer_new();
+int
+evtag_unmarshal_lookup_request(struct evbuffer *evbuf, ev_uint32_t need_tag, struct lookup_request *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+  struct evbuffer *tmp = evbuffer_new();
 
-    if (lookup_request_unmarshal(msg, tmp) == -1)
-        goto error;
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
 
-    res = 0;
+  if (lookup_request_unmarshal(msg, tmp) == -1)
+    goto error;
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
 }
 
 void
-evtag_marshal_lookup_request(struct evbuffer *evbuf, ev_uint32_t tag,
-                             const struct lookup_request *msg)
+evtag_marshal_lookup_request(struct evbuffer *evbuf, ev_uint32_t tag, const struct lookup_request *msg)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    lookup_request_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  lookup_request_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -3353,236 +3442,233 @@ evtag_marshal_lookup_request(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct lookup_response_access_ __lookup_response_base = {
-    lookup_response_stat_arr_assign,
-    lookup_response_stat_arr_get,
-    lookup_response_stat_arr_add,
+  lookup_response_stat_arr_assign,
+  lookup_response_stat_arr_get,
+  lookup_response_stat_arr_add,
 };
 
-struct lookup_response *lookup_response_new(void)
+struct lookup_response *
+lookup_response_new(void)
 {
-    return lookup_response_new_with_arg(NULL);
+  return lookup_response_new_with_arg(NULL);
 }
 
-struct lookup_response *lookup_response_new_with_arg(void *unused)
+struct lookup_response *
+lookup_response_new_with_arg(void *unused)
 {
-    struct lookup_response *tmp;
-    if ((tmp = malloc(sizeof(struct lookup_response))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__lookup_response_base;
+  struct lookup_response *tmp;
+  if ((tmp = malloc(sizeof(struct lookup_response))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__lookup_response_base;
 
-    tmp->stat_arr = NULL;
-    tmp->stat_arr_length = 0;
-    tmp->stat_arr_num_allocated = 0;
-    tmp->stat_arr_set = 0;
+  tmp->stat_arr = NULL;
+  tmp->stat_arr_length = 0;
+  tmp->stat_arr_num_allocated = 0;
+  tmp->stat_arr_set = 0;
 
-    return (tmp);
+  return (tmp);
 }
 
 static int
 lookup_response_stat_arr_expand_to_hold_more(struct lookup_response *msg)
 {
-    int tobe_allocated = msg->stat_arr_num_allocated;
-    struct file_stat **new_d_ata = NULL;
-    tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
-    new_d_ata = (struct file_stat **)realloc(msg->stat_arr,
-                                             tobe_allocated *
-                                             sizeof(struct file_stat *));
-    if (new_d_ata == NULL)
-        return -1;
-    msg->stat_arr = new_d_ata;
-    msg->stat_arr_num_allocated = tobe_allocated;
-    return 0;
-}
+  int tobe_allocated = msg->stat_arr_num_allocated;
+  struct file_stat** new_d_ata = NULL;
+  tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
+  new_d_ata = (struct file_stat**) realloc(msg->stat_arr,
+      tobe_allocated * sizeof(struct file_stat*));
+  if (new_d_ata == NULL)
+    return -1;
+  msg->stat_arr = new_d_ata;
+  msg->stat_arr_num_allocated = tobe_allocated;
+  return 0;}
 
-struct file_stat *lookup_response_stat_arr_add(struct lookup_response *msg)
+struct file_stat* 
+lookup_response_stat_arr_add(struct lookup_response *msg)
 {
-    if (++msg->stat_arr_length >= msg->stat_arr_num_allocated) {
-        if (lookup_response_stat_arr_expand_to_hold_more(msg) < 0)
-            goto error;
-    }
-    msg->stat_arr[msg->stat_arr_length - 1] = file_stat_new();
-    if (msg->stat_arr[msg->stat_arr_length - 1] == NULL)
-        goto error;
-    msg->stat_arr_set = 1;
-    return (msg->stat_arr[msg->stat_arr_length - 1]);
-  error:
-    --msg->stat_arr_length;
-    return (NULL);
+  if (++msg->stat_arr_length >= msg->stat_arr_num_allocated) {
+    if (lookup_response_stat_arr_expand_to_hold_more(msg)<0)
+      goto error;
+  }
+  msg->stat_arr[msg->stat_arr_length - 1] = file_stat_new();
+  if (msg->stat_arr[msg->stat_arr_length - 1] == NULL)
+    goto error;
+  msg->stat_arr_set = 1;
+  return (msg->stat_arr[msg->stat_arr_length - 1]);
+error:
+  --msg->stat_arr_length;
+  return (NULL);
 }
 
 int
 lookup_response_stat_arr_assign(struct lookup_response *msg, int off,
-                                const struct file_stat *value)
+    const struct file_stat* value)
 {
-    if (!msg->stat_arr_set || off < 0 || off >= msg->stat_arr_length)
-        return (-1);
+  if (!msg->stat_arr_set || off < 0 || off >= msg->stat_arr_length)
+    return (-1);
 
-    {
-        int had_error = 0;
-        struct evbuffer *tmp = NULL;
-        file_stat_clear(msg->stat_arr[off]);
-        if ((tmp = evbuffer_new()) == NULL) {
-            event_warn("%s: evbuffer_new()", __func__);
-            had_error = 1;
-            goto done;
-        }
-        file_stat_marshal(tmp, value);
-        if (file_stat_unmarshal(msg->stat_arr[off], tmp) == -1) {
-            event_warnx("%s: file_stat_unmarshal", __func__);
-            had_error = 1;
-            goto done;
-        }
-      done:if (tmp != NULL)
-            evbuffer_free(tmp);
-        if (had_error) {
-            file_stat_clear(msg->stat_arr[off]);
-            return (-1);
-        }
+  {
+    int had_error = 0;
+    struct evbuffer *tmp = NULL;
+    file_stat_clear(msg->stat_arr[off]);
+    if ((tmp = evbuffer_new()) == NULL) {
+      event_warn("%s: evbuffer_new()", __func__);
+      had_error = 1;
+      goto done;
     }
-    return (0);
+    file_stat_marshal(tmp, value);
+    if (file_stat_unmarshal(msg->stat_arr[off], tmp) == -1) {
+      event_warnx("%s: file_stat_unmarshal", __func__);
+      had_error = 1;
+      goto done;
+    }
+    done:if (tmp != NULL)
+      evbuffer_free(tmp);
+    if (had_error) {
+      file_stat_clear(msg->stat_arr[off]);
+      return (-1);
+    }
+  }
+  return (0);
 }
 
 int
 lookup_response_stat_arr_get(struct lookup_response *msg, int offset,
-                             struct file_stat **value)
+    struct file_stat* *value)
 {
-    if (!msg->stat_arr_set || offset < 0 || offset >= msg->stat_arr_length)
-        return (-1);
-    *value = msg->stat_arr[offset];
-    return (0);
+  if (!msg->stat_arr_set || offset < 0 || offset >= msg->stat_arr_length)
+    return (-1);
+  *value = msg->stat_arr[offset];
+  return (0);
 }
 
-void lookup_response_clear(struct lookup_response *tmp)
+void
+lookup_response_clear(struct lookup_response *tmp)
 {
-    if (tmp->stat_arr_set == 1) {
-        int i;
-        for (i = 0; i < tmp->stat_arr_length; ++i) {
-            file_stat_free(tmp->stat_arr[i]);
-        }
-        free(tmp->stat_arr);
-        tmp->stat_arr = NULL;
-        tmp->stat_arr_set = 0;
-        tmp->stat_arr_length = 0;
-        tmp->stat_arr_num_allocated = 0;
-    }
-}
-
-void lookup_response_free(struct lookup_response *tmp)
-{
-    if (tmp->stat_arr_set == 1) {
-        int i;
-        for (i = 0; i < tmp->stat_arr_length; ++i) {
-            file_stat_free(tmp->stat_arr[i]);
-        }
-        free(tmp->stat_arr);
-        tmp->stat_arr = NULL;
-        tmp->stat_arr_set = 0;
-        tmp->stat_arr_length = 0;
-        tmp->stat_arr_num_allocated = 0;
+  if (tmp->stat_arr_set == 1) {
+    int i;
+    for (i = 0; i < tmp->stat_arr_length; ++i) {
+      file_stat_free(tmp->stat_arr[i]);
     }
     free(tmp->stat_arr);
-    free(tmp);
+    tmp->stat_arr = NULL;
+    tmp->stat_arr_set = 0;
+    tmp->stat_arr_length = 0;
+    tmp->stat_arr_num_allocated = 0;
+  }
 }
 
 void
-lookup_response_marshal(struct evbuffer *evbuf,
-                        const struct lookup_response *tmp)
+lookup_response_free(struct lookup_response *tmp)
 {
-    if (tmp->stat_arr_set) {
-        {
-            int i;
-            for (i = 0; i < tmp->stat_arr_length; ++i) {
-                evtag_marshal_file_stat(evbuf, LOOKUP_RESPONSE_STAT_ARR,
-                                        tmp->stat_arr[i]);
-            }
-        }
+  if (tmp->stat_arr_set == 1) {
+    int i;
+    for (i = 0; i < tmp->stat_arr_length; ++i) {
+      file_stat_free(tmp->stat_arr[i]);
     }
+    free(tmp->stat_arr);
+    tmp->stat_arr = NULL;
+    tmp->stat_arr_set = 0;
+    tmp->stat_arr_length = 0;
+    tmp->stat_arr_num_allocated = 0;
+  }
+  free(tmp->stat_arr);
+  free(tmp);
 }
 
-int
-lookup_response_unmarshal(struct lookup_response *tmp, struct evbuffer *evbuf)
-{
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
-
-        case LOOKUP_RESPONSE_STAT_ARR:
-
-            if (tmp->stat_arr_length >= tmp->stat_arr_num_allocated &&
-                lookup_response_stat_arr_expand_to_hold_more(tmp) < 0) {
-                puts("HEY NOW");
-                return (-1);
-            }
-            tmp->stat_arr[tmp->stat_arr_length] = file_stat_new();
-            if (tmp->stat_arr[tmp->stat_arr_length] == NULL)
-                return (-1);
-            if (evtag_unmarshal_file_stat
-                (evbuf, LOOKUP_RESPONSE_STAT_ARR,
-                 tmp->stat_arr[tmp->stat_arr_length]) == -1) {
-                event_warnx("%s: failed to unmarshal stat_arr", __func__);
-                return (-1);
-            }
-            ++tmp->stat_arr_length;
-            tmp->stat_arr_set = 1;
-            break;
-
-        default:
-            return -1;
-        }
-    }
-
-    if (lookup_response_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int lookup_response_complete(struct lookup_response *msg)
-{
+void
+lookup_response_marshal(struct evbuffer *evbuf, const struct lookup_response *tmp){
+  if (tmp->stat_arr_set) {
     {
-        int i;
-        for (i = 0; i < msg->stat_arr_length; ++i) {
-            if (msg->stat_arr_set && file_stat_complete(msg->stat_arr[i]) == -1)
-                return (-1);
-        }
+      int i;
+      for (i = 0; i < tmp->stat_arr_length; ++i) {
+    evtag_marshal_file_stat(evbuf, LOOKUP_RESPONSE_STAT_ARR, tmp->stat_arr[i]);
+      }
     }
-    return (0);
+  }
 }
 
 int
-evtag_unmarshal_lookup_response(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                                struct lookup_response *msg)
+lookup_response_unmarshal(struct lookup_response *tmp,  struct evbuffer *evbuf)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
 
-    struct evbuffer *tmp = evbuffer_new();
+      case LOOKUP_RESPONSE_STAT_ARR:
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+        if (tmp->stat_arr_length >= tmp->stat_arr_num_allocated &&
+            lookup_response_stat_arr_expand_to_hold_more(tmp) < 0) {
+          puts("HEY NOW");
+          return (-1);
+        }
+        tmp->stat_arr[tmp->stat_arr_length] = file_stat_new();
+        if (tmp->stat_arr[tmp->stat_arr_length] == NULL)
+          return (-1);
+        if (evtag_unmarshal_file_stat(evbuf, LOOKUP_RESPONSE_STAT_ARR, tmp->stat_arr[tmp->stat_arr_length]) == -1) {
+          event_warnx("%s: failed to unmarshal stat_arr", __func__);
+          return (-1);
+        }
+        ++tmp->stat_arr_length;
+        tmp->stat_arr_set = 1;
+        break;
 
-    if (lookup_response_unmarshal(msg, tmp) == -1)
-        goto error;
+      default:
+        return -1;
+    }
+  }
 
-    res = 0;
+  if (lookup_response_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+int
+lookup_response_complete(struct lookup_response *msg)
+{
+  {
+    int i;
+    for (i = 0; i < msg->stat_arr_length; ++i) {
+      if (msg->stat_arr_set && file_stat_complete(msg->stat_arr[i]) == -1)
+        return (-1);
+    }
+  }
+  return (0);
+}
+
+int
+evtag_unmarshal_lookup_response(struct evbuffer *evbuf, ev_uint32_t need_tag, struct lookup_response *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (lookup_response_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
 }
 
 void
-evtag_marshal_lookup_response(struct evbuffer *evbuf, ev_uint32_t tag,
-                              const struct lookup_response *msg)
+evtag_marshal_lookup_response(struct evbuffer *evbuf, ev_uint32_t tag, const struct lookup_response *msg)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    lookup_response_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  lookup_response_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -3590,177 +3676,182 @@ evtag_marshal_lookup_response(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct unlink_request_access_ __unlink_request_base = {
-    unlink_request_parent_ino_assign,
-    unlink_request_parent_ino_get,
-    unlink_request_name_assign,
-    unlink_request_name_get,
+  unlink_request_parent_ino_assign,
+  unlink_request_parent_ino_get,
+  unlink_request_name_assign,
+  unlink_request_name_get,
 };
 
-struct unlink_request *unlink_request_new(void)
+struct unlink_request *
+unlink_request_new(void)
 {
-    return unlink_request_new_with_arg(NULL);
+  return unlink_request_new_with_arg(NULL);
 }
 
-struct unlink_request *unlink_request_new_with_arg(void *unused)
+struct unlink_request *
+unlink_request_new_with_arg(void *unused)
 {
-    struct unlink_request *tmp;
-    if ((tmp = malloc(sizeof(struct unlink_request))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__unlink_request_base;
+  struct unlink_request *tmp;
+  if ((tmp = malloc(sizeof(struct unlink_request))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__unlink_request_base;
 
-    tmp->parent_ino = 0;
-    tmp->parent_ino_set = 0;
+  tmp->parent_ino = 0;
+  tmp->parent_ino_set = 0;
 
+  tmp->name = NULL;
+  tmp->name_set = 0;
+
+  return (tmp);
+}
+
+
+
+int
+unlink_request_parent_ino_assign(struct unlink_request *msg, const ev_uint64_t value)
+{
+  msg->parent_ino_set = 1;
+  msg->parent_ino = value;
+  return (0);
+}
+
+int
+unlink_request_name_assign(struct unlink_request *msg,
+    const char * value)
+{
+  if (msg->name != NULL)
+    free(msg->name);
+  if ((msg->name = strdup(value)) == NULL)
+    return (-1);
+  msg->name_set = 1;
+  return (0);
+}
+
+int
+unlink_request_parent_ino_get(struct unlink_request *msg, ev_uint64_t *value)
+{
+  if (msg->parent_ino_set != 1)
+    return (-1);
+  *value = msg->parent_ino;
+  return (0);
+}
+
+int
+unlink_request_name_get(struct unlink_request *msg, char * *value)
+{
+  if (msg->name_set != 1)
+    return (-1);
+  *value = msg->name;
+  return (0);
+}
+
+void
+unlink_request_clear(struct unlink_request *tmp)
+{
+  tmp->parent_ino_set = 0;
+  if (tmp->name_set == 1) {
+    free(tmp->name);
     tmp->name = NULL;
     tmp->name_set = 0;
-
-    return (tmp);
-}
-
-int
-unlink_request_parent_ino_assign(struct unlink_request *msg,
-                                 const ev_uint64_t value)
-{
-    msg->parent_ino_set = 1;
-    msg->parent_ino = value;
-    return (0);
-}
-
-int unlink_request_name_assign(struct unlink_request *msg, const char *value)
-{
-    if (msg->name != NULL)
-        free(msg->name);
-    if ((msg->name = strdup(value)) == NULL)
-        return (-1);
-    msg->name_set = 1;
-    return (0);
-}
-
-int
-unlink_request_parent_ino_get(struct unlink_request *msg, ev_uint64_t * value)
-{
-    if (msg->parent_ino_set != 1)
-        return (-1);
-    *value = msg->parent_ino;
-    return (0);
-}
-
-int unlink_request_name_get(struct unlink_request *msg, char **value)
-{
-    if (msg->name_set != 1)
-        return (-1);
-    *value = msg->name;
-    return (0);
-}
-
-void unlink_request_clear(struct unlink_request *tmp)
-{
-    tmp->parent_ino_set = 0;
-    if (tmp->name_set == 1) {
-        free(tmp->name);
-        tmp->name = NULL;
-        tmp->name_set = 0;
-    }
-}
-
-void unlink_request_free(struct unlink_request *tmp)
-{
-    if (tmp->name != NULL)
-        free(tmp->name);
-    free(tmp);
+  }
 }
 
 void
-unlink_request_marshal(struct evbuffer *evbuf, const struct unlink_request *tmp)
+unlink_request_free(struct unlink_request *tmp)
 {
-    evtag_marshal_int64(evbuf, UNLINK_REQUEST_PARENT_INO, tmp->parent_ino);
-    evtag_marshal_string(evbuf, UNLINK_REQUEST_NAME, tmp->name);
+  if (tmp->name != NULL)
+      free (tmp->name);
+  free(tmp);
 }
 
-int unlink_request_unmarshal(struct unlink_request *tmp, struct evbuffer *evbuf)
+void
+unlink_request_marshal(struct evbuffer *evbuf, const struct unlink_request *tmp){
+  evtag_marshal_int64(evbuf, UNLINK_REQUEST_PARENT_INO, tmp->parent_ino);
+  evtag_marshal_string(evbuf, UNLINK_REQUEST_NAME, tmp->name);
+}
+
+int
+unlink_request_unmarshal(struct unlink_request *tmp,  struct evbuffer *evbuf)
 {
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
 
-        case UNLINK_REQUEST_PARENT_INO:
+      case UNLINK_REQUEST_PARENT_INO:
 
-            if (tmp->parent_ino_set)
-                return (-1);
-            if (evtag_unmarshal_int64
-                (evbuf, UNLINK_REQUEST_PARENT_INO, &tmp->parent_ino) == -1) {
-                event_warnx("%s: failed to unmarshal parent_ino", __func__);
-                return (-1);
-            }
-            tmp->parent_ino_set = 1;
-            break;
-
-        case UNLINK_REQUEST_NAME:
-
-            if (tmp->name_set)
-                return (-1);
-            if (evtag_unmarshal_string(evbuf, UNLINK_REQUEST_NAME, &tmp->name)
-                == -1) {
-                event_warnx("%s: failed to unmarshal name", __func__);
-                return (-1);
-            }
-            tmp->name_set = 1;
-            break;
-
-        default:
-            return -1;
+        if (tmp->parent_ino_set)
+          return (-1);
+        if (evtag_unmarshal_int64(evbuf, UNLINK_REQUEST_PARENT_INO, &tmp->parent_ino) == -1) {
+          event_warnx("%s: failed to unmarshal parent_ino", __func__);
+          return (-1);
         }
+        tmp->parent_ino_set = 1;
+        break;
+
+      case UNLINK_REQUEST_NAME:
+
+        if (tmp->name_set)
+          return (-1);
+        if (evtag_unmarshal_string(evbuf, UNLINK_REQUEST_NAME, &tmp->name) == -1) {
+          event_warnx("%s: failed to unmarshal name", __func__);
+          return (-1);
+        }
+        tmp->name_set = 1;
+        break;
+
+      default:
+        return -1;
     }
+  }
 
-    if (unlink_request_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int unlink_request_complete(struct unlink_request *msg)
-{
-    if (!msg->parent_ino_set)
-        return (-1);
-    if (!msg->name_set)
-        return (-1);
-    return (0);
+  if (unlink_request_complete(tmp) == -1)
+    return (-1);
+  return (0);
 }
 
 int
-evtag_unmarshal_unlink_request(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                               struct unlink_request *msg)
+unlink_request_complete(struct unlink_request *msg)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  if (!msg->parent_ino_set)
+    return (-1);
+  if (!msg->name_set)
+    return (-1);
+  return (0);
+}
 
-    struct evbuffer *tmp = evbuffer_new();
+int
+evtag_unmarshal_unlink_request(struct evbuffer *evbuf, ev_uint32_t need_tag, struct unlink_request *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+  struct evbuffer *tmp = evbuffer_new();
 
-    if (unlink_request_unmarshal(msg, tmp) == -1)
-        goto error;
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
 
-    res = 0;
+  if (unlink_request_unmarshal(msg, tmp) == -1)
+    goto error;
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
 }
 
 void
-evtag_marshal_unlink_request(struct evbuffer *evbuf, ev_uint32_t tag,
-                             const struct unlink_request *msg)
+evtag_marshal_unlink_request(struct evbuffer *evbuf, ev_uint32_t tag, const struct unlink_request *msg)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    unlink_request_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  unlink_request_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -3768,132 +3859,134 @@ evtag_marshal_unlink_request(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct unlink_response_access_ __unlink_response_base = {
-    unlink_response_ino_assign,
-    unlink_response_ino_get,
+  unlink_response_ino_assign,
+  unlink_response_ino_get,
 };
 
-struct unlink_response *unlink_response_new(void)
+struct unlink_response *
+unlink_response_new(void)
 {
-    return unlink_response_new_with_arg(NULL);
+  return unlink_response_new_with_arg(NULL);
 }
 
-struct unlink_response *unlink_response_new_with_arg(void *unused)
+struct unlink_response *
+unlink_response_new_with_arg(void *unused)
 {
-    struct unlink_response *tmp;
-    if ((tmp = malloc(sizeof(struct unlink_response))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__unlink_response_base;
+  struct unlink_response *tmp;
+  if ((tmp = malloc(sizeof(struct unlink_response))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__unlink_response_base;
 
-    tmp->ino = 0;
-    tmp->ino_set = 0;
+  tmp->ino = 0;
+  tmp->ino_set = 0;
 
-    return (tmp);
+  return (tmp);
 }
+
 
 int
 unlink_response_ino_assign(struct unlink_response *msg, const ev_uint64_t value)
 {
-    msg->ino_set = 1;
-    msg->ino = value;
-    return (0);
-}
-
-int unlink_response_ino_get(struct unlink_response *msg, ev_uint64_t * value)
-{
-    if (msg->ino_set != 1)
-        return (-1);
-    *value = msg->ino;
-    return (0);
-}
-
-void unlink_response_clear(struct unlink_response *tmp)
-{
-    tmp->ino_set = 0;
-}
-
-void unlink_response_free(struct unlink_response *tmp)
-{
-    free(tmp);
-}
-
-void
-unlink_response_marshal(struct evbuffer *evbuf,
-                        const struct unlink_response *tmp)
-{
-    if (tmp->ino_set) {
-        evtag_marshal_int64(evbuf, UNLINK_RESPONSE_INO, tmp->ino);
-    }
+  msg->ino_set = 1;
+  msg->ino = value;
+  return (0);
 }
 
 int
-unlink_response_unmarshal(struct unlink_response *tmp, struct evbuffer *evbuf)
+unlink_response_ino_get(struct unlink_response *msg, ev_uint64_t *value)
 {
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
+  if (msg->ino_set != 1)
+    return (-1);
+  *value = msg->ino;
+  return (0);
+}
 
-        case UNLINK_RESPONSE_INO:
+void
+unlink_response_clear(struct unlink_response *tmp)
+{
+  tmp->ino_set = 0;
+}
 
-            if (tmp->ino_set)
-                return (-1);
-            if (evtag_unmarshal_int64(evbuf, UNLINK_RESPONSE_INO, &tmp->ino) ==
-                -1) {
-                event_warnx("%s: failed to unmarshal ino", __func__);
-                return (-1);
-            }
-            tmp->ino_set = 1;
-            break;
+void
+unlink_response_free(struct unlink_response *tmp)
+{
+  free(tmp);
+}
 
-        default:
-            return -1;
+void
+unlink_response_marshal(struct evbuffer *evbuf, const struct unlink_response *tmp){
+  if (tmp->ino_set) {
+    evtag_marshal_int64(evbuf, UNLINK_RESPONSE_INO, tmp->ino);
+  }
+}
+
+int
+unlink_response_unmarshal(struct unlink_response *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case UNLINK_RESPONSE_INO:
+
+        if (tmp->ino_set)
+          return (-1);
+        if (evtag_unmarshal_int64(evbuf, UNLINK_RESPONSE_INO, &tmp->ino) == -1) {
+          event_warnx("%s: failed to unmarshal ino", __func__);
+          return (-1);
         }
+        tmp->ino_set = 1;
+        break;
+
+      default:
+        return -1;
     }
+  }
 
-    if (unlink_response_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int unlink_response_complete(struct unlink_response *msg)
-{
-    return (0);
+  if (unlink_response_complete(tmp) == -1)
+    return (-1);
+  return (0);
 }
 
 int
-evtag_unmarshal_unlink_response(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                                struct unlink_response *msg)
+unlink_response_complete(struct unlink_response *msg)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  return (0);
+}
 
-    struct evbuffer *tmp = evbuffer_new();
+int
+evtag_unmarshal_unlink_response(struct evbuffer *evbuf, ev_uint32_t need_tag, struct unlink_response *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+  struct evbuffer *tmp = evbuffer_new();
 
-    if (unlink_response_unmarshal(msg, tmp) == -1)
-        goto error;
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
 
-    res = 0;
+  if (unlink_response_unmarshal(msg, tmp) == -1)
+    goto error;
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
 }
 
 void
-evtag_marshal_unlink_response(struct evbuffer *evbuf, ev_uint32_t tag,
-                              const struct unlink_response *msg)
+evtag_marshal_unlink_response(struct evbuffer *evbuf, ev_uint32_t tag, const struct unlink_response *msg)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    unlink_response_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  unlink_response_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -3901,131 +3994,134 @@ evtag_marshal_unlink_response(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct statfs_request_access_ __statfs_request_base = {
-    statfs_request_nothing_assign,
-    statfs_request_nothing_get,
+  statfs_request_nothing_assign,
+  statfs_request_nothing_get,
 };
 
-struct statfs_request *statfs_request_new(void)
+struct statfs_request *
+statfs_request_new(void)
 {
-    return statfs_request_new_with_arg(NULL);
+  return statfs_request_new_with_arg(NULL);
 }
 
-struct statfs_request *statfs_request_new_with_arg(void *unused)
+struct statfs_request *
+statfs_request_new_with_arg(void *unused)
 {
-    struct statfs_request *tmp;
-    if ((tmp = malloc(sizeof(struct statfs_request))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__statfs_request_base;
+  struct statfs_request *tmp;
+  if ((tmp = malloc(sizeof(struct statfs_request))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__statfs_request_base;
 
-    tmp->nothing = 0;
-    tmp->nothing_set = 0;
+  tmp->nothing = 0;
+  tmp->nothing_set = 0;
 
-    return (tmp);
+  return (tmp);
+}
+
+
+int
+statfs_request_nothing_assign(struct statfs_request *msg, const ev_uint32_t value)
+{
+  msg->nothing_set = 1;
+  msg->nothing = value;
+  return (0);
 }
 
 int
-statfs_request_nothing_assign(struct statfs_request *msg,
-                              const ev_uint32_t value)
+statfs_request_nothing_get(struct statfs_request *msg, ev_uint32_t *value)
 {
-    msg->nothing_set = 1;
-    msg->nothing = value;
-    return (0);
-}
-
-int statfs_request_nothing_get(struct statfs_request *msg, ev_uint32_t * value)
-{
-    if (msg->nothing_set != 1)
-        return (-1);
-    *value = msg->nothing;
-    return (0);
-}
-
-void statfs_request_clear(struct statfs_request *tmp)
-{
-    tmp->nothing_set = 0;
-}
-
-void statfs_request_free(struct statfs_request *tmp)
-{
-    free(tmp);
+  if (msg->nothing_set != 1)
+    return (-1);
+  *value = msg->nothing;
+  return (0);
 }
 
 void
-statfs_request_marshal(struct evbuffer *evbuf, const struct statfs_request *tmp)
+statfs_request_clear(struct statfs_request *tmp)
 {
-    if (tmp->nothing_set) {
-        evtag_marshal_int(evbuf, STATFS_REQUEST_NOTHING, tmp->nothing);
-    }
+  tmp->nothing_set = 0;
 }
 
-int statfs_request_unmarshal(struct statfs_request *tmp, struct evbuffer *evbuf)
+void
+statfs_request_free(struct statfs_request *tmp)
 {
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
+  free(tmp);
+}
 
-        case STATFS_REQUEST_NOTHING:
+void
+statfs_request_marshal(struct evbuffer *evbuf, const struct statfs_request *tmp){
+  if (tmp->nothing_set) {
+    evtag_marshal_int(evbuf, STATFS_REQUEST_NOTHING, tmp->nothing);
+  }
+}
 
-            if (tmp->nothing_set)
-                return (-1);
-            if (evtag_unmarshal_int
-                (evbuf, STATFS_REQUEST_NOTHING, &tmp->nothing) == -1) {
-                event_warnx("%s: failed to unmarshal nothing", __func__);
-                return (-1);
-            }
-            tmp->nothing_set = 1;
-            break;
+int
+statfs_request_unmarshal(struct statfs_request *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
 
-        default:
-            return -1;
+      case STATFS_REQUEST_NOTHING:
+
+        if (tmp->nothing_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, STATFS_REQUEST_NOTHING, &tmp->nothing) == -1) {
+          event_warnx("%s: failed to unmarshal nothing", __func__);
+          return (-1);
         }
+        tmp->nothing_set = 1;
+        break;
+
+      default:
+        return -1;
     }
+  }
 
-    if (statfs_request_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int statfs_request_complete(struct statfs_request *msg)
-{
-    return (0);
+  if (statfs_request_complete(tmp) == -1)
+    return (-1);
+  return (0);
 }
 
 int
-evtag_unmarshal_statfs_request(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                               struct statfs_request *msg)
+statfs_request_complete(struct statfs_request *msg)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  return (0);
+}
 
-    struct evbuffer *tmp = evbuffer_new();
+int
+evtag_unmarshal_statfs_request(struct evbuffer *evbuf, ev_uint32_t need_tag, struct statfs_request *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+  struct evbuffer *tmp = evbuffer_new();
 
-    if (statfs_request_unmarshal(msg, tmp) == -1)
-        goto error;
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
 
-    res = 0;
+  if (statfs_request_unmarshal(msg, tmp) == -1)
+    goto error;
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
 }
 
 void
-evtag_marshal_statfs_request(struct evbuffer *evbuf, ev_uint32_t tag,
-                             const struct statfs_request *msg)
+evtag_marshal_statfs_request(struct evbuffer *evbuf, ev_uint32_t tag, const struct statfs_request *msg)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    statfs_request_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  statfs_request_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -4033,214 +4129,210 @@ evtag_marshal_statfs_request(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct statfs_response_access_ __statfs_response_base = {
-    statfs_response_total_space_assign,
-    statfs_response_total_space_get,
-    statfs_response_avail_space_assign,
-    statfs_response_avail_space_get,
-    statfs_response_inode_cnt_assign,
-    statfs_response_inode_cnt_get,
+  statfs_response_total_space_assign,
+  statfs_response_total_space_get,
+  statfs_response_avail_space_assign,
+  statfs_response_avail_space_get,
+  statfs_response_inode_cnt_assign,
+  statfs_response_inode_cnt_get,
 };
 
-struct statfs_response *statfs_response_new(void)
+struct statfs_response *
+statfs_response_new(void)
 {
-    return statfs_response_new_with_arg(NULL);
+  return statfs_response_new_with_arg(NULL);
 }
 
-struct statfs_response *statfs_response_new_with_arg(void *unused)
+struct statfs_response *
+statfs_response_new_with_arg(void *unused)
 {
-    struct statfs_response *tmp;
-    if ((tmp = malloc(sizeof(struct statfs_response))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__statfs_response_base;
+  struct statfs_response *tmp;
+  if ((tmp = malloc(sizeof(struct statfs_response))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__statfs_response_base;
 
-    tmp->total_space = 0;
-    tmp->total_space_set = 0;
+  tmp->total_space = 0;
+  tmp->total_space_set = 0;
 
-    tmp->avail_space = 0;
-    tmp->avail_space_set = 0;
+  tmp->avail_space = 0;
+  tmp->avail_space_set = 0;
 
-    tmp->inode_cnt = 0;
-    tmp->inode_cnt_set = 0;
+  tmp->inode_cnt = 0;
+  tmp->inode_cnt_set = 0;
 
-    return (tmp);
+  return (tmp);
+}
+
+
+
+
+int
+statfs_response_total_space_assign(struct statfs_response *msg, const ev_uint32_t value)
+{
+  msg->total_space_set = 1;
+  msg->total_space = value;
+  return (0);
 }
 
 int
-statfs_response_total_space_assign(struct statfs_response *msg,
-                                   const ev_uint32_t value)
+statfs_response_avail_space_assign(struct statfs_response *msg, const ev_uint32_t value)
 {
-    msg->total_space_set = 1;
-    msg->total_space = value;
-    return (0);
+  msg->avail_space_set = 1;
+  msg->avail_space = value;
+  return (0);
 }
 
 int
-statfs_response_avail_space_assign(struct statfs_response *msg,
-                                   const ev_uint32_t value)
+statfs_response_inode_cnt_assign(struct statfs_response *msg, const ev_uint32_t value)
 {
-    msg->avail_space_set = 1;
-    msg->avail_space = value;
-    return (0);
+  msg->inode_cnt_set = 1;
+  msg->inode_cnt = value;
+  return (0);
 }
 
 int
-statfs_response_inode_cnt_assign(struct statfs_response *msg,
-                                 const ev_uint32_t value)
+statfs_response_total_space_get(struct statfs_response *msg, ev_uint32_t *value)
 {
-    msg->inode_cnt_set = 1;
-    msg->inode_cnt = value;
-    return (0);
+  if (msg->total_space_set != 1)
+    return (-1);
+  *value = msg->total_space;
+  return (0);
 }
 
 int
-statfs_response_total_space_get(struct statfs_response *msg,
-                                ev_uint32_t * value)
+statfs_response_avail_space_get(struct statfs_response *msg, ev_uint32_t *value)
 {
-    if (msg->total_space_set != 1)
-        return (-1);
-    *value = msg->total_space;
-    return (0);
+  if (msg->avail_space_set != 1)
+    return (-1);
+  *value = msg->avail_space;
+  return (0);
 }
 
 int
-statfs_response_avail_space_get(struct statfs_response *msg,
-                                ev_uint32_t * value)
+statfs_response_inode_cnt_get(struct statfs_response *msg, ev_uint32_t *value)
 {
-    if (msg->avail_space_set != 1)
-        return (-1);
-    *value = msg->avail_space;
-    return (0);
-}
-
-int
-statfs_response_inode_cnt_get(struct statfs_response *msg, ev_uint32_t * value)
-{
-    if (msg->inode_cnt_set != 1)
-        return (-1);
-    *value = msg->inode_cnt;
-    return (0);
-}
-
-void statfs_response_clear(struct statfs_response *tmp)
-{
-    tmp->total_space_set = 0;
-    tmp->avail_space_set = 0;
-    tmp->inode_cnt_set = 0;
-}
-
-void statfs_response_free(struct statfs_response *tmp)
-{
-    free(tmp);
+  if (msg->inode_cnt_set != 1)
+    return (-1);
+  *value = msg->inode_cnt;
+  return (0);
 }
 
 void
-statfs_response_marshal(struct evbuffer *evbuf,
-                        const struct statfs_response *tmp)
+statfs_response_clear(struct statfs_response *tmp)
 {
-    evtag_marshal_int(evbuf, STATFS_RESPONSE_TOTAL_SPACE, tmp->total_space);
-    evtag_marshal_int(evbuf, STATFS_RESPONSE_AVAIL_SPACE, tmp->avail_space);
-    evtag_marshal_int(evbuf, STATFS_RESPONSE_INODE_CNT, tmp->inode_cnt);
+  tmp->total_space_set = 0;
+  tmp->avail_space_set = 0;
+  tmp->inode_cnt_set = 0;
+}
+
+void
+statfs_response_free(struct statfs_response *tmp)
+{
+  free(tmp);
+}
+
+void
+statfs_response_marshal(struct evbuffer *evbuf, const struct statfs_response *tmp){
+  evtag_marshal_int(evbuf, STATFS_RESPONSE_TOTAL_SPACE, tmp->total_space);
+  evtag_marshal_int(evbuf, STATFS_RESPONSE_AVAIL_SPACE, tmp->avail_space);
+  evtag_marshal_int(evbuf, STATFS_RESPONSE_INODE_CNT, tmp->inode_cnt);
 }
 
 int
-statfs_response_unmarshal(struct statfs_response *tmp, struct evbuffer *evbuf)
+statfs_response_unmarshal(struct statfs_response *tmp,  struct evbuffer *evbuf)
 {
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
 
-        case STATFS_RESPONSE_TOTAL_SPACE:
+      case STATFS_RESPONSE_TOTAL_SPACE:
 
-            if (tmp->total_space_set)
-                return (-1);
-            if (evtag_unmarshal_int
-                (evbuf, STATFS_RESPONSE_TOTAL_SPACE, &tmp->total_space) == -1) {
-                event_warnx("%s: failed to unmarshal total_space", __func__);
-                return (-1);
-            }
-            tmp->total_space_set = 1;
-            break;
-
-        case STATFS_RESPONSE_AVAIL_SPACE:
-
-            if (tmp->avail_space_set)
-                return (-1);
-            if (evtag_unmarshal_int
-                (evbuf, STATFS_RESPONSE_AVAIL_SPACE, &tmp->avail_space) == -1) {
-                event_warnx("%s: failed to unmarshal avail_space", __func__);
-                return (-1);
-            }
-            tmp->avail_space_set = 1;
-            break;
-
-        case STATFS_RESPONSE_INODE_CNT:
-
-            if (tmp->inode_cnt_set)
-                return (-1);
-            if (evtag_unmarshal_int
-                (evbuf, STATFS_RESPONSE_INODE_CNT, &tmp->inode_cnt) == -1) {
-                event_warnx("%s: failed to unmarshal inode_cnt", __func__);
-                return (-1);
-            }
-            tmp->inode_cnt_set = 1;
-            break;
-
-        default:
-            return -1;
+        if (tmp->total_space_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, STATFS_RESPONSE_TOTAL_SPACE, &tmp->total_space) == -1) {
+          event_warnx("%s: failed to unmarshal total_space", __func__);
+          return (-1);
         }
+        tmp->total_space_set = 1;
+        break;
+
+      case STATFS_RESPONSE_AVAIL_SPACE:
+
+        if (tmp->avail_space_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, STATFS_RESPONSE_AVAIL_SPACE, &tmp->avail_space) == -1) {
+          event_warnx("%s: failed to unmarshal avail_space", __func__);
+          return (-1);
+        }
+        tmp->avail_space_set = 1;
+        break;
+
+      case STATFS_RESPONSE_INODE_CNT:
+
+        if (tmp->inode_cnt_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, STATFS_RESPONSE_INODE_CNT, &tmp->inode_cnt) == -1) {
+          event_warnx("%s: failed to unmarshal inode_cnt", __func__);
+          return (-1);
+        }
+        tmp->inode_cnt_set = 1;
+        break;
+
+      default:
+        return -1;
     }
+  }
 
-    if (statfs_response_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int statfs_response_complete(struct statfs_response *msg)
-{
-    if (!msg->total_space_set)
-        return (-1);
-    if (!msg->avail_space_set)
-        return (-1);
-    if (!msg->inode_cnt_set)
-        return (-1);
-    return (0);
+  if (statfs_response_complete(tmp) == -1)
+    return (-1);
+  return (0);
 }
 
 int
-evtag_unmarshal_statfs_response(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                                struct statfs_response *msg)
+statfs_response_complete(struct statfs_response *msg)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  if (!msg->total_space_set)
+    return (-1);
+  if (!msg->avail_space_set)
+    return (-1);
+  if (!msg->inode_cnt_set)
+    return (-1);
+  return (0);
+}
 
-    struct evbuffer *tmp = evbuffer_new();
+int
+evtag_unmarshal_statfs_response(struct evbuffer *evbuf, ev_uint32_t need_tag, struct statfs_response *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+  struct evbuffer *tmp = evbuffer_new();
 
-    if (statfs_response_unmarshal(msg, tmp) == -1)
-        goto error;
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
 
-    res = 0;
+  if (statfs_response_unmarshal(msg, tmp) == -1)
+    goto error;
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
 }
 
 void
-evtag_marshal_statfs_response(struct evbuffer *evbuf, ev_uint32_t tag,
-                              const struct statfs_response *msg)
+evtag_marshal_statfs_response(struct evbuffer *evbuf, ev_uint32_t tag, const struct statfs_response *msg)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    statfs_response_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  statfs_response_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -4248,130 +4340,194 @@ evtag_marshal_statfs_response(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct mkfs_request_access_ __mkfs_request_base = {
-    mkfs_request_nothing_assign,
-    mkfs_request_nothing_get,
+  mkfs_request_pos_arr_assign,
+  mkfs_request_pos_arr_get,
+  mkfs_request_pos_arr_add,
 };
 
-struct mkfs_request *mkfs_request_new(void)
+struct mkfs_request *
+mkfs_request_new(void)
 {
-    return mkfs_request_new_with_arg(NULL);
+  return mkfs_request_new_with_arg(NULL);
 }
 
-struct mkfs_request *mkfs_request_new_with_arg(void *unused)
+struct mkfs_request *
+mkfs_request_new_with_arg(void *unused)
 {
-    struct mkfs_request *tmp;
-    if ((tmp = malloc(sizeof(struct mkfs_request))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__mkfs_request_base;
+  struct mkfs_request *tmp;
+  if ((tmp = malloc(sizeof(struct mkfs_request))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__mkfs_request_base;
 
-    tmp->nothing = 0;
-    tmp->nothing_set = 0;
+  tmp->pos_arr = NULL;
+  tmp->pos_arr_length = 0;
+  tmp->pos_arr_num_allocated = 0;
+  tmp->pos_arr_set = 0;
 
-    return (tmp);
+  return (tmp);
+}
+
+static int
+mkfs_request_pos_arr_expand_to_hold_more(struct mkfs_request *msg)
+{
+  int tobe_allocated = msg->pos_arr_num_allocated;
+  ev_uint32_t* new_d_ata = NULL;
+  tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
+  new_d_ata = (ev_uint32_t*) realloc(msg->pos_arr,
+      tobe_allocated * sizeof(ev_uint32_t));
+  if (new_d_ata == NULL)
+    return -1;
+  msg->pos_arr = new_d_ata;
+  msg->pos_arr_num_allocated = tobe_allocated;
+  return 0;}
+
+ev_uint32_t *
+mkfs_request_pos_arr_add(struct mkfs_request *msg, const ev_uint32_t value)
+{
+  if (++msg->pos_arr_length >= msg->pos_arr_num_allocated) {
+    if (mkfs_request_pos_arr_expand_to_hold_more(msg)<0)
+      goto error;
+  }
+  msg->pos_arr[msg->pos_arr_length - 1] = value;
+  msg->pos_arr_set = 1;
+  return &(msg->pos_arr[msg->pos_arr_length - 1]);
+error:
+  --msg->pos_arr_length;
+  return (NULL);
 }
 
 int
-mkfs_request_nothing_assign(struct mkfs_request *msg, const ev_uint32_t value)
+mkfs_request_pos_arr_assign(struct mkfs_request *msg, int off,
+    const ev_uint32_t value)
 {
-    msg->nothing_set = 1;
-    msg->nothing = value;
-    return (0);
+  if (!msg->pos_arr_set || off < 0 || off >= msg->pos_arr_length)
+    return (-1);
+
+  {
+    msg->pos_arr[off] = value;
+  }
+  return (0);
 }
 
-int mkfs_request_nothing_get(struct mkfs_request *msg, ev_uint32_t * value)
+int
+mkfs_request_pos_arr_get(struct mkfs_request *msg, int offset,
+    ev_uint32_t *value)
 {
-    if (msg->nothing_set != 1)
-        return (-1);
-    *value = msg->nothing;
-    return (0);
-}
-
-void mkfs_request_clear(struct mkfs_request *tmp)
-{
-    tmp->nothing_set = 0;
-}
-
-void mkfs_request_free(struct mkfs_request *tmp)
-{
-    free(tmp);
+  if (!msg->pos_arr_set || offset < 0 || offset >= msg->pos_arr_length)
+    return (-1);
+  *value = msg->pos_arr[offset];
+  return (0);
 }
 
 void
-mkfs_request_marshal(struct evbuffer *evbuf, const struct mkfs_request *tmp)
+mkfs_request_clear(struct mkfs_request *tmp)
 {
-    if (tmp->nothing_set) {
-        evtag_marshal_int(evbuf, MKFS_REQUEST_NOTHING, tmp->nothing);
-    }
+  if (tmp->pos_arr_set == 1) {
+    free(tmp->pos_arr);
+    tmp->pos_arr = NULL;
+    tmp->pos_arr_set = 0;
+    tmp->pos_arr_length = 0;
+    tmp->pos_arr_num_allocated = 0;
+  }
 }
 
-int mkfs_request_unmarshal(struct mkfs_request *tmp, struct evbuffer *evbuf)
+void
+mkfs_request_free(struct mkfs_request *tmp)
 {
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
+  if (tmp->pos_arr_set == 1) {
+    free(tmp->pos_arr);
+    tmp->pos_arr = NULL;
+    tmp->pos_arr_set = 0;
+    tmp->pos_arr_length = 0;
+    tmp->pos_arr_num_allocated = 0;
+  }
+  free(tmp->pos_arr);
+  free(tmp);
+}
 
-        case MKFS_REQUEST_NOTHING:
+void
+mkfs_request_marshal(struct evbuffer *evbuf, const struct mkfs_request *tmp){
+  if (tmp->pos_arr_set) {
+    {
+      int i;
+      for (i = 0; i < tmp->pos_arr_length; ++i) {
+    evtag_marshal_int(evbuf, MKFS_REQUEST_POS_ARR, tmp->pos_arr[i]);
+      }
+    }
+  }
+}
 
-            if (tmp->nothing_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, MKFS_REQUEST_NOTHING, &tmp->nothing)
-                == -1) {
-                event_warnx("%s: failed to unmarshal nothing", __func__);
-                return (-1);
-            }
-            tmp->nothing_set = 1;
-            break;
+int
+mkfs_request_unmarshal(struct mkfs_request *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
 
-        default:
-            return -1;
+      case MKFS_REQUEST_POS_ARR:
+
+        if (tmp->pos_arr_length >= tmp->pos_arr_num_allocated &&
+            mkfs_request_pos_arr_expand_to_hold_more(tmp) < 0) {
+          puts("HEY NOW");
+          return (-1);
         }
+        if (evtag_unmarshal_int(evbuf, MKFS_REQUEST_POS_ARR, &tmp->pos_arr[tmp->pos_arr_length]) == -1) {
+          event_warnx("%s: failed to unmarshal pos_arr", __func__);
+          return (-1);
+        }
+        ++tmp->pos_arr_length;
+        tmp->pos_arr_set = 1;
+        break;
+
+      default:
+        return -1;
     }
+  }
 
-    if (mkfs_request_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int mkfs_request_complete(struct mkfs_request *msg)
-{
-    return (0);
+  if (mkfs_request_complete(tmp) == -1)
+    return (-1);
+  return (0);
 }
 
 int
-evtag_unmarshal_mkfs_request(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                             struct mkfs_request *msg)
+mkfs_request_complete(struct mkfs_request *msg)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  return (0);
+}
 
-    struct evbuffer *tmp = evbuffer_new();
+int
+evtag_unmarshal_mkfs_request(struct evbuffer *evbuf, ev_uint32_t need_tag, struct mkfs_request *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+  struct evbuffer *tmp = evbuffer_new();
 
-    if (mkfs_request_unmarshal(msg, tmp) == -1)
-        goto error;
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
 
-    res = 0;
+  if (mkfs_request_unmarshal(msg, tmp) == -1)
+    goto error;
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
 }
 
 void
-evtag_marshal_mkfs_request(struct evbuffer *evbuf, ev_uint32_t tag,
-                           const struct mkfs_request *msg)
+evtag_marshal_mkfs_request(struct evbuffer *evbuf, ev_uint32_t tag, const struct mkfs_request *msg)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    mkfs_request_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  mkfs_request_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
 
 /*
@@ -4379,128 +4535,133 @@ evtag_marshal_mkfs_request(struct evbuffer *evbuf, ev_uint32_t tag,
  */
 
 static struct mkfs_response_access_ __mkfs_response_base = {
-    mkfs_response_nothing_assign,
-    mkfs_response_nothing_get,
+  mkfs_response_rst_assign,
+  mkfs_response_rst_get,
 };
 
-struct mkfs_response *mkfs_response_new(void)
+struct mkfs_response *
+mkfs_response_new(void)
 {
-    return mkfs_response_new_with_arg(NULL);
+  return mkfs_response_new_with_arg(NULL);
 }
 
-struct mkfs_response *mkfs_response_new_with_arg(void *unused)
+struct mkfs_response *
+mkfs_response_new_with_arg(void *unused)
 {
-    struct mkfs_response *tmp;
-    if ((tmp = malloc(sizeof(struct mkfs_response))) == NULL) {
-        event_warn("%s: malloc", __func__);
-        return (NULL);
-    }
-    tmp->base = &__mkfs_response_base;
+  struct mkfs_response *tmp;
+  if ((tmp = malloc(sizeof(struct mkfs_response))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__mkfs_response_base;
 
-    tmp->nothing = 0;
-    tmp->nothing_set = 0;
+  tmp->rst = 0;
+  tmp->rst_set = 0;
 
-    return (tmp);
+  return (tmp);
+}
+
+
+int
+mkfs_response_rst_assign(struct mkfs_response *msg, const ev_uint32_t value)
+{
+  msg->rst_set = 1;
+  msg->rst = value;
+  return (0);
 }
 
 int
-mkfs_response_nothing_assign(struct mkfs_response *msg, const ev_uint32_t value)
+mkfs_response_rst_get(struct mkfs_response *msg, ev_uint32_t *value)
 {
-    msg->nothing_set = 1;
-    msg->nothing = value;
-    return (0);
-}
-
-int mkfs_response_nothing_get(struct mkfs_response *msg, ev_uint32_t * value)
-{
-    if (msg->nothing_set != 1)
-        return (-1);
-    *value = msg->nothing;
-    return (0);
-}
-
-void mkfs_response_clear(struct mkfs_response *tmp)
-{
-    tmp->nothing_set = 0;
-}
-
-void mkfs_response_free(struct mkfs_response *tmp)
-{
-    free(tmp);
+  if (msg->rst_set != 1)
+    return (-1);
+  *value = msg->rst;
+  return (0);
 }
 
 void
-mkfs_response_marshal(struct evbuffer *evbuf, const struct mkfs_response *tmp)
+mkfs_response_clear(struct mkfs_response *tmp)
 {
-    if (tmp->nothing_set) {
-        evtag_marshal_int(evbuf, MKFS_RESPONSE_NOTHING, tmp->nothing);
-    }
+  tmp->rst_set = 0;
 }
 
-int mkfs_response_unmarshal(struct mkfs_response *tmp, struct evbuffer *evbuf)
+void
+mkfs_response_free(struct mkfs_response *tmp)
 {
-    ev_uint32_t tag;
-    while (evbuffer_get_length(evbuf) > 0) {
-        if (evtag_peek(evbuf, &tag) == -1)
-            return (-1);
-        switch (tag) {
+  free(tmp);
+}
 
-        case MKFS_RESPONSE_NOTHING:
+void
+mkfs_response_marshal(struct evbuffer *evbuf, const struct mkfs_response *tmp){
+  if (tmp->rst_set) {
+    evtag_marshal_int(evbuf, MKFS_RESPONSE_RST, tmp->rst);
+  }
+}
 
-            if (tmp->nothing_set)
-                return (-1);
-            if (evtag_unmarshal_int(evbuf, MKFS_RESPONSE_NOTHING, &tmp->nothing)
-                == -1) {
-                event_warnx("%s: failed to unmarshal nothing", __func__);
-                return (-1);
-            }
-            tmp->nothing_set = 1;
-            break;
+int
+mkfs_response_unmarshal(struct mkfs_response *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
 
-        default:
-            return -1;
+      case MKFS_RESPONSE_RST:
+
+        if (tmp->rst_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, MKFS_RESPONSE_RST, &tmp->rst) == -1) {
+          event_warnx("%s: failed to unmarshal rst", __func__);
+          return (-1);
         }
+        tmp->rst_set = 1;
+        break;
+
+      default:
+        return -1;
     }
+  }
 
-    if (mkfs_response_complete(tmp) == -1)
-        return (-1);
-    return (0);
-}
-
-int mkfs_response_complete(struct mkfs_response *msg)
-{
-    return (0);
+  if (mkfs_response_complete(tmp) == -1)
+    return (-1);
+  return (0);
 }
 
 int
-evtag_unmarshal_mkfs_response(struct evbuffer *evbuf, ev_uint32_t need_tag,
-                              struct mkfs_response *msg)
+mkfs_response_complete(struct mkfs_response *msg)
 {
-    ev_uint32_t tag;
-    int res = -1;
+  return (0);
+}
 
-    struct evbuffer *tmp = evbuffer_new();
+int
+evtag_unmarshal_mkfs_response(struct evbuffer *evbuf, ev_uint32_t need_tag, struct mkfs_response *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
 
-    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
-        goto error;
+  struct evbuffer *tmp = evbuffer_new();
 
-    if (mkfs_response_unmarshal(msg, tmp) == -1)
-        goto error;
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
 
-    res = 0;
+  if (mkfs_response_unmarshal(msg, tmp) == -1)
+    goto error;
 
-  error:
-    evbuffer_free(tmp);
-    return (res);
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
 }
 
 void
-evtag_marshal_mkfs_response(struct evbuffer *evbuf, ev_uint32_t tag,
-                            const struct mkfs_response *msg)
+evtag_marshal_mkfs_response(struct evbuffer *evbuf, ev_uint32_t tag, const struct mkfs_response *msg)
 {
-    struct evbuffer *_buf = evbuffer_new();
-    assert(_buf != NULL);
-    mkfs_response_marshal(_buf, msg);
-    evtag_marshal_buffer(evbuf, tag, _buf);
-    evbuffer_free(_buf);
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  mkfs_response_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
 }
+
