@@ -5,7 +5,7 @@
 
 void mds_conn_init(void);
 
-int ls_send_request(uint64_t ino, struct file_stat **o_stat_arr, int * o_cnt);
+int ls_send_request(uint64_t ino, struct file_stat **o_stat_arr, int *o_cnt);
 
 int stat_send_request(uint64_t * ino_arr, int len, struct file_stat *stat_arr);
 

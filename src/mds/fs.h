@@ -53,11 +53,9 @@ typedef struct _fsnode {
 //#define TYPE_SOCKET           's'
 //#define TYPE_UNKNOWN          '?'
 
-
 #define NODEHASHBITS (22)
 #define NODEHASHSIZE (1<<NODEHASHBITS)
 #define NODEHASHPOS(nodeid) ((nodeid)&(NODEHASHSIZE-1))
-
 
 fsnode *fsnode_new();
 
@@ -79,6 +77,7 @@ fsnode *fs_lookup(uint64_t parent_ino, char *name);
 fsnode *fs_ls(uint64_t ino);
 
 void fs_statfs(int *total_space, int *avail_space, int *inode_cnt);
+int fs_mkfs();
 
 int fs_rename();
 int fs_get_goal();

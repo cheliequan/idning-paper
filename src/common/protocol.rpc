@@ -21,8 +21,8 @@ struct pong {
 }
 
 struct file_stat {
-    int64   ino                           = 1;
-    int64   size                          = 2;
+    int64   ino                         = 1;
+    int64   size                        = 2;
     optional int   type                 = 3;
     optional string name                = 4;
     optional int   mode                 = 5;
@@ -34,7 +34,7 @@ struct file_stat {
 }
 
 struct stat_request {
-    array int64 ino_arr                   = 1;
+    array int64 ino_arr                 = 1;
 }
 
 struct stat_response {
@@ -51,7 +51,7 @@ struct setattr_response {
 }
 
 struct ls_request {
-    array int64 ino_arr                   = 1;
+    array int64 ino_arr                 = 1;
 }
 
 struct ls_response {
@@ -60,7 +60,7 @@ struct ls_response {
 
 /*create & mkdir*/
 struct mknod_request {
-    int64 parent_ino                      = 1;
+    int64 parent_ino                    = 1;
     string name                         = 2;
     int type                            = 3;
     optional int mode                   = 4;
@@ -71,7 +71,7 @@ struct mknod_response {
 }
 
 struct lookup_request {
-    int64 parent_ino                      = 1;
+    int64 parent_ino                    = 1;
     string name                         = 2;
 }
 
@@ -81,23 +81,31 @@ struct lookup_response {
 
 
 struct unlink_request {
-    int64 parent_ino                      = 1;
+    int64 parent_ino                    = 1;
     string name                         = 2;
 }
 
 struct unlink_response {
-    optional int64 ino                             = 1;
+    optional int64 ino                  = 1;
 }
 
 
 struct statfs_request {
-    optional int nothing                         = 1;
+    optional int nothing                = 1;
 }
 
 struct statfs_response {
     int total_space                     = 1;
     int avail_space                     = 2;
-    int inode_cnt                        = 3;
+    int inode_cnt                       = 3;
+}
+
+struct mkfs_request {
+    optional int nothing                = 1;
+}
+
+struct mkfs_response {
+    optional int nothing                = 1;
 }
 
 

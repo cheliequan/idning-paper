@@ -26,6 +26,8 @@ struct unlink_request;
 struct unlink_response;
 struct statfs_request;
 struct statfs_response;
+struct mkfs_request;
+struct mkfs_response;
 
 /* Tag definition for ping */
 enum ping_ {
@@ -895,5 +897,75 @@ int statfs_response_inode_cnt_assign(struct statfs_response *,
                                      const ev_uint32_t);
 int statfs_response_inode_cnt_get(struct statfs_response *, ev_uint32_t *);
 /* --- statfs_response done --- */
+
+/* Tag definition for mkfs_request */
+enum mkfs_request_ {
+    MKFS_REQUEST_NOTHING = 1,
+    MKFS_REQUEST_MAX_TAGS
+};
+
+/* Structure declaration for mkfs_request */
+struct mkfs_request_access_ {
+    int (*nothing_assign) (struct mkfs_request *, const ev_uint32_t);
+    int (*nothing_get) (struct mkfs_request *, ev_uint32_t *);
+};
+
+struct mkfs_request {
+    struct mkfs_request_access_ *base;
+
+    ev_uint32_t nothing;
+
+    ev_uint8_t nothing_set;
+};
+
+struct mkfs_request *mkfs_request_new(void);
+struct mkfs_request *mkfs_request_new_with_arg(void *);
+void mkfs_request_free(struct mkfs_request *);
+void mkfs_request_clear(struct mkfs_request *);
+void mkfs_request_marshal(struct evbuffer *, const struct mkfs_request *);
+int mkfs_request_unmarshal(struct mkfs_request *, struct evbuffer *);
+int mkfs_request_complete(struct mkfs_request *);
+void evtag_marshal_mkfs_request(struct evbuffer *, ev_uint32_t,
+                                const struct mkfs_request *);
+int evtag_unmarshal_mkfs_request(struct evbuffer *, ev_uint32_t,
+                                 struct mkfs_request *);
+int mkfs_request_nothing_assign(struct mkfs_request *, const ev_uint32_t);
+int mkfs_request_nothing_get(struct mkfs_request *, ev_uint32_t *);
+/* --- mkfs_request done --- */
+
+/* Tag definition for mkfs_response */
+enum mkfs_response_ {
+    MKFS_RESPONSE_NOTHING = 1,
+    MKFS_RESPONSE_MAX_TAGS
+};
+
+/* Structure declaration for mkfs_response */
+struct mkfs_response_access_ {
+    int (*nothing_assign) (struct mkfs_response *, const ev_uint32_t);
+    int (*nothing_get) (struct mkfs_response *, ev_uint32_t *);
+};
+
+struct mkfs_response {
+    struct mkfs_response_access_ *base;
+
+    ev_uint32_t nothing;
+
+    ev_uint8_t nothing_set;
+};
+
+struct mkfs_response *mkfs_response_new(void);
+struct mkfs_response *mkfs_response_new_with_arg(void *);
+void mkfs_response_free(struct mkfs_response *);
+void mkfs_response_clear(struct mkfs_response *);
+void mkfs_response_marshal(struct evbuffer *, const struct mkfs_response *);
+int mkfs_response_unmarshal(struct mkfs_response *, struct evbuffer *);
+int mkfs_response_complete(struct mkfs_response *);
+void evtag_marshal_mkfs_response(struct evbuffer *, ev_uint32_t,
+                                 const struct mkfs_response *);
+int evtag_unmarshal_mkfs_response(struct evbuffer *, ev_uint32_t,
+                                  struct mkfs_response *);
+int mkfs_response_nothing_assign(struct mkfs_response *, const ev_uint32_t);
+int mkfs_response_nothing_get(struct mkfs_response *, ev_uint32_t *);
+/* --- mkfs_response done --- */
 
 #endif /* _COMMON_PROTOCOL_RPC_ */

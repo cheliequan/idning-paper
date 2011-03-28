@@ -4242,3 +4242,265 @@ evtag_marshal_statfs_response(struct evbuffer *evbuf, ev_uint32_t tag,
     evtag_marshal_buffer(evbuf, tag, _buf);
     evbuffer_free(_buf);
 }
+
+/*
+ * Implementation of mkfs_request
+ */
+
+static struct mkfs_request_access_ __mkfs_request_base = {
+    mkfs_request_nothing_assign,
+    mkfs_request_nothing_get,
+};
+
+struct mkfs_request *mkfs_request_new(void)
+{
+    return mkfs_request_new_with_arg(NULL);
+}
+
+struct mkfs_request *mkfs_request_new_with_arg(void *unused)
+{
+    struct mkfs_request *tmp;
+    if ((tmp = malloc(sizeof(struct mkfs_request))) == NULL) {
+        event_warn("%s: malloc", __func__);
+        return (NULL);
+    }
+    tmp->base = &__mkfs_request_base;
+
+    tmp->nothing = 0;
+    tmp->nothing_set = 0;
+
+    return (tmp);
+}
+
+int
+mkfs_request_nothing_assign(struct mkfs_request *msg, const ev_uint32_t value)
+{
+    msg->nothing_set = 1;
+    msg->nothing = value;
+    return (0);
+}
+
+int mkfs_request_nothing_get(struct mkfs_request *msg, ev_uint32_t * value)
+{
+    if (msg->nothing_set != 1)
+        return (-1);
+    *value = msg->nothing;
+    return (0);
+}
+
+void mkfs_request_clear(struct mkfs_request *tmp)
+{
+    tmp->nothing_set = 0;
+}
+
+void mkfs_request_free(struct mkfs_request *tmp)
+{
+    free(tmp);
+}
+
+void
+mkfs_request_marshal(struct evbuffer *evbuf, const struct mkfs_request *tmp)
+{
+    if (tmp->nothing_set) {
+        evtag_marshal_int(evbuf, MKFS_REQUEST_NOTHING, tmp->nothing);
+    }
+}
+
+int mkfs_request_unmarshal(struct mkfs_request *tmp, struct evbuffer *evbuf)
+{
+    ev_uint32_t tag;
+    while (evbuffer_get_length(evbuf) > 0) {
+        if (evtag_peek(evbuf, &tag) == -1)
+            return (-1);
+        switch (tag) {
+
+        case MKFS_REQUEST_NOTHING:
+
+            if (tmp->nothing_set)
+                return (-1);
+            if (evtag_unmarshal_int(evbuf, MKFS_REQUEST_NOTHING, &tmp->nothing)
+                == -1) {
+                event_warnx("%s: failed to unmarshal nothing", __func__);
+                return (-1);
+            }
+            tmp->nothing_set = 1;
+            break;
+
+        default:
+            return -1;
+        }
+    }
+
+    if (mkfs_request_complete(tmp) == -1)
+        return (-1);
+    return (0);
+}
+
+int mkfs_request_complete(struct mkfs_request *msg)
+{
+    return (0);
+}
+
+int
+evtag_unmarshal_mkfs_request(struct evbuffer *evbuf, ev_uint32_t need_tag,
+                             struct mkfs_request *msg)
+{
+    ev_uint32_t tag;
+    int res = -1;
+
+    struct evbuffer *tmp = evbuffer_new();
+
+    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+        goto error;
+
+    if (mkfs_request_unmarshal(msg, tmp) == -1)
+        goto error;
+
+    res = 0;
+
+  error:
+    evbuffer_free(tmp);
+    return (res);
+}
+
+void
+evtag_marshal_mkfs_request(struct evbuffer *evbuf, ev_uint32_t tag,
+                           const struct mkfs_request *msg)
+{
+    struct evbuffer *_buf = evbuffer_new();
+    assert(_buf != NULL);
+    mkfs_request_marshal(_buf, msg);
+    evtag_marshal_buffer(evbuf, tag, _buf);
+    evbuffer_free(_buf);
+}
+
+/*
+ * Implementation of mkfs_response
+ */
+
+static struct mkfs_response_access_ __mkfs_response_base = {
+    mkfs_response_nothing_assign,
+    mkfs_response_nothing_get,
+};
+
+struct mkfs_response *mkfs_response_new(void)
+{
+    return mkfs_response_new_with_arg(NULL);
+}
+
+struct mkfs_response *mkfs_response_new_with_arg(void *unused)
+{
+    struct mkfs_response *tmp;
+    if ((tmp = malloc(sizeof(struct mkfs_response))) == NULL) {
+        event_warn("%s: malloc", __func__);
+        return (NULL);
+    }
+    tmp->base = &__mkfs_response_base;
+
+    tmp->nothing = 0;
+    tmp->nothing_set = 0;
+
+    return (tmp);
+}
+
+int
+mkfs_response_nothing_assign(struct mkfs_response *msg, const ev_uint32_t value)
+{
+    msg->nothing_set = 1;
+    msg->nothing = value;
+    return (0);
+}
+
+int mkfs_response_nothing_get(struct mkfs_response *msg, ev_uint32_t * value)
+{
+    if (msg->nothing_set != 1)
+        return (-1);
+    *value = msg->nothing;
+    return (0);
+}
+
+void mkfs_response_clear(struct mkfs_response *tmp)
+{
+    tmp->nothing_set = 0;
+}
+
+void mkfs_response_free(struct mkfs_response *tmp)
+{
+    free(tmp);
+}
+
+void
+mkfs_response_marshal(struct evbuffer *evbuf, const struct mkfs_response *tmp)
+{
+    if (tmp->nothing_set) {
+        evtag_marshal_int(evbuf, MKFS_RESPONSE_NOTHING, tmp->nothing);
+    }
+}
+
+int mkfs_response_unmarshal(struct mkfs_response *tmp, struct evbuffer *evbuf)
+{
+    ev_uint32_t tag;
+    while (evbuffer_get_length(evbuf) > 0) {
+        if (evtag_peek(evbuf, &tag) == -1)
+            return (-1);
+        switch (tag) {
+
+        case MKFS_RESPONSE_NOTHING:
+
+            if (tmp->nothing_set)
+                return (-1);
+            if (evtag_unmarshal_int(evbuf, MKFS_RESPONSE_NOTHING, &tmp->nothing)
+                == -1) {
+                event_warnx("%s: failed to unmarshal nothing", __func__);
+                return (-1);
+            }
+            tmp->nothing_set = 1;
+            break;
+
+        default:
+            return -1;
+        }
+    }
+
+    if (mkfs_response_complete(tmp) == -1)
+        return (-1);
+    return (0);
+}
+
+int mkfs_response_complete(struct mkfs_response *msg)
+{
+    return (0);
+}
+
+int
+evtag_unmarshal_mkfs_response(struct evbuffer *evbuf, ev_uint32_t need_tag,
+                              struct mkfs_response *msg)
+{
+    ev_uint32_t tag;
+    int res = -1;
+
+    struct evbuffer *tmp = evbuffer_new();
+
+    if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+        goto error;
+
+    if (mkfs_response_unmarshal(msg, tmp) == -1)
+        goto error;
+
+    res = 0;
+
+  error:
+    evbuffer_free(tmp);
+    return (res);
+}
+
+void
+evtag_marshal_mkfs_response(struct evbuffer *evbuf, ev_uint32_t tag,
+                            const struct mkfs_response *msg)
+{
+    struct evbuffer *_buf = evbuffer_new();
+    assert(_buf != NULL);
+    mkfs_response_marshal(_buf, msg);
+    evtag_marshal_buffer(evbuf, tag, _buf);
+    evbuffer_free(_buf);
+}

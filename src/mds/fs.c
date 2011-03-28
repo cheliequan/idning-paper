@@ -1,6 +1,5 @@
 #include "fs.h"
 static uint64_t cur_ino = 3;
-static fsnode *root;
 static fsnode *nodehash[NODEHASHSIZE];
 static uint64_t version;
 
@@ -99,31 +98,17 @@ inline fsnode *fsnode_new()
 int fs_init()
 {
     DBG();
-    root = fsnode_new();
-    root->ino = 1;
-    root->mode = S_IFDIR;
-    root->name = "/";
-    root->nlen = strlen(root->name);
-    root->parent = root;
-    root->data.ddata.children = NULL;
 
-    fsnode_hash_insert(root);
+    fsnode *vroot;              // for those fsnode whose parent is not in the same mds
+    vroot = fsnode_new();
+    vroot->ino = 0;
+    vroot->mode = S_IFDIR;
+    vroot->name = "-";
+    vroot->nlen = strlen(vroot->name);
+    vroot->parent = vroot;
+    vroot->data.ddata.children = NULL;
 
-    //fsnode * n = fsnode_hash_find(1);
-
-    //fsnode * node2 = fsnode_new();
-    //node2 -> ino = 2;
-    //node2 -> name = "hello_";
-    //node2 -> mode = S_IFREG;
-    //node2 -> nlen = strlen(node2->name);
-    //node2 -> parent = root;
-    //node2 -> data.fdata.length = 10;
-
-    //fsnode_hash_insert(node2);
-    //fsnode_tree_insert(root, node2);
-
-    //fsnode * node3 = fsnode_tree_find(root, 2);
-
+    fsnode_hash_insert(vroot);
     return 0;
 }
 
@@ -133,7 +118,7 @@ int fs_setattr(uint64_t ino, struct file_stat *st)
 
     fsnode *n = fsnode_hash_find(ino);
     n->data.fdata.length = st->size;
-    version ++;
+    version++;
     return 0;
 }
 
@@ -196,7 +181,7 @@ fsnode *fs_unlink(uint64_t parent_ino, char *name)
     fsnode_tree_remove(s);
     fsnode_hash_remove(s);
     free(s);
-    version ++;
+    version++;
     return NULL;
 }
 
@@ -222,8 +207,29 @@ fsnode *fs_mknod(uint64_t parent_ino, char *name, int type, int mode)
 
     fsnode_hash_insert(n);
     fsnode_tree_insert(n->parent, n);
-    version ++;
+    version++;
     return n;
+}
+
+/*
+ * make root of a whole fs, call by mkfs.sfs
+ * */
+int fs_mkfs()
+{
+    DBG();
+
+    fsnode *root;               // for those fsnode whose parent is not in the same mds
+    root = fsnode_new();
+    root->ino = 1;
+    root->mode = S_IFDIR;
+    root->name = "/";
+    root->nlen = strlen(root->name);
+    root->parent = root;
+    root->data.ddata.children = NULL;
+
+    fsnode_hash_insert(root);
+
+    return 0;
 }
 
 void fs_statfs(int *total_space, int *avail_space, int *inode_cnt)

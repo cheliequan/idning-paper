@@ -22,8 +22,8 @@ int setattr_send_request(struct file_stat *stat_arr)
     struct setattr_response *response = setattr_response_new();
 
     struct file_stat *t = EVTAG_ARRAY_ADD(req, stat_arr);
-    EVTAG_ASSIGN(t, ino, stat_arr->ino);    
-    EVTAG_ASSIGN(t, size, stat_arr->size);  
+    EVTAG_ASSIGN(t, ino, stat_arr->ino);
+    EVTAG_ASSIGN(t, size, stat_arr->size);
 
     general_req("127.0.0.1", 9528, "/.rpc.rpc_setattr",
                 req, (marshal_func) setattr_request_marshal,
@@ -75,7 +75,7 @@ int stat_send_request(uint64_t * ino_arr, int len, struct file_stat *stat_arr)
 }
 
 //seams same as stat_send_request
-int ls_send_request(uint64_t ino, struct file_stat **o_stat_arr, int * o_cnt)
+int ls_send_request(uint64_t ino, struct file_stat **o_stat_arr, int *o_cnt)
 {
     DBG();
     struct ls_request *req = ls_request_new();
@@ -89,19 +89,19 @@ int ls_send_request(uint64_t ino, struct file_stat **o_stat_arr, int * o_cnt)
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
 
     int i;
-    struct file_stat * stat_arr = calloc(sizeof(struct file_stat), cnt);
+    struct file_stat *stat_arr = calloc(sizeof(struct file_stat), cnt);
 
     struct file_stat *stat = file_stat_new();
-    
+
     for (i = 0; i < cnt; i++) {
         EVTAG_ARRAY_GET(response, stat_arr, i, &stat);
-        file_stat_copy(stat_arr+i, stat);
+        file_stat_copy(stat_arr + i, stat);
     }
     ls_request_free(req);
     ls_response_free(response);
 
-    * o_stat_arr = stat_arr;
-    * o_cnt = cnt;
+    *o_stat_arr = stat_arr;
+    *o_cnt = cnt;
 
     return cnt;
 }
@@ -138,7 +138,7 @@ static void file_stat_copy(struct file_stat *dst, struct file_stat *src)
     dst->type = src->type;
     dst->mode = src->mode;
     if (src->name)
-        dst->name = strdup(src->name); //FIXME : free me!
+        dst->name = strdup(src->name);  //FIXME : free me!
 
     int len = EVTAG_ARRAY_LEN(src, pos_arr);
     int i = 0, pos;
