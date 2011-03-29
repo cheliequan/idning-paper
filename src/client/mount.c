@@ -38,13 +38,8 @@ static int sfs_stat(fuse_ino_t ino, struct stat *stbuf)
         stbuf->st_size = stat->size;
         stbuf->st_blksize = 1024 * 1024 * 1024;
         stbuf->st_mode = stat->mode | 0777;
-        int pos1 = stat->pos_arr[0];
-        int pos2 = stat->pos_arr[1];
 
-        logging(LOG_DEUBG,
-                "stat (ino = %lu) return {size: %" PRIu64
-                ", mode: %04o, pos at [%d, %d] }", ino, stbuf->st_size,
-                stbuf->st_mode, pos1, pos2);
+        log_file_stat("stat return :", stat);
         stbuf->st_nlink = 1;
     }
     file_stat_free(stat);
@@ -129,18 +124,16 @@ static void sfs_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     logging(LOG_DEUBG, "readdir(ino = %lu)", ino);
     (void)fi;
 
-    struct file_stat *stat_arr;
+    struct file_stat **stat_arr;
     int cnt;
     ls_send_request(ino, &stat_arr, &cnt);
     int i;
     struct dirbuf b;
     memset(&b, 0, sizeof(b));
     for (i = 0; i < cnt; i++) {
-        logging(LOG_DEUBG,
-                "readdir(parent = %lu) return {ino: %lu, name : %s, mode: %04o}",
-                ino, stat_arr[i].ino, stat_arr[i].name, stat_arr[i].mode);
-        dirbuf_add(req, &b, stat_arr[i].name, stat_arr[i].mode,
-                   stat_arr[i].ino);
+        log_file_stat("readdir return :", stat_arr[i]);
+        dirbuf_add(req, &b, stat_arr[i]->name, stat_arr[i]->mode,
+                   stat_arr[i]->ino);
     }
 
     reply_buf_limited(req, b.p, b.size, off, size);
@@ -286,7 +279,7 @@ void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
     if (sfs_stat((uint64_t) ino, &stbuf) == -1)
         fuse_reply_err(req, ENOENT);
 
-    struct file_stat *f_stat = file_stat_new();
+    struct file_stat *f_stat = attr_cache_lookup((uint64_t)ino);
     if (stbuf.st_size < sizenow) {
         //修改文件size
         f_stat->ino = ino;
@@ -295,7 +288,6 @@ void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
         setattr_send_request(f_stat);
     }
 
-    file_stat_free(f_stat);
     fuse_reply_err(req, err);
 }
 
@@ -307,6 +299,10 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
     struct fuse_entry_param e;
     struct file_stat *stat = file_stat_new();
     mknod_send_request(parent, name, 0, S_IFREG, stat);
+
+//FIXME  add cache
+    log_file_stat("create return :", stat);
+    attr_cache_add(stat); //no free
 
     memset(&e, 0, sizeof(e));
     e.ino = stat->ino;
@@ -332,6 +328,9 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
     struct file_stat *stat = file_stat_new();
     mknod_send_request(parent, name, 0, S_IFDIR, stat);
 
+    log_file_stat("create return :", stat);
+    attr_cache_add(stat); //no free
+
     memset(&e, 0, sizeof(e));
     e.ino = stat->ino;
     e.attr_timeout = 0.0;
@@ -342,7 +341,7 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
     if (fuse_reply_entry(req, &e) == -ENOENT) {
 
     }
-    file_stat_free(stat);
+    /*file_stat_free(stat);*/
 }
 
 static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
@@ -430,10 +429,10 @@ void sfs_mkfs(){
         logging(LOG_WARN, "we need at least 2 mds !, fs not mk");
         return;
     }
-    if(find_root()){
-        logging(LOG_WARN, "fs is not null!!! can't do mkfs");
-        return ;
-    }
+    /*if(find_root()){*/
+        /*logging(LOG_WARN, "fs is not null!!! can't do mkfs");*/
+        /*return ;*/
+    /*}*/
     mkfs_send_request(mds[0], mds[1]);
 }
 #undef RST_FOUND
@@ -467,6 +466,7 @@ int main(int argc, char *argv[])
 {
     init_app(argc, argv, "client");
     mds_conn_init();
+    attr_cache_init();
     if (!find_root()){
         sfs_mkfs();
         find_root();
@@ -478,10 +478,11 @@ int main(int argc, char *argv[])
 
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
     struct fuse_chan *ch;
-    char *mountpoint;
+    char *mountpoint = "/tmp/a";
     int err = -1;
 
-    if (fuse_parse_cmdline(&args, &mountpoint, NULL, NULL) != -1 &&
+    //if (fuse_parse_cmdline(&args, &mountpoint, NULL, NULL) != -1 &&
+    if (fuse_parse_cmdline(&args, NULL, NULL, NULL) != -1 &&
         (ch = fuse_mount(mountpoint, &args)) != NULL) {
         struct fuse_session *se;
 

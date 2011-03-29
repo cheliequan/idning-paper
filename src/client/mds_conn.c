@@ -13,6 +13,7 @@ static void general_req(char *ip, int port, const char *rpcname,
 
 static void rpc_request_gen_cb(struct evhttp_request *req, void *arg);
 static void file_stat_copy(struct file_stat *dst, struct file_stat *src);
+static int get_mid_of_ino(int ino);
 
 ///////////////////
 int setattr_send_request(struct file_stat *stat_arr)
@@ -26,7 +27,10 @@ int setattr_send_request(struct file_stat *stat_arr)
     EVTAG_ASSIGN(t, ino, stat_arr->ino);
     EVTAG_ASSIGN(t, size, stat_arr->size);
 
-    general_req("127.0.0.1", 9528, "/.rpc.rpc_setattr",
+    int mid = get_mid_of_ino(stat_arr->parent_ino);
+    struct machine * m = cluster_get_machine_by_mid(mid);
+
+    general_req(m->ip, m->port, "/.rpc.rpc_setattr",
                 req, (marshal_func) setattr_request_marshal,
                 response, (unmarshal_func) setattr_response_unmarshal);
 
@@ -81,13 +85,14 @@ int stat_send_request(uint64_t * ino_arr, int len, struct file_stat *stat_arr)
 {
     // it MUST be int the attr_cache
     struct file_stat * cached = attr_cache_lookup(ino_arr[0]);
+    assert(cached);
     file_stat_copy(stat_arr, cached);
     return 0;
 
 }
 
 //seams same as stat_send_request
-int ls_send_request(uint64_t ino, struct file_stat **o_stat_arr, int *o_cnt)
+int ls_send_request(uint64_t ino, struct file_stat ***o_stat_arr, int *o_cnt)
 {
     DBG();
     struct ls_request *req = ls_request_new();
@@ -95,19 +100,28 @@ int ls_send_request(uint64_t ino, struct file_stat **o_stat_arr, int *o_cnt)
 
     EVTAG_ARRAY_ADD_VALUE(req, ino_arr, ino);
 
-    general_req("127.0.0.1", 9528, "/.rpc.rpc_ls",
+    int mid = get_mid_of_ino(ino);
+    struct machine * m = cluster_get_machine_by_mid(mid);
+
+    general_req(m->ip, m->port, "/.rpc.rpc_ls",
                 req, (marshal_func) ls_request_marshal,
                 response, (unmarshal_func) ls_response_unmarshal);
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
 
     int i;
-    struct file_stat *stat_arr = calloc(sizeof(struct file_stat), cnt);
+    struct file_stat **stat_arr = malloc(sizeof(void*) * cnt);
+        // calloc(sizeof(struct file_stat), cnt);
+    for (i=0; i<cnt; i++)
+        stat_arr[i] = file_stat_new();
 
-    struct file_stat *stat = file_stat_new();
+    struct file_stat *stat ;
 
     for (i = 0; i < cnt; i++) {
         EVTAG_ARRAY_GET(response, stat_arr, i, &stat);
-        file_stat_copy(stat_arr + i, stat);
+        file_stat_copy(stat_arr [i], stat);
+        log_file_stat("ls get : ", stat);
+        if (( strcmp(stat->name, ".") != 0) && (strcmp(stat->name, "..")!=0 ) )
+            attr_cache_add(stat_arr[i]);
     }
     ls_request_free(req);
     ls_response_free(response);
@@ -130,13 +144,20 @@ int mknod_send_request(uint64_t parent_ino, const char *name, int type,
     EVTAG_ASSIGN(req, type, type);
     EVTAG_ASSIGN(req, mode, mode);
 
-    general_req("127.0.0.1", 9528, "/.rpc.rpc_mknod",
+    int mid = get_mid_of_ino(parent_ino);
+    struct machine * m = cluster_get_machine_by_mid(mid);
+
+    general_req(m->ip, m->port, "/.rpc.rpc_mknod",
                 req, (marshal_func) mknod_request_marshal,
                 response, (unmarshal_func) mknod_response_unmarshal);
 
     struct file_stat *stat;
     EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
     file_stat_copy(o_stat, stat);
+
+    struct file_stat * new_stat = file_stat_new();
+    file_stat_copy(new_stat, stat);
+    attr_cache_add(new_stat);
 
     mknod_request_free(req);
     mknod_response_free(response);
@@ -149,6 +170,7 @@ static void file_stat_copy(struct file_stat *dst, struct file_stat *src)
     dst->ino = src->ino;
     dst->type = src->type;
     dst->mode = src->mode;
+    dst->parent_ino = src->parent_ino ;
     if (src->name)
         dst->name = strdup(src->name);  //FIXME : free me!
 
@@ -160,17 +182,40 @@ static void file_stat_copy(struct file_stat *dst, struct file_stat *src)
     }
 }
 
+static int get_mid_of_ino(int ino){
+
+    struct file_stat * cached = attr_cache_lookup(ino);
+    if (cached == NULL){
+        /*cached = find_in_all();*/
+        assert(0);
+    }
+    if (cached == NULL){
+        // return err
+        assert(0);
+
+    }
+    
+    
+    
+    int mid = cached->pos_arr[0];
+    return mid;
+}
+
 int lookup_send_request(uint64_t parent_ino, const char *name,
                         struct file_stat *o_stat)
 {
     DBG();
     struct lookup_request *req = lookup_request_new();
 
+    int mid = get_mid_of_ino(parent_ino);
+    struct machine * m = cluster_get_machine_by_mid(mid);
+
+
     struct lookup_response *response = lookup_response_new();
     EVTAG_ASSIGN(req, parent_ino, parent_ino);
     EVTAG_ASSIGN(req, name, name);
 
-    general_req("127.0.0.1", 9528, "/.rpc.rpc_lookup",
+    general_req(m->ip, m->port, "/.rpc.rpc_lookup",
                 req, (marshal_func) lookup_request_marshal,
                 response, (unmarshal_func) lookup_response_unmarshal);
 
@@ -178,6 +223,13 @@ int lookup_send_request(uint64_t parent_ino, const char *name,
     EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
     o_stat->size = stat->size;
     o_stat->ino = stat->ino;
+
+
+    if(stat->ino != 0){
+        struct file_stat * new_stat = file_stat_new();
+        file_stat_copy(new_stat, stat);
+        attr_cache_add(new_stat);
+    }
 
     lookup_request_free(req);
     lookup_response_free(response);
@@ -193,7 +245,10 @@ int unlink_send_request(uint64_t parent_ino, const char *name)
     EVTAG_ASSIGN(req, parent_ino, parent_ino);
     EVTAG_ASSIGN(req, name, name);
 
-    general_req("127.0.0.1", 9528, "/.rpc.rpc_unlink",
+    int mid = get_mid_of_ino(parent_ino);
+    struct machine * m = cluster_get_machine_by_mid(mid);
+
+    general_req(m->ip, m->port, "/.rpc.rpc_unlink",
                 req, (marshal_func) unlink_request_marshal,
                 response, (unmarshal_func) unlink_response_unmarshal);
     unlink_request_free(req);
@@ -289,3 +344,7 @@ void mds_conn_init()
     conn_pool = connection_pool_new();
 
 }
+
+
+
+

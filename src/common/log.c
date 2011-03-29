@@ -1,18 +1,5 @@
-#include <stdio.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-
-#include <sys/time.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include "log.h"
 
-#define  LOG_DEUBG 1
-#define  LOG_INFO 2
-#define  LOG_WARN 3
-#define  LOG_ERROR 4
 
 static int puttime(char **buf)
 {

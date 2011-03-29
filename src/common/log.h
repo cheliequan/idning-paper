@@ -1,3 +1,12 @@
+#include <stdio.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #ifndef _LOG_H__
 #define _LOG_H__

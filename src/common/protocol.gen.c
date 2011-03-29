@@ -914,6 +914,8 @@ static struct file_stat_access_ __file_stat_base = {
   file_stat_pos_arr_assign,
   file_stat_pos_arr_get,
   file_stat_pos_arr_add,
+  file_stat_parent_ino_assign,
+  file_stat_parent_ino_get,
 };
 
 struct file_stat *
@@ -964,6 +966,9 @@ file_stat_new_with_arg(void *unused)
   tmp->pos_arr_num_allocated = 0;
   tmp->pos_arr_set = 0;
 
+  tmp->parent_ino = 0;
+  tmp->parent_ino_set = 0;
+
   return (tmp);
 }
 
@@ -1004,6 +1009,7 @@ error:
   --msg->pos_arr_length;
   return (NULL);
 }
+
 
 int
 file_stat_ino_assign(struct file_stat *msg, const ev_uint64_t value)
@@ -1091,6 +1097,14 @@ file_stat_pos_arr_assign(struct file_stat *msg, int off,
   {
     msg->pos_arr[off] = value;
   }
+  return (0);
+}
+
+int
+file_stat_parent_ino_assign(struct file_stat *msg, const ev_uint64_t value)
+{
+  msg->parent_ino_set = 1;
+  msg->parent_ino = value;
   return (0);
 }
 
@@ -1185,6 +1199,15 @@ file_stat_pos_arr_get(struct file_stat *msg, int offset,
   return (0);
 }
 
+int
+file_stat_parent_ino_get(struct file_stat *msg, ev_uint64_t *value)
+{
+  if (msg->parent_ino_set != 1)
+    return (-1);
+  *value = msg->parent_ino;
+  return (0);
+}
+
 void
 file_stat_clear(struct file_stat *tmp)
 {
@@ -1208,6 +1231,7 @@ file_stat_clear(struct file_stat *tmp)
     tmp->pos_arr_length = 0;
     tmp->pos_arr_num_allocated = 0;
   }
+  tmp->parent_ino_set = 0;
 }
 
 void
@@ -1258,6 +1282,9 @@ file_stat_marshal(struct evbuffer *evbuf, const struct file_stat *tmp){
     evtag_marshal_int(evbuf, FILE_STAT_POS_ARR, tmp->pos_arr[i]);
       }
     }
+  }
+  if (tmp->parent_ino_set) {
+    evtag_marshal_int64(evbuf, FILE_STAT_PARENT_INO, tmp->parent_ino);
   }
 }
 
@@ -1382,6 +1409,17 @@ file_stat_unmarshal(struct file_stat *tmp,  struct evbuffer *evbuf)
         }
         ++tmp->pos_arr_length;
         tmp->pos_arr_set = 1;
+        break;
+
+      case FILE_STAT_PARENT_INO:
+
+        if (tmp->parent_ino_set)
+          return (-1);
+        if (evtag_unmarshal_int64(evbuf, FILE_STAT_PARENT_INO, &tmp->parent_ino) == -1) {
+          event_warnx("%s: failed to unmarshal parent_ino", __func__);
+          return (-1);
+        }
+        tmp->parent_ino_set = 1;
         break;
 
       default:

@@ -109,6 +109,7 @@ int ping_send_request()
     EVTAG_ASSIGN(ping, self_port, self_machine.port);
     EVTAG_ASSIGN(ping, self_type, self_machine.type);
     EVTAG_ASSIGN(ping, mid, self_machine.mid);
+    logging(LOG_DEUBG, "ping(version = %u, mid = %d)", cluster_version, self_machine.mid);
 
     EVRPC_MAKE_REQUEST(rpc_ping, cmgr_conn_pool, ping, pong, ping_cb, NULL);
     event_base_dispatch(to_cmgr_ev_base);
@@ -118,7 +119,8 @@ int ping_send_request()
     EVTAG_GET(pong, version, &pong_version);
     EVTAG_GET(pong, mid, &pong_mid);
 
-    printf("get pong version is : %d \n", pong_version);
+    logging(LOG_DEUBG, "get pong (version = %u, mid = %d)", pong_version, pong_mid);
+
     if (pong_version == cluster_version) {
         logging(LOG_INFO, "cluster not change!");
         goto done;
@@ -156,6 +158,8 @@ void rpc_client_setup(char *self_host, int self_port, int self_type)
     to_cmgr_ev_base = event_base_new();
     cmgr_conn_pool = evrpc_pool_new(to_cmgr_ev_base);
 
+    int cluster_mid = cfg_getint32("CLUSTER_MID", 0);
+    self_machine.mid = cluster_mid;
     self_machine.ip = strdup(self_host);
     self_machine.port = self_port;
     self_machine.type = self_type;
@@ -168,7 +172,6 @@ void rpc_client_setup(char *self_host, int self_port, int self_type)
         evrpc_pool_add_connection(cmgr_conn_pool, evcon);
     }
 
-    int cluster_mid = cfg_getint32("CLUSTER_MID", 0);
     int new_mid = ping_send_request();
     if (cluster_mid == 0) {
         char tmp[32];
