@@ -1,5 +1,6 @@
 #include "sfs_common.h"
 #include "fs.h"
+static void fsnode_to_stat_copy(struct file_stat * t, fsnode * n);
 
 static void setattr_handler(EVRPC_STRUCT(rpc_setattr) * rpc, void *arg)
 {
@@ -36,23 +37,11 @@ static void stat_handler(EVRPC_STRUCT(rpc_stat) * rpc, void *arg)
         logging(LOG_DEUBG, "stat(%" PRIu64 ")", ino);
 
         struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
-        if( 0 == fs_stat(ino, t)){
-            EVTAG_ASSIGN(t, ino, t->ino);
-            EVTAG_ASSIGN(t, size, t->size);
-            EVTAG_ASSIGN(t, type, t->type);
-            EVTAG_ASSIGN(t, mode, t->mode);
-
-            logging(LOG_DEUBG,
-                    "stat(%" PRIu64 ") return {ino: %" PRIu64 ", size: %" PRIu64
-                    ", type : %d, mode : %04o, pos [%d, %d]}", ino, t->ino, t->size,
-                    t->type, t->mode, t->pos_arr[0], t->pos_arr[1]);
-        }else{
-            EVTAG_ASSIGN(t, ino, 0);
-            EVTAG_ASSIGN(t, size, 0);
-            EVTAG_ASSIGN(t, type, 0);
-            EVTAG_ASSIGN(t, mode, 0);
-            logging(LOG_DEUBG, "stat(%" PRIu64 ") , not Found ", ino );
-        }
+        //TODO;
+        
+        fsnode *n = fsnode_hash_find(ino);
+        fsnode_to_stat_copy(t, n);
+        log_file_stat("stat return : ", t);
     }
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -93,15 +82,8 @@ static void ls_handler(EVRPC_STRUCT(rpc_stat) * rpc, void *arg)
 
             p = dlist_data(pl, fsnode, tree_dlist);
             t = EVTAG_ARRAY_ADD(response, stat_arr);
-            EVTAG_ASSIGN(t, ino, p->ino);
-            EVTAG_ASSIGN(t, size, p->data.fdata.length);
-            EVTAG_ASSIGN(t, name, p->name);
-            EVTAG_ASSIGN(t, type, p->type);
-            EVTAG_ASSIGN(t, mode, p->mode);
-            logging(LOG_DEUBG,
-                    "ls(%" PRIu64 ") return {ino: %" PRIu64
-                    ", name: %s, size: %" PRIu64 ", mode: %04o}", ino, t->ino,
-                    t->name, t->size, t->mode);
+            fsnode_to_stat_copy(t, p);
+            log_file_stat("ls return : ", t);
         }
     }
     EVRPC_REQUEST_DONE(rpc);
@@ -125,6 +107,28 @@ static void statfs_handler(EVRPC_STRUCT(rpc_statfs) * rpc, void *arg)
     EVRPC_REQUEST_DONE(rpc);
 }
 
+static void fsnode_to_stat_copy(struct file_stat * t, fsnode * n){
+
+    if (NULL == n) {
+        EVTAG_ASSIGN(t, ino, 0);
+        EVTAG_ASSIGN(t, parent_ino, 0);
+        EVTAG_ASSIGN(t, size, 0);
+        EVTAG_ASSIGN(t, name, "");
+        return ;
+    } 
+
+    EVTAG_ASSIGN(t, ino, n->ino);
+    EVTAG_ASSIGN(t, parent_ino, n->parent->ino);
+    EVTAG_ASSIGN(t, size, n->data.fdata.length);
+    EVTAG_ASSIGN(t, name, n->name);
+    EVTAG_ASSIGN(t, mode, n->mode);
+    EVTAG_ASSIGN(t, type, n->type);
+    EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[0]);
+    EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[1]);
+
+}
+
+
 static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
 {
     DBG();
@@ -140,20 +144,11 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
             request->parent_ino, request->name, request->type, request->mode);
 
     struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
-
-    EVTAG_ASSIGN(t, ino, n->ino);
-    EVTAG_ASSIGN(t, size, n->data.fdata.length);
-    EVTAG_ASSIGN(t, name, n->name);
-    EVTAG_ASSIGN(t, mode, n->mode);
-    EVTAG_ASSIGN(t, type, n->type);
-    EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[0]);
-    EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[1]);
+    fsnode_to_stat_copy(t, n);
     /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 8); */
     /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 9); */
 
-    logging(LOG_DEUBG,
-            "mknod(%s) return {ino: %" PRIu64 ", name: %s, size: %" PRIu64
-            ", mode: %04o}", request->name, t->ino, t->name, t->size, t->mode);
+    log_file_stat("mknode return ", t);
 
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -170,19 +165,10 @@ static void lookup_handler(EVRPC_STRUCT(rpc_lookup) * rpc, void *arg)
 
     fsnode *n = fs_lookup(request->parent_ino, request->name);
     struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
-    if (NULL == n) {
-        EVTAG_ASSIGN(t, ino, 0);
-        EVTAG_ASSIGN(t, size, 0);
-        EVTAG_ASSIGN(t, name, "");
-    } else {
-        EVTAG_ASSIGN(t, ino, n->ino);
-        EVTAG_ASSIGN(t, size, n->data.fdata.length);
-        EVTAG_ASSIGN(t, name, n->name);
-    }
-    logging(LOG_DEUBG,
-            "lookup(%s) return {ino: %" PRIu64 ", name: %s, size: %" PRIu64 "}",
-            request->name, t->ino, t->name, t->size);
 
+    fsnode_to_stat_copy(t, n);
+
+    log_file_stat("lookup return ", t);
     EVRPC_REQUEST_DONE(rpc);
 }
 

@@ -7,6 +7,10 @@ int attr_cache_init(){
     return 0;
 }
 int attr_cache_add(struct file_stat * st){
+    assert(st->ino != 0);
+    assert(st->parent_ino != 0);
+    log_file_stat("attr_cache_add: ", st);
+
     hashtable_insert(attr_ht, &(st->ino), st);
     return 0;
 }

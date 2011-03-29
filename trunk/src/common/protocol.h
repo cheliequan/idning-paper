@@ -17,4 +17,11 @@ EVRPC_HEADER(rpc_ping, ping, pong)
     EVRPC_HEADER(rpc_lookup, lookup_request, lookup_response)
     EVRPC_HEADER(rpc_setattr, setattr_request, setattr_response)
     EVRPC_HEADER(rpc_mkfs, mkfs_request, mkfs_response)
+void file_stat_init(struct file_stat * stat);
+void log_file_stat(char * hint, struct file_stat * t);
+
+
+
+
+
 #endif

@@ -1,4 +1,10 @@
 #include<protocol.h>
+#include<protocol.gen.h>
+#include <stdlib.h>
+#include <string.h>
+#include <inttypes.h>
+
+#include "log.h"
 
 EVRPC_GENERATE(rpc_ping, ping, pong)
     EVRPC_GENERATE(rpc_stat, stat_request, stat_response)
@@ -18,7 +24,35 @@ EVRPC_GENERATE(rpc_ping, ping, pong)
  * this should be in rpc_gen.py 
  * but I have no time to do this
  */
-/*void file_stat_init(struct file_stat * stat){*/
-    /*memset(stat, 0, sizeof(struct file_stat)); */
-    /*stat->base = &__file_stat_base; */
-/*}*/
+
+void file_stat_init(struct file_stat * stat){
+    struct file_stat * null_stat = file_stat_new();
+    memcpy(stat, null_stat, sizeof(struct file_stat));
+    file_stat_free(null_stat);
+
+    /*stat->base = &__file_stat_base;*/
+}
+
+
+
+void log_file_stat(char * hint, struct file_stat * t){
+
+
+    logging(LOG_DEUBG, "%d", 1);
+    if (t->pos_arr){
+        logging(LOG_DEUBG,
+                "%s  ::::  {ino: %" PRIu64 ", parent: %" PRIu64 ", size: %" PRIu64
+                ", type : %d, mode : %04o, pos [%d, %d]}", hint, t->ino, t->parent_ino, t->size,
+                t->type, t->mode, t->pos_arr[0], t->pos_arr[1]);
+    } else {
+        logging(LOG_DEUBG,
+                "%s  ::::  {ino: %" PRIu64 ", size: %" PRIu64
+                ", type : %d, mode : %04o }", hint, t->ino, t->size,
+                t->type, t->mode);
+    }
+
+    /*logging(LOG_DEUBG,*/
+            /*"%s {ino: %" PRIu64 ", name: %s, size: %" PRIu64*/
+            /*", mode: %04o}", hint, t->ino, t->name, t->size, t->mode);*/
+}
+
