@@ -316,9 +316,16 @@ int statfs_send_request(int *total_space, int *avail_space, int *inode_cnt)
     struct statfs_request *req = statfs_request_new();
     struct statfs_response *response = statfs_response_new();
 
+
     EVTAG_ASSIGN(req, nothing, 1);
 
-    general_req("127.0.0.1", 9528, "/.rpc.rpc_statfs",
+    int *mds;
+    int mds_cnt;
+
+    cluster_get_mds_arr(&mds, &mds_cnt);
+    struct machine * m = cluster_get_machine_by_mid(mds[0]); // TODO: currently it's  a random one 
+
+    general_req(m->ip, m->port, "/.rpc.rpc_statfs",
                 req, (marshal_func) statfs_request_marshal,
                 response, (unmarshal_func) statfs_response_unmarshal);
 
