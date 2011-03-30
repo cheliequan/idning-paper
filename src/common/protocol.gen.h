@@ -20,6 +20,10 @@ struct ls_request;
 struct ls_response;
 struct mknod_request;
 struct mknod_response;
+struct symlink_request;
+struct symlink_response;
+struct readlink_request;
+struct readlink_response;
 struct lookup_request;
 struct lookup_response;
 struct unlink_request;
@@ -638,6 +642,160 @@ int mknod_response_stat_arr_assign(struct mknod_response *, int, const struct fi
 int mknod_response_stat_arr_get(struct mknod_response *, int, struct file_stat* *);
 struct file_stat*  mknod_response_stat_arr_add(struct mknod_response *msg);
 /* --- mknod_response done --- */
+
+/* Tag definition for symlink_request */
+enum symlink_request_ {
+  SYMLINK_REQUEST_PARENT_INO=1,
+  SYMLINK_REQUEST_NAME=2,
+  SYMLINK_REQUEST_PATH=3,
+  SYMLINK_REQUEST_MAX_TAGS
+};
+
+/* Structure declaration for symlink_request */
+struct symlink_request_access_ {
+  int (*parent_ino_assign)(struct symlink_request *, const ev_uint64_t);
+  int (*parent_ino_get)(struct symlink_request *, ev_uint64_t *);
+  int (*name_assign)(struct symlink_request *, const char *);
+  int (*name_get)(struct symlink_request *, char * *);
+  int (*path_assign)(struct symlink_request *, const char *);
+  int (*path_get)(struct symlink_request *, char * *);
+};
+
+struct symlink_request {
+  struct symlink_request_access_ *base;
+
+  ev_uint64_t parent_ino;
+  char *name;
+  char *path;
+
+  ev_uint8_t parent_ino_set;
+  ev_uint8_t name_set;
+  ev_uint8_t path_set;
+};
+
+struct symlink_request *symlink_request_new(void);
+struct symlink_request *symlink_request_new_with_arg(void *);
+void symlink_request_free(struct symlink_request *);
+void symlink_request_clear(struct symlink_request *);
+void symlink_request_marshal(struct evbuffer *, const struct symlink_request *);
+int symlink_request_unmarshal(struct symlink_request *, struct evbuffer *);
+int symlink_request_complete(struct symlink_request *);
+void evtag_marshal_symlink_request(struct evbuffer *, ev_uint32_t,
+    const struct symlink_request *);
+int evtag_unmarshal_symlink_request(struct evbuffer *, ev_uint32_t,
+    struct symlink_request *);
+int symlink_request_parent_ino_assign(struct symlink_request *, const ev_uint64_t);
+int symlink_request_parent_ino_get(struct symlink_request *, ev_uint64_t *);
+int symlink_request_name_assign(struct symlink_request *, const char *);
+int symlink_request_name_get(struct symlink_request *, char * *);
+int symlink_request_path_assign(struct symlink_request *, const char *);
+int symlink_request_path_get(struct symlink_request *, char * *);
+/* --- symlink_request done --- */
+
+/* Tag definition for symlink_response */
+enum symlink_response_ {
+  SYMLINK_RESPONSE_STAT=1,
+  SYMLINK_RESPONSE_MAX_TAGS
+};
+
+/* Structure declaration for symlink_response */
+struct symlink_response_access_ {
+  int (*stat_assign)(struct symlink_response *, const struct file_stat*);
+  int (*stat_get)(struct symlink_response *, struct file_stat* *);
+};
+
+struct symlink_response {
+  struct symlink_response_access_ *base;
+
+  struct file_stat* stat;
+
+  ev_uint8_t stat_set;
+};
+
+struct symlink_response *symlink_response_new(void);
+struct symlink_response *symlink_response_new_with_arg(void *);
+void symlink_response_free(struct symlink_response *);
+void symlink_response_clear(struct symlink_response *);
+void symlink_response_marshal(struct evbuffer *, const struct symlink_response *);
+int symlink_response_unmarshal(struct symlink_response *, struct evbuffer *);
+int symlink_response_complete(struct symlink_response *);
+void evtag_marshal_symlink_response(struct evbuffer *, ev_uint32_t,
+    const struct symlink_response *);
+int evtag_unmarshal_symlink_response(struct evbuffer *, ev_uint32_t,
+    struct symlink_response *);
+int symlink_response_stat_assign(struct symlink_response *, const struct file_stat*);
+int symlink_response_stat_get(struct symlink_response *, struct file_stat* *);
+/* --- symlink_response done --- */
+
+/* Tag definition for readlink_request */
+enum readlink_request_ {
+  READLINK_REQUEST_INO=1,
+  READLINK_REQUEST_MAX_TAGS
+};
+
+/* Structure declaration for readlink_request */
+struct readlink_request_access_ {
+  int (*ino_assign)(struct readlink_request *, const ev_uint64_t);
+  int (*ino_get)(struct readlink_request *, ev_uint64_t *);
+};
+
+struct readlink_request {
+  struct readlink_request_access_ *base;
+
+  ev_uint64_t ino;
+
+  ev_uint8_t ino_set;
+};
+
+struct readlink_request *readlink_request_new(void);
+struct readlink_request *readlink_request_new_with_arg(void *);
+void readlink_request_free(struct readlink_request *);
+void readlink_request_clear(struct readlink_request *);
+void readlink_request_marshal(struct evbuffer *, const struct readlink_request *);
+int readlink_request_unmarshal(struct readlink_request *, struct evbuffer *);
+int readlink_request_complete(struct readlink_request *);
+void evtag_marshal_readlink_request(struct evbuffer *, ev_uint32_t,
+    const struct readlink_request *);
+int evtag_unmarshal_readlink_request(struct evbuffer *, ev_uint32_t,
+    struct readlink_request *);
+int readlink_request_ino_assign(struct readlink_request *, const ev_uint64_t);
+int readlink_request_ino_get(struct readlink_request *, ev_uint64_t *);
+/* --- readlink_request done --- */
+
+/* Tag definition for readlink_response */
+enum readlink_response_ {
+  READLINK_RESPONSE_PATH=1,
+  READLINK_RESPONSE_MAX_TAGS
+};
+
+/* Structure declaration for readlink_response */
+struct readlink_response_access_ {
+  int (*path_assign)(struct readlink_response *, const char *);
+  int (*path_get)(struct readlink_response *, char * *);
+};
+
+struct readlink_response {
+  struct readlink_response_access_ *base;
+
+  char *path;
+
+  ev_uint8_t path_set;
+};
+
+struct readlink_response *readlink_response_new(void);
+struct readlink_response *readlink_response_new_with_arg(void *);
+void readlink_response_free(struct readlink_response *);
+void readlink_response_clear(struct readlink_response *);
+void readlink_response_marshal(struct evbuffer *, const struct readlink_response *);
+int readlink_response_unmarshal(struct readlink_response *, struct evbuffer *);
+int readlink_response_complete(struct readlink_response *);
+void evtag_marshal_readlink_response(struct evbuffer *, ev_uint32_t,
+    const struct readlink_response *);
+int evtag_unmarshal_readlink_response(struct evbuffer *, ev_uint32_t,
+    struct readlink_response *);
+int readlink_response_path_assign(struct readlink_response *, const char *);
+int readlink_response_path_get(struct readlink_response *, char * *);
+/* --- readlink_response done --- */
 
 /* Tag definition for lookup_request */
 enum lookup_request_ {

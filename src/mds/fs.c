@@ -191,7 +191,7 @@ fsnode *fs_unlink(uint64_t parent_ino, char *name)
 
 fsnode *fs_mknod(uint64_t parent_ino, char *name, int type, int mode)
 {
-    logging(LOG_DEUBG, "fs_unlink(parent_ino = %" PRIu64 " , name = %s)",
+    logging(LOG_DEUBG, "fs_mknod(parent_ino = %" PRIu64 " , name = %s)",
             parent_ino, name);
     fsnode *n = fsnode_new();
     n->ino = cur_ino++;
@@ -214,6 +214,37 @@ fsnode *fs_mknod(uint64_t parent_ino, char *name, int type, int mode)
     version++;
     return n;
 }
+
+fsnode * fs_symlink(uint64_t parent_ino, const char * name, const char *path){
+    logging(LOG_DEUBG, "fs_symlink(parent_ino = %" PRIu64 " , name = %s, path = %s)",
+            parent_ino, name, path);
+    fsnode *n = fsnode_new();
+    n->ino = cur_ino++;
+    n->type = 255; //TODO
+
+    n->mode = S_IFLNK;
+    n->name = strdup(name);
+    n->nlen = strlen(n->name);
+    n->data.sdata.path = strdup(path);
+    n->data.sdata.pleng = strlen(path);
+
+    n->parent = fsnode_hash_find(parent_ino);
+
+    n->pos_arr[0] = n->parent->pos_arr[0];
+    n->pos_arr[1] = n->parent->pos_arr[1];
+    fsnode_hash_insert(n);
+    fsnode_tree_insert(n->parent, n);
+    version++;
+    return n;
+}
+
+char * fs_readlink(uint64_t ino){
+    fsnode * n = fsnode_hash_find(ino);
+    if (n && n->mode == S_IFLNK)
+        return n->data.sdata.path;
+    return NULL;
+}
+
 
 /*
  * make root of a whole fs, call by mkfs.sfs
