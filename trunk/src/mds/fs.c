@@ -194,20 +194,22 @@ fsnode *fs_mknod(uint64_t parent_ino, char *name, int type, int mode)
     logging(LOG_DEUBG, "fs_mknod(parent_ino = %" PRIu64 " , name = %s)",
             parent_ino, name);
     fsnode *n = fsnode_new();
+    n->parent = fsnode_hash_find(parent_ino);
     n->ino = cur_ino++;
     n->type = type;
     n->mode = mode;
     n->name = strdup(name);
     n->nlen = strlen(n->name);
     if (n->mode & S_IFREG) {    //is file 
-        n->data.fdata.length = 0;
+        n->data.fdata.length = 4096;
         n->pos_arr[0] = select_osd();
         n->pos_arr[1] = select_osd();
     } else if (n->mode & S_IFDIR) {
+        n->pos_arr[0] = n->parent->pos_arr[0];
+        n->pos_arr[1] = n->parent->pos_arr[1];
         n->data.ddata.children = NULL;
     }
 
-    n->parent = fsnode_hash_find(parent_ino);
 
     fsnode_hash_insert(n);
     fsnode_tree_insert(n->parent, n);

@@ -173,7 +173,7 @@ static void symlink_handler(EVRPC_STRUCT(rpc_symlink) * rpc, void *arg)
     fsnode_to_stat_copy(t, n);
     /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 8); */
     /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 9); */
-    log_file_stat("symlinke return ", t);
+    log_file_stat("symlink return ", t);
 
     EVRPC_REQUEST_DONE(rpc);
 }
