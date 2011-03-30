@@ -344,6 +344,47 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
     /*file_stat_free(stat);*/
 }
 
+
+
+void sfs_symlink(fuse_req_t req, const char *path, fuse_ino_t parent, const char *name) {
+    logging(LOG_DEUBG, "symlink(parent = %lu, name = %s, path=%s)", parent,
+            name, path);
+    struct fuse_entry_param e;
+    struct file_stat *stat = file_stat_new();
+    symlink_send_request(parent, name, path, stat);
+
+    log_file_stat("symlink return :", stat);
+    attr_cache_add(stat); //no free
+
+    memset(&e, 0, sizeof(e));
+    e.ino = stat->ino;
+    e.attr_timeout = 0.0;
+    e.entry_timeout = 0.0;
+
+    sfs_stat(e.ino, &e.attr);
+
+    if (fuse_reply_entry(req, &e) == -ENOENT) {
+
+    }
+}
+
+
+void sfs_readlink(fuse_req_t req, fuse_ino_t ino) {
+    logging(LOG_DEUBG, "readlink(ino = %lu)", ino);
+    const char *path = readlink_send_request(ino); 
+    logging(LOG_DEUBG, "sfs_readlink get path: %s", path);
+
+    if (0) {
+        fuse_reply_err(req, 3);
+    } else {
+        fuse_reply_readlink(req, (char*)path);
+    }
+
+    free((void*)path);  
+}
+
+
+
 static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
 {
     logging(LOG_DEUBG, "unlink(parent = %lu, name = %s)", parent, name);
@@ -440,20 +481,24 @@ void sfs_mkfs(){
 
 
 static struct fuse_lowlevel_ops sfs_ll_op = {
-    .lookup = sfs_ll_lookup,
-    .getattr = sfs_ll_getattr,
-    .readdir = sfs_ll_readdir,
-    .open = sfs_ll_open,
-    .read = sfs_ll_read,
-    .write = sfs_ll_write,
-    .setattr = sfs_ll_setattr,
-    .flush = sfs_ll_flush,
-    .create = sfs_ll_create,
-    .mkdir = sfs_ll_mkdir,
-    .unlink = sfs_ll_unlink,
-    .rmdir = sfs_ll_unlink,
-    .statfs = sfs_statfs,
-    .release = sfs_release,
+    .lookup     = sfs_ll_lookup,
+    .getattr    = sfs_ll_getattr,
+    .readdir    = sfs_ll_readdir,
+    .open       = sfs_ll_open,
+    .read       = sfs_ll_read,
+    .write      = sfs_ll_write,
+    .setattr    = sfs_ll_setattr,
+    .flush      = sfs_ll_flush,
+    .create     = sfs_ll_create,
+    .mkdir      = sfs_ll_mkdir,
+    .unlink     = sfs_ll_unlink,
+    .rmdir      = sfs_ll_unlink,
+    .statfs     = sfs_statfs,
+    .release    = sfs_release,
+
+    .symlink    = sfs_symlink,
+    .readlink   = sfs_readlink,
+
 };
 
 void usage(const char *appname)

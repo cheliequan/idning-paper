@@ -71,6 +71,25 @@ struct mknod_response {
     array struct[file_stat] stat_arr    = 1;
 }
 
+
+struct symlink_request {
+    int64 parent_ino                    = 1;
+    string name                         = 2;
+    string path                         = 3;
+}
+
+struct symlink_response {
+    struct[file_stat] stat              = 1;
+}
+
+struct readlink_request {
+    int64 ino                           = 1;
+}
+
+struct readlink_response {
+    string path                         = 1;
+}
+
 struct lookup_request {
     int64 parent_ino                    = 1;
     string name                         = 2;

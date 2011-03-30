@@ -153,6 +153,51 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
     EVRPC_REQUEST_DONE(rpc);
 }
 
+
+
+static void symlink_handler(EVRPC_STRUCT(rpc_symlink) * rpc, void *arg)
+{
+    DBG();
+    //ping cmgr, get current cluster_map
+    ping_send_request();
+
+    struct symlink_request *request = rpc->request;
+    struct symlink_response *response = rpc->reply;
+    fsnode *n = fs_symlink(request->parent_ino, request->name, request->path);
+
+    logging(LOG_DEUBG, "symlink(parent=%" PRIu64 ", name=%s, path =%s)",
+            request->parent_ino, request->name, request->path);
+
+    struct file_stat *t ;
+    EVTAG_GET(response, stat, &t);
+    fsnode_to_stat_copy(t, n);
+    /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 8); */
+    /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 9); */
+    log_file_stat("symlinke return ", t);
+
+    EVRPC_REQUEST_DONE(rpc);
+}
+
+static void readlink_handler(EVRPC_STRUCT(rpc_readlink) * rpc, void *arg)
+{
+    DBG();
+    //ping cmgr, get current cluster_map
+    ping_send_request();
+
+    struct readlink_request *request = rpc->request;
+    struct readlink_response *response = rpc->reply;
+    char * p = fs_readlink(request->ino);
+
+    logging(LOG_DEUBG, "readlink(ino =%" PRIu64 ")", request->ino);
+    logging(LOG_DEUBG, "readlink return : %s", p);
+
+    EVTAG_ASSIGN(response, path, p);
+
+    EVRPC_REQUEST_DONE(rpc);
+}
+
+
+
 static void lookup_handler(EVRPC_STRUCT(rpc_lookup) * rpc, void *arg)
 {
     DBG();
@@ -194,7 +239,7 @@ static void mkfs_handler(EVRPC_STRUCT(rpc_mkfs) * rpc, void *arg)
     DBG();
 
     struct mkfs_request * request = rpc->request;
-    struct mkfs_response * response = rpc->reply;
+    /*struct mkfs_response * response = rpc->reply;*/
 
     int mds1, mds2;
     EVTAG_ARRAY_GET(request, pos_arr, 0, &mds1);
@@ -241,6 +286,10 @@ static void rpc_setup()
                    statfs_handler, NULL);
     EVRPC_REGISTER(base, rpc_mkfs, mkfs_request, mkfs_response,
                    mkfs_handler, NULL);
+    EVRPC_REGISTER(base, rpc_symlink, symlink_request, symlink_response,
+                   symlink_handler, NULL);
+    EVRPC_REGISTER(base, rpc_readlink, readlink_request, readlink_response,
+                   readlink_handler, NULL);
 
 }
 

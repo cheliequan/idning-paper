@@ -18,6 +18,8 @@ EVRPC_GENERATE(rpc_ping, ping, pong)
     EVRPC_GENERATE(rpc_setattr, setattr_request, setattr_response)
     EVRPC_GENERATE(rpc_mkfs, mkfs_request, mkfs_response)
 
+    EVRPC_GENERATE(rpc_symlink, symlink_request, symlink_response)
+    EVRPC_GENERATE(rpc_readlink, readlink_request, readlink_response)
 /*EVRPC_GENERATE(rpc_, _request, _response)*/
 /*EVRPC_GENERATE(rpc_, _request, _response)*/
 /**

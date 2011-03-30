@@ -19,5 +19,7 @@ int setattr_send_request(struct file_stat *stat_arr);
 
 int statfs_send_request(int *total_space, int *avail_space, int *inode_cnt);
 int mkfs_send_request(int mds1, int mds2);
+int symlink_send_request(uint64_t parent_ino, const char *name, const char * path, struct file_stat *o_stat);
+const char * readlink_send_request(uint64_t ino);
 
 #endif

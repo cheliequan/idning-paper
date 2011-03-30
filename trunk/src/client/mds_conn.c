@@ -164,6 +164,60 @@ int mknod_send_request(uint64_t parent_ino, const char *name, int type,
     return 0;
 }
 
+int symlink_send_request(uint64_t parent_ino, const char *name, const char * path, struct file_stat *o_stat)
+{
+    DBG();
+    struct symlink_request *req = symlink_request_new();
+
+    struct symlink_response *response = symlink_response_new();
+    EVTAG_ASSIGN(req, parent_ino, parent_ino);
+    EVTAG_ASSIGN(req, name, name);
+    EVTAG_ASSIGN(req, path, path);
+
+    int mid = get_mid_of_ino(parent_ino);
+    struct machine * m = cluster_get_machine_by_mid(mid);
+
+    general_req(m->ip, m->port, "/.rpc.rpc_symlink",
+                req, (marshal_func) symlink_request_marshal,
+                response, (unmarshal_func) symlink_response_unmarshal);
+
+    struct file_stat *stat;
+    EVTAG_GET(response, stat, &stat);
+    file_stat_copy(o_stat, stat);
+
+    struct file_stat * new_stat = file_stat_new();
+    file_stat_copy(new_stat, stat);
+    attr_cache_add(new_stat);
+
+    symlink_request_free(req);
+    symlink_response_free(response);
+    return 0;
+}
+
+
+const char * readlink_send_request(uint64_t ino)
+{
+    DBG();
+    struct readlink_request *req = readlink_request_new();
+    struct readlink_response *response = readlink_response_new();
+
+    EVTAG_ASSIGN(req, ino, ino);
+
+    int mid = get_mid_of_ino(ino);
+    struct machine * m = cluster_get_machine_by_mid(mid);
+
+    general_req(m->ip, m->port, "/.rpc.rpc_readlink",
+                req, (marshal_func) readlink_request_marshal,
+                response, (unmarshal_func) readlink_response_unmarshal);
+
+    logging(LOG_DEUBG, "readlink , test : %s", response->path);
+    char * p = strdup(response->path);
+    readlink_request_free(req);
+    readlink_response_free(response);
+    return p;
+}
+
+
 static void file_stat_copy(struct file_stat *dst, struct file_stat *src)
 {
     dst->size = src->size;

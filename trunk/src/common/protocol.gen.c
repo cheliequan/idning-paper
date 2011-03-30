@@ -3293,6 +3293,696 @@ evtag_marshal_mknod_response(struct evbuffer *evbuf, ev_uint32_t tag, const stru
 }
 
 /*
+ * Implementation of symlink_request
+ */
+
+static struct symlink_request_access_ __symlink_request_base = {
+  symlink_request_parent_ino_assign,
+  symlink_request_parent_ino_get,
+  symlink_request_name_assign,
+  symlink_request_name_get,
+  symlink_request_path_assign,
+  symlink_request_path_get,
+};
+
+struct symlink_request *
+symlink_request_new(void)
+{
+  return symlink_request_new_with_arg(NULL);
+}
+
+struct symlink_request *
+symlink_request_new_with_arg(void *unused)
+{
+  struct symlink_request *tmp;
+  if ((tmp = malloc(sizeof(struct symlink_request))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__symlink_request_base;
+
+  tmp->parent_ino = 0;
+  tmp->parent_ino_set = 0;
+
+  tmp->name = NULL;
+  tmp->name_set = 0;
+
+  tmp->path = NULL;
+  tmp->path_set = 0;
+
+  return (tmp);
+}
+
+
+
+
+int
+symlink_request_parent_ino_assign(struct symlink_request *msg, const ev_uint64_t value)
+{
+  msg->parent_ino_set = 1;
+  msg->parent_ino = value;
+  return (0);
+}
+
+int
+symlink_request_name_assign(struct symlink_request *msg,
+    const char * value)
+{
+  if (msg->name != NULL)
+    free(msg->name);
+  if ((msg->name = strdup(value)) == NULL)
+    return (-1);
+  msg->name_set = 1;
+  return (0);
+}
+
+int
+symlink_request_path_assign(struct symlink_request *msg,
+    const char * value)
+{
+  if (msg->path != NULL)
+    free(msg->path);
+  if ((msg->path = strdup(value)) == NULL)
+    return (-1);
+  msg->path_set = 1;
+  return (0);
+}
+
+int
+symlink_request_parent_ino_get(struct symlink_request *msg, ev_uint64_t *value)
+{
+  if (msg->parent_ino_set != 1)
+    return (-1);
+  *value = msg->parent_ino;
+  return (0);
+}
+
+int
+symlink_request_name_get(struct symlink_request *msg, char * *value)
+{
+  if (msg->name_set != 1)
+    return (-1);
+  *value = msg->name;
+  return (0);
+}
+
+int
+symlink_request_path_get(struct symlink_request *msg, char * *value)
+{
+  if (msg->path_set != 1)
+    return (-1);
+  *value = msg->path;
+  return (0);
+}
+
+void
+symlink_request_clear(struct symlink_request *tmp)
+{
+  tmp->parent_ino_set = 0;
+  if (tmp->name_set == 1) {
+    free(tmp->name);
+    tmp->name = NULL;
+    tmp->name_set = 0;
+  }
+  if (tmp->path_set == 1) {
+    free(tmp->path);
+    tmp->path = NULL;
+    tmp->path_set = 0;
+  }
+}
+
+void
+symlink_request_free(struct symlink_request *tmp)
+{
+  if (tmp->name != NULL)
+      free (tmp->name);
+  if (tmp->path != NULL)
+      free (tmp->path);
+  free(tmp);
+}
+
+void
+symlink_request_marshal(struct evbuffer *evbuf, const struct symlink_request *tmp){
+  evtag_marshal_int64(evbuf, SYMLINK_REQUEST_PARENT_INO, tmp->parent_ino);
+  evtag_marshal_string(evbuf, SYMLINK_REQUEST_NAME, tmp->name);
+  evtag_marshal_string(evbuf, SYMLINK_REQUEST_PATH, tmp->path);
+}
+
+int
+symlink_request_unmarshal(struct symlink_request *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case SYMLINK_REQUEST_PARENT_INO:
+
+        if (tmp->parent_ino_set)
+          return (-1);
+        if (evtag_unmarshal_int64(evbuf, SYMLINK_REQUEST_PARENT_INO, &tmp->parent_ino) == -1) {
+          event_warnx("%s: failed to unmarshal parent_ino", __func__);
+          return (-1);
+        }
+        tmp->parent_ino_set = 1;
+        break;
+
+      case SYMLINK_REQUEST_NAME:
+
+        if (tmp->name_set)
+          return (-1);
+        if (evtag_unmarshal_string(evbuf, SYMLINK_REQUEST_NAME, &tmp->name) == -1) {
+          event_warnx("%s: failed to unmarshal name", __func__);
+          return (-1);
+        }
+        tmp->name_set = 1;
+        break;
+
+      case SYMLINK_REQUEST_PATH:
+
+        if (tmp->path_set)
+          return (-1);
+        if (evtag_unmarshal_string(evbuf, SYMLINK_REQUEST_PATH, &tmp->path) == -1) {
+          event_warnx("%s: failed to unmarshal path", __func__);
+          return (-1);
+        }
+        tmp->path_set = 1;
+        break;
+
+      default:
+        return -1;
+    }
+  }
+
+  if (symlink_request_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+symlink_request_complete(struct symlink_request *msg)
+{
+  if (!msg->parent_ino_set)
+    return (-1);
+  if (!msg->name_set)
+    return (-1);
+  if (!msg->path_set)
+    return (-1);
+  return (0);
+}
+
+int
+evtag_unmarshal_symlink_request(struct evbuffer *evbuf, ev_uint32_t need_tag, struct symlink_request *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (symlink_request_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
+}
+
+void
+evtag_marshal_symlink_request(struct evbuffer *evbuf, ev_uint32_t tag, const struct symlink_request *msg)
+{
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  symlink_request_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
+}
+
+/*
+ * Implementation of symlink_response
+ */
+
+static struct symlink_response_access_ __symlink_response_base = {
+  symlink_response_stat_assign,
+  symlink_response_stat_get,
+};
+
+struct symlink_response *
+symlink_response_new(void)
+{
+  return symlink_response_new_with_arg(NULL);
+}
+
+struct symlink_response *
+symlink_response_new_with_arg(void *unused)
+{
+  struct symlink_response *tmp;
+  if ((tmp = malloc(sizeof(struct symlink_response))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__symlink_response_base;
+
+  tmp->stat = NULL;
+  tmp->stat_set = 0;
+
+  return (tmp);
+}
+
+
+int
+symlink_response_stat_assign(struct symlink_response *msg,
+    const struct file_stat* value)
+{
+   struct evbuffer *tmp = NULL;
+   if (msg->stat_set) {
+     file_stat_clear(msg->stat);
+     msg->stat_set = 0;
+   } else {
+     msg->stat = file_stat_new();
+     if (msg->stat == NULL) {
+       event_warn("%s: file_stat_new()", __func__);
+       goto error;
+     }
+   }
+   if ((tmp = evbuffer_new()) == NULL) {
+     event_warn("%s: evbuffer_new()", __func__);
+     goto error;
+   }
+   file_stat_marshal(tmp, value);
+   if (file_stat_unmarshal(msg->stat, tmp) == -1) {
+     event_warnx("%s: file_stat_unmarshal", __func__);
+     goto error;
+   }
+   msg->stat_set = 1;
+   evbuffer_free(tmp);
+   return (0);
+ error:
+   if (tmp != NULL)
+     evbuffer_free(tmp);
+   if (msg->stat != NULL) {
+     file_stat_free(msg->stat);
+     msg->stat = NULL;
+   }
+   return (-1);
+}
+
+int
+symlink_response_stat_get(struct symlink_response *msg, struct file_stat* *value)
+{
+  if (msg->stat_set != 1) {
+    msg->stat = file_stat_new();
+    if (msg->stat == NULL)
+      return (-1);
+    msg->stat_set = 1;
+  }
+  *value = msg->stat;
+  return (0);
+}
+
+void
+symlink_response_clear(struct symlink_response *tmp)
+{
+  if (tmp->stat_set == 1) {
+    file_stat_free(tmp->stat);
+    tmp->stat = NULL;
+    tmp->stat_set = 0;
+  }
+}
+
+void
+symlink_response_free(struct symlink_response *tmp)
+{
+  if (tmp->stat != NULL)
+      file_stat_free(tmp->stat);
+  free(tmp);
+}
+
+void
+symlink_response_marshal(struct evbuffer *evbuf, const struct symlink_response *tmp){
+  evtag_marshal_file_stat(evbuf, SYMLINK_RESPONSE_STAT, tmp->stat);
+}
+
+int
+symlink_response_unmarshal(struct symlink_response *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case SYMLINK_RESPONSE_STAT:
+
+        if (tmp->stat_set)
+          return (-1);
+        tmp->stat = file_stat_new();
+        if (tmp->stat == NULL)
+          return (-1);
+        if (evtag_unmarshal_file_stat(evbuf, SYMLINK_RESPONSE_STAT, tmp->stat) == -1) {
+          event_warnx("%s: failed to unmarshal stat", __func__);
+          return (-1);
+        }
+        tmp->stat_set = 1;
+        break;
+
+      default:
+        return -1;
+    }
+  }
+
+  if (symlink_response_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+symlink_response_complete(struct symlink_response *msg)
+{
+  if (!msg->stat_set)
+    return (-1);
+  if (msg->stat_set && file_stat_complete(msg->stat) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+evtag_unmarshal_symlink_response(struct evbuffer *evbuf, ev_uint32_t need_tag, struct symlink_response *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (symlink_response_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
+}
+
+void
+evtag_marshal_symlink_response(struct evbuffer *evbuf, ev_uint32_t tag, const struct symlink_response *msg)
+{
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  symlink_response_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
+}
+
+/*
+ * Implementation of readlink_request
+ */
+
+static struct readlink_request_access_ __readlink_request_base = {
+  readlink_request_ino_assign,
+  readlink_request_ino_get,
+};
+
+struct readlink_request *
+readlink_request_new(void)
+{
+  return readlink_request_new_with_arg(NULL);
+}
+
+struct readlink_request *
+readlink_request_new_with_arg(void *unused)
+{
+  struct readlink_request *tmp;
+  if ((tmp = malloc(sizeof(struct readlink_request))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__readlink_request_base;
+
+  tmp->ino = 0;
+  tmp->ino_set = 0;
+
+  return (tmp);
+}
+
+
+int
+readlink_request_ino_assign(struct readlink_request *msg, const ev_uint64_t value)
+{
+  msg->ino_set = 1;
+  msg->ino = value;
+  return (0);
+}
+
+int
+readlink_request_ino_get(struct readlink_request *msg, ev_uint64_t *value)
+{
+  if (msg->ino_set != 1)
+    return (-1);
+  *value = msg->ino;
+  return (0);
+}
+
+void
+readlink_request_clear(struct readlink_request *tmp)
+{
+  tmp->ino_set = 0;
+}
+
+void
+readlink_request_free(struct readlink_request *tmp)
+{
+  free(tmp);
+}
+
+void
+readlink_request_marshal(struct evbuffer *evbuf, const struct readlink_request *tmp){
+  evtag_marshal_int64(evbuf, READLINK_REQUEST_INO, tmp->ino);
+}
+
+int
+readlink_request_unmarshal(struct readlink_request *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case READLINK_REQUEST_INO:
+
+        if (tmp->ino_set)
+          return (-1);
+        if (evtag_unmarshal_int64(evbuf, READLINK_REQUEST_INO, &tmp->ino) == -1) {
+          event_warnx("%s: failed to unmarshal ino", __func__);
+          return (-1);
+        }
+        tmp->ino_set = 1;
+        break;
+
+      default:
+        return -1;
+    }
+  }
+
+  if (readlink_request_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+readlink_request_complete(struct readlink_request *msg)
+{
+  if (!msg->ino_set)
+    return (-1);
+  return (0);
+}
+
+int
+evtag_unmarshal_readlink_request(struct evbuffer *evbuf, ev_uint32_t need_tag, struct readlink_request *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (readlink_request_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
+}
+
+void
+evtag_marshal_readlink_request(struct evbuffer *evbuf, ev_uint32_t tag, const struct readlink_request *msg)
+{
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  readlink_request_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
+}
+
+/*
+ * Implementation of readlink_response
+ */
+
+static struct readlink_response_access_ __readlink_response_base = {
+  readlink_response_path_assign,
+  readlink_response_path_get,
+};
+
+struct readlink_response *
+readlink_response_new(void)
+{
+  return readlink_response_new_with_arg(NULL);
+}
+
+struct readlink_response *
+readlink_response_new_with_arg(void *unused)
+{
+  struct readlink_response *tmp;
+  if ((tmp = malloc(sizeof(struct readlink_response))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__readlink_response_base;
+
+  tmp->path = NULL;
+  tmp->path_set = 0;
+
+  return (tmp);
+}
+
+
+int
+readlink_response_path_assign(struct readlink_response *msg,
+    const char * value)
+{
+  if (msg->path != NULL)
+    free(msg->path);
+  if ((msg->path = strdup(value)) == NULL)
+    return (-1);
+  msg->path_set = 1;
+  return (0);
+}
+
+int
+readlink_response_path_get(struct readlink_response *msg, char * *value)
+{
+  if (msg->path_set != 1)
+    return (-1);
+  *value = msg->path;
+  return (0);
+}
+
+void
+readlink_response_clear(struct readlink_response *tmp)
+{
+  if (tmp->path_set == 1) {
+    free(tmp->path);
+    tmp->path = NULL;
+    tmp->path_set = 0;
+  }
+}
+
+void
+readlink_response_free(struct readlink_response *tmp)
+{
+  if (tmp->path != NULL)
+      free (tmp->path);
+  free(tmp);
+}
+
+void
+readlink_response_marshal(struct evbuffer *evbuf, const struct readlink_response *tmp){
+  evtag_marshal_string(evbuf, READLINK_RESPONSE_PATH, tmp->path);
+}
+
+int
+readlink_response_unmarshal(struct readlink_response *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case READLINK_RESPONSE_PATH:
+
+        if (tmp->path_set)
+          return (-1);
+        if (evtag_unmarshal_string(evbuf, READLINK_RESPONSE_PATH, &tmp->path) == -1) {
+          event_warnx("%s: failed to unmarshal path", __func__);
+          return (-1);
+        }
+        tmp->path_set = 1;
+        break;
+
+      default:
+        return -1;
+    }
+  }
+
+  if (readlink_response_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+readlink_response_complete(struct readlink_response *msg)
+{
+  if (!msg->path_set)
+    return (-1);
+  return (0);
+}
+
+int
+evtag_unmarshal_readlink_response(struct evbuffer *evbuf, ev_uint32_t need_tag, struct readlink_response *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (readlink_response_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
+}
+
+void
+evtag_marshal_readlink_response(struct evbuffer *evbuf, ev_uint32_t tag, const struct readlink_response *msg)
+{
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  readlink_response_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
+}
+
+/*
  * Implementation of lookup_request
  */
 
