@@ -69,9 +69,9 @@ r:
 
 #killall
 k: 
-	rm /mnt/hd1/* -rf & 
-	rm /mnt/hd2/* -rf & 
-	rm ~/log/ -rf  &
+	rm /mnt/hd1/* -rf 
+	rm /mnt/hd2/* -rf  
+	rm ~/log/ -rf  
 	-killall -q cmgr.out osd.out mds.out mount.out
 
 indent:
