@@ -1,6 +1,5 @@
 #include "sfs_common.h"
 #include "mds_conn.h"
-#include "attr_cache.h"
 
 ConnectionPool *conn_pool = NULL;
 
@@ -81,16 +80,6 @@ int stat_send_request(char *ip, int port, uint64_t * ino_arr, int len,
     return ret;
 }
 
-/*int stat_send_request(uint64_t * ino_arr, int len, struct file_stat *stat_arr)*/
-/*{*/
-    /*// it MUST be int the attr_cache */
-    /*struct file_stat * cached = attr_cache_lookup(ino_arr[0]); */
-    /*assert(cached); */
-    /*file_stat_copy(stat_arr, cached); */
-    /*return 0; */
-
-/*}*/
-
 //seams same as stat_send_request
 int ls_send_request(char *ip, int port, uint64_t ino,
                     struct file_stat ***o_stat_arr, int *o_cnt)
@@ -120,9 +109,7 @@ int ls_send_request(char *ip, int port, uint64_t ino,
     for (i = 0; i < cnt; i++) {
         EVTAG_ARRAY_GET(response, stat_arr, i, &stat);
         file_stat_copy(stat_arr[i], stat);
-        log_file_stat("ls get : ", stat);
-        if ((strcmp(stat->name, ".") != 0) && (strcmp(stat->name, "..") != 0))
-            attr_cache_add(stat_arr[i]);
+        /*log_file_stat("ls get : ", stat);*/
     }
     ls_request_free(req);
     ls_response_free(response);
@@ -157,10 +144,6 @@ int mknod_send_request(char *ip, int port,
     EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
     file_stat_copy(o_stat, stat);
 
-    struct file_stat *new_stat = file_stat_new();
-    file_stat_copy(new_stat, stat);
-    attr_cache_add(new_stat);
-
     mknod_request_free(req);
     mknod_response_free(response);
     return 0;
@@ -188,10 +171,6 @@ int symlink_send_request(char *ip, int port, uint64_t parent_ino,
     struct file_stat *stat;
     EVTAG_GET(response, stat, &stat);
     file_stat_copy(o_stat, stat);
-
-    struct file_stat *new_stat = file_stat_new();
-    file_stat_copy(new_stat, stat);
-    attr_cache_add(new_stat);
 
     symlink_request_free(req);
     symlink_response_free(response);
@@ -240,12 +219,6 @@ int lookup_send_request(char *ip, int port, uint64_t parent_ino,
     struct file_stat *stat;
     EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
     file_stat_copy(o_stat, stat);
-    //TODO : remove this
-    if (stat->ino != 0) {
-        struct file_stat *new_stat = file_stat_new();
-        file_stat_copy(new_stat, stat);
-        attr_cache_add(new_stat);
-    }
 
     lookup_request_free(req);
     lookup_response_free(response);
