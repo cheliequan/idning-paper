@@ -184,6 +184,10 @@ static void sfs_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     memset(&b, 0, sizeof(b));
     for (i = 0; i < cnt; i++) {
         log_file_stat("readdir return :", stat_arr[i]);
+
+        if ((strcmp(stat_arr[i]->name, ".") != 0) && (strcmp(stat_arr[i]->name, "..") != 0))
+            attr_cache_add(stat_arr[i]);
+
         dirbuf_add(req, &b, stat_arr[i]->name, stat_arr[i]->mode,
                    stat_arr[i]->ino);
     }
