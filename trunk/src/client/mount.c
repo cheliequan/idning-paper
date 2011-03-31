@@ -22,62 +22,68 @@ void init_sig_handler()
     if (signal(SIGTERM, sig_handler) == SIG_IGN)
         signal(SIGTERM, SIG_IGN);
 }
-static int get_mid_of_ino(int ino){
 
-    struct file_stat * cached = attr_cache_lookup(ino);
-    if (cached == NULL){
-        /*cached = find_in_all();*/
+static int get_mid_of_ino(int ino)
+{
+
+    struct file_stat *cached = attr_cache_lookup(ino);
+    if (cached == NULL) {
+        /*cached = find_in_all(); */
         assert(0);
     }
-    if (cached == NULL){
+    if (cached == NULL) {
         // return err
         assert(0);
 
     }
-    
+
     int mid = cached->pos_arr[0];
     return mid;
 }
 
-static inline struct machine * get_machine_of_parent_inode(fuse_ino_t ino){
-    struct file_stat * cached = attr_cache_lookup(ino);
+static inline struct machine *get_machine_of_parent_inode(fuse_ino_t ino)
+{
+    struct file_stat *cached = attr_cache_lookup(ino);
     int mid = get_mid_of_ino(cached->parent_ino);
-    struct machine * m = cluster_get_machine_by_mid(mid);
+    struct machine *m = cluster_get_machine_by_mid(mid);
     return m;
 }
 
-static inline struct machine * get_machine_of_inode(fuse_ino_t ino){
+static inline struct machine *get_machine_of_inode(fuse_ino_t ino)
+{
     int mid = get_mid_of_ino(ino);
-    struct machine * m = cluster_get_machine_by_mid(mid);
+    struct machine *m = cluster_get_machine_by_mid(mid);
     return m;
 }
-static inline int is_dir(struct file_stat * stat){
+
+static inline int is_dir(struct file_stat *stat)
+{
     return (stat->mode & S_IFDIR) != 0;
 }
+
 /*
  * get file_stat form cache  
  * if the cache is out of date
  * get it from mds
  * the returned file_stat is Already in the cache , so we do not need to free it!
  * */
-static struct file_stat * get_attr(fuse_ino_t ino){
-    int mid ;
-    struct file_stat * cached = attr_cache_lookup(ino);
-    if (is_dir(cached)){
+static struct file_stat *get_attr(fuse_ino_t ino)
+{
+    int mid;
+    struct file_stat *cached = attr_cache_lookup(ino);
+    if (is_dir(cached)) {
         mid = get_mid_of_ino(ino);
-    }
-    else{
+    } else {
         mid = get_mid_of_ino(cached->parent_ino);
     }
     //?? out of date??
-    struct machine * m = cluster_get_machine_by_mid(mid);
-
+    struct machine *m = cluster_get_machine_by_mid(mid);
 
     uint64_t arr[1];
     struct file_stat *stat = file_stat_new();
     arr[0] = ino;
 
-    stat_send_request(m->ip, m->port, arr, 1, cached); // update the cache item
+    stat_send_request(m->ip, m->port, arr, 1, cached);  // update the cache item
     log_file_stat("stat updated in cache:", stat);
     return cached;
 }
@@ -117,17 +123,17 @@ static void sfs_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
     memset(&e, 0, sizeof(e));
 
     struct file_stat *stat = file_stat_new();
-    struct machine * m = get_machine_of_inode(parent);
+    struct machine *m = get_machine_of_inode(parent);
     lookup_send_request(m->ip, m->port, (uint64_t) parent, name, stat);
     logging(LOG_DEUBG, "lookup(parent = %lu, name = %s) return inode: %lu",
             parent, name, e.ino);
-    if (stat->ino){
+    if (stat->ino) {
         attr_cache_add(stat);
         e.ino = stat->ino;
         e.attr_timeout = 1.0;
         e.entry_timeout = 1.0;
-        sfs_stat(e.ino, &e.attr); // fill e.attr , should not call rpc again
-    }else{
+        sfs_stat(e.ino, &e.attr);   // fill e.attr , should not call rpc again
+    } else {
         e.ino = 0;
         file_stat_free(stat);
     }
@@ -148,13 +154,7 @@ static void dirbuf_add(fuse_req_t req, struct dirbuf *b, const char *name,
     b->p = (char *)realloc(b->p, b->size);
     memset(&stbuf, 0, sizeof(stbuf));
     stbuf.st_ino = ino;
-    /*stbuf.st_mode = mode; */
-
-    stbuf.st_mode = S_IFREG;
-    printf("S_IFREG: %04o\n", S_IFREG);
-    printf("S_IFDIR: %04o\n", S_IFDIR);
-    /*stbuf.st_mode = */
-
+    stbuf.st_mode = mode;
     fuse_add_direntry(req, b->p + oldsize, b->size - oldsize, name, &stbuf,
                       b->size);
 }
@@ -179,7 +179,7 @@ static void sfs_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     struct file_stat **stat_arr;
     int cnt;
 
-    struct machine * m = get_machine_of_inode(ino);
+    struct machine *m = get_machine_of_inode(ino);
     ls_send_request(m->ip, m->port, ino, &stat_arr, &cnt);
     int i;
     struct dirbuf b;
@@ -206,6 +206,7 @@ static void sfs_ll_open(fuse_req_t req, fuse_ino_t ino,
     /*file_stat_free(stat);  do not free!! */
     fuse_reply_open(req, fi);
 }
+
 static void sfs_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
                         off_t off, struct fuse_file_info *fi)
 {
@@ -302,7 +303,7 @@ void sfs_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf,
                 in_stbuf->st_size);
     }
 
-    struct machine * m = get_machine_of_parent_inode(ino);
+    struct machine *m = get_machine_of_parent_inode(ino);
     setattr_send_request(m->ip, m->port, old_stat);
 
     struct stat stbuf;
@@ -332,7 +333,7 @@ void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
         f_stat->ino = ino;
         f_stat->size = sizenow;
 
-        struct machine * m = get_machine_of_parent_inode(f_stat->ino);
+        struct machine *m = get_machine_of_parent_inode(f_stat->ino);
         setattr_send_request(m->ip, m->port, f_stat);
     }
 
@@ -345,14 +346,14 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
     logging(LOG_DEUBG, "create(parent = %lu, name = %s, mode=%04o)", parent,
             name, mode);
     struct fuse_entry_param e;
-    struct machine * m = get_machine_of_parent_inode(parent);
+    struct machine *m = get_machine_of_parent_inode(parent);
     struct file_stat *stat = file_stat_new();
 
     mknod_send_request(m->ip, m->port, parent, name, 0, S_IFREG, stat);
 
 //FIXME  add cache
     log_file_stat("create return :", stat);
-    attr_cache_add(stat); //no free
+    attr_cache_add(stat);       //no free
 
     memset(&e, 0, sizeof(e));
     e.ino = stat->ino;
@@ -375,12 +376,12 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
     logging(LOG_DEUBG, "mkdir(parent = %lu, name = %s, mode=%04o)", parent,
             name, mode);
     struct fuse_entry_param e;
-    struct machine * m = get_machine_of_parent_inode(parent);
+    struct machine *m = get_machine_of_parent_inode(parent);
     struct file_stat *stat = file_stat_new();
     mknod_send_request(m->ip, m->port, parent, name, 0, S_IFDIR, stat);
 
     log_file_stat("create return :", stat);
-    attr_cache_add(stat); //no free
+    attr_cache_add(stat);       //no free
 
     memset(&e, 0, sizeof(e));
     e.ino = stat->ino;
@@ -392,21 +393,21 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
     if (fuse_reply_entry(req, &e) == -ENOENT) {
 
     }
-    /*file_stat_free(stat);*/
+    /*file_stat_free(stat); */
 }
 
-
-
-void sfs_symlink(fuse_req_t req, const char *path, fuse_ino_t parent, const char *name) {
+void sfs_symlink(fuse_req_t req, const char *path, fuse_ino_t parent,
+                 const char *name)
+{
     logging(LOG_DEUBG, "symlink(parent = %lu, name = %s, path=%s)", parent,
             name, path);
     struct fuse_entry_param e;
-    struct machine * m = get_machine_of_parent_inode(parent);
+    struct machine *m = get_machine_of_parent_inode(parent);
     struct file_stat *stat = file_stat_new();
     symlink_send_request(m->ip, m->port, parent, name, path, stat);
 
     log_file_stat("symlink return :", stat);
-    attr_cache_add(stat); //no free
+    attr_cache_add(stat);       //no free
 
     memset(&e, 0, sizeof(e));
     e.ino = stat->ino;
@@ -420,28 +421,26 @@ void sfs_symlink(fuse_req_t req, const char *path, fuse_ino_t parent, const char
     }
 }
 
-
-void sfs_readlink(fuse_req_t req, fuse_ino_t ino) {
+void sfs_readlink(fuse_req_t req, fuse_ino_t ino)
+{
     logging(LOG_DEUBG, "readlink(ino = %lu)", ino);
-    struct machine * m = get_machine_of_parent_inode(ino);
-    const char *path = readlink_send_request(m->ip, m->port, ino); 
+    struct machine *m = get_machine_of_parent_inode(ino);
+    const char *path = readlink_send_request(m->ip, m->port, ino);
     logging(LOG_DEUBG, "sfs_readlink get path: %s", path);
 
     if (0) {
         fuse_reply_err(req, 3);
     } else {
-        fuse_reply_readlink(req, (char*)path);
+        fuse_reply_readlink(req, (char *)path);
     }
 
-    free((void*)path);  
+    free((void *)path);
 }
-
-
 
 static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
 {
     logging(LOG_DEUBG, "unlink(parent = %lu, name = %s)", parent, name);
-    struct machine * m = get_machine_of_inode(parent);
+    struct machine *m = get_machine_of_inode(parent);
 
     unlink_send_request(m->ip, m->port, parent, name);
 
@@ -452,9 +451,9 @@ void sfs_release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 {
     struct file_stat *stat = (struct file_stat *)(unsigned long)(fi->fh);
 
-    /*if (stat != NULL) {*/
-        /*file_stat_free(stat);*/
-    /*}*/
+    /*if (stat != NULL) { */
+    /*file_stat_free(stat); */
+    /*} */
     fuse_reply_err(req, 0);
 }
 
@@ -471,7 +470,7 @@ void sfs_statfs(fuse_req_t req, fuse_ino_t ino)
     int *mds;
     int mds_cnt;
     cluster_get_mds_arr(&mds, &mds_cnt);
-    struct machine * m = cluster_get_machine_by_mid(mds[0]); // TODO: currently it's  a random one
+    struct machine *m = cluster_get_machine_by_mid(mds[0]); // TODO: currently it's  a random one
     statfs_send_request(m->ip, m->port, &totalspace, &availspace, &inodes);
     logging(LOG_DEUBG, "sfs_statfs get : %d , %d, %d ", totalspace, availspace,
             inodes);
@@ -492,24 +491,25 @@ void sfs_statfs(fuse_req_t req, fuse_ino_t ino)
 
 #define RST_FOUND 0
 
-
-int find_root(){
+int find_root()
+{
     DBG();
 
     int *mds;
     int mds_cnt;
     int i;
-    int64_t ino_arr[1] = {1};
+    int64_t ino_arr[1] = { 1 };
 
     cluster_get_mds_arr(&mds, &mds_cnt);
-    for (i = 0; i < mds_cnt; i++){
+    for (i = 0; i < mds_cnt; i++) {
         struct file_stat *stat = file_stat_new();
         EVTAG_ARRAY_ADD_VALUE(stat, pos_arr, mds[i]);
-        struct machine * m = cluster_get_machine_by_mid(mds[i]);
+        struct machine *m = cluster_get_machine_by_mid(mds[i]);
 
-        if(stat_send_request(m->ip, m->port, ino_arr, 1, stat) == RST_FOUND){
-            logging(LOG_INFO, "get inode %"PRIu64" at mds (%d)", (uint64_t)1, mds[i] );
-            attr_cache_add(stat); //no free
+        if (stat_send_request(m->ip, m->port, ino_arr, 1, stat) == RST_FOUND) {
+            logging(LOG_INFO, "get inode %" PRIu64 " at mds (%d)", (uint64_t) 1,
+                    mds[i]);
+            attr_cache_add(stat);   //no free
 
             return 1;
         }
@@ -518,60 +518,62 @@ int find_root(){
     return 0;
 }
 
-void sfs_mkfs(){
+void sfs_mkfs()
+{
     DBG();
 
     int *mds;
     int mds_cnt;
     cluster_get_mds_arr(&mds, &mds_cnt);
-    if (mds_cnt <= 1){
+    if (mds_cnt <= 1) {
         logging(LOG_WARN, "we need at least 2 mds !, fs not mk");
         return;
     }
-    /*if(find_root()){*/
-        /*logging(LOG_WARN, "fs is not null!!! can't do mkfs");*/
-        /*return ;*/
-    /*}*/
+    /*if(find_root()){ */
+    /*logging(LOG_WARN, "fs is not null!!! can't do mkfs"); */
+    /*return ; */
+    /*} */
     mkfs_send_request(mds[0], mds[1]);
 }
+
 #undef RST_FOUND
 
-
-
-void sfs_access(fuse_req_t req, fuse_ino_t ino, int mask) {
+void sfs_access(fuse_req_t req, fuse_ino_t ino, int mask)
+{
     DBG();
     if (0) {
         assert(0);
     } else {
-        fuse_reply_err(req,0);
+        fuse_reply_err(req, 0);
     }
 }
 
-
-void sfs_init(int debug_mode_in,int keep_cache_in,double direntry_cache_timeout_in,double entry_cache_timeout_in,double attr_cache_timeout_in) {
+void sfs_init(int debug_mode_in, int keep_cache_in,
+              double direntry_cache_timeout_in, double entry_cache_timeout_in,
+              double attr_cache_timeout_in)
+{
 }
 
-
 static struct fuse_lowlevel_ops sfs_ll_op = {
-    /*.init       = sfs_init,*/
-    .lookup     = sfs_ll_lookup,
-    .getattr    = sfs_ll_getattr,
-    .readdir    = sfs_ll_readdir,
-    .open       = sfs_ll_open,
-    .read       = sfs_ll_read,
-    .write      = sfs_ll_write,
-    .setattr    = sfs_ll_setattr,
-    .flush      = sfs_ll_flush,
-    .create     = sfs_ll_create,
-    .mkdir      = sfs_ll_mkdir,
-    .unlink     = sfs_ll_unlink,
-    .rmdir      = sfs_ll_unlink,
-    .statfs     = sfs_statfs,
-    .release    = sfs_release,
+    /*.init       = sfs_init, */
+    .lookup = sfs_ll_lookup,
+    .getattr = sfs_ll_getattr,
+    .readdir = sfs_ll_readdir,
+    .open = sfs_ll_open,
+    .read = sfs_ll_read,
+    .write = sfs_ll_write,
+    .setattr = sfs_ll_setattr,
+    .flush = sfs_ll_flush,
+    .create = sfs_ll_create,
+    .mkdir = sfs_ll_mkdir,
+    .unlink = sfs_ll_unlink,
+    .rmdir = sfs_ll_unlink,
+    .statfs = sfs_statfs,
+    .release = sfs_release,
 
-    .symlink    = sfs_symlink,
-    .readlink   = sfs_readlink,
-    .access     = sfs_access,
+    .symlink = sfs_symlink,
+    .readlink = sfs_readlink,
+    .access = sfs_access,
 
 };
 
@@ -586,14 +588,12 @@ int main(int argc, char *argv[])
     init_app(argc, argv, "client");
     mds_conn_init();
     attr_cache_init();
-    if (!find_root()){
+    if (!find_root()) {
         sfs_mkfs();
         find_root();
     }
     http_client_init();
     init_sig_handler();
-
-
 
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
     struct fuse_chan *ch;

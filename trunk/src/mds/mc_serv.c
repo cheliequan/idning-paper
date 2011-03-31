@@ -1,6 +1,6 @@
 #include "sfs_common.h"
 #include "fs.h"
-static void fsnode_to_stat_copy(struct file_stat * t, fsnode * n);
+static void fsnode_to_stat_copy(struct file_stat *t, fsnode * n);
 
 static void setattr_handler(EVRPC_STRUCT(rpc_setattr) * rpc, void *arg)
 {
@@ -38,7 +38,7 @@ static void stat_handler(EVRPC_STRUCT(rpc_stat) * rpc, void *arg)
 
         struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
         //TODO;
-        
+
         fsnode *n = fsnode_hash_find(ino);
         fsnode_to_stat_copy(t, n);
         log_file_stat("stat return : ", t);
@@ -107,15 +107,16 @@ static void statfs_handler(EVRPC_STRUCT(rpc_statfs) * rpc, void *arg)
     EVRPC_REQUEST_DONE(rpc);
 }
 
-static void fsnode_to_stat_copy(struct file_stat * t, fsnode * n){
+static void fsnode_to_stat_copy(struct file_stat *t, fsnode * n)
+{
 
     if (NULL == n) {
         EVTAG_ASSIGN(t, ino, 0);
         EVTAG_ASSIGN(t, parent_ino, 0);
         EVTAG_ASSIGN(t, size, 0);
         EVTAG_ASSIGN(t, name, "");
-        return ;
-    } 
+        return;
+    }
 
     EVTAG_ASSIGN(t, ino, n->ino);
     EVTAG_ASSIGN(t, parent_ino, n->parent->ino);
@@ -127,7 +128,6 @@ static void fsnode_to_stat_copy(struct file_stat * t, fsnode * n){
     EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[1]);
 
 }
-
 
 static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
 {
@@ -153,8 +153,6 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
     EVRPC_REQUEST_DONE(rpc);
 }
 
-
-
 static void symlink_handler(EVRPC_STRUCT(rpc_symlink) * rpc, void *arg)
 {
     DBG();
@@ -168,7 +166,7 @@ static void symlink_handler(EVRPC_STRUCT(rpc_symlink) * rpc, void *arg)
     logging(LOG_DEUBG, "symlink(parent=%" PRIu64 ", name=%s, path =%s)",
             request->parent_ino, request->name, request->path);
 
-    struct file_stat *t ;
+    struct file_stat *t;
     EVTAG_GET(response, stat, &t);
     fsnode_to_stat_copy(t, n);
     /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 8); */
@@ -186,7 +184,7 @@ static void readlink_handler(EVRPC_STRUCT(rpc_readlink) * rpc, void *arg)
 
     struct readlink_request *request = rpc->request;
     struct readlink_response *response = rpc->reply;
-    char * p = fs_readlink(request->ino);
+    char *p = fs_readlink(request->ino);
 
     logging(LOG_DEUBG, "readlink(ino =%" PRIu64 ")", request->ino);
     logging(LOG_DEUBG, "readlink return : %s", p);
@@ -195,8 +193,6 @@ static void readlink_handler(EVRPC_STRUCT(rpc_readlink) * rpc, void *arg)
 
     EVRPC_REQUEST_DONE(rpc);
 }
-
-
 
 static void lookup_handler(EVRPC_STRUCT(rpc_lookup) * rpc, void *arg)
 {
@@ -232,14 +228,12 @@ static void unlink_handler(EVRPC_STRUCT(rpc_unlink) * rpc, void *arg)
     EVRPC_REQUEST_DONE(rpc);
 }
 
-
-
 static void mkfs_handler(EVRPC_STRUCT(rpc_mkfs) * rpc, void *arg)
 {
     DBG();
 
-    struct mkfs_request * request = rpc->request;
-    /*struct mkfs_response * response = rpc->reply;*/
+    struct mkfs_request *request = rpc->request;
+    /*struct mkfs_response * response = rpc->reply; */
 
     int mds1, mds2;
     EVTAG_ARRAY_GET(request, pos_arr, 0, &mds1);

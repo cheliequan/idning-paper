@@ -126,8 +126,8 @@ int fs_stat(uint64_t ino, struct file_stat *st)
 {
     logging(LOG_DEUBG, "fs_stat(%" PRIu64 ")", ino);
     fsnode *n = fsnode_hash_find(ino);
-    if (n == NULL){
-        st->ino=0;
+    if (n == NULL) {
+        st->ino = 0;
         return 1;
     }
     st->ino = ino;
@@ -201,15 +201,15 @@ fsnode *fs_mknod(uint64_t parent_ino, char *name, int type, int mode)
     n->name = strdup(name);
     n->nlen = strlen(n->name);
     if (n->mode & S_IFREG) {    //is file 
-        n->data.fdata.length = 4096;
+        n->data.fdata.length = 0;
         n->pos_arr[0] = select_osd();
         n->pos_arr[1] = select_osd();
     } else if (n->mode & S_IFDIR) {
+        n->data.fdata.length = 4096;
         n->pos_arr[0] = n->parent->pos_arr[0];
         n->pos_arr[1] = n->parent->pos_arr[1];
         n->data.ddata.children = NULL;
     }
-
 
     fsnode_hash_insert(n);
     fsnode_tree_insert(n->parent, n);
@@ -217,12 +217,14 @@ fsnode *fs_mknod(uint64_t parent_ino, char *name, int type, int mode)
     return n;
 }
 
-fsnode * fs_symlink(uint64_t parent_ino, const char * name, const char *path){
-    logging(LOG_DEUBG, "fs_symlink(parent_ino = %" PRIu64 " , name = %s, path = %s)",
+fsnode *fs_symlink(uint64_t parent_ino, const char *name, const char *path)
+{
+    logging(LOG_DEUBG,
+            "fs_symlink(parent_ino = %" PRIu64 " , name = %s, path = %s)",
             parent_ino, name, path);
     fsnode *n = fsnode_new();
     n->ino = cur_ino++;
-    n->type = 255; //TODO
+    n->type = 255;              //TODO
 
     n->mode = S_IFLNK;
     n->name = strdup(name);
@@ -240,13 +242,13 @@ fsnode * fs_symlink(uint64_t parent_ino, const char * name, const char *path){
     return n;
 }
 
-char * fs_readlink(uint64_t ino){
-    fsnode * n = fsnode_hash_find(ino);
+char *fs_readlink(uint64_t ino)
+{
+    fsnode *n = fsnode_hash_find(ino);
     if (n && n->mode == S_IFLNK)
         return n->data.sdata.path;
     return NULL;
 }
-
 
 /*
  * make root of a whole fs, call by mkfs.sfs
@@ -264,8 +266,8 @@ int fs_mkfs(int mds1, int mds2)
     root->parent = root;
     root->data.ddata.children = NULL;
 
-    root -> pos_arr[0] = mds1;
-    root -> pos_arr[1] = mds2;
+    root->pos_arr[0] = mds1;
+    root->pos_arr[1] = mds2;
 
     fsnode_hash_insert(root);
 

@@ -79,9 +79,9 @@ fsnode *fs_ls(uint64_t ino);
 void fs_statfs(int *total_space, int *avail_space, int *inode_cnt);
 int fs_mkfs();
 
-fsnode * fs_symlink(uint64_t parent_ino, const char * name, const char *path);
+fsnode *fs_symlink(uint64_t parent_ino, const char *name, const char *path);
 
-char * fs_readlink(uint64_t ino);
+char *fs_readlink(uint64_t ino);
 int fs_rename();
 int fs_get_goal();
 int fs_set_goal();
