@@ -7,16 +7,15 @@ ConnectionPool *conn_pool = NULL;
 typedef void (*marshal_func) (struct evbuffer *, void *);
 typedef int (*unmarshal_func) (void *, struct evbuffer *);
 
-static void general_req(char *ip, int port, const char *rpcname,
+static void rpc_grneral_request(char *ip, int port, const char *rpcname,
                         void *req, marshal_func req_marshal,
                         void *resp, unmarshal_func resp_unmarshal);
 
-static void rpc_request_gen_cb(struct evhttp_request *req, void *arg);
+static void rpc_rpc_grneral_requestuest_cb(struct evhttp_request *req, void *arg);
 static void file_stat_copy(struct file_stat *dst, struct file_stat *src);
-static int get_mid_of_ino(int ino);
 
 ///////////////////
-int setattr_send_request(struct file_stat *stat_arr)
+int setattr_send_request(char * ip ,int port, struct file_stat *stat_arr)
 {
     DBG();
     int ret = 0;
@@ -27,10 +26,10 @@ int setattr_send_request(struct file_stat *stat_arr)
     EVTAG_ASSIGN(t, ino, stat_arr->ino);
     EVTAG_ASSIGN(t, size, stat_arr->size);
 
-    int mid = get_mid_of_ino(stat_arr->parent_ino);
-    struct machine * m = cluster_get_machine_by_mid(mid);
+    /*int mid = get_mid_of_ino(stat_arr->parent_ino);*/
+    /*struct machine * m = cluster_get_machine_by_mid(mid);*/
 
-    general_req(m->ip, m->port, "/.rpc.rpc_setattr",
+    rpc_grneral_request(ip, port, "/.rpc.rpc_setattr",
                 req, (marshal_func) setattr_request_marshal,
                 response, (unmarshal_func) setattr_response_unmarshal);
 
@@ -48,7 +47,7 @@ int setattr_send_request(struct file_stat *stat_arr)
 
 }
 
-int stat_send_request_to(uint64_t * ino_arr, int len, struct file_stat *stat_arr, char * ip, int port){
+int stat_send_request(char * ip, int port, uint64_t * ino_arr, int len, struct file_stat *stat_arr){
     DBG();
     int ret = 0;
     struct stat_request *req = stat_request_new();
@@ -58,7 +57,7 @@ int stat_send_request_to(uint64_t * ino_arr, int len, struct file_stat *stat_arr
         EVTAG_ARRAY_ADD_VALUE(req, ino_arr, ino_arr[i]);
     }
 
-    general_req(ip, port, "/.rpc.rpc_stat",
+    rpc_grneral_request(ip, port, "/.rpc.rpc_stat",
                 req, (marshal_func) stat_request_marshal,
                 response, (unmarshal_func) stat_response_unmarshal);
 
@@ -81,18 +80,18 @@ int stat_send_request_to(uint64_t * ino_arr, int len, struct file_stat *stat_arr
     stat_response_free(response);
     return ret;
 }
-int stat_send_request(uint64_t * ino_arr, int len, struct file_stat *stat_arr)
-{
-    // it MUST be int the attr_cache
-    struct file_stat * cached = attr_cache_lookup(ino_arr[0]);
-    assert(cached);
-    file_stat_copy(stat_arr, cached);
-    return 0;
+/*int stat_send_request(uint64_t * ino_arr, int len, struct file_stat *stat_arr)*/
+/*{*/
+    /*// it MUST be int the attr_cache*/
+    /*struct file_stat * cached = attr_cache_lookup(ino_arr[0]);*/
+    /*assert(cached);*/
+    /*file_stat_copy(stat_arr, cached);*/
+    /*return 0;*/
 
-}
+/*}*/
 
 //seams same as stat_send_request
-int ls_send_request(uint64_t ino, struct file_stat ***o_stat_arr, int *o_cnt)
+int ls_send_request(char * ip, int port, uint64_t ino, struct file_stat ***o_stat_arr, int *o_cnt)
 {
     DBG();
     struct ls_request *req = ls_request_new();
@@ -100,10 +99,10 @@ int ls_send_request(uint64_t ino, struct file_stat ***o_stat_arr, int *o_cnt)
 
     EVTAG_ARRAY_ADD_VALUE(req, ino_arr, ino);
 
-    int mid = get_mid_of_ino(ino);
-    struct machine * m = cluster_get_machine_by_mid(mid);
+    /*int mid = get_mid_of_ino(ino);*/
+    /*struct machine * m = cluster_get_machine_by_mid(mid);*/
 
-    general_req(m->ip, m->port, "/.rpc.rpc_ls",
+    rpc_grneral_request(ip, port, "/.rpc.rpc_ls",
                 req, (marshal_func) ls_request_marshal,
                 response, (unmarshal_func) ls_response_unmarshal);
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
@@ -132,7 +131,8 @@ int ls_send_request(uint64_t ino, struct file_stat ***o_stat_arr, int *o_cnt)
     return cnt;
 }
 
-int mknod_send_request(uint64_t parent_ino, const char *name, int type,
+int mknod_send_request(char * ip, int port, 
+        uint64_t parent_ino, const char *name, int type,
                        int mode, struct file_stat *o_stat)
 {
     DBG();
@@ -144,10 +144,10 @@ int mknod_send_request(uint64_t parent_ino, const char *name, int type,
     EVTAG_ASSIGN(req, type, type);
     EVTAG_ASSIGN(req, mode, mode);
 
-    int mid = get_mid_of_ino(parent_ino);
-    struct machine * m = cluster_get_machine_by_mid(mid);
+    /*int mid = get_mid_of_ino(parent_ino);*/
+    /*struct machine * m = cluster_get_machine_by_mid(mid);*/
 
-    general_req(m->ip, m->port, "/.rpc.rpc_mknod",
+    rpc_grneral_request(ip, port, "/.rpc.rpc_mknod",
                 req, (marshal_func) mknod_request_marshal,
                 response, (unmarshal_func) mknod_response_unmarshal);
 
@@ -164,7 +164,7 @@ int mknod_send_request(uint64_t parent_ino, const char *name, int type,
     return 0;
 }
 
-int symlink_send_request(uint64_t parent_ino, const char *name, const char * path, struct file_stat *o_stat)
+int symlink_send_request(char * ip, int port, uint64_t parent_ino, const char *name, const char * path, struct file_stat *o_stat)
 {
     DBG();
     struct symlink_request *req = symlink_request_new();
@@ -174,10 +174,10 @@ int symlink_send_request(uint64_t parent_ino, const char *name, const char * pat
     EVTAG_ASSIGN(req, name, name);
     EVTAG_ASSIGN(req, path, path);
 
-    int mid = get_mid_of_ino(parent_ino);
-    struct machine * m = cluster_get_machine_by_mid(mid);
+    /*int mid = get_mid_of_ino(parent_ino);*/
+    /*struct machine * m = cluster_get_machine_by_mid(mid);*/
 
-    general_req(m->ip, m->port, "/.rpc.rpc_symlink",
+    rpc_grneral_request(ip, port, "/.rpc.rpc_symlink",
                 req, (marshal_func) symlink_request_marshal,
                 response, (unmarshal_func) symlink_response_unmarshal);
 
@@ -195,7 +195,7 @@ int symlink_send_request(uint64_t parent_ino, const char *name, const char * pat
 }
 
 
-const char * readlink_send_request(uint64_t ino)
+const char * readlink_send_request(char * ip, int port, uint64_t ino)
 {
     DBG();
     struct readlink_request *req = readlink_request_new();
@@ -203,10 +203,10 @@ const char * readlink_send_request(uint64_t ino)
 
     EVTAG_ASSIGN(req, ino, ino);
 
-    int mid = get_mid_of_ino(ino);
-    struct machine * m = cluster_get_machine_by_mid(mid);
+    /*int mid = get_mid_of_ino(ino);*/
+    /*struct machine * m = cluster_get_machine_by_mid(mid);*/
 
-    general_req(m->ip, m->port, "/.rpc.rpc_readlink",
+    rpc_grneral_request(ip, port, "/.rpc.rpc_readlink",
                 req, (marshal_func) readlink_request_marshal,
                 response, (unmarshal_func) readlink_response_unmarshal);
 
@@ -218,67 +218,29 @@ const char * readlink_send_request(uint64_t ino)
 }
 
 
-static void file_stat_copy(struct file_stat *dst, struct file_stat *src)
-{
-    dst->size = src->size;
-    dst->ino = src->ino;
-    dst->type = src->type;
-    dst->mode = src->mode;
-    dst->parent_ino = src->parent_ino ;
-    if (src->name)
-        dst->name = strdup(src->name);  //FIXME : free me!
 
-    int len = EVTAG_ARRAY_LEN(src, pos_arr);
-    int i = 0, pos;
-    for (i = 0; i < len; i++) {
-        EVTAG_ARRAY_GET(src, pos_arr, i, &pos);
-        EVTAG_ARRAY_ADD_VALUE(dst, pos_arr, pos);
-    }
-}
-
-static int get_mid_of_ino(int ino){
-
-    struct file_stat * cached = attr_cache_lookup(ino);
-    if (cached == NULL){
-        /*cached = find_in_all();*/
-        assert(0);
-    }
-    if (cached == NULL){
-        // return err
-        assert(0);
-
-    }
-    
-    
-    
-    int mid = cached->pos_arr[0];
-    return mid;
-}
-
-int lookup_send_request(uint64_t parent_ino, const char *name,
+int lookup_send_request(char * ip, int port, uint64_t parent_ino, const char *name,
                         struct file_stat *o_stat)
 {
     DBG();
     struct lookup_request *req = lookup_request_new();
 
-    int mid = get_mid_of_ino(parent_ino);
-    struct machine * m = cluster_get_machine_by_mid(mid);
+    /*int mid = get_mid_of_ino(parent_ino);*/
+    /*struct machine * m = cluster_get_machine_by_mid(mid);*/
 
 
     struct lookup_response *response = lookup_response_new();
     EVTAG_ASSIGN(req, parent_ino, parent_ino);
     EVTAG_ASSIGN(req, name, name);
 
-    general_req(m->ip, m->port, "/.rpc.rpc_lookup",
+    rpc_grneral_request(ip, port, "/.rpc.rpc_lookup",
                 req, (marshal_func) lookup_request_marshal,
                 response, (unmarshal_func) lookup_response_unmarshal);
 
     struct file_stat *stat;
     EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
-    o_stat->size = stat->size;
-    o_stat->ino = stat->ino;
-
-
+    file_stat_copy(o_stat, stat);
+    //TODO : remove this
     if(stat->ino != 0){
         struct file_stat * new_stat = file_stat_new();
         file_stat_copy(new_stat, stat);
@@ -291,7 +253,7 @@ int lookup_send_request(uint64_t parent_ino, const char *name,
     return 0;
 }
 
-int unlink_send_request(uint64_t parent_ino, const char *name)
+int unlink_send_request(char * ip, int port, uint64_t parent_ino, const char *name)
 {
     DBG();
     struct unlink_request *req = unlink_request_new();
@@ -299,10 +261,10 @@ int unlink_send_request(uint64_t parent_ino, const char *name)
     EVTAG_ASSIGN(req, parent_ino, parent_ino);
     EVTAG_ASSIGN(req, name, name);
 
-    int mid = get_mid_of_ino(parent_ino);
-    struct machine * m = cluster_get_machine_by_mid(mid);
+    /*int mid = get_mid_of_ino(parent_ino);*/
+    /*struct machine * m = cluster_get_machine_by_mid(mid);*/
 
-    general_req(m->ip, m->port, "/.rpc.rpc_unlink",
+    rpc_grneral_request(ip, port, "/.rpc.rpc_unlink",
                 req, (marshal_func) unlink_request_marshal,
                 response, (unmarshal_func) unlink_response_unmarshal);
     unlink_request_free(req);
@@ -310,7 +272,7 @@ int unlink_send_request(uint64_t parent_ino, const char *name)
     return 0;
 }
 
-int statfs_send_request(int *total_space, int *avail_space, int *inode_cnt)
+int statfs_send_request(char * ip, int port, int *total_space, int *avail_space, int *inode_cnt)
 {
     DBG();
     struct statfs_request *req = statfs_request_new();
@@ -319,13 +281,11 @@ int statfs_send_request(int *total_space, int *avail_space, int *inode_cnt)
 
     EVTAG_ASSIGN(req, nothing, 1);
 
-    int *mds;
-    int mds_cnt;
 
-    cluster_get_mds_arr(&mds, &mds_cnt);
-    struct machine * m = cluster_get_machine_by_mid(mds[0]); // TODO: currently it's  a random one 
+    /*cluster_get_mds_arr(&mds, &mds_cnt);*/
+    /*struct machine * m = cluster_get_machine_by_mid(mds[0]); // TODO: currently it's  a random one */
 
-    general_req(m->ip, m->port, "/.rpc.rpc_statfs",
+    rpc_grneral_request(ip, port, "/.rpc.rpc_statfs",
                 req, (marshal_func) statfs_request_marshal,
                 response, (unmarshal_func) statfs_response_unmarshal);
 
@@ -349,13 +309,13 @@ int mkfs_send_request(int mds1, int mds2)
 
    struct machine * m = cluster_get_machine_by_mid(mds1);
 
-   general_req(m->ip, m->port, "/.rpc.rpc_mkfs",
+   rpc_grneral_request(m->ip, m->port, "/.rpc.rpc_mkfs",
                req, (marshal_func) mkfs_request_marshal,
                response, (unmarshal_func) mkfs_response_unmarshal);
 
    m = cluster_get_machine_by_mid(mds2);
 
-   general_req(m->ip, m->port, "/.rpc.rpc_mkfs",
+   rpc_grneral_request(m->ip, m->port, "/.rpc.rpc_mkfs",
                req, (marshal_func) mkfs_request_marshal,
                response, (unmarshal_func) mkfs_response_unmarshal);
 
@@ -364,13 +324,13 @@ int mkfs_send_request(int mds1, int mds2)
     return 0;
 }
 
-static void general_req(char *ip, int port, const char *rpcname,
+static void rpc_grneral_request(char *ip, int port, const char *rpcname,
                         void *req, marshal_func req_marshal,
                         void *resp, unmarshal_func resp_unmarshal)
 {
     struct evhttp_connection *evcon =
         connection_pool_get_or_create_conn(conn_pool, ip, port);
-    struct evhttp_request *evreq = evhttp_request_new(rpc_request_gen_cb, NULL);
+    struct evhttp_request *evreq = evhttp_request_new(rpc_rpc_grneral_requestuest_cb, NULL);
     evhttp_request_own(evreq);  // this means that I should free it my self
 
     req_marshal(evreq->output_buffer, req);
@@ -385,7 +345,7 @@ static void general_req(char *ip, int port, const char *rpcname,
     evhttp_request_free(evreq);
 }
 
-static void rpc_request_gen_cb(struct evhttp_request *req, void *arg)
+static void rpc_rpc_grneral_requestuest_cb(struct evhttp_request *req, void *arg)
 {
     if (req->response_code != HTTP_OK) {
         fprintf(stderr, "FAILED (response code)\n");
@@ -409,3 +369,20 @@ void mds_conn_init()
 
 
 
+static void file_stat_copy(struct file_stat *dst, struct file_stat *src)
+{
+    dst->size = src->size;
+    dst->ino = src->ino;
+    dst->type = src->type;
+    dst->mode = src->mode;
+    dst->parent_ino = src->parent_ino ;
+    if (src->name)
+        dst->name = strdup(src->name);  //FIXME : free me!
+
+    int len = EVTAG_ARRAY_LEN(src, pos_arr);
+    int i = 0, pos;
+    for (i = 0; i < len; i++) {
+        EVTAG_ARRAY_GET(src, pos_arr, i, &pos);
+        EVTAG_ARRAY_ADD_VALUE(dst, pos_arr, pos);
+    }
+}
