@@ -205,7 +205,6 @@ fsnode *fs_mknod(uint64_t parent_ino, char *name, int type, int mode)
         n->pos_arr[0] = select_osd();
         n->pos_arr[1] = select_osd();
     } else if (n->mode & S_IFDIR) {
-        n->data.fdata.length = 4096;
         n->pos_arr[0] = n->parent->pos_arr[0];
         n->pos_arr[1] = n->parent->pos_arr[1];
         n->data.ddata.children = NULL;

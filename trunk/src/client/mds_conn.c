@@ -27,9 +27,6 @@ int setattr_send_request(char *ip, int port, struct file_stat *stat_arr)
     EVTAG_ASSIGN(t, ino, stat_arr->ino);
     EVTAG_ASSIGN(t, size, stat_arr->size);
 
-    /*int mid = get_mid_of_ino(stat_arr->parent_ino); */
-    /*struct machine * m = cluster_get_machine_by_mid(mid); */
-
     rpc_grneral_request(ip, port, "/.rpc.rpc_setattr",
                         req, (marshal_func) setattr_request_marshal,
                         response, (unmarshal_func) setattr_response_unmarshal);

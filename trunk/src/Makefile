@@ -6,16 +6,22 @@
 # m cs
 #
 #
+#
+.PHONY: all cs g c t r k gen clean test  u m v run killall indent
 all: cs 
 	scons -Q -f scons.py
 
 g : gen
+c : clean
+t : test
+r : run
+k : killall
 
 gen: 
 	#./scripts/protocol_gen.py
 	./scripts/event_rpcgen.py common/protocol.rpc
 
-c:
+clean:
 	scons -f scons.py -c
 	find . -name '*.gcov' | xargs rm -f
 	find . -name '*.gcda' | xargs rm -f
@@ -24,7 +30,7 @@ c:
 	find . -name '*.o' | xargs rm -f
 	find . -name '*~' | xargs rm -f
 
-t: all
+test: all
 	scons -Q -f scons.py ning_target=test
 
 #cscope
@@ -58,7 +64,7 @@ v: u
 ARG=--window-with-profile=tmp --working-directory=/home/ning/idning-paper/src --hide-menubar
 
 # show log windows
-r:
+run:
 	gnome-terminal $(ARG) -e "./cmgr/cmgr.out" 						-t "cmgr" 	--geometry=60x10+0+0 
 	gnome-terminal $(ARG) -e "./mds/mds.out" 						-t "mds0" 	--geometry=80x28+0+200	
 	gnome-terminal $(ARG) -e "./mds/mds.out -c etc/mds.cfg.1" 		-t "mds1" 	--geometry=80x28+500+200	&
@@ -68,7 +74,7 @@ r:
 	gnome-terminal $(ARG) -e "./osd/osd.out -c etc/osd.cfg.2" 		-t "osd2" 	--geometry=80x20-0-0 &
 
 #killall
-k: 
+killall: 
 	rm /mnt/hd1/* -rf 
 	rm /mnt/hd2/* -rf  
 	rm ~/log/ -rf  

@@ -56,11 +56,6 @@ static inline struct machine *get_machine_of_inode(fuse_ino_t ino)
     return m;
 }
 
-static inline int is_dir(struct file_stat *stat)
-{
-    return (stat->mode & S_IFDIR) != 0;
-}
-
 /*
  * get file_stat form cache  
  * if the cache is out of date
@@ -71,7 +66,7 @@ static struct file_stat *get_attr(fuse_ino_t ino)
 {
     int mid;
     struct file_stat *cached = attr_cache_lookup(ino);
-    if (is_dir(cached)) {
+    if (S_ISDIR(cached->mode)) {
         mid = get_mid_of_ino(ino);
     } else {
         mid = get_mid_of_ino(cached->parent_ino);
@@ -99,8 +94,11 @@ static int sfs_stat(fuse_ino_t ino, struct stat *stbuf)
     stbuf->st_size = stat->size;
     stbuf->st_blksize = 1024 * 1024 * 1024;
     stbuf->st_mode = stat->mode | 0777;
-    stbuf->st_nlink = 1;
-
+    if (S_ISDIR(stat->mode)) {
+        stbuf->st_nlink = 2;
+    }else{
+        stbuf->st_nlink = 1;
+    }
     return 0;
 }
 

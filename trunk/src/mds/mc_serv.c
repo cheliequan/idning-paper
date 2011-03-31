@@ -120,13 +120,16 @@ static void fsnode_to_stat_copy(struct file_stat *t, fsnode * n)
 
     EVTAG_ASSIGN(t, ino, n->ino);
     EVTAG_ASSIGN(t, parent_ino, n->parent->ino);
-    EVTAG_ASSIGN(t, size, n->data.fdata.length);
     EVTAG_ASSIGN(t, name, n->name);
     EVTAG_ASSIGN(t, mode, n->mode);
     EVTAG_ASSIGN(t, type, n->type);
     EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[0]);
     EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[1]);
 
+    EVTAG_ASSIGN(t, size, n->data.fdata.length);
+    if (S_ISDIR(n->mode)) {
+        EVTAG_ASSIGN(t, size, 4096);
+    }
 }
 
 static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
