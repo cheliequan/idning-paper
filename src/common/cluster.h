@@ -16,10 +16,8 @@ int ping_send_request();
 void rpc_client_setup(char *self_host, int self_port, int self_type);
 struct machine *cluster_get_machine_by_mid(int mid);
 
+void cluster_get_mds_arr(int **o_arr, int *o_cnt);
 
-
-void cluster_get_mds_arr(int ** o_arr, int * o_cnt);
-
-void cluster_get_osd_arr(int ** o_arr, int * o_cnt);
+void cluster_get_osd_arr(int **o_arr, int *o_cnt);
 
 #endif

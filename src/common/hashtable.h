@@ -29,7 +29,6 @@ uint32_t hash_int_hash_func_func(const void *v);
 void hash_int_str_foreach(void *key, void *value, void *user_data);
 ///////////////////////////////////////////////////////////
 
-
 int equal_int64(void *v1, void *v2);
 uint32_t hash_int64(const void *v);
 void foreach_int64_str(void *key, void *value, void *user_data);

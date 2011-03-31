@@ -1,6 +1,5 @@
 #include "log.h"
 
-
 static int puttime(char **buf)
 {
     struct timeval tv;

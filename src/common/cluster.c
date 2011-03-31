@@ -109,7 +109,8 @@ int ping_send_request()
     EVTAG_ASSIGN(ping, self_port, self_machine.port);
     EVTAG_ASSIGN(ping, self_type, self_machine.type);
     EVTAG_ASSIGN(ping, mid, self_machine.mid);
-    logging(LOG_DEUBG, "ping(version = %u, mid = %d)", cluster_version, self_machine.mid);
+    logging(LOG_DEUBG, "ping(version = %u, mid = %d)", cluster_version,
+            self_machine.mid);
 
     EVRPC_MAKE_REQUEST(rpc_ping, cmgr_conn_pool, ping, pong, ping_cb, NULL);
     event_base_dispatch(to_cmgr_ev_base);
@@ -119,7 +120,8 @@ int ping_send_request()
     EVTAG_GET(pong, version, &pong_version);
     EVTAG_GET(pong, mid, &pong_mid);
 
-    logging(LOG_DEUBG, "get pong (version = %u, mid = %d)", pong_version, pong_mid);
+    logging(LOG_DEUBG, "get pong (version = %u, mid = %d)", pong_version,
+            pong_mid);
 
     if (pong_version == cluster_version) {
         logging(LOG_INFO, "cluster not change!");
@@ -203,14 +205,13 @@ void cluster_init()
     cluster_dump();
 }
 
-
-void cluster_get_mds_arr(int ** o_arr, int * o_cnt)
+void cluster_get_mds_arr(int **o_arr, int *o_cnt)
 {
     *o_arr = mds_arr;
     *o_cnt = mds_cnt;
 }
 
-void cluster_get_osd_arr(int ** o_arr, int * o_cnt)
+void cluster_get_osd_arr(int **o_arr, int *o_cnt)
 {
     *o_arr = osd_arr;
     *o_cnt = osd_cnt;
