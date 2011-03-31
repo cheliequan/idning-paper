@@ -184,6 +184,7 @@ static void sfs_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
     http_response *response = http_get(url, headers);
     if (response) {
         int len = evbuffer_get_length(response->body);
+        logging(LOG_DEUBG, "data in response: %d bytes", len);
         uint8_t *buf = alloca(len);
         evbuffer_copyout(response->body, buf, len);
         evhttp_clear_headers(headers);
@@ -192,6 +193,7 @@ static void sfs_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
         fuse_reply_buf(req, buf, size);
         http_response_free(response);
     } else {
+        assert(0);
         //TODO: this is  no replay ,will hold
     }
 }
@@ -480,7 +482,22 @@ void sfs_mkfs(){
 
 
 
+void sfs_access(fuse_req_t req, fuse_ino_t ino, int mask) {
+    DBG();
+    if (0) {
+        assert(0);
+    } else {
+        fuse_reply_err(req,0);
+    }
+}
+
+
+void sfs_init(int debug_mode_in,int keep_cache_in,double direntry_cache_timeout_in,double entry_cache_timeout_in,double attr_cache_timeout_in) {
+}
+
+
 static struct fuse_lowlevel_ops sfs_ll_op = {
+    .init       = sfs_init,
     .lookup     = sfs_ll_lookup,
     .getattr    = sfs_ll_getattr,
     .readdir    = sfs_ll_readdir,
@@ -498,6 +515,7 @@ static struct fuse_lowlevel_ops sfs_ll_op = {
 
     .symlink    = sfs_symlink,
     .readlink   = sfs_readlink,
+    .access     = sfs_access,
 
 };
 
