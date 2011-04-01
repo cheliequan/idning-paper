@@ -530,10 +530,6 @@ void sfs_mkfs()
         logging(LOG_WARN, "we need at least 2 mds !, fs not mk");
         return;
     }
-    /*if(find_root()){ */
-    /*logging(LOG_WARN, "fs is not null!!! can't do mkfs"); */
-    /*return ; */
-    /*} */
     mkfs_send_request(mds[0], mds[1]);
 }
 

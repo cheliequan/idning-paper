@@ -22,7 +22,7 @@ u:
 	-mkdir -p /tmp/a
 	-sudo umount /tmp/a -l
 m: u
-	./client/mount.out /tmp/a -d 
+	./client/mount.out /tmp/a -d
 v: u
 	valgrind --tool=memcheck --leak-check=full -v ./client/mount.out /tmp/a -d 
 #i:
@@ -69,9 +69,6 @@ gcov:
 	gcov client/osd_conn.c -o client
 	gcov client/mds_conn.c -o client
 
-
-
-# show log windows
 run:
 	gnome-terminal $(ARG) -e "./cmgr/cmgr.out" 						-t "cmgr" 	--geometry=60x10+0+0 
 	gnome-terminal $(ARG) -e "./mds/mds.out" 						-t "mds0" 	--geometry=80x28+0+200	
@@ -80,6 +77,18 @@ run:
 	#
 	gnome-terminal $(ARG) -e "./osd/osd.out" 						-t "osd" 	--geometry=80x20+0-0 &
 	gnome-terminal $(ARG) -e "./osd/osd.out -c etc/osd.cfg.2" 		-t "osd2" 	--geometry=80x20-0-0 &
+
+rb: run-back
+run-back:
+	./cmgr/cmgr.out 2>/dev/null &
+	./mds/mds.out 2>/dev/null &
+	./mds/mds.out -c etc/mds.cfg.1 2>/dev/null &
+	./mds/mds.out -c etc/mds.cfg.2 2>/dev/null &
+	
+	./osd/osd.out 2>/dev/null &
+	./osd/osd.out -c etc/osd.cfg.2 2>/dev/null &
+
+show-log:
 
 #killall
 killall: 
