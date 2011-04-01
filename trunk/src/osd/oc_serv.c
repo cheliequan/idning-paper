@@ -13,9 +13,6 @@ static void reply_error(struct evhttp_request *req, int err_code, char *fmt,
     va_end(ap);
 
     logging(LOG_ERROR, "reply_error : %s", buf);
-
-    /*struct evbuffer *evb = evbuffer_new(); */
-    /*evhttp_send_reply(req, err_code, buf, evb); */
     evhttp_send_error(req, err_code, buf);
 }
 
@@ -146,14 +143,12 @@ void gen_handler(struct evhttp_request *req, void *arg)
         return;
     }
 
-    /* Let's see what path the user asked for. */
     path = evhttp_uri_get_path(decoded_uri);
     if (!path) {
         logging(LOG_INFO, "request path is nil, replace it as /");
         path = "/";
     }
 
-    /* We need to decode it, to see what path the user really wanted. */
     decoded_path = evhttp_uridecode(path, 0, NULL);
 
     uint64_t chunkid;
