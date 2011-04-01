@@ -7,6 +7,8 @@
 #
 #
 #
+ARG=--window-with-profile=tmp --working-directory=/home/ning/idning-paper/src --hide-menubar
+
 .PHONY: all cs g c t r k gen clean test  u m v run killall indent
 all: cs 
 	scons -Q -f scons.py
@@ -16,6 +18,19 @@ c : clean
 t : test
 r : run
 k : killall
+u:
+	-mkdir -p /tmp/a
+	-sudo umount /tmp/a -l
+m: u
+	./client/mount.out /tmp/a -d 
+v: u
+	valgrind --tool=memcheck --leak-check=full -v ./client/mount.out /tmp/a -d 
+#i:
+	#gnome-terminal $(ARG) -e "cd /tmp/a && iozone -a"                      -t "cmgr"   --geometry=60x60+0+0
+	
+
+
+
 
 gen: 
 	#./scripts/protocol_gen.py
@@ -54,14 +69,7 @@ gcov:
 	gcov client/osd_conn.c -o client
 	gcov client/mds_conn.c -o client
 
-u:
-	-sudo umount /tmp/a -l
-m: u
-	./client/mount.out /tmp/a -d 
-v: u
-	valgrind --tool=memcheck --leak-check=full -v ./client/mount.out /tmp/a -d 
 
-ARG=--window-with-profile=tmp --working-directory=/home/ning/idning-paper/src --hide-menubar
 
 # show log windows
 run:
