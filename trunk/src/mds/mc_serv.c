@@ -1,6 +1,6 @@
 #include "sfs_common.h"
 #include "fs.h"
-static void fsnode_to_stat_copy(struct file_stat *t, fsnode * n);
+void fsnode_to_stat_copy(struct file_stat *t, fsnode * n);
 
 static void setattr_handler(EVRPC_STRUCT(rpc_setattr) * rpc, void *arg)
 {
@@ -107,30 +107,6 @@ static void statfs_handler(EVRPC_STRUCT(rpc_statfs) * rpc, void *arg)
     EVRPC_REQUEST_DONE(rpc);
 }
 
-static void fsnode_to_stat_copy(struct file_stat *t, fsnode * n)
-{
-
-    if (NULL == n) {
-        EVTAG_ASSIGN(t, ino, 0);
-        EVTAG_ASSIGN(t, parent_ino, 0);
-        EVTAG_ASSIGN(t, size, 0);
-        EVTAG_ASSIGN(t, name, "");
-        return;
-    }
-
-    EVTAG_ASSIGN(t, ino, n->ino);
-    EVTAG_ASSIGN(t, parent_ino, n->parent->ino);
-    EVTAG_ASSIGN(t, name, n->name);
-    EVTAG_ASSIGN(t, mode, n->mode);
-    EVTAG_ASSIGN(t, type, n->type);
-    EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[0]);
-    EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[1]);
-
-    EVTAG_ASSIGN(t, size, n->data.fdata.length);
-    if (S_ISDIR(n->mode)) {
-        EVTAG_ASSIGN(t, size, 4096);
-    }
-}
 
 static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
 {

@@ -239,12 +239,17 @@ static void sfs_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
     if (response) {
         int len = evbuffer_get_length(response->body);
         logging(LOG_DEUBG, "data in response: %d bytes", len);
-        uint8_t *buf = alloca(len);
-        evbuffer_copyout(response->body, buf, len);
-        evhttp_clear_headers(headers);
-        free(headers);
+        /*if (len == 0){*/
+            /*fuse_reply_err(req, EINVAL);*/
+        
+        /*}else{*/
+            uint8_t *buf = alloca(len);
+            evbuffer_copyout(response->body, buf, len);
+            evhttp_clear_headers(headers);
+            free(headers);
 
-        fuse_reply_buf(req, buf, size);
+            fuse_reply_buf(req, buf, len);
+        /*}*/
         http_response_free(response);
     } else {
         assert(0);

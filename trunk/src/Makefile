@@ -29,7 +29,9 @@ v: u
 	#gnome-terminal $(ARG) -e "cd /tmp/a && iozone -a"                      -t "cmgr"   --geometry=60x60+0+0
 	
 
-
+data:
+	python ./scripts/specialdata.py 65k > /tmp/65k
+	python ./scripts/specialdata.py 1M > /tmp/1M
 
 
 gen: 

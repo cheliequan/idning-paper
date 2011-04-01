@@ -279,3 +279,62 @@ void fs_statfs(int *total_space, int *avail_space, int *inode_cnt)
     *avail_space = 1024;
     *inode_cnt = 8888;
 }
+
+//dfs
+void fs_dump_dfs(fsnode * root, struct evbuffer * evbuf, int fd){
+
+    logging(LOG_DEUBG, "fsdump (%" PRIu64 ")", root->ino);
+
+    struct file_stat * stat = file_stat_new();
+    fsnode_to_stat_copy(stat, root);
+    evtag_marshal_file_stat(evbuf, 1, stat);
+    
+
+    dlist_t *head ;
+    dlist_t *pl;
+    fsnode *p;
+
+    if (S_ISDIR(root->mode)){
+        fsnode *children_head = root->data.ddata.children;
+        head = &(children_head->tree_dlist);
+        for (pl = head->next; pl != head; pl = pl->next) {
+            p = dlist_data(pl, fsnode, tree_dlist);
+            fs_dump_dfs(p, evbuf, fd);
+        }
+    }
+    if(evbuffer_get_length(evbuf)> 1)
+        evbuffer_write(evbuf, fd);
+}
+
+void fs_dump(){
+    struct evbuffer * evbuf = evbuffer_new();
+    int fd = open("sfs.mds.data", O_WRONLY | O_CREAT, 0755);
+    fs_dump_dfs(fsnode_hash_find(1), evbuf, fd);
+}
+
+
+
+void fsnode_to_stat_copy(struct file_stat *t, fsnode * n)
+{
+
+    if (NULL == n) {
+        EVTAG_ASSIGN(t, ino, 0);
+        EVTAG_ASSIGN(t, parent_ino, 0);
+        EVTAG_ASSIGN(t, size, 0);
+        EVTAG_ASSIGN(t, name, "");
+        return;
+    }
+
+    EVTAG_ASSIGN(t, ino, n->ino);
+    EVTAG_ASSIGN(t, parent_ino, n->parent->ino);
+    EVTAG_ASSIGN(t, name, n->name);
+    EVTAG_ASSIGN(t, mode, n->mode);
+    EVTAG_ASSIGN(t, type, n->type);
+    EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[0]);
+    EVTAG_ARRAY_ADD_VALUE(t, pos_arr, n->pos_arr[1]);
+
+    EVTAG_ASSIGN(t, size, n->data.fdata.length);
+    if (S_ISDIR(n->mode)) {
+        EVTAG_ASSIGN(t, size, 4096);
+    }
+}

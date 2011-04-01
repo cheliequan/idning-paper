@@ -120,7 +120,7 @@ void read_chunk(uint64_t chunkid, struct evhttp_request *req)
     logging(LOG_DEUBG, "d : %" PRIu64, end - start + 1);
 
     lseek(fd, start, SEEK_SET);
-    evbuffer_add_file(evb, fd, (int)0, end - start + 1);    //如果编译的时候加上 -D_FILE_OFFSET_BITS=64 ,，evbuffer认为length = 0
+    evbuffer_add_file(evb, fd, (int)start, end - start + 1);    //如果编译的时候加上 -D_FILE_OFFSET_BITS=64 ,，evbuffer认为length = 0
 
     evhttp_send_reply(req, HTTP_OK, "OK", evb);
     evbuffer_free(evb);

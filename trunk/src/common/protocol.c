@@ -56,3 +56,8 @@ void log_file_stat(char *hint, struct file_stat *t)
     /*"%s {ino: %" PRIu64 ", name: %s, size: %" PRIu64 */
     /*", mode: %04o}", hint, t->ino, t->name, t->size, t->mode); */
 }
+
+
+
+void evtag_marshal_file_stat(struct evbuffer *evbuf, ev_uint32_t tag, const struct file_stat *msg);
+
