@@ -63,6 +63,7 @@ int init_app(int argc, char **argv, char *appname)
         fprintf(stderr, "can't load config file: %s - using defaults\n",
                 cfgfile);
     }
+    cfg_add("CFG_FILE", cfgfile);
 
     argc -= optind;
     argv += optind;

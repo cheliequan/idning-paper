@@ -33,6 +33,16 @@ static paramstr *paramhead = NULL;
 static int logundefined = 0;
 static char *config_filename = NULL;
 
+
+int cfg_add(char * key, char * value){
+    paramstr *tmp;
+    tmp = (paramstr *) malloc(sizeof(paramstr));
+    tmp->name = strdup(key);
+    tmp->value = strdup(value);
+    tmp->next = paramhead;
+    paramhead = tmp;
+}
+
 int cfg_load(const char *configfname, int _lu)
 {
     FILE *fd;
@@ -150,6 +160,7 @@ void cfg_append(char *s)
     FILE *fd;
     fd = fopen(config_filename, "a");
     fprintf(fd, "\n#Auto Added by the program\n");
+    fprintf(fd, "\n#Do Not Modify !!!!\n");
     fprintf(fd, "%s\n", s);
     fclose(fd);
 }
