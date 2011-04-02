@@ -7,22 +7,6 @@
 #include "mds_conn.h"
 #include "attr_cache.h"
 
-void sig_handler(int signum)
-{
-    fprintf(stderr, "is going to exit!");
-    exit(0);
-}
-
-void init_sig_handler()
-{
-    if (signal(SIGINT, sig_handler) == SIG_IGN)
-        signal(SIGINT, SIG_IGN);
-    if (signal(SIGHUP, sig_handler) == SIG_IGN)
-        signal(SIGHUP, SIG_IGN);
-    if (signal(SIGTERM, sig_handler) == SIG_IGN)
-        signal(SIGTERM, SIG_IGN);
-}
-
 static int get_mid_of_ino(int ino)
 {
 
@@ -583,6 +567,10 @@ void usage(const char *appname)
 {
 
 }
+void onexit()
+{
+
+}
 
 extern struct evrpc_pool *pool;
 int main(int argc, char *argv[])
@@ -595,7 +583,6 @@ int main(int argc, char *argv[])
         find_root();
     }
     http_client_init();
-    init_sig_handler();
 
     struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
     struct fuse_chan *ch;

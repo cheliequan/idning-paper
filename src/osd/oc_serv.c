@@ -174,6 +174,10 @@ void usage(const char *appname)
 
 }
 
+void onexit()
+{
+
+}
 int main(int argc, char **argv)
 {
     init_app(argc, argv, "osd");

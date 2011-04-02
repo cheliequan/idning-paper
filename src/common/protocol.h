@@ -23,4 +23,16 @@ EVRPC_HEADER(rpc_ping, ping, pong)
 void file_stat_init(struct file_stat *stat);
 void log_file_stat(char *hint, struct file_stat *t);
 
+
+
+void file_stat_marshal(struct evbuffer *evbuf, const struct file_stat *tmp);
+
+int file_stat_unmarshal(struct file_stat *tmp,  struct evbuffer *evbuf);
+
+
+int evtag_unmarshal_file_stat(struct evbuffer *evbuf, ev_uint32_t need_tag, struct file_stat *msg);
+
+void evtag_marshal_file_stat(struct evbuffer *evbuf, ev_uint32_t tag, const struct file_stat *msg);
+
+
 #endif

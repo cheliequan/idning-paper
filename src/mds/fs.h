@@ -82,6 +82,7 @@ int fs_mkfs();
 fsnode *fs_symlink(uint64_t parent_ino, const char *name, const char *path);
 
 void fsnode_to_stat_copy(struct file_stat *t, fsnode * n);
+void stat_to_fsnode_copy(fsnode * n, struct file_stat *t);
 
 char *fs_readlink(uint64_t ino);
 int fs_rename();
@@ -89,5 +90,5 @@ int fs_get_goal();
 int fs_set_goal();
 int fs_init();
 
-int fs_load();
-int fs_store();
+int fs_load(char * path);
+int fs_store(char * path);

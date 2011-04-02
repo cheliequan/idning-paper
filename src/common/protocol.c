@@ -59,5 +59,5 @@ void log_file_stat(char *hint, struct file_stat *t)
 
 
 
-void evtag_marshal_file_stat(struct evbuffer *evbuf, ev_uint32_t tag, const struct file_stat *msg);
+
 

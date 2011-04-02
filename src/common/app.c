@@ -1,8 +1,30 @@
 #include "app.h"
+
 int usage(char *appname);
+int onexit();
+
+
+void sig_handler(int signum)
+{
+    fprintf(stderr, "is going to exit!");
+    onexit();
+    exit(0);
+}
+
+void init_sig_handler()
+{
+    if (signal(SIGINT, sig_handler) == SIG_IGN)
+        signal(SIGINT, SIG_IGN);
+    if (signal(SIGHUP, sig_handler) == SIG_IGN)
+        signal(SIGHUP, SIG_IGN);
+    if (signal(SIGTERM, sig_handler) == SIG_IGN)
+        signal(SIGTERM, SIG_IGN);
+}
+
 
 int init_app(int argc, char **argv, char *appname)
 {
+    init_sig_handler();
     //char *wrkdir;
     int ch;
     //uint8_t runmode;
