@@ -361,12 +361,11 @@ int fs_load(char * path){
             break;
         }
         else{
-
             log_file_stat("evtag_ unmarshal file_stat ", stat);
             fsnode * n = fsnode_new();
             stat_to_fsnode_copy(n, stat);
             fsnode_hash_insert(n);
-            if (stat->parent_ino == 1){
+            if (stat->ino == 1){
                 n->parent = n;
             }
             else{
@@ -416,8 +415,14 @@ void stat_to_fsnode_copy(fsnode * n, struct file_stat *t)
     n->name = strdup(t->name);
     n->mode = t->mode;
     n->type = t->type;
-    n->data.fdata.length = t->size;
+    
+    if (n->mode & S_IFREG) {    //is file 
+        n->data.fdata.length = t->size;
+    } else if (n->mode & S_IFDIR) {
+        n->data.ddata.children = NULL;
+    }
     n->pos_arr[0] = t->pos_arr[0];
     n->pos_arr[1] = t->pos_arr[1];
+
 }
 
