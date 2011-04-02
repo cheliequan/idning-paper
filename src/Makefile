@@ -27,7 +27,6 @@ v: u
 	valgrind --tool=memcheck --leak-check=full -v ./client/mount.out /tmp/a -d 
 #i:
 	#gnome-terminal $(ARG) -e "cd /tmp/a && iozone -a"                      -t "cmgr"   --geometry=60x60+0+0
-	
 
 data:
 	python ./scripts/specialdata.py 65k > /tmp/65k
