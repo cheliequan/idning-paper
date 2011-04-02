@@ -271,10 +271,16 @@ void usage(const char *appname)
 
 }
 
-
+char * mds_data_file(){
+    static char tmp [1024];
+    char * cfgfile = cfg_getstr("CFG_FILE", "");
+    char *bname = basename(cfgfile);
+    sprintf(tmp, "data/%s.data", bname);
+    return tmp;
+}
 void onexit()
 {
-    fs_store("mds.data");
+    fs_store(mds_data_file());
 }
 
 int main(int argc, char **argv)
@@ -283,7 +289,9 @@ int main(int argc, char **argv)
     event_init();
 
     fs_init();
-    fs_load("mds.data");
+
+
+    fs_load(mds_data_file());
     rpc_setup();
     char *self_host = cfg_getstr("MDS2CLIENT_LISTEN_HOST", "*");
     int self_port = cfg_getint32("MDS2CLIENT_LISTEN_PORT", 9527);
