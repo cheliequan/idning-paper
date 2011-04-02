@@ -271,12 +271,19 @@ void usage(const char *appname)
 
 }
 
+
+void onexit()
+{
+    fs_store("mds.data");
+}
+
 int main(int argc, char **argv)
 {
     init_app(argc, argv, "mds");
     event_init();
 
     fs_init();
+    fs_load("mds.data");
     rpc_setup();
     char *self_host = cfg_getstr("MDS2CLIENT_LISTEN_HOST", "*");
     int self_port = cfg_getint32("MDS2CLIENT_LISTEN_PORT", 9527);

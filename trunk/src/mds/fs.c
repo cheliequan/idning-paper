@@ -282,19 +282,17 @@ void fs_statfs(int *total_space, int *avail_space, int *inode_cnt)
 
 //dfs
 void fs_dump_dfs(fsnode * root, struct evbuffer * evbuf, int fd){
-
-    logging(LOG_DEUBG, "fsdump (%" PRIu64 ")", root->ino);
-
     struct file_stat * stat = file_stat_new();
     fsnode_to_stat_copy(stat, root);
+    log_file_stat("fsdump ", stat);
+    /*file_stat_marshal(evbuf, stat);*/
     evtag_marshal_file_stat(evbuf, 1, stat);
-    
 
     dlist_t *head ;
     dlist_t *pl;
     fsnode *p;
 
-    if (S_ISDIR(root->mode)){
+    if (S_ISDIR(root->mode) && root->data.ddata.children){
         fsnode *children_head = root->data.ddata.children;
         head = &(children_head->tree_dlist);
         for (pl = head->next; pl != head; pl = pl->next) {
@@ -302,21 +300,88 @@ void fs_dump_dfs(fsnode * root, struct evbuffer * evbuf, int fd){
             fs_dump_dfs(p, evbuf, fd);
         }
     }
+    logging(LOG_DEUBG, "evbuffer_get_length(evbuf) : %d", evbuffer_get_length(evbuf));
     if(evbuffer_get_length(evbuf)> 1)
         evbuffer_write(evbuf, fd);
 }
 
-void fs_dump(){
+int fs_store(char * path){
     struct evbuffer * evbuf = evbuffer_new();
-    int fd = open("sfs.mds.data", O_WRONLY | O_CREAT, 0755);
+    int fd = open(path, O_WRONLY | O_CREAT, 0755);
     fs_dump_dfs(fsnode_hash_find(1), evbuf, fd);
+    close(fd);
+    return 0;
 }
 
+static size_t get_file_len(char * path){
+    size_t rst = 0;
+    struct stat st;
+    int fd = open(path, O_RDONLY);
+    if (fstat(fd, &st) < 0) {
+        rst = 0;
+    }
+    close(fd);
+    rst = st.st_size;
+    return rst;
+}
 
+int fs_load(char * path){
+    struct evbuffer * evbuf = evbuffer_new();
+    size_t len = get_file_len(path);
+    if (!len){
+        logging(LOG_INFO, "no mds.data");
+        return 0;
+    }
+
+    int fd = open(path, O_RDONLY , 0755);
+
+    /*
+     * Notice:
+     * evbuffer_add_file (struct evbuffer *output, int fd, off_t offset, size_t length)
+        Move data from a file into the evbuffer for writing to a socket. 
+        Just for socket io ,not unmarshal.
+        The results of using evbuffer_remove() or evbuffer_pullup() are undefined.    --恰恰就是在这里出了问题!
+
+    evbuffer_add_file(evbuf, fd, 0, len);
+
+     * */
+
+    char buf [64*1024];
+    int cnt;
+    while((cnt = read(fd, buf, sizeof(buf))) ){ //TODO: optimize
+        evbuffer_add(evbuf, buf, cnt);
+    }
+
+    while(evbuffer_get_length(evbuf) > 0){
+        logging(LOG_DEUBG, "ready to unmarshal");
+        struct file_stat * stat = file_stat_new();
+        if (evtag_unmarshal_file_stat(evbuf, 1, stat) == -1) {
+        /*if (file_stat_unmarshal(stat, evbuf) == -1) {*/
+            logging(LOG_DEUBG, "unmarshal error");
+            break;
+        }
+        else{
+
+            log_file_stat("evtag_ unmarshal file_stat ", stat);
+            fsnode * n = fsnode_new();
+            stat_to_fsnode_copy(n, stat);
+            fsnode_hash_insert(n);
+            if (stat->parent_ino == 1){
+                n->parent = n;
+            }
+            else{
+                n->parent = fsnode_hash_find(stat->parent_ino);
+                fsnode_tree_insert(n->parent, n);
+            }
+        }
+    }
+    close(fd);
+    return 0;
+}
 
 void fsnode_to_stat_copy(struct file_stat *t, fsnode * n)
 {
-
+    assert(t);
     if (NULL == n) {
         EVTAG_ASSIGN(t, ino, 0);
         EVTAG_ASSIGN(t, parent_ino, 0);
@@ -338,3 +403,21 @@ void fsnode_to_stat_copy(struct file_stat *t, fsnode * n)
         EVTAG_ASSIGN(t, size, 4096);
     }
 }
+
+
+
+void stat_to_fsnode_copy(fsnode * n, struct file_stat *t)
+{
+    assert(n);
+    assert(t);
+
+    n->ino = t->ino;
+    /*n->parent = fsnode_hash_find(t->parent_ino);*/
+    n->name = strdup(t->name);
+    n->mode = t->mode;
+    n->type = t->type;
+    n->data.fdata.length = t->size;
+    n->pos_arr[0] = t->pos_arr[0];
+    n->pos_arr[1] = t->pos_arr[1];
+}
+
