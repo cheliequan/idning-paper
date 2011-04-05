@@ -2806,6 +2806,8 @@ evtag_marshal_ls_response(struct evbuffer *evbuf, ev_uint32_t tag, const struct 
 static struct mknod_request_access_ __mknod_request_base = {
   mknod_request_parent_ino_assign,
   mknod_request_parent_ino_get,
+  mknod_request_ino_assign,
+  mknod_request_ino_get,
   mknod_request_name_assign,
   mknod_request_name_get,
   mknod_request_type_assign,
@@ -2833,6 +2835,9 @@ mknod_request_new_with_arg(void *unused)
   tmp->parent_ino = 0;
   tmp->parent_ino_set = 0;
 
+  tmp->ino = 0;
+  tmp->ino_set = 0;
+
   tmp->name = NULL;
   tmp->name_set = 0;
 
@@ -2849,11 +2854,20 @@ mknod_request_new_with_arg(void *unused)
 
 
 
+
 int
 mknod_request_parent_ino_assign(struct mknod_request *msg, const ev_uint64_t value)
 {
   msg->parent_ino_set = 1;
   msg->parent_ino = value;
+  return (0);
+}
+
+int
+mknod_request_ino_assign(struct mknod_request *msg, const ev_uint64_t value)
+{
+  msg->ino_set = 1;
+  msg->ino = value;
   return (0);
 }
 
@@ -2895,6 +2909,15 @@ mknod_request_parent_ino_get(struct mknod_request *msg, ev_uint64_t *value)
 }
 
 int
+mknod_request_ino_get(struct mknod_request *msg, ev_uint64_t *value)
+{
+  if (msg->ino_set != 1)
+    return (-1);
+  *value = msg->ino;
+  return (0);
+}
+
+int
 mknod_request_name_get(struct mknod_request *msg, char * *value)
 {
   if (msg->name_set != 1)
@@ -2925,6 +2948,7 @@ void
 mknod_request_clear(struct mknod_request *tmp)
 {
   tmp->parent_ino_set = 0;
+  tmp->ino_set = 0;
   if (tmp->name_set == 1) {
     free(tmp->name);
     tmp->name = NULL;
@@ -2945,6 +2969,7 @@ mknod_request_free(struct mknod_request *tmp)
 void
 mknod_request_marshal(struct evbuffer *evbuf, const struct mknod_request *tmp){
   evtag_marshal_int64(evbuf, MKNOD_REQUEST_PARENT_INO, tmp->parent_ino);
+  evtag_marshal_int64(evbuf, MKNOD_REQUEST_INO, tmp->ino);
   evtag_marshal_string(evbuf, MKNOD_REQUEST_NAME, tmp->name);
   evtag_marshal_int(evbuf, MKNOD_REQUEST_TYPE, tmp->type);
   if (tmp->mode_set) {
@@ -2970,6 +2995,17 @@ mknod_request_unmarshal(struct mknod_request *tmp,  struct evbuffer *evbuf)
           return (-1);
         }
         tmp->parent_ino_set = 1;
+        break;
+
+      case MKNOD_REQUEST_INO:
+
+        if (tmp->ino_set)
+          return (-1);
+        if (evtag_unmarshal_int64(evbuf, MKNOD_REQUEST_INO, &tmp->ino) == -1) {
+          event_warnx("%s: failed to unmarshal ino", __func__);
+          return (-1);
+        }
+        tmp->ino_set = 1;
         break;
 
       case MKNOD_REQUEST_NAME:
@@ -3019,6 +3055,8 @@ int
 mknod_request_complete(struct mknod_request *msg)
 {
   if (!msg->parent_ino_set)
+    return (-1);
+  if (!msg->ino_set)
     return (-1);
   if (!msg->name_set)
     return (-1);
@@ -3299,6 +3337,8 @@ evtag_marshal_mknod_response(struct evbuffer *evbuf, ev_uint32_t tag, const stru
 static struct symlink_request_access_ __symlink_request_base = {
   symlink_request_parent_ino_assign,
   symlink_request_parent_ino_get,
+  symlink_request_ino_assign,
+  symlink_request_ino_get,
   symlink_request_name_assign,
   symlink_request_name_get,
   symlink_request_path_assign,
@@ -3324,6 +3364,9 @@ symlink_request_new_with_arg(void *unused)
   tmp->parent_ino = 0;
   tmp->parent_ino_set = 0;
 
+  tmp->ino = 0;
+  tmp->ino_set = 0;
+
   tmp->name = NULL;
   tmp->name_set = 0;
 
@@ -3336,11 +3379,20 @@ symlink_request_new_with_arg(void *unused)
 
 
 
+
 int
 symlink_request_parent_ino_assign(struct symlink_request *msg, const ev_uint64_t value)
 {
   msg->parent_ino_set = 1;
   msg->parent_ino = value;
+  return (0);
+}
+
+int
+symlink_request_ino_assign(struct symlink_request *msg, const ev_uint64_t value)
+{
+  msg->ino_set = 1;
+  msg->ino = value;
   return (0);
 }
 
@@ -3378,6 +3430,15 @@ symlink_request_parent_ino_get(struct symlink_request *msg, ev_uint64_t *value)
 }
 
 int
+symlink_request_ino_get(struct symlink_request *msg, ev_uint64_t *value)
+{
+  if (msg->ino_set != 1)
+    return (-1);
+  *value = msg->ino;
+  return (0);
+}
+
+int
 symlink_request_name_get(struct symlink_request *msg, char * *value)
 {
   if (msg->name_set != 1)
@@ -3399,6 +3460,7 @@ void
 symlink_request_clear(struct symlink_request *tmp)
 {
   tmp->parent_ino_set = 0;
+  tmp->ino_set = 0;
   if (tmp->name_set == 1) {
     free(tmp->name);
     tmp->name = NULL;
@@ -3424,6 +3486,7 @@ symlink_request_free(struct symlink_request *tmp)
 void
 symlink_request_marshal(struct evbuffer *evbuf, const struct symlink_request *tmp){
   evtag_marshal_int64(evbuf, SYMLINK_REQUEST_PARENT_INO, tmp->parent_ino);
+  evtag_marshal_int64(evbuf, SYMLINK_REQUEST_INO, tmp->ino);
   evtag_marshal_string(evbuf, SYMLINK_REQUEST_NAME, tmp->name);
   evtag_marshal_string(evbuf, SYMLINK_REQUEST_PATH, tmp->path);
 }
@@ -3446,6 +3509,17 @@ symlink_request_unmarshal(struct symlink_request *tmp,  struct evbuffer *evbuf)
           return (-1);
         }
         tmp->parent_ino_set = 1;
+        break;
+
+      case SYMLINK_REQUEST_INO:
+
+        if (tmp->ino_set)
+          return (-1);
+        if (evtag_unmarshal_int64(evbuf, SYMLINK_REQUEST_INO, &tmp->ino) == -1) {
+          event_warnx("%s: failed to unmarshal ino", __func__);
+          return (-1);
+        }
+        tmp->ino_set = 1;
         break;
 
       case SYMLINK_REQUEST_NAME:
@@ -3484,6 +3558,8 @@ int
 symlink_request_complete(struct symlink_request *msg)
 {
   if (!msg->parent_ino_set)
+    return (-1);
+  if (!msg->ino_set)
     return (-1);
   if (!msg->name_set)
     return (-1);
@@ -5389,6 +5465,314 @@ evtag_marshal_mkfs_response(struct evbuffer *evbuf, ev_uint32_t tag, const struc
   struct evbuffer *_buf = evbuffer_new();
   assert(_buf != NULL);
   mkfs_response_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
+}
+
+/*
+ * Implementation of uuid_request
+ */
+
+static struct uuid_request_access_ __uuid_request_base = {
+  uuid_request_count_assign,
+  uuid_request_count_get,
+};
+
+struct uuid_request *
+uuid_request_new(void)
+{
+  return uuid_request_new_with_arg(NULL);
+}
+
+struct uuid_request *
+uuid_request_new_with_arg(void *unused)
+{
+  struct uuid_request *tmp;
+  if ((tmp = malloc(sizeof(struct uuid_request))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__uuid_request_base;
+
+  tmp->count = 0;
+  tmp->count_set = 0;
+
+  return (tmp);
+}
+
+
+int
+uuid_request_count_assign(struct uuid_request *msg, const ev_uint32_t value)
+{
+  msg->count_set = 1;
+  msg->count = value;
+  return (0);
+}
+
+int
+uuid_request_count_get(struct uuid_request *msg, ev_uint32_t *value)
+{
+  if (msg->count_set != 1)
+    return (-1);
+  *value = msg->count;
+  return (0);
+}
+
+void
+uuid_request_clear(struct uuid_request *tmp)
+{
+  tmp->count_set = 0;
+}
+
+void
+uuid_request_free(struct uuid_request *tmp)
+{
+  free(tmp);
+}
+
+void
+uuid_request_marshal(struct evbuffer *evbuf, const struct uuid_request *tmp){
+  evtag_marshal_int(evbuf, UUID_REQUEST_COUNT, tmp->count);
+}
+
+int
+uuid_request_unmarshal(struct uuid_request *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case UUID_REQUEST_COUNT:
+
+        if (tmp->count_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, UUID_REQUEST_COUNT, &tmp->count) == -1) {
+          event_warnx("%s: failed to unmarshal count", __func__);
+          return (-1);
+        }
+        tmp->count_set = 1;
+        break;
+
+      default:
+        return -1;
+    }
+  }
+
+  if (uuid_request_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+uuid_request_complete(struct uuid_request *msg)
+{
+  if (!msg->count_set)
+    return (-1);
+  return (0);
+}
+
+int
+evtag_unmarshal_uuid_request(struct evbuffer *evbuf, ev_uint32_t need_tag, struct uuid_request *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (uuid_request_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
+}
+
+void
+evtag_marshal_uuid_request(struct evbuffer *evbuf, ev_uint32_t tag, const struct uuid_request *msg)
+{
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  uuid_request_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
+}
+
+/*
+ * Implementation of uuid_response
+ */
+
+static struct uuid_response_access_ __uuid_response_base = {
+  uuid_response_range_min_assign,
+  uuid_response_range_min_get,
+  uuid_response_range_max_assign,
+  uuid_response_range_max_get,
+};
+
+struct uuid_response *
+uuid_response_new(void)
+{
+  return uuid_response_new_with_arg(NULL);
+}
+
+struct uuid_response *
+uuid_response_new_with_arg(void *unused)
+{
+  struct uuid_response *tmp;
+  if ((tmp = malloc(sizeof(struct uuid_response))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__uuid_response_base;
+
+  tmp->range_min = 0;
+  tmp->range_min_set = 0;
+
+  tmp->range_max = 0;
+  tmp->range_max_set = 0;
+
+  return (tmp);
+}
+
+
+
+int
+uuid_response_range_min_assign(struct uuid_response *msg, const ev_uint64_t value)
+{
+  msg->range_min_set = 1;
+  msg->range_min = value;
+  return (0);
+}
+
+int
+uuid_response_range_max_assign(struct uuid_response *msg, const ev_uint64_t value)
+{
+  msg->range_max_set = 1;
+  msg->range_max = value;
+  return (0);
+}
+
+int
+uuid_response_range_min_get(struct uuid_response *msg, ev_uint64_t *value)
+{
+  if (msg->range_min_set != 1)
+    return (-1);
+  *value = msg->range_min;
+  return (0);
+}
+
+int
+uuid_response_range_max_get(struct uuid_response *msg, ev_uint64_t *value)
+{
+  if (msg->range_max_set != 1)
+    return (-1);
+  *value = msg->range_max;
+  return (0);
+}
+
+void
+uuid_response_clear(struct uuid_response *tmp)
+{
+  tmp->range_min_set = 0;
+  tmp->range_max_set = 0;
+}
+
+void
+uuid_response_free(struct uuid_response *tmp)
+{
+  free(tmp);
+}
+
+void
+uuid_response_marshal(struct evbuffer *evbuf, const struct uuid_response *tmp){
+  evtag_marshal_int64(evbuf, UUID_RESPONSE_RANGE_MIN, tmp->range_min);
+  evtag_marshal_int64(evbuf, UUID_RESPONSE_RANGE_MAX, tmp->range_max);
+}
+
+int
+uuid_response_unmarshal(struct uuid_response *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case UUID_RESPONSE_RANGE_MIN:
+
+        if (tmp->range_min_set)
+          return (-1);
+        if (evtag_unmarshal_int64(evbuf, UUID_RESPONSE_RANGE_MIN, &tmp->range_min) == -1) {
+          event_warnx("%s: failed to unmarshal range_min", __func__);
+          return (-1);
+        }
+        tmp->range_min_set = 1;
+        break;
+
+      case UUID_RESPONSE_RANGE_MAX:
+
+        if (tmp->range_max_set)
+          return (-1);
+        if (evtag_unmarshal_int64(evbuf, UUID_RESPONSE_RANGE_MAX, &tmp->range_max) == -1) {
+          event_warnx("%s: failed to unmarshal range_max", __func__);
+          return (-1);
+        }
+        tmp->range_max_set = 1;
+        break;
+
+      default:
+        return -1;
+    }
+  }
+
+  if (uuid_response_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+uuid_response_complete(struct uuid_response *msg)
+{
+  if (!msg->range_min_set)
+    return (-1);
+  if (!msg->range_max_set)
+    return (-1);
+  return (0);
+}
+
+int
+evtag_unmarshal_uuid_response(struct evbuffer *evbuf, ev_uint32_t need_tag, struct uuid_response *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (uuid_response_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
+}
+
+void
+evtag_marshal_uuid_response(struct evbuffer *evbuf, ev_uint32_t tag, const struct uuid_response *msg)
+{
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  uuid_response_marshal(_buf, msg);
   evtag_marshal_buffer(evbuf, tag, _buf);
    evbuffer_free(_buf);
 }

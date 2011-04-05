@@ -24,6 +24,7 @@
 #define _CONFIG_MAKE_PROTOTYPE(fname,type) type cfg_get##fname(const char *name,type def)
 
 int cfg_load(const char *fname, int logundefined);
+int cfg_add_and_write(char * key, char * value);
 
 _CONFIG_MAKE_PROTOTYPE(str, char *);
 _CONFIG_MAKE_PROTOTYPE(num, int);

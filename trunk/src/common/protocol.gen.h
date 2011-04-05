@@ -32,6 +32,8 @@ struct statfs_request;
 struct statfs_response;
 struct mkfs_request;
 struct mkfs_response;
+struct uuid_request;
+struct uuid_response;
 
 /* Tag definition for ping */
 enum ping_ {
@@ -551,9 +553,10 @@ struct file_stat*  ls_response_stat_arr_add(struct ls_response *msg);
 /* Tag definition for mknod_request */
 enum mknod_request_ {
   MKNOD_REQUEST_PARENT_INO=1,
-  MKNOD_REQUEST_NAME=2,
-  MKNOD_REQUEST_TYPE=3,
-  MKNOD_REQUEST_MODE=4,
+  MKNOD_REQUEST_INO=2,
+  MKNOD_REQUEST_NAME=3,
+  MKNOD_REQUEST_TYPE=4,
+  MKNOD_REQUEST_MODE=5,
   MKNOD_REQUEST_MAX_TAGS
 };
 
@@ -561,6 +564,8 @@ enum mknod_request_ {
 struct mknod_request_access_ {
   int (*parent_ino_assign)(struct mknod_request *, const ev_uint64_t);
   int (*parent_ino_get)(struct mknod_request *, ev_uint64_t *);
+  int (*ino_assign)(struct mknod_request *, const ev_uint64_t);
+  int (*ino_get)(struct mknod_request *, ev_uint64_t *);
   int (*name_assign)(struct mknod_request *, const char *);
   int (*name_get)(struct mknod_request *, char * *);
   int (*type_assign)(struct mknod_request *, const ev_uint32_t);
@@ -573,11 +578,13 @@ struct mknod_request {
   struct mknod_request_access_ *base;
 
   ev_uint64_t parent_ino;
+  ev_uint64_t ino;
   char *name;
   ev_uint32_t type;
   ev_uint32_t mode;
 
   ev_uint8_t parent_ino_set;
+  ev_uint8_t ino_set;
   ev_uint8_t name_set;
   ev_uint8_t type_set;
   ev_uint8_t mode_set;
@@ -596,6 +603,8 @@ int evtag_unmarshal_mknod_request(struct evbuffer *, ev_uint32_t,
     struct mknod_request *);
 int mknod_request_parent_ino_assign(struct mknod_request *, const ev_uint64_t);
 int mknod_request_parent_ino_get(struct mknod_request *, ev_uint64_t *);
+int mknod_request_ino_assign(struct mknod_request *, const ev_uint64_t);
+int mknod_request_ino_get(struct mknod_request *, ev_uint64_t *);
 int mknod_request_name_assign(struct mknod_request *, const char *);
 int mknod_request_name_get(struct mknod_request *, char * *);
 int mknod_request_type_assign(struct mknod_request *, const ev_uint32_t);
@@ -646,8 +655,9 @@ struct file_stat*  mknod_response_stat_arr_add(struct mknod_response *msg);
 /* Tag definition for symlink_request */
 enum symlink_request_ {
   SYMLINK_REQUEST_PARENT_INO=1,
-  SYMLINK_REQUEST_NAME=2,
-  SYMLINK_REQUEST_PATH=3,
+  SYMLINK_REQUEST_INO=2,
+  SYMLINK_REQUEST_NAME=3,
+  SYMLINK_REQUEST_PATH=4,
   SYMLINK_REQUEST_MAX_TAGS
 };
 
@@ -655,6 +665,8 @@ enum symlink_request_ {
 struct symlink_request_access_ {
   int (*parent_ino_assign)(struct symlink_request *, const ev_uint64_t);
   int (*parent_ino_get)(struct symlink_request *, ev_uint64_t *);
+  int (*ino_assign)(struct symlink_request *, const ev_uint64_t);
+  int (*ino_get)(struct symlink_request *, ev_uint64_t *);
   int (*name_assign)(struct symlink_request *, const char *);
   int (*name_get)(struct symlink_request *, char * *);
   int (*path_assign)(struct symlink_request *, const char *);
@@ -665,10 +677,12 @@ struct symlink_request {
   struct symlink_request_access_ *base;
 
   ev_uint64_t parent_ino;
+  ev_uint64_t ino;
   char *name;
   char *path;
 
   ev_uint8_t parent_ino_set;
+  ev_uint8_t ino_set;
   ev_uint8_t name_set;
   ev_uint8_t path_set;
 };
@@ -686,6 +700,8 @@ int evtag_unmarshal_symlink_request(struct evbuffer *, ev_uint32_t,
     struct symlink_request *);
 int symlink_request_parent_ino_assign(struct symlink_request *, const ev_uint64_t);
 int symlink_request_parent_ino_get(struct symlink_request *, ev_uint64_t *);
+int symlink_request_ino_assign(struct symlink_request *, const ev_uint64_t);
+int symlink_request_ino_get(struct symlink_request *, ev_uint64_t *);
 int symlink_request_name_assign(struct symlink_request *, const char *);
 int symlink_request_name_get(struct symlink_request *, char * *);
 int symlink_request_path_assign(struct symlink_request *, const char *);
@@ -1112,5 +1128,82 @@ int evtag_unmarshal_mkfs_response(struct evbuffer *, ev_uint32_t,
 int mkfs_response_rst_assign(struct mkfs_response *, const ev_uint32_t);
 int mkfs_response_rst_get(struct mkfs_response *, ev_uint32_t *);
 /* --- mkfs_response done --- */
+
+/* Tag definition for uuid_request */
+enum uuid_request_ {
+  UUID_REQUEST_COUNT=1,
+  UUID_REQUEST_MAX_TAGS
+};
+
+/* Structure declaration for uuid_request */
+struct uuid_request_access_ {
+  int (*count_assign)(struct uuid_request *, const ev_uint32_t);
+  int (*count_get)(struct uuid_request *, ev_uint32_t *);
+};
+
+struct uuid_request {
+  struct uuid_request_access_ *base;
+
+  ev_uint32_t count;
+
+  ev_uint8_t count_set;
+};
+
+struct uuid_request *uuid_request_new(void);
+struct uuid_request *uuid_request_new_with_arg(void *);
+void uuid_request_free(struct uuid_request *);
+void uuid_request_clear(struct uuid_request *);
+void uuid_request_marshal(struct evbuffer *, const struct uuid_request *);
+int uuid_request_unmarshal(struct uuid_request *, struct evbuffer *);
+int uuid_request_complete(struct uuid_request *);
+void evtag_marshal_uuid_request(struct evbuffer *, ev_uint32_t,
+    const struct uuid_request *);
+int evtag_unmarshal_uuid_request(struct evbuffer *, ev_uint32_t,
+    struct uuid_request *);
+int uuid_request_count_assign(struct uuid_request *, const ev_uint32_t);
+int uuid_request_count_get(struct uuid_request *, ev_uint32_t *);
+/* --- uuid_request done --- */
+
+/* Tag definition for uuid_response */
+enum uuid_response_ {
+  UUID_RESPONSE_RANGE_MIN=1,
+  UUID_RESPONSE_RANGE_MAX=2,
+  UUID_RESPONSE_MAX_TAGS
+};
+
+/* Structure declaration for uuid_response */
+struct uuid_response_access_ {
+  int (*range_min_assign)(struct uuid_response *, const ev_uint64_t);
+  int (*range_min_get)(struct uuid_response *, ev_uint64_t *);
+  int (*range_max_assign)(struct uuid_response *, const ev_uint64_t);
+  int (*range_max_get)(struct uuid_response *, ev_uint64_t *);
+};
+
+struct uuid_response {
+  struct uuid_response_access_ *base;
+
+  ev_uint64_t range_min;
+  ev_uint64_t range_max;
+
+  ev_uint8_t range_min_set;
+  ev_uint8_t range_max_set;
+};
+
+struct uuid_response *uuid_response_new(void);
+struct uuid_response *uuid_response_new_with_arg(void *);
+void uuid_response_free(struct uuid_response *);
+void uuid_response_clear(struct uuid_response *);
+void uuid_response_marshal(struct evbuffer *, const struct uuid_response *);
+int uuid_response_unmarshal(struct uuid_response *, struct evbuffer *);
+int uuid_response_complete(struct uuid_response *);
+void evtag_marshal_uuid_response(struct evbuffer *, ev_uint32_t,
+    const struct uuid_response *);
+int evtag_unmarshal_uuid_response(struct evbuffer *, ev_uint32_t,
+    struct uuid_response *);
+int uuid_response_range_min_assign(struct uuid_response *, const ev_uint64_t);
+int uuid_response_range_min_get(struct uuid_response *, ev_uint64_t *);
+int uuid_response_range_max_assign(struct uuid_response *, const ev_uint64_t);
+int uuid_response_range_max_get(struct uuid_response *, ev_uint64_t *);
+/* --- uuid_response done --- */
 
 #endif  /* _COMMON_PROTOCOL_RPC_ */

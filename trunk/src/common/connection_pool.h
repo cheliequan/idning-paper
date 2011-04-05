@@ -4,7 +4,7 @@
 #include "dlist.h"
 
 /*
- * a map of int -> list 
+ * a map of string -> list[evhttp_connection]
  *
  * actually it's a mutiMap
  * */

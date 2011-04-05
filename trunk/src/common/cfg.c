@@ -33,7 +33,6 @@ static paramstr *paramhead = NULL;
 static int logundefined = 0;
 static char *config_filename = NULL;
 
-
 int cfg_add(char * key, char * value){
     paramstr *tmp;
     tmp = (paramstr *) malloc(sizeof(paramstr));
@@ -41,7 +40,17 @@ int cfg_add(char * key, char * value){
     tmp->value = strdup(value);
     tmp->next = paramhead;
     paramhead = tmp;
+    return 0;
 }
+int cfg_add_and_write(char * key, char * value){
+    cfg_add(key, value);
+    char s[1024];
+    sprintf(s, "%s = %s", key, value);
+    cfg_append(s);
+    return 0;
+
+}
+
 
 int cfg_load(const char *configfname, int _lu)
 {

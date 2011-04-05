@@ -116,11 +116,12 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
 
     struct mknod_request *request = rpc->request;
     struct mknod_response *response = rpc->reply;
-    fsnode *n = fs_mknod(request->parent_ino, request->name, request->type,
+    logging(LOG_DEUBG, "mknod(parent=%" PRIu64 ", ino = % "PRIu64", name=%s, type=%d, mode=%04o)",
+            request->parent_ino, request->ino, request->name, request->type, request->mode);
+
+    fsnode *n = fs_mknod(request->parent_ino, request->ino, request->name, request->type,
                          request->mode);
 
-    logging(LOG_DEUBG, "mknod(parent=%" PRIu64 ", name=%s, type=%d, mode=%04o)",
-            request->parent_ino, request->name, request->type, request->mode);
 
     struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
     fsnode_to_stat_copy(t, n);
@@ -140,11 +141,11 @@ static void symlink_handler(EVRPC_STRUCT(rpc_symlink) * rpc, void *arg)
 
     struct symlink_request *request = rpc->request;
     struct symlink_response *response = rpc->reply;
-    fsnode *n = fs_symlink(request->parent_ino, request->name, request->path);
 
-    logging(LOG_DEUBG, "symlink(parent=%" PRIu64 ", name=%s, path =%s)",
-            request->parent_ino, request->name, request->path);
+    logging(LOG_DEUBG, "symlink(parent=%" PRIu64 ", ino = %"PRIu64", name=%s, path =%s)",
+            request->parent_ino, request->ino, request->name, request->path);
 
+    fsnode *n = fs_symlink(request->parent_ino, request->ino, request->name, request->path);
     struct file_stat *t;
     EVTAG_GET(response, stat, &t);
     fsnode_to_stat_copy(t, n);
