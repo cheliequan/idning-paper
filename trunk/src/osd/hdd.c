@@ -21,9 +21,9 @@ hdd_chunk *new_hdd_chunk()
 
 void hdd_chunk_printf(hdd_chunk * chunk)
 {
-    fprintf(stderr, "chunk->id: %" PRIX64 "\n", chunk->chunkid);
-    fprintf(stderr, "chunk->path: %s \n", chunk->path);
-    fprintf(stderr, "chunk->size: %d \n", chunk->size);
+    logging(LOG_DEUBG, "chunk->id: %" PRIX64 "\n", chunk->chunkid);
+    logging(LOG_DEUBG, "chunk->path: %s \n", chunk->path);
+    logging(LOG_DEUBG, "chunk->size: %d \n", chunk->size);
 }
 
 hdd_chunk *chunk_hashtable_put(uint64_t chunkid, char *path, size_t size)
@@ -107,7 +107,7 @@ void hdd_scan_chunk(hdd_space * hdd)
         while ((de = readdir(dd)) != NULL) {
             if (de->d_name[0] == '.')
                 continue;
-            fprintf(stderr, "de->d_name = %s\n", de->d_name);
+            logging(LOG_DEUBG, "de->d_name = %s\n", de->d_name);
             int64_t chunkid;
             sscanf(de->d_name, "%" SCNx64, &chunkid);
 

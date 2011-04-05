@@ -2,6 +2,18 @@
 #define _MDS_CONN_H__
 
 #include "sfs_common.h"
+#include <fuse_lowlevel.h>
+
+struct mds_req_ctx;
+typedef int (*mds_req_cb) (struct mds_req_ctx * ctx, void * ptr);
+
+struct mds_req_ctx{
+    fuse_req_t req;
+    struct fuse_file_info * fi;
+    int count;
+    mds_req_cb cb;
+
+}; 
 
 void mds_conn_init(void);
 
@@ -14,6 +26,10 @@ int stat_send_request(char *ip, int port, uint64_t * ino_arr, int len,
 int lookup_send_request(char *ip, int port, uint64_t parent_ino,
                         const char *name, struct file_stat *o_stat);
 
+int mknod_send_request_async(char *ip, int port,
+                       uint64_t parent_ino, uint64_t ino, 
+                       const char *name, int type,
+                       int mode, struct mds_req_ctx * ctx);
 
 int mknod_send_request(char *ip, int port,
                        uint64_t parent_ino, uint64_t ino, 

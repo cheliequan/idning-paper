@@ -91,9 +91,9 @@ static struct file_stat *get_attr(fuse_ino_t ino)
         mid = get_mid_of_ino(cached->parent_ino);
     /*}*/
     //?? out of date??
-    struct machine *m = cluster_get_machine_by_mid(mid);
-    uint64_t arr[1];
-    arr[0] = ino;
+    /*struct machine *m = cluster_get_machine_by_mid(mid);*/
+    /*uint64_t arr[1];*/
+    /*arr[0] = ino;*/
 
     //log_file_stat("stat before updat in cache:", cached);
     //stat_send_request(m->ip, m->port, arr, 1, cached);  // this will update the cache item
@@ -354,28 +354,64 @@ void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 }
 
 
-struct mds_req_ctx{
-    fuse_req_t req;
+
+
+int create_mds_req_cb(struct mds_req_ctx * ctx, void* ptr){
+    DBG();
+    if (--ctx->count){
+        return 1; 
+    }
     struct fuse_entry_param e;
-    struct fuse_file_info * fi;
+    struct file_stat * stat = (struct file_stat *) ptr;
+    log_file_stat("create return :", stat);
+    attr_cache_add(stat);       //no free
 
-}; 
+    memset(&e, 0, sizeof(e));
+    e.ino = stat->ino;
+    e.attr_timeout = 1.0;
+    e.entry_timeout = 1.0;
+    sfs_stat(e.ino, &e.attr);
 
-struct mds_req_ctx* mds_req_ctx_new( fuse_req_t req, struct fuse_entry_param e, struct fuse_file_info * fi){
+    //get attr
+    ctx->fi->fh = (unsigned long)stat;
+
+    //for test:
+    //
+    /*struct mds_req_ctx* ctx = mds_req_ctx_new( req, e, fi);*/
+    if (fuse_reply_create(ctx->req, &e, ctx->fi) == -ENOENT) {
+        assert(0);
+    }
+    return 0;
+}
+
+struct mds_req_ctx* mds_req_ctx_new( fuse_req_t req, struct fuse_file_info * fi){
     struct mds_req_ctx * ctx = malloc(sizeof(struct mds_req_ctx));
     ctx->req = req;
-    ctx->e = e;
     ctx->fi = fi;
+    ctx->count = 2;
+    ctx->cb = create_mds_req_cb;
+    return ctx;
 }
 
-void *fuse_return_func( void *ptr )
+
+void sfs_ll_create_async(fuse_req_t req, fuse_ino_t parent, const char *name,
+                   mode_t mode, struct fuse_file_info *fi)
 {
-    struct mds_req_ctx * ctx = (struct mds_req_ctx *) ptr;
-    if (fuse_reply_create(ctx->req, &(ctx->e), ctx->fi) == -ENOENT) {
+    logging(LOG_DEUBG, "create_async(parent = %lu, name = %s, mode=%04o)", parent,
+            name, mode);
+    uint64_t ino = cmgr_get_uuid();
 
+    struct file_stat *cached_parent = attr_cache_lookup(parent);
+    struct mds_req_ctx * ctx = mds_req_ctx_new(req, fi);
+    int i;
+    for (i=0;i<2; i++){
+        int mid = cached_parent->pos_arr[i];
+        struct machine *m = cluster_get_machine_by_mid(mid);
+        mknod_send_request_async(m->ip, m->port, parent, ino, name, 0, S_IFREG, ctx);
     }
-
+    event_dispatch(); //FIXME
 }
+
 
 void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
                    mode_t mode, struct fuse_file_info *fi)
@@ -407,17 +443,11 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
     //get attr
     fi->fh = (unsigned long)stat;
 
-    //for test:
-    //
-    struct mds_req_ctx* ctx = mds_req_ctx_new( req, e, fi);
-    pthread_t thread1, thread2;
+    if (fuse_reply_create(req, &e, fi) == -ENOENT) {
 
-    int rst = pthread_create( &thread1, NULL, fuse_return_func, (void*) ctx);
-
-    /*if (fuse_reply_create(req, &e, fi) == -ENOENT) {*/
-
-    /*}*/
+    }
 }
+
 
 void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
                   mode_t mode)
@@ -639,7 +669,7 @@ static struct fuse_lowlevel_ops sfs_ll_op = {
     .write =    sfs_ll_write,
     .setattr =  sfs_ll_setattr,
     .flush =    sfs_ll_flush,
-    .create =   sfs_ll_create,
+    .create =   sfs_ll_create_async,
     .mkdir =    sfs_ll_mkdir,
     .unlink =   sfs_ll_unlink,
     .rmdir =    sfs_ll_unlink,

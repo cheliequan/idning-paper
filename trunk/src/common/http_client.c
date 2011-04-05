@@ -183,7 +183,7 @@ static struct http_response *http_request(const char *url, int verb,
                                           struct evkeyvalq *headers,
                                           struct evbuffer *data)
 {
-    fprintf(stderr, "http_request: %s, %d\n", url, verb);
+    /*fprintf(stderr, "http_request: %s, %d\n", url, verb);*/
     struct request_context *ctx = context_new(url, verb, headers, data);
 
     event_dispatch();
