@@ -670,6 +670,7 @@ static struct fuse_lowlevel_ops sfs_ll_op = {
     .setattr =  sfs_ll_setattr,
     .flush =    sfs_ll_flush,
     .create =   sfs_ll_create_async,
+    /*.create =   sfs_ll_create,*/
     .mkdir =    sfs_ll_mkdir,
     .unlink =   sfs_ll_unlink,
     .rmdir =    sfs_ll_unlink,
