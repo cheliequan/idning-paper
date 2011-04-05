@@ -16,9 +16,11 @@
 #define  LOG_WARN 3
 #define  LOG_ERROR 4
 
+#define  LOG_LEVEL 3
+
 int logging(int level, char *fmt, ...);
 int log_init(char *logfile);
 
-#define DBG() (fprintf(stderr, "%s:%s: called\n", __FILE__, __func__))
+#define DBG() (logging(LOG_DEUBG, "%s:%s: called\n", __FILE__, __func__))
 
 #endif

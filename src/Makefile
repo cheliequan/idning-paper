@@ -100,8 +100,8 @@ killall:
 	-killall -q cmgr.out osd.out mds.out mount.out
 
 indent:
-	find . -name "*.c" | xargs indent -npro -kr -i4 -ts4 -sob -l80 -ss -ncs -cp1 --no-tabs
-	find . -name "*.h" | xargs indent -npro -kr -i4 -ts4 -sob -l80 -ss -ncs -cp1 --no-tabs
+	find . -name "*.c" | xargs indent -npro -kr -i4 -ts4 -sob -l120 -ss -ncs -cp1 --no-tabs
+	find . -name "*.h" | xargs indent -npro -kr -i4 -ts4 -sob -l120 -ss -ncs -cp1 --no-tabs
 
 
 

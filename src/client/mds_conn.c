@@ -1,7 +1,9 @@
 #include "sfs_common.h"
 #include "mds_conn.h"
+#include "evrpc_pool_holder.h"
 
 ConnectionPool *conn_pool = NULL;
+EVrpcPoolHolder * pool_holder = NULL; //evrpc_pool_holder_new();
 
 typedef void (*marshal_func) (struct evbuffer *, void *);
 typedef int (*unmarshal_func) (void *, struct evbuffer *);
@@ -30,7 +32,14 @@ static void ls_cb(struct evrpc_status *status, struct ls_request *request , stru
     event_loopexit(NULL);
 }
 static void mknod_cb(struct evrpc_status *status, struct mknod_request *request , struct mknod_response * response , void *arg){
-    event_loopexit(NULL);
+
+    struct mds_req_ctx * ctx = (struct mds_req_ctx *) arg;
+    struct file_stat *o_stat = file_stat_new();
+    struct file_stat *stat;
+    EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
+    file_stat_copy(o_stat, stat);
+    if (ctx->cb(ctx, o_stat) == 0)
+        event_loopexit(NULL);
 }
 
 static void lookup_cb(struct evrpc_status *status, struct lookup_request *request , struct lookup_response * response , void *arg){
@@ -167,6 +176,38 @@ int ls_send_request(char *ip, int port, uint64_t ino,
     /*int mode; */
     /*struct file_stat *o_stat;*/
 /*}*/
+
+
+int mknod_send_request_async(char *ip, int port,
+                       uint64_t parent_ino, uint64_t ino, 
+                       const char *name, int type,
+                       int mode, struct mds_req_ctx * ctx)
+{
+    DBG();
+    struct mknod_request *req = mknod_request_new();
+
+    struct mknod_response *response = mknod_response_new();
+    EVTAG_ASSIGN(req, parent_ino, parent_ino);
+    EVTAG_ASSIGN(req, ino, ino);
+    EVTAG_ASSIGN(req, name, name);
+    EVTAG_ASSIGN(req, type, type);
+    EVTAG_ASSIGN(req, mode, mode);
+
+    /*int mid = get_mid_of_ino(parent_ino); */
+    /*struct machine * m = cluster_get_machine_by_mid(mid); */
+
+    /*rpc_grneral_request(ip, port, "/.rpc.rpc_mknod",*/
+                        /*req, (marshal_func) mknod_request_marshal,*/
+                        /*response, (unmarshal_func) mknod_response_unmarshal);*/
+
+
+
+
+    struct evrpc_pool * pool  = evrpc_pool_holder_get(pool_holder, ip, port);
+    EVRPC_MAKE_REQUEST(rpc_mknod, pool, req, response,  mknod_cb, ctx);
+    return 0;
+}
+
 
 int mknod_send_request(char *ip, int port,
                        uint64_t parent_ino, uint64_t ino, 
@@ -388,6 +429,7 @@ void mds_conn_init()
     //struct machine *mds = cluster_get_machine_of_type(MACHINE_MDS);
 
     conn_pool = connection_pool_new();
+    pool_holder = evrpc_pool_holder_new();
 
 }
 

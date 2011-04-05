@@ -52,8 +52,8 @@ int log_init(char *logfile)
 
 int logging(int level, char *fmt, ...)
 {
-    /*if (level==LOG_DEUBG) */
-    /*return; */
+    if (level<LOG_LEVEL) 
+        return;
     char stmp[10240];
     char *buf = stmp;
     puttime(&buf);
@@ -63,11 +63,11 @@ int logging(int level, char *fmt, ...)
     va_start(ap, fmt);
     vsnprintf(buf, sizeof(stmp) - 30, fmt, ap);
     va_end(ap);
-    /*fprintf(stderr, "%s\n", stmp);*/
-    /*if (fout) {*/
-        /*fprintf(fout, "%s\n", stmp);*/
-        /*fflush(fout);*/
-    /*}*/
+    fprintf(stderr, "%s\n", stmp);
+    if (fout) {
+        fprintf(fout, "%s\n", stmp);
+        fflush(fout);
+    }
 
     return 0;
 }
