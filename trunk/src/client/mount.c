@@ -2,11 +2,15 @@
 
 #include "sfs_common.h"
 #include <fuse_lowlevel.h>
+#include <pthread.h>
 
 #include "cmgr_conn.h"
 #include "osd_conn.h"
 #include "mds_conn.h"
 #include "attr_cache.h"
+
+static void fill_stbuf(struct stat* stbuf, struct file_stat * stat);
+
 
 static int get_mid_of_ino(int ino)
 {
@@ -20,7 +24,6 @@ static int get_mid_of_ino(int ino)
         assert(0);
 
     }
-
     int mid = cached->pos_arr[0];
     return mid;
 }
@@ -38,6 +41,37 @@ static inline struct machine *get_machine_of_inode(fuse_ino_t ino)
     int mid = get_mid_of_ino(ino);
     struct machine *m = cluster_get_machine_by_mid(mid);
     return m;
+}
+
+
+
+struct dirbuf {
+    char *p;
+    size_t size;
+};
+//TODO: 优化.
+static void dirbuf_add(fuse_req_t req, struct dirbuf *b, const char *name,
+                       struct file_stat * stat)
+{
+    struct stat stbuf;
+    size_t oldsize = b->size;
+    b->size += fuse_add_direntry(req, NULL, 0, name, NULL, 0);
+    b->p = (char *)realloc(b->p, b->size);
+    memset(&stbuf, 0, sizeof(stbuf));
+    fill_stbuf(&stbuf, stat);
+    fuse_add_direntry(req, b->p + oldsize, b->size - oldsize, name, &stbuf,
+                      b->size);
+}
+
+#define min(x, y) ((x) < (y) ? (x) : (y))
+
+static int reply_buf_limited(fuse_req_t req, const char *buf, size_t bufsize,
+                             off_t off, size_t maxsize)
+{
+    if (off < bufsize)
+        return fuse_reply_buf(req, buf + off, min(bufsize - off, maxsize));
+    else
+        return fuse_reply_buf(req, NULL, 0);
 }
 
 /*
@@ -126,34 +160,6 @@ static void sfs_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
     fuse_reply_entry(req, &e);
 }
 
-struct dirbuf {
-    char *p;
-    size_t size;
-};
-//TODO: 优化.
-static void dirbuf_add(fuse_req_t req, struct dirbuf *b, const char *name,
-                       struct file_stat * stat)
-{
-    struct stat stbuf;
-    size_t oldsize = b->size;
-    b->size += fuse_add_direntry(req, NULL, 0, name, NULL, 0);
-    b->p = (char *)realloc(b->p, b->size);
-    memset(&stbuf, 0, sizeof(stbuf));
-    fill_stbuf(&stbuf, stat);
-    fuse_add_direntry(req, b->p + oldsize, b->size - oldsize, name, &stbuf,
-                      b->size);
-}
-
-#define min(x, y) ((x) < (y) ? (x) : (y))
-
-static int reply_buf_limited(fuse_req_t req, const char *buf, size_t bufsize,
-                             off_t off, size_t maxsize)
-{
-    if (off < bufsize)
-        return fuse_reply_buf(req, buf + off, min(bufsize - off, maxsize));
-    else
-        return fuse_reply_buf(req, NULL, 0);
-}
 
 static void sfs_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
                            off_t off, struct fuse_file_info *fi)
@@ -194,12 +200,12 @@ static void sfs_ll_open(fuse_req_t req, fuse_ino_t ino,
     fuse_reply_open(req, fi);
 }
 
-void sfs_readlink(fuse_req_t req, fuse_ino_t ino)
+void sfs_ll_readlink(fuse_req_t req, fuse_ino_t ino)
 {
     logging(LOG_DEUBG, "readlink(ino = %lu)", ino);
     struct machine *m = get_machine_of_parent_inode(ino);
     const char *path = readlink_send_request(m->ip, m->port, ino);
-    logging(LOG_DEUBG, "sfs_readlink get path: %s", path);
+    logging(LOG_DEUBG, "sfs_ll_readlink get path: %s", path);
 
     if (0) {
         fuse_reply_err(req, 3);
@@ -210,7 +216,7 @@ void sfs_readlink(fuse_req_t req, fuse_ino_t ino)
     free((void *)path);
 }
 
-void sfs_statfs(fuse_req_t req, fuse_ino_t ino)
+void sfs_ll_statfs(fuse_req_t req, fuse_ino_t ino)
 {
     uint32_t totalspace, availspace;
     uint32_t inodes;
@@ -225,7 +231,7 @@ void sfs_statfs(fuse_req_t req, fuse_ino_t ino)
     cluster_get_mds_arr(&mds, &mds_cnt);
     struct machine *m = cluster_get_machine_by_mid(mds[0]); // TODO: currently it's  a random one
     statfs_send_request(m->ip, m->port, &totalspace, &availspace, &inodes);
-    logging(LOG_DEUBG, "sfs_statfs get : %d , %d, %d ", totalspace, availspace,
+    logging(LOG_DEUBG, "sfs_ll_statfs get : %d , %d, %d ", totalspace, availspace,
             inodes);
 
     stfsbuf.f_namemax = 1024 * 1024;
@@ -347,6 +353,30 @@ void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
     fuse_reply_err(req, err);
 }
 
+
+struct mds_req_ctx{
+    fuse_req_t req;
+    struct fuse_entry_param e;
+    struct fuse_file_info * fi;
+
+}; 
+
+struct mds_req_ctx* mds_req_ctx_new( fuse_req_t req, struct fuse_entry_param e, struct fuse_file_info * fi){
+    struct mds_req_ctx * ctx = malloc(sizeof(struct mds_req_ctx));
+    ctx->req = req;
+    ctx->e = e;
+    ctx->fi = fi;
+}
+
+void *fuse_return_func( void *ptr )
+{
+    struct mds_req_ctx * ctx = (struct mds_req_ctx *) ptr;
+    if (fuse_reply_create(ctx->req, &(ctx->e), ctx->fi) == -ENOENT) {
+
+    }
+
+}
+
 void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
                    mode_t mode, struct fuse_file_info *fi)
 {
@@ -377,9 +407,16 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
     //get attr
     fi->fh = (unsigned long)stat;
 
-    if (fuse_reply_create(req, &e, fi) == -ENOENT) {
+    //for test:
+    //
+    struct mds_req_ctx* ctx = mds_req_ctx_new( req, e, fi);
+    pthread_t thread1, thread2;
 
-    }
+    int rst = pthread_create( &thread1, NULL, fuse_return_func, (void*) ctx);
+
+    /*if (fuse_reply_create(req, &e, fi) == -ENOENT) {*/
+
+    /*}*/
 }
 
 void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
@@ -417,7 +454,7 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
     }
 }
 
-void sfs_symlink(fuse_req_t req, const char *path, fuse_ino_t parent,
+void sfs_ll_symlink(fuse_req_t req, const char *path, fuse_ino_t parent,
                  const char *name)
 {
     logging(LOG_DEUBG, "symlink(parent = %lu, name = %s, path=%s)", parent,
@@ -519,10 +556,26 @@ static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
     fuse_reply_err(req, 0);
 }
 
-void sfs_release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
+void sfs_ll_release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 {
     /*struct file_stat *stat = (struct file_stat *)(unsigned long)(fi->fh);*/
     fuse_reply_err(req, 0);
+}
+
+void sfs_ll_access(fuse_req_t req, fuse_ino_t ino, int mask)
+{
+    DBG();
+    if (0) {
+        assert(0);
+    } else {
+        fuse_reply_err(req, 0);
+    }
+}
+
+void sfs_ll_init(int debug_mode_in, int keep_cache_in,
+              double direntry_cache_timeout_in, double entry_cache_timeout_in,
+              double attr_cache_timeout_in)
+{
 }
 
 
@@ -575,42 +628,27 @@ void sfs_mkfs()
 
 #undef RST_FOUND
 
-void sfs_access(fuse_req_t req, fuse_ino_t ino, int mask)
-{
-    DBG();
-    if (0) {
-        assert(0);
-    } else {
-        fuse_reply_err(req, 0);
-    }
-}
-
-void sfs_init(int debug_mode_in, int keep_cache_in,
-              double direntry_cache_timeout_in, double entry_cache_timeout_in,
-              double attr_cache_timeout_in)
-{
-}
 
 static struct fuse_lowlevel_ops sfs_ll_op = {
-    /*.init       = sfs_init, */
-    .lookup = sfs_ll_lookup,
-    .getattr = sfs_ll_getattr,
-    .readdir = sfs_ll_readdir,
-    .open = sfs_ll_open,
-    .read = sfs_ll_read,
-    .write = sfs_ll_write,
-    .setattr = sfs_ll_setattr,
-    .flush = sfs_ll_flush,
-    .create = sfs_ll_create,
-    .mkdir = sfs_ll_mkdir,
-    .unlink = sfs_ll_unlink,
-    .rmdir = sfs_ll_unlink,
-    .statfs = sfs_statfs,
-    .release = sfs_release,
+    /*.init       = sfs_ll_init, */
+    .lookup =   sfs_ll_lookup,
+    .getattr =  sfs_ll_getattr,
+    .readdir =  sfs_ll_readdir,
+    .open =     sfs_ll_open,
+    .read =     sfs_ll_read,
+    .write =    sfs_ll_write,
+    .setattr =  sfs_ll_setattr,
+    .flush =    sfs_ll_flush,
+    .create =   sfs_ll_create,
+    .mkdir =    sfs_ll_mkdir,
+    .unlink =   sfs_ll_unlink,
+    .rmdir =    sfs_ll_unlink,
+    .statfs =   sfs_ll_statfs,
+    .release =  sfs_ll_release,
 
-    .symlink = sfs_symlink,
-    .readlink = sfs_readlink,
-    .access = sfs_access,
+    .symlink =  sfs_ll_symlink,
+    .readlink = sfs_ll_readlink,
+    .access =   sfs_ll_access,
 
 };
 
@@ -618,6 +656,7 @@ void usage(const char *appname)
 {
 
 }
+
 void onexit()
 {
 
