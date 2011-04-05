@@ -32,7 +32,7 @@ int uuid_send_request()
 }
 
 
-int64_t get_uuid(){
+int64_t cmgr_get_uuid(){
     if(uuid_max <= uuid_min){
         uuid_send_request();
     }

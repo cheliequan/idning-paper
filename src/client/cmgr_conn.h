@@ -1,2 +1,2 @@
 
-int64_t get_uuid();
+int64_t cmgr_get_uuid();
