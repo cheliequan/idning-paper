@@ -22,7 +22,8 @@ u:
 	-mkdir -p /tmp/a
 	-sudo umount /tmp/a -l
 m: u
-	./client/mount.out /tmp/a -d
+	#./client/mount.out /tmp/a -d
+	./client/mount.out /tmp/a 
 v: u
 	valgrind --tool=memcheck --leak-check=full -v ./client/mount.out /tmp/a -d 
 #i:

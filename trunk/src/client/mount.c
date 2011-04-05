@@ -3,14 +3,13 @@
 #include "sfs_common.h"
 #include <fuse_lowlevel.h>
 
+#include "cmgr_conn.h"
 #include "osd_conn.h"
 #include "mds_conn.h"
-#include "cmgr_conn.h"
 #include "attr_cache.h"
 
 static int get_mid_of_ino(int ino)
 {
-
     struct file_stat *cached = attr_cache_lookup(ino);
     if (cached == NULL) {
         /*cached = find_in_all(); */
@@ -62,14 +61,13 @@ static struct file_stat *get_attr(fuse_ino_t ino)
     uint64_t arr[1];
     arr[0] = ino;
 
-    log_file_stat("stat before updat in cache:", cached);
-    stat_send_request(m->ip, m->port, arr, 1, cached);  // update the cache item
-    log_file_stat("stat updated in cache:", cached);
+    //log_file_stat("stat before updat in cache:", cached);
+    //stat_send_request(m->ip, m->port, arr, 1, cached);  // this will update the cache item
+    //log_file_stat("stat updated in cache:", cached);
     return cached;
 }
 
 static void fill_stbuf(struct stat* stbuf, struct file_stat * stat){
-
     stbuf->st_ino = stat->ino;
     stbuf->st_uid = 0;
     stbuf->st_gid = 0;
@@ -81,7 +79,6 @@ static void fill_stbuf(struct stat* stbuf, struct file_stat * stat){
     }else{
         stbuf->st_nlink = 1;
     }
-
 }
 
 static int sfs_stat(fuse_ino_t ino, struct stat *stbuf)
@@ -195,6 +192,54 @@ static void sfs_ll_open(fuse_req_t req, fuse_ino_t ino,
     fi->fh = (unsigned long)get_attr(ino);
 
     fuse_reply_open(req, fi);
+}
+
+void sfs_readlink(fuse_req_t req, fuse_ino_t ino)
+{
+    logging(LOG_DEUBG, "readlink(ino = %lu)", ino);
+    struct machine *m = get_machine_of_parent_inode(ino);
+    const char *path = readlink_send_request(m->ip, m->port, ino);
+    logging(LOG_DEUBG, "sfs_readlink get path: %s", path);
+
+    if (0) {
+        fuse_reply_err(req, 3);
+    } else {
+        fuse_reply_readlink(req, (char *)path);
+    }
+
+    free((void *)path);
+}
+
+void sfs_statfs(fuse_req_t req, fuse_ino_t ino)
+{
+    uint32_t totalspace, availspace;
+    uint32_t inodes;
+
+    uint32_t bsize = 1024;
+    struct statvfs stfsbuf;
+    memset(&stfsbuf, 0, sizeof(stfsbuf));
+
+    (void)ino;
+    int *mds;
+    int mds_cnt;
+    cluster_get_mds_arr(&mds, &mds_cnt);
+    struct machine *m = cluster_get_machine_by_mid(mds[0]); // TODO: currently it's  a random one
+    statfs_send_request(m->ip, m->port, &totalspace, &availspace, &inodes);
+    logging(LOG_DEUBG, "sfs_statfs get : %d , %d, %d ", totalspace, availspace,
+            inodes);
+
+    stfsbuf.f_namemax = 1024 * 1024;
+    stfsbuf.f_frsize = bsize;
+    stfsbuf.f_bsize = bsize;
+
+    stfsbuf.f_blocks = totalspace / bsize;
+    stfsbuf.f_bfree = availspace / bsize;
+    stfsbuf.f_bavail = availspace / bsize;
+
+    stfsbuf.f_files = inodes;
+    stfsbuf.f_ffree = 1000000000;
+    stfsbuf.f_favail = 1000000000;
+    fuse_reply_statfs(req, &stfsbuf);
 }
 
 static void sfs_ll_read(fuse_req_t req, fuse_ino_t ino, size_t size,
@@ -325,8 +370,8 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
 
     memset(&e, 0, sizeof(e));
     e.ino = stat->ino;
-    e.attr_timeout = 0.0;
-    e.entry_timeout = 0.0;
+    e.attr_timeout = 1.0;
+    e.entry_timeout = 1.0;
     sfs_stat(e.ino, &e.attr);
 
     //get attr
@@ -362,8 +407,8 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
 
     memset(&e, 0, sizeof(e));
     e.ino = stat->ino;
-    e.attr_timeout = 0.0;
-    e.entry_timeout = 0.0;
+    e.attr_timeout = 1.0;
+    e.entry_timeout = 1.0;
 
     sfs_stat(e.ino, &e.attr);
 
@@ -395,8 +440,8 @@ void sfs_symlink(fuse_req_t req, const char *path, fuse_ino_t parent,
 
     memset(&e, 0, sizeof(e));
     e.ino = stat->ino;
-    e.attr_timeout = 0.0;
-    e.entry_timeout = 0.0;
+    e.attr_timeout = 1.0;
+    e.entry_timeout = 1.0;
 
     sfs_stat(e.ino, &e.attr);
 
@@ -457,29 +502,20 @@ void sfs_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf,
     fuse_reply_attr(req, &stbuf, 1.0);
 }
 
-void sfs_readlink(fuse_req_t req, fuse_ino_t ino)
-{
-    logging(LOG_DEUBG, "readlink(ino = %lu)", ino);
-    struct machine *m = get_machine_of_parent_inode(ino);
-    const char *path = readlink_send_request(m->ip, m->port, ino);
-    logging(LOG_DEUBG, "sfs_readlink get path: %s", path);
-
-    if (0) {
-        fuse_reply_err(req, 3);
-    } else {
-        fuse_reply_readlink(req, (char *)path);
-    }
-
-    free((void *)path);
-}
 
 static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
 {
     logging(LOG_DEUBG, "unlink(parent = %lu, name = %s)", parent, name);
-    struct machine *m = get_machine_of_inode(parent);
 
-    unlink_send_request(m->ip, m->port, parent, name);
 
+    struct file_stat *cached_parent = attr_cache_lookup(parent);
+
+    int i;
+    for (i=0;i<2; i++){
+        int mid = cached_parent->pos_arr[i];
+        struct machine *m = cluster_get_machine_by_mid(mid);
+        unlink_send_request(m->ip, m->port, parent, name);
+    }
     fuse_reply_err(req, 0);
 }
 
@@ -489,37 +525,6 @@ void sfs_release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
     fuse_reply_err(req, 0);
 }
 
-void sfs_statfs(fuse_req_t req, fuse_ino_t ino)
-{
-    uint32_t totalspace, availspace;
-    uint32_t inodes;
-
-    uint32_t bsize = 1024;
-    struct statvfs stfsbuf;
-    memset(&stfsbuf, 0, sizeof(stfsbuf));
-
-    (void)ino;
-    int *mds;
-    int mds_cnt;
-    cluster_get_mds_arr(&mds, &mds_cnt);
-    struct machine *m = cluster_get_machine_by_mid(mds[0]); // TODO: currently it's  a random one
-    statfs_send_request(m->ip, m->port, &totalspace, &availspace, &inodes);
-    logging(LOG_DEUBG, "sfs_statfs get : %d , %d, %d ", totalspace, availspace,
-            inodes);
-
-    stfsbuf.f_namemax = 1024 * 1024;
-    stfsbuf.f_frsize = bsize;
-    stfsbuf.f_bsize = bsize;
-
-    stfsbuf.f_blocks = totalspace / bsize;
-    stfsbuf.f_bfree = availspace / bsize;
-    stfsbuf.f_bavail = availspace / bsize;
-
-    stfsbuf.f_files = inodes;
-    stfsbuf.f_ffree = 1000000000;
-    stfsbuf.f_favail = 1000000000;
-    fuse_reply_statfs(req, &stfsbuf);
-}
 
 #define RST_FOUND 0
 
@@ -535,7 +540,7 @@ int search_inode_over_all_mds(uint64_t ino)
 
     cluster_get_mds_arr(&mds, &mds_cnt);
     for (i = 0; i < mds_cnt; i++) {
-        struct file_stat *stat = file_stat_new();
+       struct file_stat *stat = file_stat_new();
         /*EVTAG_ARRAY_ADD_VALUE(stat, pos_arr, mds[i]);*/
         struct machine *m = cluster_get_machine_by_mid(mds[i]);
 

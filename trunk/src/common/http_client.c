@@ -25,6 +25,9 @@ struct http_response *http_get(const char *url, struct evkeyvalq *headers);
 struct http_response *http_post(const char *url, struct evkeyvalq *headers,
                                 struct evbuffer *postdata);
 
+typedef void (*callback_func) (struct http_response * response);
+
+
 struct request_context {
     struct evhttp_uri *uri;
     struct evhttp_connection *conn;
@@ -38,11 +41,11 @@ struct request_context {
     int ok;
 };
 
-static void client_callback(struct evhttp_request *req, void *arg);
+static void http_client_callback(struct evhttp_request *req, void *arg);
 
 static int client_renew_request(struct request_context *ctx);
 
-static void client_callback(struct evhttp_request *req, void *arg)
+static void http_client_callback(struct evhttp_request *req, void *arg)
 {
     struct request_context *ctx = (struct request_context *)arg;
     struct evhttp_uri *new_uri = NULL;
@@ -147,7 +150,7 @@ static int client_renew_request(struct request_context *ctx)
         //fprintf(stderr, " conn->state: %d\n", conn->state);
     }
 
-    ctx->req = evhttp_request_new(client_callback, ctx);
+    ctx->req = evhttp_request_new(http_client_callback, ctx);
     evhttp_request_own(ctx->req);   // means that I will free it myself
 
     struct evkeyval *header;
