@@ -13,8 +13,46 @@ static void rpc_grneral_request(char *ip, int port, const char *rpcname,
 static void rpc_rpc_grneral_requestuest_cb(struct evhttp_request *req,
                                            void *arg);
 static void file_stat_copy(struct file_stat *dst, struct file_stat *src);
+///////////////////////////////////////////////////////////////////////////////////////////
+/*
+在一个group里面的rpc需要都完成，才向上返回.
+*/
+struct rpc_group{
+    int cnt;
+};
 
-///////////////////
+
+static void stat_cb(struct evrpc_status *status, struct stat_request *request , struct stat_response * response , void *arg) {
+    event_loopexit(NULL);
+}
+
+static void ls_cb(struct evrpc_status *status, struct ls_request *request , struct ls_response * response , void *arg){
+    event_loopexit(NULL);
+}
+static void mknod_cb(struct evrpc_status *status, struct mknod_request *request , struct mknod_response * response , void *arg){
+    event_loopexit(NULL);
+}
+
+static void lookup_cb(struct evrpc_status *status, struct lookup_request *request , struct lookup_response * response , void *arg){
+    event_loopexit(NULL);
+}
+
+static void unlink_cb(struct evrpc_status *status, struct unlink_request *request , struct unlink_response * response , void *arg){
+    event_loopexit(NULL);
+}
+
+static void setattr_cb(struct evrpc_status *status, struct setattr_request *request , struct setattr_response * response , void *arg){
+    event_loopexit(NULL);
+}
+
+/*static void statfs_cb(struct evrpc_status *status, struct statfs_request *request , struct statfs_response* response , void *arg){*/
+    /*event_loopexit(NULL);*/
+/*}*/
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
 int setattr_send_request(char *ip, int port, struct file_stat *stat_arr)
 {
     DBG();
@@ -120,8 +158,19 @@ int ls_send_request(char *ip, int port, uint64_t ino,
     return cnt;
 }
 
+/*struct mknod_reqeust{*/
+    /*char *ip;*/
+    /*int port;*/
+    /*uint64_t parent_ino; */
+    /*const char *name; */
+    /*int type;*/
+    /*int mode; */
+    /*struct file_stat *o_stat;*/
+/*}*/
+
 int mknod_send_request(char *ip, int port,
-                       uint64_t parent_ino, const char *name, int type,
+                       uint64_t parent_ino, uint64_t ino, 
+                       const char *name, int type,
                        int mode, struct file_stat *o_stat)
 {
     DBG();
@@ -129,6 +178,7 @@ int mknod_send_request(char *ip, int port,
 
     struct mknod_response *response = mknod_response_new();
     EVTAG_ASSIGN(req, parent_ino, parent_ino);
+    EVTAG_ASSIGN(req, ino, ino);
     EVTAG_ASSIGN(req, name, name);
     EVTAG_ASSIGN(req, type, type);
     EVTAG_ASSIGN(req, mode, mode);
@@ -149,7 +199,7 @@ int mknod_send_request(char *ip, int port,
     return 0;
 }
 
-int symlink_send_request(char *ip, int port, uint64_t parent_ino,
+int symlink_send_request(char *ip, int port, uint64_t parent_ino, uint64_t ino, 
                          const char *name, const char *path,
                          struct file_stat *o_stat)
 {
@@ -158,6 +208,7 @@ int symlink_send_request(char *ip, int port, uint64_t parent_ino,
 
     struct symlink_response *response = symlink_response_new();
     EVTAG_ASSIGN(req, parent_ino, parent_ino);
+    EVTAG_ASSIGN(req, ino, ino);
     EVTAG_ASSIGN(req, name, name);
     EVTAG_ASSIGN(req, path, path);
 

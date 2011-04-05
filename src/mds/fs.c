@@ -1,5 +1,5 @@
 #include "fs.h"
-static uint64_t cur_ino = 3;
+/*static uint64_t cur_ino = 3;*/
 static fsnode *nodehash[NODEHASHSIZE];
 static uint64_t version;
 
@@ -189,13 +189,13 @@ fsnode *fs_unlink(uint64_t parent_ino, char *name)
     return NULL;
 }
 
-fsnode *fs_mknod(uint64_t parent_ino, char *name, int type, int mode)
+fsnode *fs_mknod(uint64_t parent_ino, uint64_t ino, char *name, int type, int mode)
 {
     logging(LOG_DEUBG, "fs_mknod(parent_ino = %" PRIu64 " , name = %s)",
             parent_ino, name);
     fsnode *n = fsnode_new();
     n->parent = fsnode_hash_find(parent_ino);
-    n->ino = cur_ino++;
+    n->ino = ino;
     n->type = type;
     n->mode = mode;
     n->name = strdup(name);
@@ -216,13 +216,13 @@ fsnode *fs_mknod(uint64_t parent_ino, char *name, int type, int mode)
     return n;
 }
 
-fsnode *fs_symlink(uint64_t parent_ino, const char *name, const char *path)
+fsnode *fs_symlink(uint64_t parent_ino, uint64_t ino, const char *name, const char *path)
 {
     logging(LOG_DEUBG,
             "fs_symlink(parent_ino = %" PRIu64 " , name = %s, path = %s)",
             parent_ino, name, path);
     fsnode *n = fsnode_new();
-    n->ino = cur_ino++;
+    n->ino = ino;
     n->type = 255;              //TODO
 
     n->mode = S_IFLNK;

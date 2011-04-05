@@ -67,7 +67,8 @@ int fs_setattr(uint64_t ino, struct file_stat *st);
 /*
  * create, mkdir
  * */
-fsnode *fs_mknod(uint64_t parent_ino, char *name, int type, int mode);
+fsnode *fs_mknod(uint64_t parent_ino, uint64_t ino, char *name, int type, int mode);
+fsnode *fs_symlink(uint64_t parent_ino, uint64_t ino, const char *name, const char *path);
 /*
  *  rmdir 
  *  rm
@@ -79,7 +80,6 @@ fsnode *fs_ls(uint64_t ino);
 void fs_statfs(int *total_space, int *avail_space, int *inode_cnt);
 int fs_mkfs();
 
-fsnode *fs_symlink(uint64_t parent_ino, const char *name, const char *path);
 
 void fsnode_to_stat_copy(struct file_stat *t, fsnode * n);
 void stat_to_fsnode_copy(fsnode * n, struct file_stat *t);

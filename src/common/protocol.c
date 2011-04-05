@@ -6,20 +6,18 @@
 
 #include "log.h"
 
-EVRPC_GENERATE(rpc_ping, ping, pong)
-    EVRPC_GENERATE(rpc_stat, stat_request, stat_response)
-    EVRPC_GENERATE(rpc_ls, ls_request, ls_response)
-
-    EVRPC_GENERATE(rpc_mknod, mknod_request, mknod_response)
-    EVRPC_GENERATE(rpc_unlink, unlink_request, unlink_response)
-    EVRPC_GENERATE(rpc_statfs, statfs_request, statfs_response)
-    EVRPC_GENERATE(rpc_lookup, lookup_request, lookup_response)
-
-    EVRPC_GENERATE(rpc_setattr, setattr_request, setattr_response)
-    EVRPC_GENERATE(rpc_mkfs, mkfs_request, mkfs_response)
-
-    EVRPC_GENERATE(rpc_symlink, symlink_request, symlink_response)
-    EVRPC_GENERATE(rpc_readlink, readlink_request, readlink_response)
+EVRPC_GENERATE(rpc_ping, ping, pong);
+    EVRPC_GENERATE(rpc_stat, stat_request, stat_response);
+    EVRPC_GENERATE(rpc_ls, ls_request, ls_response);
+    EVRPC_GENERATE(rpc_mknod, mknod_request, mknod_response);
+    EVRPC_GENERATE(rpc_unlink, unlink_request, unlink_response);
+    EVRPC_GENERATE(rpc_statfs, statfs_request, statfs_response);
+    EVRPC_GENERATE(rpc_lookup, lookup_request, lookup_response);
+    EVRPC_GENERATE(rpc_setattr, setattr_request, setattr_response);
+    EVRPC_GENERATE(rpc_mkfs, mkfs_request, mkfs_response);
+    EVRPC_GENERATE(rpc_symlink, symlink_request, symlink_response);
+    EVRPC_GENERATE(rpc_readlink, readlink_request, readlink_response);
+    EVRPC_GENERATE(rpc_uuid, uuid_request, uuid_response);
 /*EVRPC_GENERATE(rpc_, _request, _response)*/
 /*EVRPC_GENERATE(rpc_, _request, _response)*/
 /**

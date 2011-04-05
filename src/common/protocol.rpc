@@ -62,9 +62,10 @@ struct ls_response {
 /*create & mkdir*/
 struct mknod_request {
     int64 parent_ino                    = 1;
-    string name                         = 2;
-    int type                            = 3;
-    optional int mode                   = 4;
+    int64 ino                           = 2;
+    string name                         = 3;
+    int type                            = 4;
+    optional int mode                   = 5;
 }
 
 struct mknod_response {
@@ -74,8 +75,9 @@ struct mknod_response {
 
 struct symlink_request {
     int64 parent_ino                    = 1;
-    string name                         = 2;
-    string path                         = 3;
+    int64 ino                           = 2;
+    string name                         = 3;
+    string path                         = 4;
 }
 
 struct symlink_response {
@@ -128,4 +130,14 @@ struct mkfs_response {
     optional int rst                    = 1;
 }
 
+
+/************       uuid ***************/
+struct uuid_request {
+    int count                           = 1;
+}
+
+struct uuid_response {  /*return range [min, max)  */
+    int64 range_min                     = 1;
+    int64 range_max                     = 2;
+}
 

@@ -5,6 +5,7 @@
 
 #include "osd_conn.h"
 #include "mds_conn.h"
+#include "cmgr_conn.h"
 #include "attr_cache.h"
 
 static int get_mid_of_ino(int ino)
@@ -66,6 +67,7 @@ static struct file_stat *get_attr(fuse_ino_t ino)
     log_file_stat("stat updated in cache:", cached);
     return cached;
 }
+
 static void fill_stbuf(struct stat* stbuf, struct file_stat * stat){
 
     stbuf->st_ino = stat->ino;
@@ -341,9 +343,10 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
     struct machine *m = get_machine_of_parent_inode(parent);
     struct file_stat *stat = file_stat_new();
 
-    mknod_send_request(m->ip, m->port, parent, name, 0, S_IFREG, stat);
+    uint64_t ino = get_uuid();
 
-//FIXME  add cache
+    mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFREG, stat);
+
     log_file_stat("create return :", stat);
     attr_cache_add(stat);       //no free
 
@@ -369,7 +372,8 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
     struct fuse_entry_param e;
     struct machine *m = get_machine_of_parent_inode(parent);
     struct file_stat *stat = file_stat_new();
-    mknod_send_request(m->ip, m->port, parent, name, 0, S_IFDIR, stat);
+    uint64_t ino = get_uuid();
+    mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFDIR, stat);
 
     log_file_stat("create return :", stat);
     attr_cache_add(stat);       //no free
@@ -394,7 +398,8 @@ void sfs_symlink(fuse_req_t req, const char *path, fuse_ino_t parent,
     struct fuse_entry_param e;
     struct machine *m = get_machine_of_parent_inode(parent);
     struct file_stat *stat = file_stat_new();
-    symlink_send_request(m->ip, m->port, parent, name, path, stat);
+    uint64_t ino = get_uuid();
+    symlink_send_request(m->ip, m->port, parent, ino, name, path, stat);
 
     log_file_stat("symlink return :", stat);
     attr_cache_add(stat);       //no free

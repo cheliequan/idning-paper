@@ -24,8 +24,8 @@ static int mds_cnt = 0;
 static int osd_arr[MAX_MACHINE_CNT];
 static int osd_cnt = 0;
 
-static struct evrpc_pool *cmgr_conn_pool;
-struct event_base *to_cmgr_ev_base;
+struct evrpc_pool *cmgr_conn_pool;
+struct event_base *cmgr_ev_base;
 struct machine self_machine;
 
 void cluster_init();
@@ -95,7 +95,7 @@ void ping_handler(EVRPC_STRUCT(rpc_ping) * rpc, void *arg)
 void ping_cb(struct evrpc_status *status, struct ping *ping, struct pong *pong,
              void *arg)
 {
-    event_base_loopexit(to_cmgr_ev_base, NULL);
+    event_base_loopexit(cmgr_ev_base, NULL);
 }
 
 int ping_send_request()
@@ -113,7 +113,7 @@ int ping_send_request()
             self_machine.mid);
 
     EVRPC_MAKE_REQUEST(rpc_ping, cmgr_conn_pool, ping, pong, ping_cb, NULL);
-    event_base_dispatch(to_cmgr_ev_base);
+    event_base_dispatch(cmgr_ev_base);
 
     int pong_version;
     int pong_mid;
@@ -157,8 +157,8 @@ void rpc_client_setup(char *self_host, int self_port, int self_type)
 {
     struct evhttp_connection *evcon;
 
-    to_cmgr_ev_base = event_base_new();
-    cmgr_conn_pool = evrpc_pool_new(to_cmgr_ev_base);
+    cmgr_ev_base = event_base_new();
+    cmgr_conn_pool = evrpc_pool_new(cmgr_ev_base);
 
     int cluster_mid = cfg_getint32("CLUSTER_MID", 0);
     self_machine.mid = cluster_mid;
