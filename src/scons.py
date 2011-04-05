@@ -37,11 +37,12 @@ LIBPATH = ['common',  '/usr/local/lib', '/usr/lib'] #顺序很重要
 
 CPPPATH = ['common', '/usr/local/include/', '/usr/include/fuse']
 
-#CCFLAGS='-D_DEBUG -Wall -g -Wno-pointer-sign -pg -fprofile-arcs -ftest-coverage' # -pg is for gprof
-#LINKFLAGS=' -pg '
-
 CCFLAGS='-D_DEBUG -Wall -g -Wno-pointer-sign ' # -pg is for gprof  osd 不能用 -D_FILE_OFFSET_BITS=64
 LINKFLAGS=' '
+
+CCFLAGS='-D_DEBUG -Wall -g -Wno-pointer-sign -pg -fprofile-arcs -ftest-coverage' # -pg is for gprof
+LINKFLAGS=' -pg '
+
 
 def compile():
     Library('common/common', common_src, CPPPATH = CPPPATH, CCFLAGS = CCFLAGS)

@@ -19,7 +19,7 @@ int uuid_send_request()
     struct uuid_request * request = uuid_request_new();
     struct uuid_response * response = uuid_response_new();
 
-    EVTAG_ASSIGN(request, count , 10);
+    EVTAG_ASSIGN(request, count , 100);
 
     EVRPC_MAKE_REQUEST(rpc_uuid, cmgr_conn_pool, request, response, uuid_cb, NULL);
     event_base_dispatch(cmgr_ev_base);
