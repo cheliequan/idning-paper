@@ -263,6 +263,148 @@ void sfs_ll_write(fuse_req_t req, fuse_ino_t ino, const char *buf, size_t size,
     }
 }
 
+
+void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
+{
+    logging(LOG_DEUBG, "flush(ino= %lu)", ino);
+
+    int err = 0;
+    struct file_stat *stat = (struct file_stat *)(unsigned long)(fi->fh);
+    int sizenow = buffered_write_flush(stat);
+
+    //do stat
+    struct stat stbuf;
+    memset(&stbuf, 0, sizeof(stbuf));
+    if (sfs_stat((uint64_t) ino, &stbuf) == -1)
+        fuse_reply_err(req, ENOENT);
+
+    struct file_stat *f_stat = get_attr(ino);
+    if (stbuf.st_size < sizenow) {
+        //修改文件size
+        f_stat->ino = ino;
+        f_stat->size = sizenow;
+
+
+
+        struct file_stat *cached_parent = attr_cache_lookup(f_stat->parent_ino);
+        int i;
+        for (i=0;i<2; i++){
+            int mid = cached_parent->pos_arr[i];
+            struct machine *m = cluster_get_machine_by_mid(mid);
+            setattr_send_request(m->ip, m->port, f_stat);
+        }
+
+
+        /*struct machine *m = get_machine_of_parent_inode(f_stat->ino);*/
+        /*setattr_send_request(m->ip, m->port, f_stat);*/
+    }
+
+    fuse_reply_err(req, err);
+}
+
+void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
+                   mode_t mode, struct fuse_file_info *fi)
+{
+    logging(LOG_DEUBG, "create(parent = %lu, name = %s, mode=%04o)", parent,
+            name, mode);
+    struct fuse_entry_param e;
+    uint64_t ino = cmgr_get_uuid();
+
+    struct file_stat *cached_parent = attr_cache_lookup(parent);
+    struct file_stat *stat = file_stat_new();
+
+    int i;
+    for (i=0;i<2; i++){
+        int mid = cached_parent->pos_arr[i];
+        struct machine *m = cluster_get_machine_by_mid(mid);
+        mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFREG, stat);
+    }
+
+    log_file_stat("create return :", stat);
+    attr_cache_add(stat);       //no free
+
+    memset(&e, 0, sizeof(e));
+    e.ino = stat->ino;
+    e.attr_timeout = 0.0;
+    e.entry_timeout = 0.0;
+    sfs_stat(e.ino, &e.attr);
+
+    //get attr
+    fi->fh = (unsigned long)stat;
+
+    if (fuse_reply_create(req, &e, fi) == -ENOENT) {
+
+    }
+}
+
+void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
+                  mode_t mode)
+{
+    logging(LOG_DEUBG, "mkdir(parent = %lu, name = %s, mode=%04o)", parent,
+            name, mode);
+    struct fuse_entry_param e;
+    /*struct machine *m = get_machine_of_parent_inode(parent);*/
+    struct file_stat *stat = file_stat_new();
+    uint64_t ino = cmgr_get_uuid();
+
+
+    struct file_stat *cached_parent = attr_cache_lookup(parent);
+
+    int i;
+    for (i=0;i<2; i++){
+        int mid = cached_parent->pos_arr[i];
+        struct machine *m = cluster_get_machine_by_mid(mid);
+        mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFDIR, stat);
+    }
+
+    log_file_stat("create return :", stat);
+    attr_cache_add(stat);       //no free
+
+    memset(&e, 0, sizeof(e));
+    e.ino = stat->ino;
+    e.attr_timeout = 0.0;
+    e.entry_timeout = 0.0;
+
+    sfs_stat(e.ino, &e.attr);
+
+    if (fuse_reply_entry(req, &e) == -ENOENT) {
+
+    }
+}
+
+void sfs_symlink(fuse_req_t req, const char *path, fuse_ino_t parent,
+                 const char *name)
+{
+    logging(LOG_DEUBG, "symlink(parent = %lu, name = %s, path=%s)", parent,
+            name, path);
+    struct fuse_entry_param e;
+    uint64_t ino = cmgr_get_uuid();
+
+    struct file_stat *cached_parent = attr_cache_lookup(parent);
+    struct file_stat *stat = file_stat_new();
+
+    int i;
+    for (i=0;i<2; i++){
+        int mid = cached_parent->pos_arr[i];
+        struct machine *m = cluster_get_machine_by_mid(mid);
+        symlink_send_request(m->ip, m->port, parent, ino, name, path, stat);
+    }
+
+    log_file_stat("symlink return :", stat);
+    attr_cache_add(stat);       //no free
+
+    memset(&e, 0, sizeof(e));
+    e.ino = stat->ino;
+    e.attr_timeout = 0.0;
+    e.entry_timeout = 0.0;
+
+    sfs_stat(e.ino, &e.attr);
+
+    if (fuse_reply_entry(req, &e) == -ENOENT) {
+
+    }
+}
+
 /*
  * 包括st_atime
  * 包括st_mtime
@@ -297,123 +439,22 @@ void sfs_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf,
                 in_stbuf->st_size);
     }
 
-    struct machine *m = get_machine_of_parent_inode(ino);
-    setattr_send_request(m->ip, m->port, old_stat);
+
+    struct file_stat *cached = attr_cache_lookup(ino);
+    struct file_stat *cached_parent = attr_cache_lookup(cached->parent_ino);
+
+    int i;
+    for (i=0;i<2; i++){
+        int mid = cached_parent->pos_arr[i];
+        struct machine *m = cluster_get_machine_by_mid(mid);
+        setattr_send_request(m->ip, m->port, old_stat);
+    }
 
     struct stat stbuf;
     memset(&stbuf, 0, sizeof(stbuf));
     if (sfs_stat(ino, &stbuf) == -1)
         fuse_reply_err(req, ENOENT);
     fuse_reply_attr(req, &stbuf, 1.0);
-}
-
-void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
-{
-    logging(LOG_DEUBG, "flush(ino= %lu)", ino);
-
-    int err = 0;
-    struct file_stat *stat = (struct file_stat *)(unsigned long)(fi->fh);
-    int sizenow = buffered_write_flush(stat);
-
-    //do stat
-    struct stat stbuf;
-    memset(&stbuf, 0, sizeof(stbuf));
-    if (sfs_stat((uint64_t) ino, &stbuf) == -1)
-        fuse_reply_err(req, ENOENT);
-
-    struct file_stat *f_stat = get_attr(ino);
-    if (stbuf.st_size < sizenow) {
-        //修改文件size
-        f_stat->ino = ino;
-        f_stat->size = sizenow;
-
-        struct machine *m = get_machine_of_parent_inode(f_stat->ino);
-        setattr_send_request(m->ip, m->port, f_stat);
-    }
-
-    fuse_reply_err(req, err);
-}
-
-void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
-                   mode_t mode, struct fuse_file_info *fi)
-{
-    logging(LOG_DEUBG, "create(parent = %lu, name = %s, mode=%04o)", parent,
-            name, mode);
-    struct fuse_entry_param e;
-    struct machine *m = get_machine_of_parent_inode(parent);
-    struct file_stat *stat = file_stat_new();
-
-    uint64_t ino = get_uuid();
-
-    mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFREG, stat);
-
-    log_file_stat("create return :", stat);
-    attr_cache_add(stat);       //no free
-
-    memset(&e, 0, sizeof(e));
-    e.ino = stat->ino;
-    e.attr_timeout = 0.0;
-    e.entry_timeout = 0.0;
-    sfs_stat(e.ino, &e.attr);
-
-    //get attr
-    fi->fh = (unsigned long)stat;
-
-    if (fuse_reply_create(req, &e, fi) == -ENOENT) {
-
-    }
-}
-
-void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
-                  mode_t mode)
-{
-    logging(LOG_DEUBG, "mkdir(parent = %lu, name = %s, mode=%04o)", parent,
-            name, mode);
-    struct fuse_entry_param e;
-    struct machine *m = get_machine_of_parent_inode(parent);
-    struct file_stat *stat = file_stat_new();
-    uint64_t ino = get_uuid();
-    mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFDIR, stat);
-
-    log_file_stat("create return :", stat);
-    attr_cache_add(stat);       //no free
-
-    memset(&e, 0, sizeof(e));
-    e.ino = stat->ino;
-    e.attr_timeout = 0.0;
-    e.entry_timeout = 0.0;
-
-    sfs_stat(e.ino, &e.attr);
-
-    if (fuse_reply_entry(req, &e) == -ENOENT) {
-
-    }
-}
-
-void sfs_symlink(fuse_req_t req, const char *path, fuse_ino_t parent,
-                 const char *name)
-{
-    logging(LOG_DEUBG, "symlink(parent = %lu, name = %s, path=%s)", parent,
-            name, path);
-    struct fuse_entry_param e;
-    struct machine *m = get_machine_of_parent_inode(parent);
-    struct file_stat *stat = file_stat_new();
-    uint64_t ino = get_uuid();
-    symlink_send_request(m->ip, m->port, parent, ino, name, path, stat);
-
-    log_file_stat("symlink return :", stat);
-    attr_cache_add(stat);       //no free
-
-    memset(&e, 0, sizeof(e));
-    e.ino = stat->ino;
-    e.attr_timeout = 0.0;
-    e.entry_timeout = 0.0;
-
-    sfs_stat(e.ino, &e.attr);
-
-    if (fuse_reply_entry(req, &e) == -ENOENT) {
-
-    }
 }
 
 void sfs_readlink(fuse_req_t req, fuse_ino_t ino)
@@ -495,7 +536,7 @@ int search_inode_over_all_mds(uint64_t ino)
     cluster_get_mds_arr(&mds, &mds_cnt);
     for (i = 0; i < mds_cnt; i++) {
         struct file_stat *stat = file_stat_new();
-        EVTAG_ARRAY_ADD_VALUE(stat, pos_arr, mds[i]);
+        /*EVTAG_ARRAY_ADD_VALUE(stat, pos_arr, mds[i]);*/
         struct machine *m = cluster_get_machine_by_mid(mds[i]);
 
         if (stat_send_request(m->ip, m->port, ino_arr, 1, stat) == RST_FOUND) {
