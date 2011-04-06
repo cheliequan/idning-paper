@@ -353,6 +353,18 @@ void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
     fuse_reply_err(req, err);
 }
 
+int stat_mds_req_cb(struct mds_req_ctx * ctx, void* ptr){
+    DBG();
+    if (--ctx->count){
+        return 1; 
+    }
+    struct fuse_entry_param e;
+    struct file_stat * stat = (struct file_stat *) ptr;
+    log_file_stat("return :", stat);
+    if (stat->ino)
+        attr_cache_add(stat);       //no free
+    return 0;
+}
 
 
 
@@ -363,7 +375,7 @@ int create_mds_req_cb(struct mds_req_ctx * ctx, void* ptr){
     }
     struct fuse_entry_param e;
     struct file_stat * stat = (struct file_stat *) ptr;
-    log_file_stat("create return :", stat);
+    log_file_stat("return :", stat);
     attr_cache_add(stat);       //no free
 
     memset(&e, 0, sizeof(e));
@@ -375,21 +387,18 @@ int create_mds_req_cb(struct mds_req_ctx * ctx, void* ptr){
     //get attr
     ctx->fi->fh = (unsigned long)stat;
 
-    //for test:
-    //
-    /*struct mds_req_ctx* ctx = mds_req_ctx_new( req, e, fi);*/
     if (fuse_reply_create(ctx->req, &e, ctx->fi) == -ENOENT) {
         assert(0);
     }
     return 0;
 }
 
-struct mds_req_ctx* mds_req_ctx_new( fuse_req_t req, struct fuse_file_info * fi){
+struct mds_req_ctx* mds_req_ctx_new( fuse_req_t req, struct fuse_file_info * fi, int count, mds_req_cb cb){
     struct mds_req_ctx * ctx = malloc(sizeof(struct mds_req_ctx));
     ctx->req = req;
     ctx->fi = fi;
     ctx->count = 2;
-    ctx->cb = create_mds_req_cb;
+    ctx->cb = cb;
     return ctx;
 }
 
@@ -402,14 +411,14 @@ void sfs_ll_create_async(fuse_req_t req, fuse_ino_t parent, const char *name,
     uint64_t ino = cmgr_get_uuid();
 
     struct file_stat *cached_parent = attr_cache_lookup(parent);
-    struct mds_req_ctx * ctx = mds_req_ctx_new(req, fi);
+    struct mds_req_ctx * ctx = mds_req_ctx_new(req, fi, 2, create_mds_req_cb);
     int i;
     for (i=0;i<2; i++){
         int mid = cached_parent->pos_arr[i];
         struct machine *m = cluster_get_machine_by_mid(mid);
         mknod_send_request_async(m->ip, m->port, parent, ino, name, 0, S_IFREG, ctx);
     }
-    event_dispatch(); //FIXME
+    event_dispatch(); //FIXME , should not be here
 }
 
 
@@ -611,6 +620,28 @@ void sfs_ll_init(int debug_mode_in, int keep_cache_in,
 
 #define RST_FOUND 0
 
+
+int search_inode_over_all_mds_async(uint64_t ino)
+{
+    DBG();
+
+    int *mds;
+    int mds_cnt;
+    int i;
+    int64_t ino_arr[1] ;
+    ino_arr[0] = ino;
+
+    cluster_get_mds_arr(&mds, &mds_cnt);
+    struct mds_req_ctx * ctx = mds_req_ctx_new(0, 0, mds_cnt, stat_mds_req_cb);
+    for (i = 0; i < mds_cnt; i++) {
+        struct machine *m = cluster_get_machine_by_mid(mds[i]);
+        stat_send_request_async(m->ip, m->port, ino_arr, 1, ctx);
+    }
+    event_dispatch();
+    return 1;
+}
+
+
 int search_inode_over_all_mds(uint64_t ino)
 {
     DBG();
@@ -640,7 +671,7 @@ int search_inode_over_all_mds(uint64_t ino)
 }
 
 int find_root(){
-    return search_inode_over_all_mds(1);
+    return search_inode_over_all_mds_async(1);
 }
 void sfs_mkfs()
 {

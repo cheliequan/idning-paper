@@ -211,6 +211,11 @@ void cluster_get_mds_arr(int **o_arr, int *o_cnt)
     *o_cnt = mds_cnt;
 }
 
+int cluster_get_osd_cnt()
+{
+    return osd_cnt;
+}
+
 void cluster_get_osd_arr(int **o_arr, int *o_cnt)
 {
     *o_arr = osd_arr;
