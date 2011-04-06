@@ -15,8 +15,8 @@
 #define  LOG_INFO 2
 #define  LOG_WARN 3
 #define  LOG_ERROR 4
-
-#define  LOG_LEVEL 3
+// which >=LOG_LEVEL  will be print
+#define  LOG_LEVEL 1
 
 int logging(int level, char *fmt, ...);
 int log_init(char *logfile);

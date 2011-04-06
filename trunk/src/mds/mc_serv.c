@@ -112,7 +112,11 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
 {
     DBG();
     //ping cmgr, get current cluster_map
-    ping_send_request();
+    while(cluster_get_osd_cnt() < 2 ){
+        logging(LOG_WARN, "do not have more then 2 osds");
+        //TODO: sleep
+        ping_send_request();
+    }
 
     struct mknod_request *request = rpc->request;
     struct mknod_response *response = rpc->reply;
@@ -137,7 +141,8 @@ static void symlink_handler(EVRPC_STRUCT(rpc_symlink) * rpc, void *arg)
 {
     DBG();
     //ping cmgr, get current cluster_map
-    ping_send_request();
+    //do not need!
+    /*ping_send_request();*/
 
     struct symlink_request *request = rpc->request;
     struct symlink_response *response = rpc->reply;

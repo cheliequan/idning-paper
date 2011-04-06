@@ -19,5 +19,6 @@ struct machine *cluster_get_machine_by_mid(int mid);
 void cluster_get_mds_arr(int **o_arr, int *o_cnt);
 
 void cluster_get_osd_arr(int **o_arr, int *o_cnt);
+int cluster_get_osd_cnt();
 
 #endif

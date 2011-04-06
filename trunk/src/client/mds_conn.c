@@ -1,6 +1,7 @@
 #include "sfs_common.h"
 #include "mds_conn.h"
 #include "evrpc_pool_holder.h"
+#include <pthread.h>
 
 ConnectionPool *conn_pool = NULL;
 EVrpcPoolHolder * pool_holder = NULL; //evrpc_pool_holder_new();
@@ -25,7 +26,13 @@ struct rpc_group{
 
 
 static void stat_cb(struct evrpc_status *status, struct stat_request *request , struct stat_response * response , void *arg) {
-    event_loopexit(NULL);
+    struct mds_req_ctx * ctx = (struct mds_req_ctx *) arg;
+    struct file_stat *o_stat = file_stat_new();
+    struct file_stat *stat;
+    EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
+    file_stat_copy(o_stat, stat);
+    if (ctx->cb(ctx, o_stat) == 0)
+        event_loopexit(NULL);
 }
 
 static void ls_cb(struct evrpc_status *status, struct ls_request *request , struct ls_response * response , void *arg){
@@ -89,6 +96,22 @@ int setattr_send_request(char *ip, int port, struct file_stat *stat_arr)
     setattr_response_free(response);
     return ret;
 
+}
+
+int stat_send_request_async(char *ip, int port, uint64_t * ino_arr, int len, struct mds_req_ctx * ctx)
+{
+    DBG();
+    int ret = 0;
+    struct stat_request *req = stat_request_new();
+    struct stat_response *response = stat_response_new();
+    int i;
+    for (i = 0; i < len; i++) {
+        EVTAG_ARRAY_ADD_VALUE(req, ino_arr, ino_arr[i]);
+    }
+
+    struct evrpc_pool * pool  = evrpc_pool_holder_get(pool_holder, ip, port);
+    EVRPC_MAKE_REQUEST(rpc_stat, pool, req, response,  stat_cb, ctx);
+    return 0;
 }
 
 int stat_send_request(char *ip, int port, uint64_t * ino_arr, int len,
@@ -402,7 +425,7 @@ static void rpc_grneral_request(char *ip, int port, const char *rpcname,
     if (evhttp_make_request(evcon, evreq, EVHTTP_REQ_POST, rpcname))
         logging(LOG_ERROR, "error on make_request");
 
-    event_dispatch();
+    event_dispatch();//TODO 
     if (resp_unmarshal(resp, evreq->input_buffer)) {
         logging(LOG_ERROR, "error on statfs_response_unmarshal");
     }
@@ -420,6 +443,13 @@ static void rpc_rpc_grneral_requestuest_cb(struct evhttp_request *req,
     event_loopexit(NULL);
 }
 
+
+void * ev_loop_func(void * ptr){
+    while(1){
+        event_dispatch();
+    }
+}
+
 void mds_conn_init()
 {
     DBG();
@@ -430,6 +460,10 @@ void mds_conn_init()
 
     conn_pool = connection_pool_new();
     pool_holder = evrpc_pool_holder_new();
+    pthread_t thread1;
+    /*int ret = pthread_create( &thread1, NULL, ev_loop_func, NULL);*/
+
+
 
 }
 
