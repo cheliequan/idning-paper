@@ -21,4 +21,5 @@ void cluster_get_mds_arr(int **o_arr, int *o_cnt);
 void cluster_get_osd_arr(int **o_arr, int *o_cnt);
 int cluster_get_osd_cnt();
 
+void set_self_machine_load(int load);
 #endif

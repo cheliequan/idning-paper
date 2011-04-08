@@ -370,6 +370,8 @@ static struct machine_access_ __machine_base = {
   machine_port_get,
   machine_type_assign,
   machine_type_get,
+  machine_load_assign,
+  machine_load_get,
 };
 
 struct machine *
@@ -400,8 +402,12 @@ machine_new_with_arg(void *unused)
   tmp->type = 0;
   tmp->type_set = 0;
 
+  tmp->load = 0;
+  tmp->load_set = 0;
+
   return (tmp);
 }
+
 
 
 
@@ -444,6 +450,14 @@ machine_type_assign(struct machine *msg, const ev_uint32_t value)
 }
 
 int
+machine_load_assign(struct machine *msg, const ev_uint32_t value)
+{
+  msg->load_set = 1;
+  msg->load = value;
+  return (0);
+}
+
+int
 machine_mid_get(struct machine *msg, ev_uint32_t *value)
 {
   if (msg->mid_set != 1)
@@ -479,6 +493,15 @@ machine_type_get(struct machine *msg, ev_uint32_t *value)
   return (0);
 }
 
+int
+machine_load_get(struct machine *msg, ev_uint32_t *value)
+{
+  if (msg->load_set != 1)
+    return (-1);
+  *value = msg->load;
+  return (0);
+}
+
 void
 machine_clear(struct machine *tmp)
 {
@@ -490,6 +513,7 @@ machine_clear(struct machine *tmp)
   }
   tmp->port_set = 0;
   tmp->type_set = 0;
+  tmp->load_set = 0;
 }
 
 void
@@ -506,6 +530,7 @@ machine_marshal(struct evbuffer *evbuf, const struct machine *tmp){
   evtag_marshal_string(evbuf, MACHINE_IP, tmp->ip);
   evtag_marshal_int(evbuf, MACHINE_PORT, tmp->port);
   evtag_marshal_int(evbuf, MACHINE_TYPE, tmp->type);
+  evtag_marshal_int(evbuf, MACHINE_LOAD, tmp->load);
 }
 
 int
@@ -561,6 +586,17 @@ machine_unmarshal(struct machine *tmp,  struct evbuffer *evbuf)
         tmp->type_set = 1;
         break;
 
+      case MACHINE_LOAD:
+
+        if (tmp->load_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, MACHINE_LOAD, &tmp->load) == -1) {
+          event_warnx("%s: failed to unmarshal load", __func__);
+          return (-1);
+        }
+        tmp->load_set = 1;
+        break;
+
       default:
         return -1;
     }
@@ -581,6 +617,8 @@ machine_complete(struct machine *msg)
   if (!msg->port_set)
     return (-1);
   if (!msg->type_set)
+    return (-1);
+  if (!msg->load_set)
     return (-1);
   return (0);
 }

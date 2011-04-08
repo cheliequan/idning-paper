@@ -178,6 +178,12 @@ void onexit()
 {
 
 }
+
+static void update_clustermap_from_cmgr_on_timer_cb(evutil_socket_t fd, short what, void *arg)
+{ 
+    ping_send_request();
+}
+
 int main(int argc, char **argv)
 {
     init_app(argc, argv, "osd");
@@ -205,6 +211,12 @@ int main(int argc, char **argv)
     }
     evhttp_set_cb(httpd, "/shutdown", shutdown_handler, NULL);
     evhttp_set_gencb(httpd, gen_handler, NULL);
+
+
+    struct timeval five_seconds = {2,0};
+    struct event *update_clustermap_event= event_new(NULL, -1, EV_PERSIST, update_clustermap_from_cmgr_on_timer_cb, NULL);
+    event_add(update_clustermap_event, &five_seconds);
+
     event_dispatch();
 
     evhttp_free(httpd);

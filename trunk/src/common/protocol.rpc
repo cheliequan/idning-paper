@@ -12,6 +12,7 @@ struct machine {
     string ip                           = 2;
     int port                            = 3;
     int type                            = 4;
+	int load                       = 6; 
 }
 
 
