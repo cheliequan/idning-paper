@@ -2,6 +2,7 @@
 the source code is mainly from mfs/mfsmaster/filesystem.c
 */
 #include "sfs_common.h"
+#define FS_ROOT_INO 1
 
 typedef struct _fsnode {
     uint64_t ino;               //4
@@ -15,6 +16,8 @@ typedef struct _fsnode {
 
     uint16_t nlen;
     uint8_t *name;
+    uint8_t modifiy_flag;
+
     uint32_t pos_arr[3];        //每一份的存储位置，对于dir，是mds的mid,  /对于file，是osd的mid, 现在最多存3份.
 
     struct dlist_t tree_dlist;  //在parent->children构成的链表 实际上是同父的众节点之间的兄弟关系，用于ls操作. 
@@ -60,6 +63,9 @@ typedef struct _fsnode {
 fsnode *fsnode_new();
 
 inline fsnode *fsnode_hash_find(uint64_t ino);
+inline fsnode *fsnode_hash_insert(fsnode * n);
+
+void fsnode_tree_insert(fsnode * p, fsnode * n);
 
 int fs_stat(uint64_t ino, struct file_stat *stat);
 int fs_setattr(uint64_t ino, struct file_stat *st);
