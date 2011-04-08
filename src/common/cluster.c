@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 
 #include "protocol.gen.h"
 #include "protocol.h"
@@ -29,7 +30,7 @@ struct event_base *cmgr_ev_base;
 struct machine self_machine;
 
 void cluster_init();
-int cluster_add(char *ip, int port, char type, int mid);
+struct machine * cluster_add(char *ip, int port, char type, int mid);
 void cluster_remove(char *ip, int port);
 void cluster_printf(char *hint);
 void cluster_dump();
@@ -67,15 +68,17 @@ void ping_handler(EVRPC_STRUCT(rpc_ping) * rpc, void *arg)
     remote_port = ping->self_port;
     int type = ping->self_type;
     int mid = ping->mid;
-    logging(LOG_INFO, "ping_handler(ip=%s, port=%d, type=%s)", remote_ip,
-            remote_port, cluster_type_str(type));
+    logging(LOG_INFO, "ping_handler(ip=%s, port=%d, type=%s, load=%d)", remote_ip,
+            remote_port, cluster_type_str(type), ping->load);
 
     if (ping->mid == 0) {
         mid = cluster_uuid();
         EVTAG_ASSIGN(pong, mid, mid);
     }
 
-    cluster_add(remote_ip, remote_port, type, mid);
+    struct machine * m = cluster_add(remote_ip, remote_port, type, mid);
+
+    m->load = ping->load;
 
     if (cluster_version > ping_version) {   // new machine added to cluster
         EVTAG_ASSIGN(pong, version, cluster_version);
@@ -109,6 +112,7 @@ int ping_send_request()
     EVTAG_ASSIGN(ping, self_port, self_machine.port);
     EVTAG_ASSIGN(ping, self_type, self_machine.type);
     EVTAG_ASSIGN(ping, mid, self_machine.mid);
+    EVTAG_ASSIGN(ping, load, self_machine.load);
     logging(LOG_DEUBG, "ping(version = %u, mid = %d)", cluster_version,
             self_machine.mid);
 
@@ -152,7 +156,10 @@ int ping_send_request()
 
     return pong_mid;
 }
-
+void set_self_machine_load(int load){
+    self_machine.load = load;
+}
+//TODO: rename it to cmgr_client_setup or something
 void rpc_client_setup(char *self_host, int self_port, int self_type)
 {
     struct evhttp_connection *evcon;
@@ -190,8 +197,8 @@ void cluster_printf(char *hint)
     int i;
 
     for (i = 0; i < machine_cnt; i++) {
-        sprintf(p, "%5s%20s:%-6d(%d)\n", cluster_type_str(machines[i].type)
-                , machines[i].ip, machines[i].port, machines[i].mid);
+        sprintf(p, "%6s%20s:%-6d(%5d) LOAD: %d\n", cluster_type_str(machines[i].type)
+                , machines[i].ip, machines[i].port, machines[i].mid, machines[i].load);
         while (*p)
             p++;
     }
@@ -259,14 +266,14 @@ static int cluster_uuid()
     return t;
 }
 
-int cluster_add(char *ip, int port, char type, int mid)
+struct machine *cluster_add(char *ip, int port, char type, int mid)
 {
     DBG();
     cluster_printf("before cluster_add");
     int i;
     for (i = 0; i < machine_cnt; i++) {
         if (machines[i].port == port && (0 == strcmp((char *)machines[i].ip, ip)))  //already in array
-            return 0;
+            return machines+i;
     }
     logging(LOG_DEUBG, "add machine %s:%d @ %d\n", ip, port, machine_cnt);
 
@@ -285,7 +292,7 @@ int cluster_add(char *ip, int port, char type, int mid)
     /*dlist_insert_tail(cluster_head, m); */
     cluster_version++;
     cluster_dump();
-    return 1;
+    return machines+(machine_cnt-1);
 }
 
 void cluster_remove(char *ip, int port)
@@ -315,3 +322,20 @@ void cluster_dump()
 
     /*pong_buffer[pong_buffer_len] = 0; */
 }
+
+/*void * cmgr_client_loop_func(void * ptr){*/
+    /*while(1){*/
+        /*logging(LOG_INFO, "ev_loop_func");*/
+    /*}*/
+/*}*/
+
+
+/*pthread_mutex_t update_cluster_map_mut = PTHREAD_MUTEX_INITIALIZER;*/
+/*pthread_cond_t update_cluster_map_cond = PTHREAD_COND_INITIALIZER;*/
+
+//void cmgr_client_thread_start(){
+//    pthread_t cmgr_thread;
+//    /*int ret = pthread_create( &thread1, NULL, ev_loop_func, NULL);*/
+//    
+//
+//}

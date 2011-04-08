@@ -1,10 +1,12 @@
 #include "sfs_common.h"
 #include "fs.h"
+int mds_op_counter = 0;
 void fsnode_to_stat_copy(struct file_stat *t, fsnode * n);
 
 static void setattr_handler(EVRPC_STRUCT(rpc_setattr) * rpc, void *arg)
 {
     DBG();
+    mds_op_counter++;
     struct setattr_request *request = rpc->request;
     struct setattr_response *response = rpc->reply;
 
@@ -26,6 +28,7 @@ static void setattr_handler(EVRPC_STRUCT(rpc_setattr) * rpc, void *arg)
 static void stat_handler(EVRPC_STRUCT(rpc_stat) * rpc, void *arg)
 {
     DBG();
+    mds_op_counter++;
     struct stat_request *request = rpc->request;
     struct stat_response *response = rpc->reply;
 
@@ -49,6 +52,7 @@ static void stat_handler(EVRPC_STRUCT(rpc_stat) * rpc, void *arg)
 static void ls_handler(EVRPC_STRUCT(rpc_stat) * rpc, void *arg)
 {
     DBG();
+    mds_op_counter++;
     struct stat_request *request = rpc->request;
     struct stat_response *response = rpc->reply;
 
@@ -92,6 +96,7 @@ static void ls_handler(EVRPC_STRUCT(rpc_stat) * rpc, void *arg)
 static void statfs_handler(EVRPC_STRUCT(rpc_statfs) * rpc, void *arg)
 {
     DBG();
+    mds_op_counter++;
 
     struct statfs_response *response = rpc->reply;
     int avail_space;
@@ -111,11 +116,10 @@ static void statfs_handler(EVRPC_STRUCT(rpc_statfs) * rpc, void *arg)
 static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
 {
     DBG();
-    //ping cmgr, get current cluster_map
+    mds_op_counter++;
     while(cluster_get_osd_cnt() < 2 ){
         logging(LOG_WARN, "do not have more then 2 osds");
-        //TODO: sleep
-        ping_send_request();
+        sleep(5);
     }
 
     struct mknod_request *request = rpc->request;
@@ -140,9 +144,7 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
 static void symlink_handler(EVRPC_STRUCT(rpc_symlink) * rpc, void *arg)
 {
     DBG();
-    //ping cmgr, get current cluster_map
-    //do not need!
-    /*ping_send_request();*/
+    mds_op_counter++;
 
     struct symlink_request *request = rpc->request;
     struct symlink_response *response = rpc->reply;
@@ -164,8 +166,7 @@ static void symlink_handler(EVRPC_STRUCT(rpc_symlink) * rpc, void *arg)
 static void readlink_handler(EVRPC_STRUCT(rpc_readlink) * rpc, void *arg)
 {
     DBG();
-    //ping cmgr, get current cluster_map
-    ping_send_request();
+    mds_op_counter++;
 
     struct readlink_request *request = rpc->request;
     struct readlink_response *response = rpc->reply;
@@ -182,6 +183,7 @@ static void readlink_handler(EVRPC_STRUCT(rpc_readlink) * rpc, void *arg)
 static void lookup_handler(EVRPC_STRUCT(rpc_lookup) * rpc, void *arg)
 {
     DBG();
+    mds_op_counter++;
 
     struct lookup_request *request = rpc->request;
     struct lookup_response *response = rpc->reply;
@@ -201,6 +203,7 @@ static void lookup_handler(EVRPC_STRUCT(rpc_lookup) * rpc, void *arg)
 static void unlink_handler(EVRPC_STRUCT(rpc_unlink) * rpc, void *arg)
 {
     DBG();
+    mds_op_counter++;
 
     struct unlink_request *request = rpc->request;
     //struct unlink_response * response = rpc->reply;
@@ -216,6 +219,7 @@ static void unlink_handler(EVRPC_STRUCT(rpc_unlink) * rpc, void *arg)
 static void mkfs_handler(EVRPC_STRUCT(rpc_mkfs) * rpc, void *arg)
 {
     DBG();
+    mds_op_counter++;
 
     struct mkfs_request *request = rpc->request;
     /*struct mkfs_response * response = rpc->reply; */
@@ -290,6 +294,16 @@ void onexit()
     fs_store(mds_data_file());
 }
 
+static void update_clustermap_from_cmgr_on_timer_cb(evutil_socket_t fd, short what, void *arg)
+{ 
+    int t = mds_op_counter;
+    mds_op_counter = 0;
+
+    set_self_machine_load(t);
+
+    ping_send_request();
+}
+
 int main(int argc, char **argv)
 {
     init_app(argc, argv, "mds");
@@ -303,6 +317,12 @@ int main(int argc, char **argv)
     char *self_host = cfg_getstr("MDS2CLIENT_LISTEN_HOST", "*");
     int self_port = cfg_getint32("MDS2CLIENT_LISTEN_PORT", 9527);
     rpc_client_setup(self_host, self_port, MACHINE_MDS);
+
+
+    struct timeval five_seconds = {2,0};
+    struct event *update_clustermap_event= event_new(NULL, -1, EV_PERSIST, update_clustermap_from_cmgr_on_timer_cb, NULL);
+    event_add(update_clustermap_event, &five_seconds);
+
 
     event_dispatch();
     return 0;

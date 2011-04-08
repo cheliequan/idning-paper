@@ -113,6 +113,7 @@ enum machine_ {
   MACHINE_IP=2,
   MACHINE_PORT=3,
   MACHINE_TYPE=4,
+  MACHINE_LOAD=6,
   MACHINE_MAX_TAGS
 };
 
@@ -126,6 +127,8 @@ struct machine_access_ {
   int (*port_get)(struct machine *, ev_uint32_t *);
   int (*type_assign)(struct machine *, const ev_uint32_t);
   int (*type_get)(struct machine *, ev_uint32_t *);
+  int (*load_assign)(struct machine *, const ev_uint32_t);
+  int (*load_get)(struct machine *, ev_uint32_t *);
 };
 
 struct machine {
@@ -135,11 +138,13 @@ struct machine {
   char *ip;
   ev_uint32_t port;
   ev_uint32_t type;
+  ev_uint32_t load;
 
   ev_uint8_t mid_set;
   ev_uint8_t ip_set;
   ev_uint8_t port_set;
   ev_uint8_t type_set;
+  ev_uint8_t load_set;
 };
 
 struct machine *machine_new(void);
@@ -161,6 +166,8 @@ int machine_port_assign(struct machine *, const ev_uint32_t);
 int machine_port_get(struct machine *, ev_uint32_t *);
 int machine_type_assign(struct machine *, const ev_uint32_t);
 int machine_type_get(struct machine *, ev_uint32_t *);
+int machine_load_assign(struct machine *, const ev_uint32_t);
+int machine_load_get(struct machine *, ev_uint32_t *);
 /* --- machine done --- */
 
 /* Tag definition for pong */
