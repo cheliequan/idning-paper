@@ -18,6 +18,7 @@ EVRPC_GENERATE(rpc_ping, ping, pong);
     EVRPC_GENERATE(rpc_symlink, symlink_request, symlink_response);
     EVRPC_GENERATE(rpc_readlink, readlink_request, readlink_response);
     EVRPC_GENERATE(rpc_uuid, uuid_request, uuid_response);
+    EVRPC_GENERATE(rpc_migrate, migrate_request, migrate_response);
 /*EVRPC_GENERATE(rpc_, _request, _response)*/
 /*EVRPC_GENERATE(rpc_, _request, _response)*/
 /**

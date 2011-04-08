@@ -21,6 +21,7 @@ EVRPC_HEADER(rpc_ping, ping, pong);
     EVRPC_HEADER(rpc_symlink, symlink_request, symlink_response)
     EVRPC_HEADER(rpc_readlink, readlink_request, readlink_response);
     EVRPC_HEADER(rpc_uuid, uuid_request, uuid_response);
+    EVRPC_HEADER(rpc_migrate, migrate_request, migrate_response);
 
 
 

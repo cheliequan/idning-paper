@@ -4,6 +4,7 @@ struct ping {
 	int self_port                       = 3; 
 	int self_type                       = 4; 
 	int mid                             = 5;
+	int load                       = 6; 
 }
 
 struct machine {
@@ -140,4 +141,10 @@ struct uuid_response {  /*return range [min, max)  */
     int64 range_min                     = 1;
     int64 range_max                     = 2;
 }
-
+/************       migrate ***************/
+struct migrate_request {
+    array struct[file_stat] stat_arr    = 1;
+}
+struct migrate_response {
+    int rst                             = 1;
+}

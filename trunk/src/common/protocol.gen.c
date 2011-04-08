@@ -37,6 +37,8 @@ static struct ping_access_ __ping_base = {
   ping_self_type_get,
   ping_mid_assign,
   ping_mid_get,
+  ping_load_assign,
+  ping_load_get,
 };
 
 struct ping *
@@ -70,8 +72,12 @@ ping_new_with_arg(void *unused)
   tmp->mid = 0;
   tmp->mid_set = 0;
 
+  tmp->load = 0;
+  tmp->load_set = 0;
+
   return (tmp);
 }
+
 
 
 
@@ -123,6 +129,14 @@ ping_mid_assign(struct ping *msg, const ev_uint32_t value)
 }
 
 int
+ping_load_assign(struct ping *msg, const ev_uint32_t value)
+{
+  msg->load_set = 1;
+  msg->load = value;
+  return (0);
+}
+
+int
 ping_version_get(struct ping *msg, ev_uint32_t *value)
 {
   if (msg->version_set != 1)
@@ -167,6 +181,15 @@ ping_mid_get(struct ping *msg, ev_uint32_t *value)
   return (0);
 }
 
+int
+ping_load_get(struct ping *msg, ev_uint32_t *value)
+{
+  if (msg->load_set != 1)
+    return (-1);
+  *value = msg->load;
+  return (0);
+}
+
 void
 ping_clear(struct ping *tmp)
 {
@@ -179,6 +202,7 @@ ping_clear(struct ping *tmp)
   tmp->self_port_set = 0;
   tmp->self_type_set = 0;
   tmp->mid_set = 0;
+  tmp->load_set = 0;
 }
 
 void
@@ -196,6 +220,7 @@ ping_marshal(struct evbuffer *evbuf, const struct ping *tmp){
   evtag_marshal_int(evbuf, PING_SELF_PORT, tmp->self_port);
   evtag_marshal_int(evbuf, PING_SELF_TYPE, tmp->self_type);
   evtag_marshal_int(evbuf, PING_MID, tmp->mid);
+  evtag_marshal_int(evbuf, PING_LOAD, tmp->load);
 }
 
 int
@@ -262,6 +287,17 @@ ping_unmarshal(struct ping *tmp,  struct evbuffer *evbuf)
         tmp->mid_set = 1;
         break;
 
+      case PING_LOAD:
+
+        if (tmp->load_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, PING_LOAD, &tmp->load) == -1) {
+          event_warnx("%s: failed to unmarshal load", __func__);
+          return (-1);
+        }
+        tmp->load_set = 1;
+        break;
+
       default:
         return -1;
     }
@@ -284,6 +320,8 @@ ping_complete(struct ping *msg)
   if (!msg->self_type_set)
     return (-1);
   if (!msg->mid_set)
+    return (-1);
+  if (!msg->load_set)
     return (-1);
   return (0);
 }
@@ -5773,6 +5811,375 @@ evtag_marshal_uuid_response(struct evbuffer *evbuf, ev_uint32_t tag, const struc
   struct evbuffer *_buf = evbuffer_new();
   assert(_buf != NULL);
   uuid_response_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
+}
+
+/*
+ * Implementation of migrate_request
+ */
+
+static struct migrate_request_access_ __migrate_request_base = {
+  migrate_request_stat_arr_assign,
+  migrate_request_stat_arr_get,
+  migrate_request_stat_arr_add,
+};
+
+struct migrate_request *
+migrate_request_new(void)
+{
+  return migrate_request_new_with_arg(NULL);
+}
+
+struct migrate_request *
+migrate_request_new_with_arg(void *unused)
+{
+  struct migrate_request *tmp;
+  if ((tmp = malloc(sizeof(struct migrate_request))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__migrate_request_base;
+
+  tmp->stat_arr = NULL;
+  tmp->stat_arr_length = 0;
+  tmp->stat_arr_num_allocated = 0;
+  tmp->stat_arr_set = 0;
+
+  return (tmp);
+}
+
+static int
+migrate_request_stat_arr_expand_to_hold_more(struct migrate_request *msg)
+{
+  int tobe_allocated = msg->stat_arr_num_allocated;
+  struct file_stat** new_d_ata = NULL;
+  tobe_allocated = !tobe_allocated ? 1 : tobe_allocated << 1;
+  new_d_ata = (struct file_stat**) realloc(msg->stat_arr,
+      tobe_allocated * sizeof(struct file_stat*));
+  if (new_d_ata == NULL)
+    return -1;
+  msg->stat_arr = new_d_ata;
+  msg->stat_arr_num_allocated = tobe_allocated;
+  return 0;}
+
+struct file_stat* 
+migrate_request_stat_arr_add(struct migrate_request *msg)
+{
+  if (++msg->stat_arr_length >= msg->stat_arr_num_allocated) {
+    if (migrate_request_stat_arr_expand_to_hold_more(msg)<0)
+      goto error;
+  }
+  msg->stat_arr[msg->stat_arr_length - 1] = file_stat_new();
+  if (msg->stat_arr[msg->stat_arr_length - 1] == NULL)
+    goto error;
+  msg->stat_arr_set = 1;
+  return (msg->stat_arr[msg->stat_arr_length - 1]);
+error:
+  --msg->stat_arr_length;
+  return (NULL);
+}
+
+int
+migrate_request_stat_arr_assign(struct migrate_request *msg, int off,
+    const struct file_stat* value)
+{
+  if (!msg->stat_arr_set || off < 0 || off >= msg->stat_arr_length)
+    return (-1);
+
+  {
+    int had_error = 0;
+    struct evbuffer *tmp = NULL;
+    file_stat_clear(msg->stat_arr[off]);
+    if ((tmp = evbuffer_new()) == NULL) {
+      event_warn("%s: evbuffer_new()", __func__);
+      had_error = 1;
+      goto done;
+    }
+    file_stat_marshal(tmp, value);
+    if (file_stat_unmarshal(msg->stat_arr[off], tmp) == -1) {
+      event_warnx("%s: file_stat_unmarshal", __func__);
+      had_error = 1;
+      goto done;
+    }
+    done:if (tmp != NULL)
+      evbuffer_free(tmp);
+    if (had_error) {
+      file_stat_clear(msg->stat_arr[off]);
+      return (-1);
+    }
+  }
+  return (0);
+}
+
+int
+migrate_request_stat_arr_get(struct migrate_request *msg, int offset,
+    struct file_stat* *value)
+{
+  if (!msg->stat_arr_set || offset < 0 || offset >= msg->stat_arr_length)
+    return (-1);
+  *value = msg->stat_arr[offset];
+  return (0);
+}
+
+void
+migrate_request_clear(struct migrate_request *tmp)
+{
+  if (tmp->stat_arr_set == 1) {
+    int i;
+    for (i = 0; i < tmp->stat_arr_length; ++i) {
+      file_stat_free(tmp->stat_arr[i]);
+    }
+    free(tmp->stat_arr);
+    tmp->stat_arr = NULL;
+    tmp->stat_arr_set = 0;
+    tmp->stat_arr_length = 0;
+    tmp->stat_arr_num_allocated = 0;
+  }
+}
+
+void
+migrate_request_free(struct migrate_request *tmp)
+{
+  if (tmp->stat_arr_set == 1) {
+    int i;
+    for (i = 0; i < tmp->stat_arr_length; ++i) {
+      file_stat_free(tmp->stat_arr[i]);
+    }
+    free(tmp->stat_arr);
+    tmp->stat_arr = NULL;
+    tmp->stat_arr_set = 0;
+    tmp->stat_arr_length = 0;
+    tmp->stat_arr_num_allocated = 0;
+  }
+  free(tmp->stat_arr);
+  free(tmp);
+}
+
+void
+migrate_request_marshal(struct evbuffer *evbuf, const struct migrate_request *tmp){
+  if (tmp->stat_arr_set) {
+    {
+      int i;
+      for (i = 0; i < tmp->stat_arr_length; ++i) {
+    evtag_marshal_file_stat(evbuf, MIGRATE_REQUEST_STAT_ARR, tmp->stat_arr[i]);
+      }
+    }
+  }
+}
+
+int
+migrate_request_unmarshal(struct migrate_request *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case MIGRATE_REQUEST_STAT_ARR:
+
+        if (tmp->stat_arr_length >= tmp->stat_arr_num_allocated &&
+            migrate_request_stat_arr_expand_to_hold_more(tmp) < 0) {
+          puts("HEY NOW");
+          return (-1);
+        }
+        tmp->stat_arr[tmp->stat_arr_length] = file_stat_new();
+        if (tmp->stat_arr[tmp->stat_arr_length] == NULL)
+          return (-1);
+        if (evtag_unmarshal_file_stat(evbuf, MIGRATE_REQUEST_STAT_ARR, tmp->stat_arr[tmp->stat_arr_length]) == -1) {
+          event_warnx("%s: failed to unmarshal stat_arr", __func__);
+          return (-1);
+        }
+        ++tmp->stat_arr_length;
+        tmp->stat_arr_set = 1;
+        break;
+
+      default:
+        return -1;
+    }
+  }
+
+  if (migrate_request_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+migrate_request_complete(struct migrate_request *msg)
+{
+  {
+    int i;
+    for (i = 0; i < msg->stat_arr_length; ++i) {
+      if (msg->stat_arr_set && file_stat_complete(msg->stat_arr[i]) == -1)
+        return (-1);
+    }
+  }
+  return (0);
+}
+
+int
+evtag_unmarshal_migrate_request(struct evbuffer *evbuf, ev_uint32_t need_tag, struct migrate_request *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (migrate_request_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
+}
+
+void
+evtag_marshal_migrate_request(struct evbuffer *evbuf, ev_uint32_t tag, const struct migrate_request *msg)
+{
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  migrate_request_marshal(_buf, msg);
+  evtag_marshal_buffer(evbuf, tag, _buf);
+   evbuffer_free(_buf);
+}
+
+/*
+ * Implementation of migrate_response
+ */
+
+static struct migrate_response_access_ __migrate_response_base = {
+  migrate_response_rst_assign,
+  migrate_response_rst_get,
+};
+
+struct migrate_response *
+migrate_response_new(void)
+{
+  return migrate_response_new_with_arg(NULL);
+}
+
+struct migrate_response *
+migrate_response_new_with_arg(void *unused)
+{
+  struct migrate_response *tmp;
+  if ((tmp = malloc(sizeof(struct migrate_response))) == NULL) {
+    event_warn("%s: malloc", __func__);
+    return (NULL);
+  }
+  tmp->base = &__migrate_response_base;
+
+  tmp->rst = 0;
+  tmp->rst_set = 0;
+
+  return (tmp);
+}
+
+
+int
+migrate_response_rst_assign(struct migrate_response *msg, const ev_uint32_t value)
+{
+  msg->rst_set = 1;
+  msg->rst = value;
+  return (0);
+}
+
+int
+migrate_response_rst_get(struct migrate_response *msg, ev_uint32_t *value)
+{
+  if (msg->rst_set != 1)
+    return (-1);
+  *value = msg->rst;
+  return (0);
+}
+
+void
+migrate_response_clear(struct migrate_response *tmp)
+{
+  tmp->rst_set = 0;
+}
+
+void
+migrate_response_free(struct migrate_response *tmp)
+{
+  free(tmp);
+}
+
+void
+migrate_response_marshal(struct evbuffer *evbuf, const struct migrate_response *tmp){
+  evtag_marshal_int(evbuf, MIGRATE_RESPONSE_RST, tmp->rst);
+}
+
+int
+migrate_response_unmarshal(struct migrate_response *tmp,  struct evbuffer *evbuf)
+{
+  ev_uint32_t tag;
+  while (evbuffer_get_length(evbuf) > 0) {
+    if (evtag_peek(evbuf, &tag) == -1)
+      return (-1);
+    switch (tag) {
+
+      case MIGRATE_RESPONSE_RST:
+
+        if (tmp->rst_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, MIGRATE_RESPONSE_RST, &tmp->rst) == -1) {
+          event_warnx("%s: failed to unmarshal rst", __func__);
+          return (-1);
+        }
+        tmp->rst_set = 1;
+        break;
+
+      default:
+        return -1;
+    }
+  }
+
+  if (migrate_response_complete(tmp) == -1)
+    return (-1);
+  return (0);
+}
+
+int
+migrate_response_complete(struct migrate_response *msg)
+{
+  if (!msg->rst_set)
+    return (-1);
+  return (0);
+}
+
+int
+evtag_unmarshal_migrate_response(struct evbuffer *evbuf, ev_uint32_t need_tag, struct migrate_response *msg)
+{
+  ev_uint32_t tag;
+  int res = -1;
+
+  struct evbuffer *tmp = evbuffer_new();
+
+  if (evtag_unmarshal(evbuf, &tag, tmp) == -1 || tag != need_tag)
+    goto error;
+
+  if (migrate_response_unmarshal(msg, tmp) == -1)
+    goto error;
+
+  res = 0;
+
+ error:
+  evbuffer_free(tmp);
+  return (res);
+}
+
+void
+evtag_marshal_migrate_response(struct evbuffer *evbuf, ev_uint32_t tag, const struct migrate_response *msg)
+{
+  struct evbuffer *_buf = evbuffer_new();
+  assert(_buf != NULL);
+  migrate_response_marshal(_buf, msg);
   evtag_marshal_buffer(evbuf, tag, _buf);
    evbuffer_free(_buf);
 }

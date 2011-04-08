@@ -34,6 +34,8 @@ struct mkfs_request;
 struct mkfs_response;
 struct uuid_request;
 struct uuid_response;
+struct migrate_request;
+struct migrate_response;
 
 /* Tag definition for ping */
 enum ping_ {
@@ -42,6 +44,7 @@ enum ping_ {
   PING_SELF_PORT=3,
   PING_SELF_TYPE=4,
   PING_MID=5,
+  PING_LOAD=6,
   PING_MAX_TAGS
 };
 
@@ -57,6 +60,8 @@ struct ping_access_ {
   int (*self_type_get)(struct ping *, ev_uint32_t *);
   int (*mid_assign)(struct ping *, const ev_uint32_t);
   int (*mid_get)(struct ping *, ev_uint32_t *);
+  int (*load_assign)(struct ping *, const ev_uint32_t);
+  int (*load_get)(struct ping *, ev_uint32_t *);
 };
 
 struct ping {
@@ -67,12 +72,14 @@ struct ping {
   ev_uint32_t self_port;
   ev_uint32_t self_type;
   ev_uint32_t mid;
+  ev_uint32_t load;
 
   ev_uint8_t version_set;
   ev_uint8_t self_ip_set;
   ev_uint8_t self_port_set;
   ev_uint8_t self_type_set;
   ev_uint8_t mid_set;
+  ev_uint8_t load_set;
 };
 
 struct ping *ping_new(void);
@@ -96,6 +103,8 @@ int ping_self_type_assign(struct ping *, const ev_uint32_t);
 int ping_self_type_get(struct ping *, ev_uint32_t *);
 int ping_mid_assign(struct ping *, const ev_uint32_t);
 int ping_mid_get(struct ping *, ev_uint32_t *);
+int ping_load_assign(struct ping *, const ev_uint32_t);
+int ping_load_get(struct ping *, ev_uint32_t *);
 /* --- ping done --- */
 
 /* Tag definition for machine */
@@ -1205,5 +1214,79 @@ int uuid_response_range_min_get(struct uuid_response *, ev_uint64_t *);
 int uuid_response_range_max_assign(struct uuid_response *, const ev_uint64_t);
 int uuid_response_range_max_get(struct uuid_response *, ev_uint64_t *);
 /* --- uuid_response done --- */
+
+/* Tag definition for migrate_request */
+enum migrate_request_ {
+  MIGRATE_REQUEST_STAT_ARR=1,
+  MIGRATE_REQUEST_MAX_TAGS
+};
+
+/* Structure declaration for migrate_request */
+struct migrate_request_access_ {
+  int (*stat_arr_assign)(struct migrate_request *, int, const struct file_stat*);
+  int (*stat_arr_get)(struct migrate_request *, int, struct file_stat* *);
+  struct file_stat*  (*stat_arr_add)(struct migrate_request *msg);
+};
+
+struct migrate_request {
+  struct migrate_request_access_ *base;
+
+  struct file_stat* *stat_arr;
+  int stat_arr_length;
+  int stat_arr_num_allocated;
+
+  ev_uint8_t stat_arr_set;
+};
+
+struct migrate_request *migrate_request_new(void);
+struct migrate_request *migrate_request_new_with_arg(void *);
+void migrate_request_free(struct migrate_request *);
+void migrate_request_clear(struct migrate_request *);
+void migrate_request_marshal(struct evbuffer *, const struct migrate_request *);
+int migrate_request_unmarshal(struct migrate_request *, struct evbuffer *);
+int migrate_request_complete(struct migrate_request *);
+void evtag_marshal_migrate_request(struct evbuffer *, ev_uint32_t,
+    const struct migrate_request *);
+int evtag_unmarshal_migrate_request(struct evbuffer *, ev_uint32_t,
+    struct migrate_request *);
+int migrate_request_stat_arr_assign(struct migrate_request *, int, const struct file_stat*);
+int migrate_request_stat_arr_get(struct migrate_request *, int, struct file_stat* *);
+struct file_stat*  migrate_request_stat_arr_add(struct migrate_request *msg);
+/* --- migrate_request done --- */
+
+/* Tag definition for migrate_response */
+enum migrate_response_ {
+  MIGRATE_RESPONSE_RST=1,
+  MIGRATE_RESPONSE_MAX_TAGS
+};
+
+/* Structure declaration for migrate_response */
+struct migrate_response_access_ {
+  int (*rst_assign)(struct migrate_response *, const ev_uint32_t);
+  int (*rst_get)(struct migrate_response *, ev_uint32_t *);
+};
+
+struct migrate_response {
+  struct migrate_response_access_ *base;
+
+  ev_uint32_t rst;
+
+  ev_uint8_t rst_set;
+};
+
+struct migrate_response *migrate_response_new(void);
+struct migrate_response *migrate_response_new_with_arg(void *);
+void migrate_response_free(struct migrate_response *);
+void migrate_response_clear(struct migrate_response *);
+void migrate_response_marshal(struct evbuffer *, const struct migrate_response *);
+int migrate_response_unmarshal(struct migrate_response *, struct evbuffer *);
+int migrate_response_complete(struct migrate_response *);
+void evtag_marshal_migrate_response(struct evbuffer *, ev_uint32_t,
+    const struct migrate_response *);
+int evtag_unmarshal_migrate_response(struct evbuffer *, ev_uint32_t,
+    struct migrate_response *);
+int migrate_response_rst_assign(struct migrate_response *, const ev_uint32_t);
+int migrate_response_rst_get(struct migrate_response *, ev_uint32_t *);
+/* --- migrate_response done --- */
 
 #endif  /* _COMMON_PROTOCOL_RPC_ */

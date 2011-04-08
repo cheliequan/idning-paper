@@ -92,6 +92,8 @@ inline fsnode *fsnode_hash_remove(fsnode * p)
 inline fsnode *fsnode_new()
 {
     fsnode *p = (fsnode *) malloc(sizeof(fsnode));
+    memset(p, 0, sizeof(fsnode));
+    p->modifiy_flag = 0;
     return p;
 }
 
@@ -112,12 +114,24 @@ int fs_init()
     return 0;
 }
 
+/*
+ * set the modify flag of <which>
+ * and it's every ancestor
+ * */
+void fs_set_modify_flag(fsnode * n){
+    n->modifiy_flag = 1;
+    while((n=n->parent) && (n->ino!=1)){
+        n->modifiy_flag = 1;
+    }
+}
+
 int fs_setattr(uint64_t ino, struct file_stat *st)
 {
     logging(LOG_DEUBG, "fs_setattr(%" PRIu64 ")", ino);
 
     fsnode *n = fsnode_hash_find(ino);
     n->data.fdata.length = st->size;
+    fs_set_modify_flag(n);
     version++;
     return 0;
 }
@@ -176,15 +190,48 @@ fsnode *fs_lookup(uint64_t parent_ino, char *name)
     return NULL;
 }
 
+/*
+ *TODO:
+  if it's splited to another MDS??
+  what will I do ?
+  I should not del it at the other mds, gc will do it
+ *
+ * */
+void fs_del_tree_dfs(fsnode * root){
+    if(!root)
+        return;
+    dlist_t *head ;
+    dlist_t *pl;
+    fsnode *p;
+
+    if (S_ISDIR(root->mode) && root->data.ddata.children){
+        fsnode *children_head = root->data.ddata.children;
+        head = &(children_head->tree_dlist);
+        for (pl = head->next; pl != head; pl = pl->next) {
+            p = dlist_data(pl, fsnode, tree_dlist);
+            fsnode_tree_remove(p);
+            fsnode_hash_remove(p);
+            free(p);
+        }
+    }
+    fsnode_tree_remove(root);
+    fsnode_hash_remove(root);
+    free(root);
+}
+
 fsnode *fs_unlink(uint64_t parent_ino, char *name)
 {
     logging(LOG_DEUBG, "fs_unlink(parent_ino = %" PRIu64 " , name = %s)",
             parent_ino, name);
 
+    fsnode *n = fsnode_hash_find(parent_ino);
+    fs_set_modify_flag(n);
+
     fsnode *s = fs_lookup(parent_ino, name);
-    fsnode_tree_remove(s);
-    fsnode_hash_remove(s);
-    free(s);
+    fs_del_tree_dfs(s);
+    /*fsnode_tree_remove(s);*/
+    /*fsnode_hash_remove(s);*/
+    /*free(s);*/
     version++;
     return NULL;
 }
@@ -212,6 +259,7 @@ fsnode *fs_mknod(uint64_t parent_ino, uint64_t ino, char *name, int type, int mo
 
     fsnode_hash_insert(n);
     fsnode_tree_insert(n->parent, n);
+    fs_set_modify_flag(n->parent);
     version++;
     return n;
 }
@@ -237,6 +285,7 @@ fsnode *fs_symlink(uint64_t parent_ino, uint64_t ino, const char *name, const ch
     n->pos_arr[1] = n->parent->pos_arr[1];
     fsnode_hash_insert(n);
     fsnode_tree_insert(n->parent, n);
+    fs_set_modify_flag(n);
     version++;
     return n;
 }

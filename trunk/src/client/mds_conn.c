@@ -101,7 +101,6 @@ int setattr_send_request(char *ip, int port, struct file_stat *stat_arr)
 int stat_send_request_async(char *ip, int port, uint64_t * ino_arr, int len, struct mds_req_ctx * ctx)
 {
     DBG();
-    int ret = 0;
     struct stat_request *req = stat_request_new();
     struct stat_response *response = stat_response_new();
     int i;
@@ -447,6 +446,7 @@ static void rpc_rpc_grneral_requestuest_cb(struct evhttp_request *req,
 void * ev_loop_func(void * ptr){
     while(1){
         event_dispatch();
+        logging(LOG_INFO, "ev_loop_func");
     }
 }
 

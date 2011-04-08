@@ -1,4 +1,12 @@
 #include "log.h"
+#include <pthread.h>
+static int putthread(char **buf)
+{
+    pthread_t  t = pthread_self();
+    sprintf(*buf, "<%x>", t);
+    while (**buf)
+        (*buf)++;
+}
 
 static int puttime(char **buf)
 {
@@ -50,7 +58,7 @@ int log_init(char *logfile)
     return 0;
 }
 
-int logging(int level, char *fmt, ...)
+inline int logging(int level, char *fmt, ...)
 {
     if (level<LOG_LEVEL) 
         return;
@@ -58,6 +66,7 @@ int logging(int level, char *fmt, ...)
     char *buf = stmp;
     puttime(&buf);
     putlevel(&buf, level);
+    putthread(&buf);
 
     va_list ap;
     va_start(ap, fmt);

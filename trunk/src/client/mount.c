@@ -360,7 +360,7 @@ int stat_mds_req_cb(struct mds_req_ctx * ctx, void* ptr){
     }
     struct fuse_entry_param e;
     struct file_stat * stat = (struct file_stat *) ptr;
-    log_file_stat("return :", stat);
+    log_file_stat("stat return :", stat);
     if (stat->ino)
         attr_cache_add(stat);       //no free
     return 0;
@@ -671,7 +671,8 @@ int search_inode_over_all_mds(uint64_t ino)
 }
 
 int find_root(){
-    return search_inode_over_all_mds_async(1);
+    /*return search_inode_over_all_mds_async(1);*/
+    return search_inode_over_all_mds(1);
 }
 void sfs_mkfs()
 {
