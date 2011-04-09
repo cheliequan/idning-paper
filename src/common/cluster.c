@@ -68,7 +68,7 @@ void ping_handler(EVRPC_STRUCT(rpc_ping) * rpc, void *arg)
     remote_port = ping->self_port;
     int type = ping->self_type;
     int mid = ping->mid;
-    logging(LOG_INFO, "ping_handler(ip=%s, port=%d, type=%s, load=%d)", remote_ip,
+    logging(LOG_DEUBG, "ping_handler(ip=%s, port=%d, type=%s, load=%d)", remote_ip,
             remote_port, cluster_type_str(type), ping->load);
 
     if (ping->mid == 0) {
@@ -101,19 +101,20 @@ void ping_cb(struct evrpc_status *status, struct ping *ping, struct pong *pong,
     event_base_loopexit(cmgr_ev_base, NULL);
 }
 
-int ping_send_request()
+
+int ping_send_request_with_version(int req_version)
 {
     DBG();
     struct ping *ping = ping_new();
     struct pong *pong = pong_new();
 
-    EVTAG_ASSIGN(ping, version, cluster_version);
+    EVTAG_ASSIGN(ping, version, req_version);
     EVTAG_ASSIGN(ping, self_ip, self_machine.ip);
     EVTAG_ASSIGN(ping, self_port, self_machine.port);
     EVTAG_ASSIGN(ping, self_type, self_machine.type);
     EVTAG_ASSIGN(ping, mid, self_machine.mid);
     EVTAG_ASSIGN(ping, load, self_machine.load);
-    logging(LOG_DEUBG, "ping(version = %u, mid = %d)", cluster_version,
+    logging(LOG_DEUBG, "ping(version = %u, mid = %d)", req_version,
             self_machine.mid);
 
     EVRPC_MAKE_REQUEST(rpc_ping, cmgr_conn_pool, ping, pong, ping_cb, NULL);
@@ -127,11 +128,11 @@ int ping_send_request()
     logging(LOG_DEUBG, "get pong (version = %u, mid = %d)", pong_version,
             pong_mid);
 
-    if (pong_version == cluster_version) {
-        logging(LOG_INFO, "cluster not change!");
+    if (pong_version == req_version) {
+        logging(LOG_DEUBG, "cluster not change!");
         goto done;
     }
-    logging(LOG_INFO, "cluster changed!");
+    logging(LOG_DEUBG, "cluster changed!");
     int cnt = EVTAG_ARRAY_LEN(pong, machines);
     int i;
     machine_cnt = cnt;
@@ -146,6 +147,7 @@ int ping_send_request()
         machines[i].port = m->port;
         machines[i].type = m->type;
         machines[i].mid = m->mid;
+        machines[i].load = m->load;
     }
     cluster_printf("after pong::");
     cluster_dump();
@@ -156,8 +158,27 @@ int ping_send_request()
 
     return pong_mid;
 }
+
+
+int ping_send_request(){
+    return ping_send_request_with_version(cluster_version);
+
+}
+
+int ping_send_request_force_update(){
+    return ping_send_request_with_version(0);
+}
+
+
+int get_self_machine_load(){
+    return self_machine.load ;
+}
 void set_self_machine_load(int load){
     self_machine.load = load;
+}
+
+struct machine * get_self_machine(){
+    return &self_machine;
 }
 //TODO: rename it to cmgr_client_setup or something
 void rpc_client_setup(char *self_host, int self_port, int self_type)
@@ -202,7 +223,7 @@ void cluster_printf(char *hint)
         while (*p)
             p++;
     }
-    logging(LOG_DEUBG, " %s clusters: v%d \n--------------\n%s\n------------\n",
+    logging(LOG_INFO, " %s clusters: v%d \n--------------\n%s\n------------\n",
             hint, cluster_version, tmp);
 }
 
@@ -227,6 +248,19 @@ void cluster_get_osd_arr(int **o_arr, int *o_cnt)
 {
     *o_arr = osd_arr;
     *o_cnt = osd_cnt;
+}
+
+struct machine *cluster_get_mds_with_lowest_load()
+{
+    logging(LOG_DEUBG, "cluster_get_mds_with_lowest_load()");
+    struct machine * rst = machines;
+    int i;
+    for (i = 0; i < machine_cnt; i++) {
+        if ( (machines[i].type == MACHINE_MDS )&& (machines[i].load < rst->load))
+            rst = machines + i;
+    }
+    logging(LOG_INFO, "cluster_get_mds_with_lowest_load() return (%d)!!", rst->mid);
+    return rst;
 }
 
 struct machine *cluster_get_machine_by_mid(int mid)

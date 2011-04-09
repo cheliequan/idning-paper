@@ -41,9 +41,9 @@ void log_file_stat(char *hint, struct file_stat *t)
     if (t->pos_arr) {
         logging(LOG_DEUBG,
                 "%s  ::::  {ino: %" PRIu64 ", parent: %" PRIu64 ", size: %"
-                PRIu64 ", type : %d, mode : %04o, pos [%d, %d]}", hint, t->ino,
+                PRIu64 ", type : %d, mode : %04o, pos [%d, %d], name : %s}", hint, t->ino,
                 t->parent_ino, t->size, t->type, t->mode, t->pos_arr[0],
-                t->pos_arr[1]);
+                t->pos_arr[1], t->name);
     } else {
         logging(LOG_DEUBG,
                 "%s  ::::  {ino: %" PRIu64 ", size: %" PRIu64

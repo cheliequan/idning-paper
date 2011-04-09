@@ -3,6 +3,8 @@ the source code is mainly from mfs/mfsmaster/filesystem.c
 */
 #include "sfs_common.h"
 #define FS_ROOT_INO 1
+#define FS_VROOT_INO 0
+//Vroot是那些split节点，它们的parent不在自己所在的MDS上，所以parent指向vroot
 
 typedef struct _fsnode {
     uint64_t ino;               //4
@@ -16,7 +18,11 @@ typedef struct _fsnode {
 
     uint16_t nlen;
     uint8_t *name;
-    uint8_t modifiy_flag;
+
+    uint8_t modifiy_flag; 
+    int32_t access_counter;  //how many descendant
+    int64_t tree_cnt;  //how many descendant
+    int64_t tree_size; //how large descendant 
 
     uint32_t pos_arr[3];        //每一份的存储位置，对于dir，是mds的mid,  /对于file，是osd的mid, 现在最多存3份.
 
