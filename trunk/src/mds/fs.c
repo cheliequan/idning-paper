@@ -103,7 +103,7 @@ int fs_init()
 
     fsnode *vroot;              // for those fsnode whose parent is not in the same mds
     vroot = fsnode_new();
-    vroot->ino = 0;
+    vroot->ino = FS_VROOT_INO;
     vroot->mode = S_IFDIR;
     vroot->name = "-";
     vroot->nlen = strlen(vroot->name);
@@ -118,20 +118,37 @@ int fs_init()
  * set the modify flag of <which>
  * and it's every ancestor
  * */
-void fs_set_modify_flag(fsnode * n){
+void fs_set_modify_flag(fsnode * n, int64_t cnt_inc){
     n->modifiy_flag = 1;
-    while((n=n->parent) && (n->ino!=1)){
+    while((n=n->parent) ){
+        n->tree_cnt += cnt_inc;
+        n->access_counter ++;
         n->modifiy_flag = 1;
+        if (n->ino == FS_ROOT_INO || n->ino == FS_VROOT_INO)
+            break;
     }
 }
+void fs_set_visit_flag(fsnode * n){
+    while((n=n->parent) ){
+        n->access_counter ++;
+        if (n->ino == FS_ROOT_INO || n->ino == FS_VROOT_INO)
+            break;
+    }
+}
+
 
 int fs_setattr(uint64_t ino, struct file_stat *st)
 {
     logging(LOG_DEUBG, "fs_setattr(%" PRIu64 ")", ino);
 
     fsnode *n = fsnode_hash_find(ino);
+
+    if (n == NULL) {
+        st->ino = 0;
+        return 1;
+    }
     n->data.fdata.length = st->size;
-    fs_set_modify_flag(n);
+    fs_set_modify_flag(n, 0);
     version++;
     return 0;
 }
@@ -144,6 +161,7 @@ int fs_stat(uint64_t ino, struct file_stat *st)
         st->ino = 0;
         return 1;
     }
+    fs_set_visit_flag(n);
     st->ino = ino;
     st->size = n->data.fdata.length;
     st->mode = n->mode;
@@ -157,6 +175,10 @@ fsnode *fs_ls(uint64_t ino)
 {
     logging(LOG_DEUBG, "fs_ls(%" PRIu64 ")", ino);
     fsnode *n = fsnode_hash_find(ino);
+    if (n == NULL) {
+        return NULL;
+    }
+    fs_set_visit_flag(n);
     return n->data.ddata.children;
 }
 
@@ -166,6 +188,7 @@ fsnode *fs_lookup(uint64_t parent_ino, char *name)
             parent_ino, name);
 
     fsnode *n = fsnode_hash_find(parent_ino);
+    fs_set_visit_flag(n);
     n = n->data.ddata.children;
     if (!n)
         return NULL;
@@ -211,7 +234,7 @@ void fs_del_tree_dfs(fsnode * root){
             p = dlist_data(pl, fsnode, tree_dlist);
             fsnode_tree_remove(p);
             fsnode_hash_remove(p);
-            free(p);
+            /*free(p);*/
         }
     }
     fsnode_tree_remove(root);
@@ -225,9 +248,11 @@ fsnode *fs_unlink(uint64_t parent_ino, char *name)
             parent_ino, name);
 
     fsnode *n = fsnode_hash_find(parent_ino);
-    fs_set_modify_flag(n);
+    fs_set_modify_flag(n, -1);
 
     fsnode *s = fs_lookup(parent_ino, name);
+    logging(LOG_DEUBG, "parent find :%"PRIu64"",
+            s->ino);
     fs_del_tree_dfs(s);
     /*fsnode_tree_remove(s);*/
     /*fsnode_hash_remove(s);*/
@@ -259,7 +284,7 @@ fsnode *fs_mknod(uint64_t parent_ino, uint64_t ino, char *name, int type, int mo
 
     fsnode_hash_insert(n);
     fsnode_tree_insert(n->parent, n);
-    fs_set_modify_flag(n->parent);
+    fs_set_modify_flag(n, 1);
     version++;
     return n;
 }
@@ -285,7 +310,7 @@ fsnode *fs_symlink(uint64_t parent_ino, uint64_t ino, const char *name, const ch
     n->pos_arr[1] = n->parent->pos_arr[1];
     fsnode_hash_insert(n);
     fsnode_tree_insert(n->parent, n);
-    fs_set_modify_flag(n);
+    fs_set_modify_flag(n, 1);
     version++;
     return n;
 }
@@ -349,7 +374,7 @@ void fs_dump_dfs(fsnode * root, struct evbuffer * evbuf, int fd){
             fs_dump_dfs(p, evbuf, fd);
         }
     }
-    logging(LOG_DEUBG, "evbuffer_get_length(evbuf) : %d", evbuffer_get_length(evbuf));
+    logging(LOG_INFO, "in fs_dump_dfs evbuffer_get_length(evbuf) : %d", evbuffer_get_length(evbuf));
     if(evbuffer_get_length(evbuf)> 1)
         evbuffer_write(evbuf, fd);
 }
@@ -400,8 +425,11 @@ int fs_load(char * path){
     while((cnt = read(fd, buf, sizeof(buf))) ){ //TODO: optimize
         evbuffer_add(evbuf, buf, cnt);
     }
+    cnt = 0;
 
     while(evbuffer_get_length(evbuf) > 0){
+        cnt ++;
+
         logging(LOG_DEUBG, "ready to unmarshal");
         struct file_stat * stat = file_stat_new();
         if (evtag_unmarshal_file_stat(evbuf, 1, stat) == -1) {
@@ -423,6 +451,7 @@ int fs_load(char * path){
             }
         }
     }
+    logging(LOG_INFO, "%d inode loaded", cnt);
     close(fd);
     return 0;
 }

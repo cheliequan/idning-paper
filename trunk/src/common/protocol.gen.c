@@ -5858,6 +5858,10 @@ evtag_marshal_uuid_response(struct evbuffer *evbuf, ev_uint32_t tag, const struc
  */
 
 static struct migrate_request_access_ __migrate_request_base = {
+  migrate_request_from_mds_assign,
+  migrate_request_from_mds_get,
+  migrate_request_to_mds_assign,
+  migrate_request_to_mds_get,
   migrate_request_stat_arr_assign,
   migrate_request_stat_arr_get,
   migrate_request_stat_arr_add,
@@ -5879,6 +5883,12 @@ migrate_request_new_with_arg(void *unused)
   }
   tmp->base = &__migrate_request_base;
 
+  tmp->from_mds = 0;
+  tmp->from_mds_set = 0;
+
+  tmp->to_mds = 0;
+  tmp->to_mds_set = 0;
+
   tmp->stat_arr = NULL;
   tmp->stat_arr_length = 0;
   tmp->stat_arr_num_allocated = 0;
@@ -5886,6 +5896,8 @@ migrate_request_new_with_arg(void *unused)
 
   return (tmp);
 }
+
+
 
 static int
 migrate_request_stat_arr_expand_to_hold_more(struct migrate_request *msg)
@@ -5916,6 +5928,22 @@ migrate_request_stat_arr_add(struct migrate_request *msg)
 error:
   --msg->stat_arr_length;
   return (NULL);
+}
+
+int
+migrate_request_from_mds_assign(struct migrate_request *msg, const ev_uint32_t value)
+{
+  msg->from_mds_set = 1;
+  msg->from_mds = value;
+  return (0);
+}
+
+int
+migrate_request_to_mds_assign(struct migrate_request *msg, const ev_uint32_t value)
+{
+  msg->to_mds_set = 1;
+  msg->to_mds = value;
+  return (0);
 }
 
 int
@@ -5951,6 +5979,24 @@ migrate_request_stat_arr_assign(struct migrate_request *msg, int off,
 }
 
 int
+migrate_request_from_mds_get(struct migrate_request *msg, ev_uint32_t *value)
+{
+  if (msg->from_mds_set != 1)
+    return (-1);
+  *value = msg->from_mds;
+  return (0);
+}
+
+int
+migrate_request_to_mds_get(struct migrate_request *msg, ev_uint32_t *value)
+{
+  if (msg->to_mds_set != 1)
+    return (-1);
+  *value = msg->to_mds;
+  return (0);
+}
+
+int
 migrate_request_stat_arr_get(struct migrate_request *msg, int offset,
     struct file_stat* *value)
 {
@@ -5963,6 +6009,8 @@ migrate_request_stat_arr_get(struct migrate_request *msg, int offset,
 void
 migrate_request_clear(struct migrate_request *tmp)
 {
+  tmp->from_mds_set = 0;
+  tmp->to_mds_set = 0;
   if (tmp->stat_arr_set == 1) {
     int i;
     for (i = 0; i < tmp->stat_arr_length; ++i) {
@@ -5996,6 +6044,8 @@ migrate_request_free(struct migrate_request *tmp)
 
 void
 migrate_request_marshal(struct evbuffer *evbuf, const struct migrate_request *tmp){
+  evtag_marshal_int(evbuf, MIGRATE_REQUEST_FROM_MDS, tmp->from_mds);
+  evtag_marshal_int(evbuf, MIGRATE_REQUEST_TO_MDS, tmp->to_mds);
   if (tmp->stat_arr_set) {
     {
       int i;
@@ -6014,6 +6064,28 @@ migrate_request_unmarshal(struct migrate_request *tmp,  struct evbuffer *evbuf)
     if (evtag_peek(evbuf, &tag) == -1)
       return (-1);
     switch (tag) {
+
+      case MIGRATE_REQUEST_FROM_MDS:
+
+        if (tmp->from_mds_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, MIGRATE_REQUEST_FROM_MDS, &tmp->from_mds) == -1) {
+          event_warnx("%s: failed to unmarshal from_mds", __func__);
+          return (-1);
+        }
+        tmp->from_mds_set = 1;
+        break;
+
+      case MIGRATE_REQUEST_TO_MDS:
+
+        if (tmp->to_mds_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, MIGRATE_REQUEST_TO_MDS, &tmp->to_mds) == -1) {
+          event_warnx("%s: failed to unmarshal to_mds", __func__);
+          return (-1);
+        }
+        tmp->to_mds_set = 1;
+        break;
 
       case MIGRATE_REQUEST_STAT_ARR:
 
@@ -6046,6 +6118,10 @@ migrate_request_unmarshal(struct migrate_request *tmp,  struct evbuffer *evbuf)
 int
 migrate_request_complete(struct migrate_request *msg)
 {
+  if (!msg->from_mds_set)
+    return (-1);
+  if (!msg->to_mds_set)
+    return (-1);
   {
     int i;
     for (i = 0; i < msg->stat_arr_length; ++i) {

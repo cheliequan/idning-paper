@@ -1,5 +1,6 @@
 #include "sfs_common.h"
 #include "fs.h"
+#include "mds_conn.h"
 int mds_op_counter = 0;
 void fsnode_to_stat_copy(struct file_stat *t, fsnode * n);
 
@@ -228,7 +229,7 @@ static void mkfs_handler(EVRPC_STRUCT(rpc_mkfs) * rpc, void *arg)
     EVTAG_ARRAY_GET(request, pos_arr, 0, &mds1);
     EVTAG_ARRAY_GET(request, pos_arr, 1, &mds2);
 
-    logging(LOG_DEUBG, "mkfs (mds1=%d, mds2=%d)", mds1, mds2);
+    logging(LOG_INFO, "mkfs (mds1=%d, mds2=%d)", mds1, mds2);
     fs_mkfs(mds1, mds2);
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -252,6 +253,8 @@ static void rpc_setup()
     base = evrpc_init(http);
 
     EVRPC_REGISTER(base, rpc_ping, ping, pong, ping_handler, NULL);
+    EVRPC_REGISTER(base, rpc_migrate , migrate_request, migrate_response, 
+            migrate_handler, NULL);
 
     EVRPC_REGISTER(base, rpc_stat, stat_request, stat_response, stat_handler,
                    NULL);
@@ -296,12 +299,77 @@ void onexit()
 
 static void update_clustermap_from_cmgr_on_timer_cb(evutil_socket_t fd, short what, void *arg)
 { 
-    int t = mds_op_counter;
+    static int load_max = 0; //max for now
+    int load_current = mds_op_counter;
+    if (load_current > load_max)
+        load_max = load_current;
+    
     mds_op_counter = 0;
 
-    set_self_machine_load(t);
+    int load_old = get_self_machine_load();
+    int load_new = (int) (load_old * 0.9 + load_current * 0.1);
+
+    logging(LOG_INFO, "load_old: %d, load_current: %d, load_new: %d, load_max: %d", 
+            load_old,load_current, load_new, load_max);
+
+    set_self_machine_load(load_new);
 
     ping_send_request();
+
+
+    if( (load_new > 1024) && (  1.0 * load_new/ load_max  > 0.75)){ // is about 0.9 max load for a long time
+        /*do_migration;*/
+        logging(LOG_WARN, "is going to migrate");
+
+
+        set_self_machine_load(-1);
+        ping_send_request_force_update();
+        do_migrate();
+    }
+}
+
+
+fsnode * locate_hot_sub_tree(fsnode * root){
+    DBG();
+    fsnode *n = root->data.ddata.children;
+    fsnode *rst = n;
+    fsnode *p;
+    if (n != NULL) {
+        dlist_t *head = &(n->tree_dlist);
+        dlist_t *pl;
+        for (pl = head->next; pl != head; pl = pl->next) {
+            p = dlist_data(pl, fsnode, tree_dlist);
+            if (p->access_counter > rst->access_counter)
+                rst = p;
+            p->access_counter = 0;
+        }
+    }
+    return rst;
+}
+
+void do_migrate2(fsnode * r){
+    DBG();
+    struct machine * m = cluster_get_mds_with_lowest_load();
+    struct machine * self = get_self_machine();
+    migrate_send_request(m->ip, m->port, r, self->mid, m->mid);
+}
+/*
+ * 从根开始，找下一层目录中access最多(最热)，，设为x，
+ * 然后在x的儿子中找，也是找最热的一个，直到找到一个，它的大小小于1w个inode，就迁移它
+ * 每次找的过程中，所有访问过的node, access_cnt都重置
+ * */
+void do_migrate(){
+    DBG();
+    fsnode * n = fsnode_hash_find(FS_ROOT_INO);
+    while(1){
+        n = locate_hot_sub_tree(n);
+        if (n->tree_cnt < 1024) {// 1w
+            logging(LOG_INFO, "migrate on %"PRIu64". %s, tree_cnt : %d", n->ino, n->name, n->tree_cnt);
+            do_migrate2(n);
+            return;
+        }
+    }
+
 }
 
 int main(int argc, char **argv)
