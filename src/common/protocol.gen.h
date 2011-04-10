@@ -373,12 +373,15 @@ ev_uint64_t * stat_request_ino_arr_add(struct stat_request *msg, const ev_uint64
 
 /* Tag definition for stat_response */
 enum stat_response_ {
-  STAT_RESPONSE_STAT_ARR=1,
+  STAT_RESPONSE_RST_CODE=1,
+  STAT_RESPONSE_STAT_ARR=2,
   STAT_RESPONSE_MAX_TAGS
 };
 
 /* Structure declaration for stat_response */
 struct stat_response_access_ {
+  int (*rst_code_assign)(struct stat_response *, const ev_uint32_t);
+  int (*rst_code_get)(struct stat_response *, ev_uint32_t *);
   int (*stat_arr_assign)(struct stat_response *, int, const struct file_stat*);
   int (*stat_arr_get)(struct stat_response *, int, struct file_stat* *);
   struct file_stat*  (*stat_arr_add)(struct stat_response *msg);
@@ -387,10 +390,12 @@ struct stat_response_access_ {
 struct stat_response {
   struct stat_response_access_ *base;
 
+  ev_uint32_t rst_code;
   struct file_stat* *stat_arr;
   int stat_arr_length;
   int stat_arr_num_allocated;
 
+  ev_uint8_t rst_code_set;
   ev_uint8_t stat_arr_set;
 };
 
@@ -405,6 +410,8 @@ void evtag_marshal_stat_response(struct evbuffer *, ev_uint32_t,
     const struct stat_response *);
 int evtag_unmarshal_stat_response(struct evbuffer *, ev_uint32_t,
     struct stat_response *);
+int stat_response_rst_code_assign(struct stat_response *, const ev_uint32_t);
+int stat_response_rst_code_get(struct stat_response *, ev_uint32_t *);
 int stat_response_stat_arr_assign(struct stat_response *, int, const struct file_stat*);
 int stat_response_stat_arr_get(struct stat_response *, int, struct file_stat* *);
 struct file_stat*  stat_response_stat_arr_add(struct stat_response *msg);
@@ -451,12 +458,15 @@ struct file_stat*  setattr_request_stat_arr_add(struct setattr_request *msg);
 
 /* Tag definition for setattr_response */
 enum setattr_response_ {
-  SETATTR_RESPONSE_STAT_ARR=1,
+  SETATTR_RESPONSE_RST_CODE=1,
+  SETATTR_RESPONSE_STAT_ARR=2,
   SETATTR_RESPONSE_MAX_TAGS
 };
 
 /* Structure declaration for setattr_response */
 struct setattr_response_access_ {
+  int (*rst_code_assign)(struct setattr_response *, const ev_uint32_t);
+  int (*rst_code_get)(struct setattr_response *, ev_uint32_t *);
   int (*stat_arr_assign)(struct setattr_response *, int, const struct file_stat*);
   int (*stat_arr_get)(struct setattr_response *, int, struct file_stat* *);
   struct file_stat*  (*stat_arr_add)(struct setattr_response *msg);
@@ -465,10 +475,12 @@ struct setattr_response_access_ {
 struct setattr_response {
   struct setattr_response_access_ *base;
 
+  ev_uint32_t rst_code;
   struct file_stat* *stat_arr;
   int stat_arr_length;
   int stat_arr_num_allocated;
 
+  ev_uint8_t rst_code_set;
   ev_uint8_t stat_arr_set;
 };
 
@@ -483,6 +495,8 @@ void evtag_marshal_setattr_response(struct evbuffer *, ev_uint32_t,
     const struct setattr_response *);
 int evtag_unmarshal_setattr_response(struct evbuffer *, ev_uint32_t,
     struct setattr_response *);
+int setattr_response_rst_code_assign(struct setattr_response *, const ev_uint32_t);
+int setattr_response_rst_code_get(struct setattr_response *, ev_uint32_t *);
 int setattr_response_stat_arr_assign(struct setattr_response *, int, const struct file_stat*);
 int setattr_response_stat_arr_get(struct setattr_response *, int, struct file_stat* *);
 struct file_stat*  setattr_response_stat_arr_add(struct setattr_response *msg);
@@ -529,12 +543,15 @@ ev_uint64_t * ls_request_ino_arr_add(struct ls_request *msg, const ev_uint64_t v
 
 /* Tag definition for ls_response */
 enum ls_response_ {
-  LS_RESPONSE_STAT_ARR=1,
+  LS_RESPONSE_RST_CODE=1,
+  LS_RESPONSE_STAT_ARR=2,
   LS_RESPONSE_MAX_TAGS
 };
 
 /* Structure declaration for ls_response */
 struct ls_response_access_ {
+  int (*rst_code_assign)(struct ls_response *, const ev_uint32_t);
+  int (*rst_code_get)(struct ls_response *, ev_uint32_t *);
   int (*stat_arr_assign)(struct ls_response *, int, const struct file_stat*);
   int (*stat_arr_get)(struct ls_response *, int, struct file_stat* *);
   struct file_stat*  (*stat_arr_add)(struct ls_response *msg);
@@ -543,10 +560,12 @@ struct ls_response_access_ {
 struct ls_response {
   struct ls_response_access_ *base;
 
+  ev_uint32_t rst_code;
   struct file_stat* *stat_arr;
   int stat_arr_length;
   int stat_arr_num_allocated;
 
+  ev_uint8_t rst_code_set;
   ev_uint8_t stat_arr_set;
 };
 
@@ -561,6 +580,8 @@ void evtag_marshal_ls_response(struct evbuffer *, ev_uint32_t,
     const struct ls_response *);
 int evtag_unmarshal_ls_response(struct evbuffer *, ev_uint32_t,
     struct ls_response *);
+int ls_response_rst_code_assign(struct ls_response *, const ev_uint32_t);
+int ls_response_rst_code_get(struct ls_response *, ev_uint32_t *);
 int ls_response_stat_arr_assign(struct ls_response *, int, const struct file_stat*);
 int ls_response_stat_arr_get(struct ls_response *, int, struct file_stat* *);
 struct file_stat*  ls_response_stat_arr_add(struct ls_response *msg);
@@ -631,12 +652,15 @@ int mknod_request_mode_get(struct mknod_request *, ev_uint32_t *);
 
 /* Tag definition for mknod_response */
 enum mknod_response_ {
+  MKNOD_RESPONSE_RST_CODE=2,
   MKNOD_RESPONSE_STAT_ARR=1,
   MKNOD_RESPONSE_MAX_TAGS
 };
 
 /* Structure declaration for mknod_response */
 struct mknod_response_access_ {
+  int (*rst_code_assign)(struct mknod_response *, const ev_uint32_t);
+  int (*rst_code_get)(struct mknod_response *, ev_uint32_t *);
   int (*stat_arr_assign)(struct mknod_response *, int, const struct file_stat*);
   int (*stat_arr_get)(struct mknod_response *, int, struct file_stat* *);
   struct file_stat*  (*stat_arr_add)(struct mknod_response *msg);
@@ -645,10 +669,12 @@ struct mknod_response_access_ {
 struct mknod_response {
   struct mknod_response_access_ *base;
 
+  ev_uint32_t rst_code;
   struct file_stat* *stat_arr;
   int stat_arr_length;
   int stat_arr_num_allocated;
 
+  ev_uint8_t rst_code_set;
   ev_uint8_t stat_arr_set;
 };
 
@@ -663,6 +689,8 @@ void evtag_marshal_mknod_response(struct evbuffer *, ev_uint32_t,
     const struct mknod_response *);
 int evtag_unmarshal_mknod_response(struct evbuffer *, ev_uint32_t,
     struct mknod_response *);
+int mknod_response_rst_code_assign(struct mknod_response *, const ev_uint32_t);
+int mknod_response_rst_code_get(struct mknod_response *, ev_uint32_t *);
 int mknod_response_stat_arr_assign(struct mknod_response *, int, const struct file_stat*);
 int mknod_response_stat_arr_get(struct mknod_response *, int, struct file_stat* *);
 struct file_stat*  mknod_response_stat_arr_add(struct mknod_response *msg);
@@ -726,12 +754,15 @@ int symlink_request_path_get(struct symlink_request *, char * *);
 
 /* Tag definition for symlink_response */
 enum symlink_response_ {
-  SYMLINK_RESPONSE_STAT=1,
+  SYMLINK_RESPONSE_RST_CODE=1,
+  SYMLINK_RESPONSE_STAT=2,
   SYMLINK_RESPONSE_MAX_TAGS
 };
 
 /* Structure declaration for symlink_response */
 struct symlink_response_access_ {
+  int (*rst_code_assign)(struct symlink_response *, const ev_uint32_t);
+  int (*rst_code_get)(struct symlink_response *, ev_uint32_t *);
   int (*stat_assign)(struct symlink_response *, const struct file_stat*);
   int (*stat_get)(struct symlink_response *, struct file_stat* *);
 };
@@ -739,8 +770,10 @@ struct symlink_response_access_ {
 struct symlink_response {
   struct symlink_response_access_ *base;
 
+  ev_uint32_t rst_code;
   struct file_stat* stat;
 
+  ev_uint8_t rst_code_set;
   ev_uint8_t stat_set;
 };
 
@@ -755,6 +788,8 @@ void evtag_marshal_symlink_response(struct evbuffer *, ev_uint32_t,
     const struct symlink_response *);
 int evtag_unmarshal_symlink_response(struct evbuffer *, ev_uint32_t,
     struct symlink_response *);
+int symlink_response_rst_code_assign(struct symlink_response *, const ev_uint32_t);
+int symlink_response_rst_code_get(struct symlink_response *, ev_uint32_t *);
 int symlink_response_stat_assign(struct symlink_response *, const struct file_stat*);
 int symlink_response_stat_get(struct symlink_response *, struct file_stat* *);
 /* --- symlink_response done --- */
@@ -796,12 +831,15 @@ int readlink_request_ino_get(struct readlink_request *, ev_uint64_t *);
 
 /* Tag definition for readlink_response */
 enum readlink_response_ {
-  READLINK_RESPONSE_PATH=1,
+  READLINK_RESPONSE_RST_CODE=1,
+  READLINK_RESPONSE_PATH=2,
   READLINK_RESPONSE_MAX_TAGS
 };
 
 /* Structure declaration for readlink_response */
 struct readlink_response_access_ {
+  int (*rst_code_assign)(struct readlink_response *, const ev_uint32_t);
+  int (*rst_code_get)(struct readlink_response *, ev_uint32_t *);
   int (*path_assign)(struct readlink_response *, const char *);
   int (*path_get)(struct readlink_response *, char * *);
 };
@@ -809,8 +847,10 @@ struct readlink_response_access_ {
 struct readlink_response {
   struct readlink_response_access_ *base;
 
+  ev_uint32_t rst_code;
   char *path;
 
+  ev_uint8_t rst_code_set;
   ev_uint8_t path_set;
 };
 
@@ -825,6 +865,8 @@ void evtag_marshal_readlink_response(struct evbuffer *, ev_uint32_t,
     const struct readlink_response *);
 int evtag_unmarshal_readlink_response(struct evbuffer *, ev_uint32_t,
     struct readlink_response *);
+int readlink_response_rst_code_assign(struct readlink_response *, const ev_uint32_t);
+int readlink_response_rst_code_get(struct readlink_response *, ev_uint32_t *);
 int readlink_response_path_assign(struct readlink_response *, const char *);
 int readlink_response_path_get(struct readlink_response *, char * *);
 /* --- readlink_response done --- */
@@ -873,12 +915,15 @@ int lookup_request_name_get(struct lookup_request *, char * *);
 
 /* Tag definition for lookup_response */
 enum lookup_response_ {
-  LOOKUP_RESPONSE_STAT_ARR=1,
+  LOOKUP_RESPONSE_RST_CODE=1,
+  LOOKUP_RESPONSE_STAT_ARR=2,
   LOOKUP_RESPONSE_MAX_TAGS
 };
 
 /* Structure declaration for lookup_response */
 struct lookup_response_access_ {
+  int (*rst_code_assign)(struct lookup_response *, const ev_uint32_t);
+  int (*rst_code_get)(struct lookup_response *, ev_uint32_t *);
   int (*stat_arr_assign)(struct lookup_response *, int, const struct file_stat*);
   int (*stat_arr_get)(struct lookup_response *, int, struct file_stat* *);
   struct file_stat*  (*stat_arr_add)(struct lookup_response *msg);
@@ -887,10 +932,12 @@ struct lookup_response_access_ {
 struct lookup_response {
   struct lookup_response_access_ *base;
 
+  ev_uint32_t rst_code;
   struct file_stat* *stat_arr;
   int stat_arr_length;
   int stat_arr_num_allocated;
 
+  ev_uint8_t rst_code_set;
   ev_uint8_t stat_arr_set;
 };
 
@@ -905,6 +952,8 @@ void evtag_marshal_lookup_response(struct evbuffer *, ev_uint32_t,
     const struct lookup_response *);
 int evtag_unmarshal_lookup_response(struct evbuffer *, ev_uint32_t,
     struct lookup_response *);
+int lookup_response_rst_code_assign(struct lookup_response *, const ev_uint32_t);
+int lookup_response_rst_code_get(struct lookup_response *, ev_uint32_t *);
 int lookup_response_stat_arr_assign(struct lookup_response *, int, const struct file_stat*);
 int lookup_response_stat_arr_get(struct lookup_response *, int, struct file_stat* *);
 struct file_stat*  lookup_response_stat_arr_add(struct lookup_response *msg);
@@ -954,12 +1003,15 @@ int unlink_request_name_get(struct unlink_request *, char * *);
 
 /* Tag definition for unlink_response */
 enum unlink_response_ {
-  UNLINK_RESPONSE_INO=1,
+  UNLINK_RESPONSE_RST_CODE=1,
+  UNLINK_RESPONSE_INO=2,
   UNLINK_RESPONSE_MAX_TAGS
 };
 
 /* Structure declaration for unlink_response */
 struct unlink_response_access_ {
+  int (*rst_code_assign)(struct unlink_response *, const ev_uint32_t);
+  int (*rst_code_get)(struct unlink_response *, ev_uint32_t *);
   int (*ino_assign)(struct unlink_response *, const ev_uint64_t);
   int (*ino_get)(struct unlink_response *, ev_uint64_t *);
 };
@@ -967,8 +1019,10 @@ struct unlink_response_access_ {
 struct unlink_response {
   struct unlink_response_access_ *base;
 
+  ev_uint32_t rst_code;
   ev_uint64_t ino;
 
+  ev_uint8_t rst_code_set;
   ev_uint8_t ino_set;
 };
 
@@ -983,6 +1037,8 @@ void evtag_marshal_unlink_response(struct evbuffer *, ev_uint32_t,
     const struct unlink_response *);
 int evtag_unmarshal_unlink_response(struct evbuffer *, ev_uint32_t,
     struct unlink_response *);
+int unlink_response_rst_code_assign(struct unlink_response *, const ev_uint32_t);
+int unlink_response_rst_code_get(struct unlink_response *, ev_uint32_t *);
 int unlink_response_ino_assign(struct unlink_response *, const ev_uint64_t);
 int unlink_response_ino_get(struct unlink_response *, ev_uint64_t *);
 /* --- unlink_response done --- */

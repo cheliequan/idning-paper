@@ -1749,6 +1749,8 @@ evtag_marshal_stat_request(struct evbuffer *evbuf, ev_uint32_t tag, const struct
  */
 
 static struct stat_response_access_ __stat_response_base = {
+  stat_response_rst_code_assign,
+  stat_response_rst_code_get,
   stat_response_stat_arr_assign,
   stat_response_stat_arr_get,
   stat_response_stat_arr_add,
@@ -1770,6 +1772,9 @@ stat_response_new_with_arg(void *unused)
   }
   tmp->base = &__stat_response_base;
 
+  tmp->rst_code = 0;
+  tmp->rst_code_set = 0;
+
   tmp->stat_arr = NULL;
   tmp->stat_arr_length = 0;
   tmp->stat_arr_num_allocated = 0;
@@ -1777,6 +1782,7 @@ stat_response_new_with_arg(void *unused)
 
   return (tmp);
 }
+
 
 static int
 stat_response_stat_arr_expand_to_hold_more(struct stat_response *msg)
@@ -1807,6 +1813,14 @@ stat_response_stat_arr_add(struct stat_response *msg)
 error:
   --msg->stat_arr_length;
   return (NULL);
+}
+
+int
+stat_response_rst_code_assign(struct stat_response *msg, const ev_uint32_t value)
+{
+  msg->rst_code_set = 1;
+  msg->rst_code = value;
+  return (0);
 }
 
 int
@@ -1842,6 +1856,15 @@ stat_response_stat_arr_assign(struct stat_response *msg, int off,
 }
 
 int
+stat_response_rst_code_get(struct stat_response *msg, ev_uint32_t *value)
+{
+  if (msg->rst_code_set != 1)
+    return (-1);
+  *value = msg->rst_code;
+  return (0);
+}
+
+int
 stat_response_stat_arr_get(struct stat_response *msg, int offset,
     struct file_stat* *value)
 {
@@ -1854,6 +1877,7 @@ stat_response_stat_arr_get(struct stat_response *msg, int offset,
 void
 stat_response_clear(struct stat_response *tmp)
 {
+  tmp->rst_code_set = 0;
   if (tmp->stat_arr_set == 1) {
     int i;
     for (i = 0; i < tmp->stat_arr_length; ++i) {
@@ -1887,6 +1911,7 @@ stat_response_free(struct stat_response *tmp)
 
 void
 stat_response_marshal(struct evbuffer *evbuf, const struct stat_response *tmp){
+  evtag_marshal_int(evbuf, STAT_RESPONSE_RST_CODE, tmp->rst_code);
   if (tmp->stat_arr_set) {
     {
       int i;
@@ -1905,6 +1930,17 @@ stat_response_unmarshal(struct stat_response *tmp,  struct evbuffer *evbuf)
     if (evtag_peek(evbuf, &tag) == -1)
       return (-1);
     switch (tag) {
+
+      case STAT_RESPONSE_RST_CODE:
+
+        if (tmp->rst_code_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, STAT_RESPONSE_RST_CODE, &tmp->rst_code) == -1) {
+          event_warnx("%s: failed to unmarshal rst_code", __func__);
+          return (-1);
+        }
+        tmp->rst_code_set = 1;
+        break;
 
       case STAT_RESPONSE_STAT_ARR:
 
@@ -1937,6 +1973,8 @@ stat_response_unmarshal(struct stat_response *tmp,  struct evbuffer *evbuf)
 int
 stat_response_complete(struct stat_response *msg)
 {
+  if (!msg->rst_code_set)
+    return (-1);
   {
     int i;
     for (i = 0; i < msg->stat_arr_length; ++i) {
@@ -2217,6 +2255,8 @@ evtag_marshal_setattr_request(struct evbuffer *evbuf, ev_uint32_t tag, const str
  */
 
 static struct setattr_response_access_ __setattr_response_base = {
+  setattr_response_rst_code_assign,
+  setattr_response_rst_code_get,
   setattr_response_stat_arr_assign,
   setattr_response_stat_arr_get,
   setattr_response_stat_arr_add,
@@ -2238,6 +2278,9 @@ setattr_response_new_with_arg(void *unused)
   }
   tmp->base = &__setattr_response_base;
 
+  tmp->rst_code = 0;
+  tmp->rst_code_set = 0;
+
   tmp->stat_arr = NULL;
   tmp->stat_arr_length = 0;
   tmp->stat_arr_num_allocated = 0;
@@ -2245,6 +2288,7 @@ setattr_response_new_with_arg(void *unused)
 
   return (tmp);
 }
+
 
 static int
 setattr_response_stat_arr_expand_to_hold_more(struct setattr_response *msg)
@@ -2275,6 +2319,14 @@ setattr_response_stat_arr_add(struct setattr_response *msg)
 error:
   --msg->stat_arr_length;
   return (NULL);
+}
+
+int
+setattr_response_rst_code_assign(struct setattr_response *msg, const ev_uint32_t value)
+{
+  msg->rst_code_set = 1;
+  msg->rst_code = value;
+  return (0);
 }
 
 int
@@ -2310,6 +2362,15 @@ setattr_response_stat_arr_assign(struct setattr_response *msg, int off,
 }
 
 int
+setattr_response_rst_code_get(struct setattr_response *msg, ev_uint32_t *value)
+{
+  if (msg->rst_code_set != 1)
+    return (-1);
+  *value = msg->rst_code;
+  return (0);
+}
+
+int
 setattr_response_stat_arr_get(struct setattr_response *msg, int offset,
     struct file_stat* *value)
 {
@@ -2322,6 +2383,7 @@ setattr_response_stat_arr_get(struct setattr_response *msg, int offset,
 void
 setattr_response_clear(struct setattr_response *tmp)
 {
+  tmp->rst_code_set = 0;
   if (tmp->stat_arr_set == 1) {
     int i;
     for (i = 0; i < tmp->stat_arr_length; ++i) {
@@ -2355,6 +2417,7 @@ setattr_response_free(struct setattr_response *tmp)
 
 void
 setattr_response_marshal(struct evbuffer *evbuf, const struct setattr_response *tmp){
+  evtag_marshal_int(evbuf, SETATTR_RESPONSE_RST_CODE, tmp->rst_code);
   if (tmp->stat_arr_set) {
     {
       int i;
@@ -2373,6 +2436,17 @@ setattr_response_unmarshal(struct setattr_response *tmp,  struct evbuffer *evbuf
     if (evtag_peek(evbuf, &tag) == -1)
       return (-1);
     switch (tag) {
+
+      case SETATTR_RESPONSE_RST_CODE:
+
+        if (tmp->rst_code_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, SETATTR_RESPONSE_RST_CODE, &tmp->rst_code) == -1) {
+          event_warnx("%s: failed to unmarshal rst_code", __func__);
+          return (-1);
+        }
+        tmp->rst_code_set = 1;
+        break;
 
       case SETATTR_RESPONSE_STAT_ARR:
 
@@ -2405,6 +2479,8 @@ setattr_response_unmarshal(struct setattr_response *tmp,  struct evbuffer *evbuf
 int
 setattr_response_complete(struct setattr_response *msg)
 {
+  if (!msg->rst_code_set)
+    return (-1);
   {
     int i;
     for (i = 0; i < msg->stat_arr_length; ++i) {
@@ -2646,6 +2722,8 @@ evtag_marshal_ls_request(struct evbuffer *evbuf, ev_uint32_t tag, const struct l
  */
 
 static struct ls_response_access_ __ls_response_base = {
+  ls_response_rst_code_assign,
+  ls_response_rst_code_get,
   ls_response_stat_arr_assign,
   ls_response_stat_arr_get,
   ls_response_stat_arr_add,
@@ -2667,6 +2745,9 @@ ls_response_new_with_arg(void *unused)
   }
   tmp->base = &__ls_response_base;
 
+  tmp->rst_code = 0;
+  tmp->rst_code_set = 0;
+
   tmp->stat_arr = NULL;
   tmp->stat_arr_length = 0;
   tmp->stat_arr_num_allocated = 0;
@@ -2674,6 +2755,7 @@ ls_response_new_with_arg(void *unused)
 
   return (tmp);
 }
+
 
 static int
 ls_response_stat_arr_expand_to_hold_more(struct ls_response *msg)
@@ -2704,6 +2786,14 @@ ls_response_stat_arr_add(struct ls_response *msg)
 error:
   --msg->stat_arr_length;
   return (NULL);
+}
+
+int
+ls_response_rst_code_assign(struct ls_response *msg, const ev_uint32_t value)
+{
+  msg->rst_code_set = 1;
+  msg->rst_code = value;
+  return (0);
 }
 
 int
@@ -2739,6 +2829,15 @@ ls_response_stat_arr_assign(struct ls_response *msg, int off,
 }
 
 int
+ls_response_rst_code_get(struct ls_response *msg, ev_uint32_t *value)
+{
+  if (msg->rst_code_set != 1)
+    return (-1);
+  *value = msg->rst_code;
+  return (0);
+}
+
+int
 ls_response_stat_arr_get(struct ls_response *msg, int offset,
     struct file_stat* *value)
 {
@@ -2751,6 +2850,7 @@ ls_response_stat_arr_get(struct ls_response *msg, int offset,
 void
 ls_response_clear(struct ls_response *tmp)
 {
+  tmp->rst_code_set = 0;
   if (tmp->stat_arr_set == 1) {
     int i;
     for (i = 0; i < tmp->stat_arr_length; ++i) {
@@ -2784,6 +2884,7 @@ ls_response_free(struct ls_response *tmp)
 
 void
 ls_response_marshal(struct evbuffer *evbuf, const struct ls_response *tmp){
+  evtag_marshal_int(evbuf, LS_RESPONSE_RST_CODE, tmp->rst_code);
   if (tmp->stat_arr_set) {
     {
       int i;
@@ -2802,6 +2903,17 @@ ls_response_unmarshal(struct ls_response *tmp,  struct evbuffer *evbuf)
     if (evtag_peek(evbuf, &tag) == -1)
       return (-1);
     switch (tag) {
+
+      case LS_RESPONSE_RST_CODE:
+
+        if (tmp->rst_code_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, LS_RESPONSE_RST_CODE, &tmp->rst_code) == -1) {
+          event_warnx("%s: failed to unmarshal rst_code", __func__);
+          return (-1);
+        }
+        tmp->rst_code_set = 1;
+        break;
 
       case LS_RESPONSE_STAT_ARR:
 
@@ -2834,6 +2946,8 @@ ls_response_unmarshal(struct ls_response *tmp,  struct evbuffer *evbuf)
 int
 ls_response_complete(struct ls_response *msg)
 {
+  if (!msg->rst_code_set)
+    return (-1);
   {
     int i;
     for (i = 0; i < msg->stat_arr_length; ++i) {
@@ -3177,6 +3291,8 @@ evtag_marshal_mknod_request(struct evbuffer *evbuf, ev_uint32_t tag, const struc
  */
 
 static struct mknod_response_access_ __mknod_response_base = {
+  mknod_response_rst_code_assign,
+  mknod_response_rst_code_get,
   mknod_response_stat_arr_assign,
   mknod_response_stat_arr_get,
   mknod_response_stat_arr_add,
@@ -3198,6 +3314,9 @@ mknod_response_new_with_arg(void *unused)
   }
   tmp->base = &__mknod_response_base;
 
+  tmp->rst_code = 0;
+  tmp->rst_code_set = 0;
+
   tmp->stat_arr = NULL;
   tmp->stat_arr_length = 0;
   tmp->stat_arr_num_allocated = 0;
@@ -3205,6 +3324,7 @@ mknod_response_new_with_arg(void *unused)
 
   return (tmp);
 }
+
 
 static int
 mknod_response_stat_arr_expand_to_hold_more(struct mknod_response *msg)
@@ -3235,6 +3355,14 @@ mknod_response_stat_arr_add(struct mknod_response *msg)
 error:
   --msg->stat_arr_length;
   return (NULL);
+}
+
+int
+mknod_response_rst_code_assign(struct mknod_response *msg, const ev_uint32_t value)
+{
+  msg->rst_code_set = 1;
+  msg->rst_code = value;
+  return (0);
 }
 
 int
@@ -3270,6 +3398,15 @@ mknod_response_stat_arr_assign(struct mknod_response *msg, int off,
 }
 
 int
+mknod_response_rst_code_get(struct mknod_response *msg, ev_uint32_t *value)
+{
+  if (msg->rst_code_set != 1)
+    return (-1);
+  *value = msg->rst_code;
+  return (0);
+}
+
+int
 mknod_response_stat_arr_get(struct mknod_response *msg, int offset,
     struct file_stat* *value)
 {
@@ -3282,6 +3419,7 @@ mknod_response_stat_arr_get(struct mknod_response *msg, int offset,
 void
 mknod_response_clear(struct mknod_response *tmp)
 {
+  tmp->rst_code_set = 0;
   if (tmp->stat_arr_set == 1) {
     int i;
     for (i = 0; i < tmp->stat_arr_length; ++i) {
@@ -3315,6 +3453,7 @@ mknod_response_free(struct mknod_response *tmp)
 
 void
 mknod_response_marshal(struct evbuffer *evbuf, const struct mknod_response *tmp){
+  evtag_marshal_int(evbuf, MKNOD_RESPONSE_RST_CODE, tmp->rst_code);
   if (tmp->stat_arr_set) {
     {
       int i;
@@ -3333,6 +3472,17 @@ mknod_response_unmarshal(struct mknod_response *tmp,  struct evbuffer *evbuf)
     if (evtag_peek(evbuf, &tag) == -1)
       return (-1);
     switch (tag) {
+
+      case MKNOD_RESPONSE_RST_CODE:
+
+        if (tmp->rst_code_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, MKNOD_RESPONSE_RST_CODE, &tmp->rst_code) == -1) {
+          event_warnx("%s: failed to unmarshal rst_code", __func__);
+          return (-1);
+        }
+        tmp->rst_code_set = 1;
+        break;
 
       case MKNOD_RESPONSE_STAT_ARR:
 
@@ -3365,6 +3515,8 @@ mknod_response_unmarshal(struct mknod_response *tmp,  struct evbuffer *evbuf)
 int
 mknod_response_complete(struct mknod_response *msg)
 {
+  if (!msg->rst_code_set)
+    return (-1);
   {
     int i;
     for (i = 0; i < msg->stat_arr_length; ++i) {
@@ -3680,6 +3832,8 @@ evtag_marshal_symlink_request(struct evbuffer *evbuf, ev_uint32_t tag, const str
  */
 
 static struct symlink_response_access_ __symlink_response_base = {
+  symlink_response_rst_code_assign,
+  symlink_response_rst_code_get,
   symlink_response_stat_assign,
   symlink_response_stat_get,
 };
@@ -3700,12 +3854,24 @@ symlink_response_new_with_arg(void *unused)
   }
   tmp->base = &__symlink_response_base;
 
+  tmp->rst_code = 0;
+  tmp->rst_code_set = 0;
+
   tmp->stat = NULL;
   tmp->stat_set = 0;
 
   return (tmp);
 }
 
+
+
+int
+symlink_response_rst_code_assign(struct symlink_response *msg, const ev_uint32_t value)
+{
+  msg->rst_code_set = 1;
+  msg->rst_code = value;
+  return (0);
+}
 
 int
 symlink_response_stat_assign(struct symlink_response *msg,
@@ -3745,6 +3911,15 @@ symlink_response_stat_assign(struct symlink_response *msg,
 }
 
 int
+symlink_response_rst_code_get(struct symlink_response *msg, ev_uint32_t *value)
+{
+  if (msg->rst_code_set != 1)
+    return (-1);
+  *value = msg->rst_code;
+  return (0);
+}
+
+int
 symlink_response_stat_get(struct symlink_response *msg, struct file_stat* *value)
 {
   if (msg->stat_set != 1) {
@@ -3760,6 +3935,7 @@ symlink_response_stat_get(struct symlink_response *msg, struct file_stat* *value
 void
 symlink_response_clear(struct symlink_response *tmp)
 {
+  tmp->rst_code_set = 0;
   if (tmp->stat_set == 1) {
     file_stat_free(tmp->stat);
     tmp->stat = NULL;
@@ -3777,6 +3953,7 @@ symlink_response_free(struct symlink_response *tmp)
 
 void
 symlink_response_marshal(struct evbuffer *evbuf, const struct symlink_response *tmp){
+  evtag_marshal_int(evbuf, SYMLINK_RESPONSE_RST_CODE, tmp->rst_code);
   evtag_marshal_file_stat(evbuf, SYMLINK_RESPONSE_STAT, tmp->stat);
 }
 
@@ -3788,6 +3965,17 @@ symlink_response_unmarshal(struct symlink_response *tmp,  struct evbuffer *evbuf
     if (evtag_peek(evbuf, &tag) == -1)
       return (-1);
     switch (tag) {
+
+      case SYMLINK_RESPONSE_RST_CODE:
+
+        if (tmp->rst_code_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, SYMLINK_RESPONSE_RST_CODE, &tmp->rst_code) == -1) {
+          event_warnx("%s: failed to unmarshal rst_code", __func__);
+          return (-1);
+        }
+        tmp->rst_code_set = 1;
+        break;
 
       case SYMLINK_RESPONSE_STAT:
 
@@ -3816,6 +4004,8 @@ symlink_response_unmarshal(struct symlink_response *tmp,  struct evbuffer *evbuf
 int
 symlink_response_complete(struct symlink_response *msg)
 {
+  if (!msg->rst_code_set)
+    return (-1);
   if (!msg->stat_set)
     return (-1);
   if (msg->stat_set && file_stat_complete(msg->stat) == -1)
@@ -3994,6 +4184,8 @@ evtag_marshal_readlink_request(struct evbuffer *evbuf, ev_uint32_t tag, const st
  */
 
 static struct readlink_response_access_ __readlink_response_base = {
+  readlink_response_rst_code_assign,
+  readlink_response_rst_code_get,
   readlink_response_path_assign,
   readlink_response_path_get,
 };
@@ -4014,12 +4206,24 @@ readlink_response_new_with_arg(void *unused)
   }
   tmp->base = &__readlink_response_base;
 
+  tmp->rst_code = 0;
+  tmp->rst_code_set = 0;
+
   tmp->path = NULL;
   tmp->path_set = 0;
 
   return (tmp);
 }
 
+
+
+int
+readlink_response_rst_code_assign(struct readlink_response *msg, const ev_uint32_t value)
+{
+  msg->rst_code_set = 1;
+  msg->rst_code = value;
+  return (0);
+}
 
 int
 readlink_response_path_assign(struct readlink_response *msg,
@@ -4030,6 +4234,15 @@ readlink_response_path_assign(struct readlink_response *msg,
   if ((msg->path = strdup(value)) == NULL)
     return (-1);
   msg->path_set = 1;
+  return (0);
+}
+
+int
+readlink_response_rst_code_get(struct readlink_response *msg, ev_uint32_t *value)
+{
+  if (msg->rst_code_set != 1)
+    return (-1);
+  *value = msg->rst_code;
   return (0);
 }
 
@@ -4045,6 +4258,7 @@ readlink_response_path_get(struct readlink_response *msg, char * *value)
 void
 readlink_response_clear(struct readlink_response *tmp)
 {
+  tmp->rst_code_set = 0;
   if (tmp->path_set == 1) {
     free(tmp->path);
     tmp->path = NULL;
@@ -4062,6 +4276,7 @@ readlink_response_free(struct readlink_response *tmp)
 
 void
 readlink_response_marshal(struct evbuffer *evbuf, const struct readlink_response *tmp){
+  evtag_marshal_int(evbuf, READLINK_RESPONSE_RST_CODE, tmp->rst_code);
   evtag_marshal_string(evbuf, READLINK_RESPONSE_PATH, tmp->path);
 }
 
@@ -4073,6 +4288,17 @@ readlink_response_unmarshal(struct readlink_response *tmp,  struct evbuffer *evb
     if (evtag_peek(evbuf, &tag) == -1)
       return (-1);
     switch (tag) {
+
+      case READLINK_RESPONSE_RST_CODE:
+
+        if (tmp->rst_code_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, READLINK_RESPONSE_RST_CODE, &tmp->rst_code) == -1) {
+          event_warnx("%s: failed to unmarshal rst_code", __func__);
+          return (-1);
+        }
+        tmp->rst_code_set = 1;
+        break;
 
       case READLINK_RESPONSE_PATH:
 
@@ -4098,6 +4324,8 @@ readlink_response_unmarshal(struct readlink_response *tmp,  struct evbuffer *evb
 int
 readlink_response_complete(struct readlink_response *msg)
 {
+  if (!msg->rst_code_set)
+    return (-1);
   if (!msg->path_set)
     return (-1);
   return (0);
@@ -4322,6 +4550,8 @@ evtag_marshal_lookup_request(struct evbuffer *evbuf, ev_uint32_t tag, const stru
  */
 
 static struct lookup_response_access_ __lookup_response_base = {
+  lookup_response_rst_code_assign,
+  lookup_response_rst_code_get,
   lookup_response_stat_arr_assign,
   lookup_response_stat_arr_get,
   lookup_response_stat_arr_add,
@@ -4343,6 +4573,9 @@ lookup_response_new_with_arg(void *unused)
   }
   tmp->base = &__lookup_response_base;
 
+  tmp->rst_code = 0;
+  tmp->rst_code_set = 0;
+
   tmp->stat_arr = NULL;
   tmp->stat_arr_length = 0;
   tmp->stat_arr_num_allocated = 0;
@@ -4350,6 +4583,7 @@ lookup_response_new_with_arg(void *unused)
 
   return (tmp);
 }
+
 
 static int
 lookup_response_stat_arr_expand_to_hold_more(struct lookup_response *msg)
@@ -4380,6 +4614,14 @@ lookup_response_stat_arr_add(struct lookup_response *msg)
 error:
   --msg->stat_arr_length;
   return (NULL);
+}
+
+int
+lookup_response_rst_code_assign(struct lookup_response *msg, const ev_uint32_t value)
+{
+  msg->rst_code_set = 1;
+  msg->rst_code = value;
+  return (0);
 }
 
 int
@@ -4415,6 +4657,15 @@ lookup_response_stat_arr_assign(struct lookup_response *msg, int off,
 }
 
 int
+lookup_response_rst_code_get(struct lookup_response *msg, ev_uint32_t *value)
+{
+  if (msg->rst_code_set != 1)
+    return (-1);
+  *value = msg->rst_code;
+  return (0);
+}
+
+int
 lookup_response_stat_arr_get(struct lookup_response *msg, int offset,
     struct file_stat* *value)
 {
@@ -4427,6 +4678,7 @@ lookup_response_stat_arr_get(struct lookup_response *msg, int offset,
 void
 lookup_response_clear(struct lookup_response *tmp)
 {
+  tmp->rst_code_set = 0;
   if (tmp->stat_arr_set == 1) {
     int i;
     for (i = 0; i < tmp->stat_arr_length; ++i) {
@@ -4460,6 +4712,7 @@ lookup_response_free(struct lookup_response *tmp)
 
 void
 lookup_response_marshal(struct evbuffer *evbuf, const struct lookup_response *tmp){
+  evtag_marshal_int(evbuf, LOOKUP_RESPONSE_RST_CODE, tmp->rst_code);
   if (tmp->stat_arr_set) {
     {
       int i;
@@ -4478,6 +4731,17 @@ lookup_response_unmarshal(struct lookup_response *tmp,  struct evbuffer *evbuf)
     if (evtag_peek(evbuf, &tag) == -1)
       return (-1);
     switch (tag) {
+
+      case LOOKUP_RESPONSE_RST_CODE:
+
+        if (tmp->rst_code_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, LOOKUP_RESPONSE_RST_CODE, &tmp->rst_code) == -1) {
+          event_warnx("%s: failed to unmarshal rst_code", __func__);
+          return (-1);
+        }
+        tmp->rst_code_set = 1;
+        break;
 
       case LOOKUP_RESPONSE_STAT_ARR:
 
@@ -4510,6 +4774,8 @@ lookup_response_unmarshal(struct lookup_response *tmp,  struct evbuffer *evbuf)
 int
 lookup_response_complete(struct lookup_response *msg)
 {
+  if (!msg->rst_code_set)
+    return (-1);
   {
     int i;
     for (i = 0; i < msg->stat_arr_length; ++i) {
@@ -4739,6 +5005,8 @@ evtag_marshal_unlink_request(struct evbuffer *evbuf, ev_uint32_t tag, const stru
  */
 
 static struct unlink_response_access_ __unlink_response_base = {
+  unlink_response_rst_code_assign,
+  unlink_response_rst_code_get,
   unlink_response_ino_assign,
   unlink_response_ino_get,
 };
@@ -4759,6 +5027,9 @@ unlink_response_new_with_arg(void *unused)
   }
   tmp->base = &__unlink_response_base;
 
+  tmp->rst_code = 0;
+  tmp->rst_code_set = 0;
+
   tmp->ino = 0;
   tmp->ino_set = 0;
 
@@ -4766,11 +5037,29 @@ unlink_response_new_with_arg(void *unused)
 }
 
 
+
+int
+unlink_response_rst_code_assign(struct unlink_response *msg, const ev_uint32_t value)
+{
+  msg->rst_code_set = 1;
+  msg->rst_code = value;
+  return (0);
+}
+
 int
 unlink_response_ino_assign(struct unlink_response *msg, const ev_uint64_t value)
 {
   msg->ino_set = 1;
   msg->ino = value;
+  return (0);
+}
+
+int
+unlink_response_rst_code_get(struct unlink_response *msg, ev_uint32_t *value)
+{
+  if (msg->rst_code_set != 1)
+    return (-1);
+  *value = msg->rst_code;
   return (0);
 }
 
@@ -4786,6 +5075,7 @@ unlink_response_ino_get(struct unlink_response *msg, ev_uint64_t *value)
 void
 unlink_response_clear(struct unlink_response *tmp)
 {
+  tmp->rst_code_set = 0;
   tmp->ino_set = 0;
 }
 
@@ -4797,6 +5087,7 @@ unlink_response_free(struct unlink_response *tmp)
 
 void
 unlink_response_marshal(struct evbuffer *evbuf, const struct unlink_response *tmp){
+  evtag_marshal_int(evbuf, UNLINK_RESPONSE_RST_CODE, tmp->rst_code);
   if (tmp->ino_set) {
     evtag_marshal_int64(evbuf, UNLINK_RESPONSE_INO, tmp->ino);
   }
@@ -4810,6 +5101,17 @@ unlink_response_unmarshal(struct unlink_response *tmp,  struct evbuffer *evbuf)
     if (evtag_peek(evbuf, &tag) == -1)
       return (-1);
     switch (tag) {
+
+      case UNLINK_RESPONSE_RST_CODE:
+
+        if (tmp->rst_code_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, UNLINK_RESPONSE_RST_CODE, &tmp->rst_code) == -1) {
+          event_warnx("%s: failed to unmarshal rst_code", __func__);
+          return (-1);
+        }
+        tmp->rst_code_set = 1;
+        break;
 
       case UNLINK_RESPONSE_INO:
 
@@ -4835,6 +5137,8 @@ unlink_response_unmarshal(struct unlink_response *tmp,  struct evbuffer *evbuf)
 int
 unlink_response_complete(struct unlink_response *msg)
 {
+  if (!msg->rst_code_set)
+    return (-1);
   return (0);
 }
 

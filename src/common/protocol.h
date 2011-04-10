@@ -35,5 +35,6 @@ int evtag_unmarshal_file_stat(struct evbuffer *evbuf, ev_uint32_t need_tag, stru
 
 void evtag_marshal_file_stat(struct evbuffer *evbuf, ev_uint32_t tag, const struct file_stat *msg);
 
+#define RST_CODE_NOT_FOUND 1
 
 #endif

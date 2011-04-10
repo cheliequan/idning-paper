@@ -145,72 +145,82 @@ int fs_setattr(uint64_t ino, struct file_stat *st)
 
     if (n == NULL) {
         st->ino = 0;
-        return 1;
+        return RST_CODE_NOT_FOUND;
     }
     n->data.fdata.length = st->size;
     fs_set_modify_flag(n, 0);
     version++;
     return 0;
 }
-
-int fs_stat(uint64_t ino, struct file_stat *st)
+//NEW
+int fs_stat(uint64_t ino, fsnode ** o_fsnode)
 {
     logging(LOG_DEUBG, "fs_stat(%" PRIu64 ")", ino);
     fsnode *n = fsnode_hash_find(ino);
     if (n == NULL) {
-        st->ino = 0;
-        return 1;
+        return RST_CODE_NOT_FOUND;
     }
     fs_set_visit_flag(n);
-    st->ino = ino;
-    st->size = n->data.fdata.length;
-    st->mode = n->mode;
-    EVTAG_ARRAY_ADD_VALUE(st, pos_arr, n->pos_arr[0]);
-    EVTAG_ARRAY_ADD_VALUE(st, pos_arr, n->pos_arr[1]);
+    *o_fsnode = n;
     return 0;
 }
 
+
+
+//NEW
 //返回的是children链表上的一个元素，链表中所有元素为兄弟.
-fsnode *fs_ls(uint64_t ino)
+int fs_ls(uint64_t ino, fsnode ** o_fsnode)
 {
     logging(LOG_DEUBG, "fs_ls(%" PRIu64 ")", ino);
     fsnode *n = fsnode_hash_find(ino);
     if (n == NULL) {
-        return NULL;
+        return RST_CODE_NOT_FOUND;
     }
     fs_set_visit_flag(n);
-    return n->data.ddata.children;
+    *o_fsnode = n->data.ddata.children;
+    return 0;
 }
 
-fsnode *fs_lookup(uint64_t parent_ino, char *name)
+//NEW
+int fs_lookup(uint64_t parent_ino, char *name, fsnode ** o_fsnode)
 {
     logging(LOG_DEUBG, "fs_lookup (parent_ino = %" PRIu64 " , name = %s)",
             parent_ino, name);
 
     fsnode *n = fsnode_hash_find(parent_ino);
+    if (n == NULL) {
+        return RST_CODE_NOT_FOUND;
+    }
     fs_set_visit_flag(n);
     n = n->data.ddata.children;
-    if (!n)
-        return NULL;
+    if (!n){
+        *o_fsnode = NULL;
+        return 0;
+    }
+
 
     fsnode *p;
 
     dlist_t *head = &(n->tree_dlist);
-    if (NULL == head)
-        return NULL;
+    if (NULL == head){
+        *o_fsnode = NULL;
+        return 0;
+    }
     dlist_t *pl;
 
     for (pl = head->next; pl != head; pl = pl->next) {
         p = dlist_data(pl, fsnode, tree_dlist);
 
         if (0 == strcmp(name, p->name)) {
-            return p;
+            *o_fsnode = p;
+            return 0;
         }
     }
     logging(LOG_DEUBG,
             "fs_lookup (parent_ino = %" PRIu64 " , name = %s) return NULL!!",
             parent_ino, name);
-    return NULL;
+    *o_fsnode = NULL;
+    return 0;
 }
 
 /*
@@ -242,7 +252,8 @@ void fs_del_tree_dfs(fsnode * root){
     free(root);
 }
 
-fsnode *fs_unlink(uint64_t parent_ino, char *name)
+//NEW
+int fs_unlink(uint64_t parent_ino, char *name)
 {
     logging(LOG_DEUBG, "fs_unlink(parent_ino = %" PRIu64 " , name = %s)",
             parent_ino, name);
@@ -250,7 +261,10 @@ fsnode *fs_unlink(uint64_t parent_ino, char *name)
     fsnode *n = fsnode_hash_find(parent_ino);
     fs_set_modify_flag(n, -1);
 
-    fsnode *s = fs_lookup(parent_ino, name);
+    fsnode *s ;
+    if (RST_CODE_NOT_FOUND == fs_lookup(parent_ino, name, &s)){
+        return RST_CODE_NOT_FOUND;
+    }
     logging(LOG_DEUBG, "parent find :%"PRIu64"",
             s->ino);
     fs_del_tree_dfs(s);
@@ -258,15 +272,19 @@ fsnode *fs_unlink(uint64_t parent_ino, char *name)
     /*fsnode_hash_remove(s);*/
     /*free(s);*/
     version++;
-    return NULL;
+    return 0;
 }
-
-fsnode *fs_mknod(uint64_t parent_ino, uint64_t ino, char *name, int type, int mode)
+//NEW
+int fs_mknod(uint64_t parent_ino, uint64_t ino, char *name, int type, 
+        int mode, fsnode ** o_fsnode)
 {
     logging(LOG_DEUBG, "fs_mknod(parent_ino = %" PRIu64 " , name = %s)",
             parent_ino, name);
     fsnode *n = fsnode_new();
     n->parent = fsnode_hash_find(parent_ino);
+    if (n->parent == NULL) {
+        return RST_CODE_NOT_FOUND;
+    }
     n->ino = ino;
     n->type = type;
     n->mode = mode;
@@ -286,10 +304,11 @@ fsnode *fs_mknod(uint64_t parent_ino, uint64_t ino, char *name, int type, int mo
     fsnode_tree_insert(n->parent, n);
     fs_set_modify_flag(n, 1);
     version++;
-    return n;
+    *o_fsnode = n;
+    return 0;
 }
-
-fsnode *fs_symlink(uint64_t parent_ino, uint64_t ino, const char *name, const char *path)
+//NEW
+int fs_symlink(uint64_t parent_ino, uint64_t ino, const char *name, const char *path, fsnode ** o_fsnode)
 {
     logging(LOG_DEUBG,
             "fs_symlink(parent_ino = %" PRIu64 " , name = %s, path = %s)",
@@ -305,6 +324,9 @@ fsnode *fs_symlink(uint64_t parent_ino, uint64_t ino, const char *name, const ch
     n->data.sdata.pleng = strlen(path);
 
     n->parent = fsnode_hash_find(parent_ino);
+    if (n->parent == NULL) {
+        return RST_CODE_NOT_FOUND;
+    }
 
     n->pos_arr[0] = n->parent->pos_arr[0];
     n->pos_arr[1] = n->parent->pos_arr[1];
@@ -312,15 +334,19 @@ fsnode *fs_symlink(uint64_t parent_ino, uint64_t ino, const char *name, const ch
     fsnode_tree_insert(n->parent, n);
     fs_set_modify_flag(n, 1);
     version++;
-    return n;
+    *o_fsnode = n;
+    return 0;
 }
 
-char *fs_readlink(uint64_t ino)
+//NEW
+int fs_readlink(uint64_t ino, char ** path)
 {
     fsnode *n = fsnode_hash_find(ino);
-    if (n && n->mode == S_IFLNK)
-        return n->data.sdata.path;
-    return NULL;
+    if (n && n->mode == S_IFLNK){
+        * path = n->data.sdata.path;
+        return 0;
+    }
+    return RST_CODE_NOT_FOUND;
 }
 
 /*

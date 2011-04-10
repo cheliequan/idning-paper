@@ -35,9 +35,22 @@ static void stat_cb(struct evrpc_status *status, struct stat_request *request , 
         event_loopexit(NULL);
 }
 
-static void ls_cb(struct evrpc_status *status, struct ls_request *request , struct ls_response * response , void *arg){
-    event_loopexit(NULL);
-}
+/*static void ls_cb(struct evrpc_status *status, struct ls_request *request , struct ls_response * response , void *arg){*/
+    /*event_loopexit(NULL);*/
+/*}*/
+
+/*static void lookup_cb(struct evrpc_status *status, struct lookup_request *request , struct lookup_response * response , void *arg){*/
+    /*event_loopexit(NULL);*/
+/*}*/
+
+/*static void unlink_cb(struct evrpc_status *status, struct unlink_request *request , struct unlink_response * response , void *arg){*/
+    /*event_loopexit(NULL);*/
+/*}*/
+
+/*static void setattr_cb(struct evrpc_status *status, struct setattr_request *request , struct setattr_response * response , void *arg){*/
+    /*event_loopexit(NULL);*/
+/*}*/
+
 static void mknod_cb(struct evrpc_status *status, struct mknod_request *request , struct mknod_response * response , void *arg){
 
     struct mds_req_ctx * ctx = (struct mds_req_ctx *) arg;
@@ -47,18 +60,6 @@ static void mknod_cb(struct evrpc_status *status, struct mknod_request *request 
     file_stat_copy(o_stat, stat);
     if (ctx->cb(ctx, o_stat) == 0)
         event_loopexit(NULL);
-}
-
-static void lookup_cb(struct evrpc_status *status, struct lookup_request *request , struct lookup_response * response , void *arg){
-    event_loopexit(NULL);
-}
-
-static void unlink_cb(struct evrpc_status *status, struct unlink_request *request , struct unlink_response * response , void *arg){
-    event_loopexit(NULL);
-}
-
-static void setattr_cb(struct evrpc_status *status, struct setattr_request *request , struct setattr_response * response , void *arg){
-    event_loopexit(NULL);
 }
 
 /*static void statfs_cb(struct evrpc_status *status, struct statfs_request *request , struct statfs_response* response , void *arg){*/
@@ -460,7 +461,7 @@ void mds_conn_init()
 
     conn_pool = connection_pool_new();
     pool_holder = evrpc_pool_holder_new();
-    pthread_t thread1;
+    /*pthread_t thread1;*/
     /*int ret = pthread_create( &thread1, NULL, ev_loop_func, NULL);*/
 
 

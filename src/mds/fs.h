@@ -73,21 +73,24 @@ inline fsnode *fsnode_hash_insert(fsnode * n);
 
 void fsnode_tree_insert(fsnode * p, fsnode * n);
 
-int fs_stat(uint64_t ino, struct file_stat *stat);
+
+/*************fs write op****************/
+
+int fs_mknod(uint64_t parent_ino, uint64_t ino, char *name, int type, int mode, fsnode ** o_fsnode);
+
+int fs_symlink(uint64_t parent_ino, uint64_t ino, const char *name, const char *path, fsnode ** o_fsnode);
+
+int fs_unlink(uint64_t parent_ino, char *name);
+
 int fs_setattr(uint64_t ino, struct file_stat *st);
 
-/*
- * create, mkdir
- * */
-fsnode *fs_mknod(uint64_t parent_ino, uint64_t ino, char *name, int type, int mode);
-fsnode *fs_symlink(uint64_t parent_ino, uint64_t ino, const char *name, const char *path);
-/*
- *  rmdir 
- *  rm
- * */
-fsnode *fs_unlink(uint64_t parent_ino, char *name);
-fsnode *fs_lookup(uint64_t parent_ino, char *name);
-fsnode *fs_ls(uint64_t ino);
+/*************fs read op****************/
+int fs_stat(uint64_t ino, fsnode ** o_fsnode);
+int fs_ls(uint64_t ino, fsnode ** o_fsnode);
+int fs_lookup(uint64_t parent_ino, char *name, fsnode ** o_fsnode);
+
+int fs_readlink(uint64_t ino, char ** path);
+
 
 void fs_statfs(int *total_space, int *avail_space, int *inode_cnt);
 int fs_mkfs();
@@ -96,7 +99,6 @@ int fs_mkfs();
 void fsnode_to_stat_copy(struct file_stat *t, fsnode * n);
 void stat_to_fsnode_copy(fsnode * n, struct file_stat *t);
 
-char *fs_readlink(uint64_t ino);
 int fs_rename();
 int fs_get_goal();
 int fs_set_goal();

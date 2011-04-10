@@ -17,7 +17,8 @@ static void setattr_handler(EVRPC_STRUCT(rpc_setattr) * rpc, void *arg)
     logging(LOG_DEUBG,
             "setattr(%" PRIu64 ", name=%s, size=%" PRIu64 ", mode=%04o)",
             stat->ino, stat->name, stat->size, stat->mode);
-    fs_setattr(stat->ino, stat);
+    int rst_code = fs_setattr(stat->ino, stat);
+    EVTAG_ASSIGN(response, rst_code, rst_code);
 
     struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
     EVTAG_ASSIGN(t, ino, stat->ino);
@@ -32,21 +33,17 @@ static void stat_handler(EVRPC_STRUCT(rpc_stat) * rpc, void *arg)
     mds_op_counter++;
     struct stat_request *request = rpc->request;
     struct stat_response *response = rpc->reply;
+    uint64_t ino;
+    EVTAG_ARRAY_GET(request, ino_arr, 0, &ino);
+    logging(LOG_DEUBG, "stat(%" PRIu64 ")", ino);
 
-    int cnt = EVTAG_ARRAY_LEN(request, ino_arr);
-    int i;
-    for (i = 0; i < cnt; i++) {
-        uint64_t ino;
-        EVTAG_ARRAY_GET(request, ino_arr, i, &ino);
-        logging(LOG_DEUBG, "stat(%" PRIu64 ")", ino);
+    struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
 
-        struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
-        //TODO;
-
-        fsnode *n = fsnode_hash_find(ino);
-        fsnode_to_stat_copy(t, n);
-        log_file_stat("stat return : ", t);
-    }
+    fsnode *n ;
+    int rst_code = fs_stat(ino, &n);
+    EVTAG_ASSIGN(response, rst_code, rst_code);
+    fsnode_to_stat_copy(t, n);
+    log_file_stat("stat return : ", t);
     EVRPC_REQUEST_DONE(rpc);
 }
 
@@ -79,7 +76,9 @@ static void ls_handler(EVRPC_STRUCT(rpc_stat) * rpc, void *arg)
     EVTAG_ASSIGN(t, type, p->type);
     EVTAG_ASSIGN(t, mode, p->mode);
 
-    fsnode *n = fs_ls(ino);
+    fsnode *n ;
+    int rst_code = fs_ls(ino, &n);
+    EVTAG_ASSIGN(response, rst_code, rst_code);
     if (n != NULL) {
         dlist_t *head = &(n->tree_dlist);
         dlist_t *pl;
@@ -128,8 +127,10 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
     logging(LOG_DEUBG, "mknod(parent=%" PRIu64 ", ino = % "PRIu64", name=%s, type=%d, mode=%04o)",
             request->parent_ino, request->ino, request->name, request->type, request->mode);
 
-    fsnode *n = fs_mknod(request->parent_ino, request->ino, request->name, request->type,
-                         request->mode);
+    fsnode *n ;
+    int rst_code = fs_mknod(request->parent_ino, request->ino, request->name, request->type,
+                         request->mode, &n);
+    EVTAG_ASSIGN(response, rst_code, rst_code);
 
 
     struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
@@ -138,6 +139,16 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
     /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 9); */
 
     log_file_stat("mknode return ", t);
+
+
+
+    //FIXME: this is just for debug. 
+    /*struct machine * self = get_self_machine();*/
+    /*if (self->mid == 10000){*/
+        /*struct machine * m = cluster_get_machine_by_mid(10002);*/
+        /*migrate_send_request(m->ip, m->port, n, self->mid, m->mid);*/
+    /*}*/
+    //end
 
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -153,7 +164,10 @@ static void symlink_handler(EVRPC_STRUCT(rpc_symlink) * rpc, void *arg)
     logging(LOG_DEUBG, "symlink(parent=%" PRIu64 ", ino = %"PRIu64", name=%s, path =%s)",
             request->parent_ino, request->ino, request->name, request->path);
 
-    fsnode *n = fs_symlink(request->parent_ino, request->ino, request->name, request->path);
+    fsnode *n ;
+    int rst_code = fs_symlink(request->parent_ino, request->ino, request->name, request->path, &n);
+    EVTAG_ASSIGN(response, rst_code, rst_code);
+
     struct file_stat *t;
     EVTAG_GET(response, stat, &t);
     fsnode_to_stat_copy(t, n);
@@ -171,7 +185,10 @@ static void readlink_handler(EVRPC_STRUCT(rpc_readlink) * rpc, void *arg)
 
     struct readlink_request *request = rpc->request;
     struct readlink_response *response = rpc->reply;
-    char *p = fs_readlink(request->ino);
+
+    char *p ; 
+    int rst_code = fs_readlink(request->ino, &p);
+    EVTAG_ASSIGN(response, rst_code, rst_code);
 
     logging(LOG_DEUBG, "readlink(ino =%" PRIu64 ")", request->ino);
     logging(LOG_DEUBG, "readlink return : %s", p);
@@ -192,7 +209,10 @@ static void lookup_handler(EVRPC_STRUCT(rpc_lookup) * rpc, void *arg)
     logging(LOG_DEUBG, "lookup(parent=%" PRIu64 ", name=%s)",
             request->parent_ino, request->name);
 
-    fsnode *n = fs_lookup(request->parent_ino, request->name);
+    fsnode *n ;
+    int rst_code = fs_lookup(request->parent_ino, request->name, &n);
+    EVTAG_ASSIGN(response, rst_code, rst_code);
+
     struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
 
     fsnode_to_stat_copy(t, n);
@@ -207,12 +227,13 @@ static void unlink_handler(EVRPC_STRUCT(rpc_unlink) * rpc, void *arg)
     mds_op_counter++;
 
     struct unlink_request *request = rpc->request;
-    //struct unlink_response * response = rpc->reply;
+    struct unlink_response * response = rpc->reply;
 
     logging(LOG_DEUBG, "unlink (parent=%" PRIu64 ", name=%s)",
             request->parent_ino, request->name);
 
-    fs_unlink(request->parent_ino, request->name);
+    int rst_code = fs_unlink(request->parent_ino, request->name);
+    EVTAG_ASSIGN(response, rst_code, rst_code);
 
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -317,7 +338,7 @@ static void update_clustermap_from_cmgr_on_timer_cb(evutil_socket_t fd, short wh
     ping_send_request();
 
 
-    if( (load_new > 1024) && (  1.0 * load_new/ load_max  > 0.75)){ // is about 0.9 max load for a long time
+    if( (load_new > 1024) && (  1.0 * load_new/ load_max  > 0.55)){ // is about 0.9 max load for a long time
         /*do_migration;*/
         logging(LOG_WARN, "is going to migrate");
 
@@ -333,15 +354,18 @@ fsnode * locate_hot_sub_tree(fsnode * root){
     DBG();
     fsnode *n = root->data.ddata.children;
     fsnode *rst = n;
+    int max_access_count = 0;
     fsnode *p;
     if (n != NULL) {
         dlist_t *head = &(n->tree_dlist);
         dlist_t *pl;
         for (pl = head->next; pl != head; pl = pl->next) {
             p = dlist_data(pl, fsnode, tree_dlist);
-            if (p->access_counter > rst->access_counter)
+            if (p->access_counter > max_access_count){
                 rst = p;
-            p->access_counter = 0;
+                max_access_count = p->access_counter;
+            }
+            p->access_counter = 0; //FIXME: bug
         }
     }
     return rst;
@@ -363,7 +387,9 @@ void do_migrate(){
     fsnode * n = fsnode_hash_find(FS_ROOT_INO);
     while(1){
         n = locate_hot_sub_tree(n);
-        if (n->tree_cnt < 1024) {// 1w
+        if (n->tree_cnt < 10240) {// 1w
+            if (n == NULL)
+                return ;
             logging(LOG_INFO, "migrate on %"PRIu64". %s, tree_cnt : %d", n->ino, n->name, n->tree_cnt);
             do_migrate2(n);
             return;

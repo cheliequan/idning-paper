@@ -57,7 +57,7 @@ void migrate_handler(EVRPC_STRUCT(rpc_migrate) * rpc, void *arg)
 }
 
 static void unlink_cb(struct evrpc_status *status, struct unlink_request *request , struct unlink_response * response , void *arg){
-    event_loopexit(NULL);
+    event_base_loopexit(mds_mds_ev_base, NULL);
 }
 
 
@@ -70,6 +70,7 @@ void migrate_cb(struct evrpc_status *status, struct migrate_request *req,
     if(root->modifiy_flag){
         /*invalid it at dest mds*/
         /*assert(0);*/
+        logging (LOG_INFO,"I found that it's modifid after migrate request send, will delete it another node");
 
         struct unlink_request *unlink_req = unlink_request_new();
         struct unlink_response *unlink_response = unlink_response_new();
@@ -111,6 +112,8 @@ void migrate_add_fsnode_dfs(struct migrate_request * req, fsnode * root){
 int migrate_send_request(char * ip, int port, fsnode * root, int from_mds, int to_mds)
 {
     DBG();
+    root->modifiy_flag = 0;
+    logging(LOG_DEUBG, "going to migrate from %d to %d , tree root is : %s", from_mds, to_mds, root->name);
     struct migrate_request * req= migrate_request_new();
     struct migrate_response * response = migrate_response_new();
     EVTAG_ASSIGN(req, from_mds, from_mds);
