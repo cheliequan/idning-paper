@@ -139,7 +139,6 @@ int buffered_write_flush(struct file_stat *stat)
 static struct evbuffer *evbuffer_dup(struct evbuffer *orig)
 {
     int len = evbuffer_get_length(orig);
-    logging(LOG_INFO, "dup buffer len: %d", len);
     char *data = malloc(len);   // this maybe large!!!!!
     if (!data)
         logging(LOG_ERROR, "ning: no memory on evbuffer_dup");
@@ -156,8 +155,6 @@ static struct evbuffer *evbuffer_dup(struct evbuffer *orig)
 static void flush_write_buf(struct file_stat *stat, struct write_buf *b)
 {
     DBG();
-    logging(LOG_INFO, "flush_write_buf buflen: %d",
-            evbuffer_get_length(b->evb));
 
     int i;
     for (i = 0; i < 2; i++) {

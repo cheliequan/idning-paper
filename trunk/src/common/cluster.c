@@ -74,6 +74,8 @@ void ping_handler(EVRPC_STRUCT(rpc_ping) * rpc, void *arg)
     if (ping->mid == 0) {
         mid = cluster_uuid();
         EVTAG_ASSIGN(pong, mid, mid);
+    }else {
+        EVTAG_ASSIGN(pong, mid, ping->mid);
     }
 
     struct machine * m = cluster_add(remote_ip, remote_port, type, mid);

@@ -49,8 +49,8 @@ void write_chunk(uint64_t chunkid, struct evhttp_request *req)
     hdd_chunk *chunk = hdd_create_chunk(chunkid, 0);    //TODO
 
     int fd = open(chunk->path, O_WRONLY | O_CREAT, 0755);
-    logging(LOG_INFO, "write seek to : %" PRIu64 "", start);
-    logging(LOG_INFO, "evbuffer_get_length(input) = %d",
+    logging(LOG_DEUBG, "write seek to : %" PRIu64 "", start);
+    logging(LOG_DEUBG, "evbuffer_get_length(input) = %d",
             evbuffer_get_length(input));
     lseek(fd, start, SEEK_SET);
 

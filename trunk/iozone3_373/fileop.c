@@ -270,56 +270,57 @@ int main(int argc, char **argv)
 	{
 		clear_stats();
 		x=i;
-	   /*
-	    * Dir Create test 
-	    */
-	   purge_buffer_cache();
-	   dir_create(x);
+	   ///*
+	   // * Dir Create test 
+	   // */
+	   //purge_buffer_cache();
+	   //dir_create(x);
 
-	   if(verbose)
-	   {
-	      printf("mkdir:   Dirs = %9lld ",stats[_STAT_DIR_CREATE].counter);
-	      printf("Total Time = %12.9f seconds\n", stats[_STAT_DIR_CREATE].total_time);
-	      printf("         Avg mkdir(s)/sec     = %12.2f (%12.9f seconds/op)\n",
-			stats[_STAT_DIR_CREATE].counter/stats[_STAT_DIR_CREATE].total_time,
-			stats[_STAT_DIR_CREATE].total_time/stats[_STAT_DIR_CREATE].counter);
-	      printf("         Best mkdir(s)/sec    = %12.2f (%12.9f seconds/op)\n",1/stats[_STAT_DIR_CREATE].best,stats[_STAT_DIR_CREATE].best);
-	      printf("         Worst mkdir(s)/sec   = %12.2f (%12.9f seconds/op)\n\n",1/stats[_STAT_DIR_CREATE].worst,stats[_STAT_DIR_CREATE].worst);
-	   }
+	   //if(verbose)
+	   //{
+	   //   printf("mkdir:   Dirs = %9lld ",stats[_STAT_DIR_CREATE].counter);
+	   //   printf("Total Time = %12.9f seconds\n", stats[_STAT_DIR_CREATE].total_time);
+	   //   printf("         Avg mkdir(s)/sec     = %12.2f (%12.9f seconds/op)\n",
+	   // 	stats[_STAT_DIR_CREATE].counter/stats[_STAT_DIR_CREATE].total_time,
+	   // 	stats[_STAT_DIR_CREATE].total_time/stats[_STAT_DIR_CREATE].counter);
+	   //   printf("         Best mkdir(s)/sec    = %12.2f (%12.9f seconds/op)\n",1/stats[_STAT_DIR_CREATE].best,stats[_STAT_DIR_CREATE].best);
+	   //   printf("         Worst mkdir(s)/sec   = %12.2f (%12.9f seconds/op)\n\n",1/stats[_STAT_DIR_CREATE].worst,stats[_STAT_DIR_CREATE].worst);
+	   //}
 
-	   /*
-	    * Dir Traverse test
-	    */
-	   purge_buffer_cache();
-	   dir_traverse(x);
+	   ///*
+	   // * Dir Traverse test
+	   // */
+	   //purge_buffer_cache();
+	   //dir_traverse(x);
 
-	   if(verbose)
-	   {
-	      printf("chdir:   Dirs = %9lld ",stats[_STAT_DIR_TRAVERSE].counter);
-	      printf("Total Time = %12.9f seconds\n", stats[_STAT_DIR_TRAVERSE].total_time);
-	      printf("         Avg chdir(s)/sec     = %12.2f (%12.9f seconds/op)\n",
-			stats[_STAT_DIR_TRAVERSE].counter/stats[_STAT_DIR_TRAVERSE].total_time,
-			stats[_STAT_DIR_TRAVERSE].total_time/stats[_STAT_DIR_TRAVERSE].counter);
-	      printf("         Best chdir(s)/sec    = %12.2f (%12.9f seconds/op)\n",1/stats[_STAT_DIR_TRAVERSE].best,stats[_STAT_DIR_TRAVERSE].best);
-	      printf("         Worst chdir(s)/sec   = %12.2f (%12.9f seconds/op)\n\n",1/stats[_STAT_DIR_TRAVERSE].worst,stats[_STAT_DIR_TRAVERSE].worst);
-	   }
+	   //if(verbose)
+	   //{
+	   //   printf("chdir:   Dirs = %9lld ",stats[_STAT_DIR_TRAVERSE].counter);
+	   //   printf("Total Time = %12.9f seconds\n", stats[_STAT_DIR_TRAVERSE].total_time);
+	   //   printf("         Avg chdir(s)/sec     = %12.2f (%12.9f seconds/op)\n",
+	   // 	stats[_STAT_DIR_TRAVERSE].counter/stats[_STAT_DIR_TRAVERSE].total_time,
+	   // 	stats[_STAT_DIR_TRAVERSE].total_time/stats[_STAT_DIR_TRAVERSE].counter);
+	   //   printf("         Best chdir(s)/sec    = %12.2f (%12.9f seconds/op)\n",1/stats[_STAT_DIR_TRAVERSE].best,stats[_STAT_DIR_TRAVERSE].best);
+	   //   printf("         Worst chdir(s)/sec   = %12.2f (%12.9f seconds/op)\n\n",1/stats[_STAT_DIR_TRAVERSE].worst,stats[_STAT_DIR_TRAVERSE].worst);
+	   //}
+
 
 	   /*
 	    * Dir delete test
 	    */
-	   purge_buffer_cache();
-	   dir_delete(x);
+	   //purge_buffer_cache();
+	   //dir_delete(x);
 
-	   if(verbose)
-	   {
-	   printf("rmdir:   Dirs = %9lld ",stats[_STAT_DIR_DELETE].counter);
-	   printf("Total Time = %12.9f seconds\n",stats[_STAT_DIR_DELETE].total_time);
-	   printf("         Avg rmdir(s)/sec     = %12.2f (%12.9f seconds/op)\n",
-			stats[_STAT_DIR_DELETE].counter/stats[_STAT_DIR_DELETE].total_time,
-			stats[_STAT_DIR_DELETE].total_time/stats[_STAT_DIR_DELETE].counter);
-	   printf("         Best rmdir(s)/sec    = %12.2f (%12.9f seconds/op)\n",1/stats[_STAT_DIR_DELETE].best,stats[_STAT_DIR_DELETE].best);
-	   printf("         Worst rmdir(s)/sec   = %12.2f (%12.9f seconds/op)\n\n",1/stats[_STAT_DIR_DELETE].worst,stats[_STAT_DIR_DELETE].worst);
-	   }
+	   //if(verbose)
+	   //{
+	   //printf("rmdir:   Dirs = %9lld ",stats[_STAT_DIR_DELETE].counter);
+	   //printf("Total Time = %12.9f seconds\n",stats[_STAT_DIR_DELETE].total_time);
+	   //printf("         Avg rmdir(s)/sec     = %12.2f (%12.9f seconds/op)\n",
+	   // 	stats[_STAT_DIR_DELETE].counter/stats[_STAT_DIR_DELETE].total_time,
+	   // 	stats[_STAT_DIR_DELETE].total_time/stats[_STAT_DIR_DELETE].counter);
+	   //printf("         Best rmdir(s)/sec    = %12.2f (%12.9f seconds/op)\n",1/stats[_STAT_DIR_DELETE].best,stats[_STAT_DIR_DELETE].best);
+	   //printf("         Worst rmdir(s)/sec   = %12.2f (%12.9f seconds/op)\n\n",1/stats[_STAT_DIR_DELETE].worst,stats[_STAT_DIR_DELETE].worst);
+	   //}
 
 	   /*
 	    * Create test 
@@ -357,88 +358,91 @@ int main(int argc, char **argv)
 			1/stats[_STAT_CLOSE].worst,stats[_STAT_CLOSE].worst);
 	   }
 
-	   /*
-	    * Stat test 
-	    */
-	   purge_buffer_cache();
-	   file_stat(x);
+	   //by ning
+	   ///*
+	   // * Stat test 
+	   // */
+	   //purge_buffer_cache();
+	   //file_stat(x);
 
-	   if(verbose)
-	   {
-	      printf("stat:    Files = %9lld ",stats[_STAT_STAT].counter);
-	      printf("Total Time = %12.9f seconds\n", stats[_STAT_STAT].total_time);
-	      printf("         Avg stat(s)/sec      = %12.2f (%12.9f seconds/op)\n",
-			stats[_STAT_STAT].counter/stats[_STAT_STAT].total_time,
-			stats[_STAT_STAT].total_time/stats[_STAT_STAT].counter);
-	      printf("         Best stat(s)/sec     = %12.2f (%12.9f seconds/op)\n",
-			1/stats[_STAT_STAT].best,stats[_STAT_STAT].best);
-	      printf("         Worst stat(s)/sec    = %12.2f (%12.9f seconds/op)\n\n",
-			1/stats[_STAT_STAT].worst,stats[_STAT_STAT].worst);
-	   }
-	   /*
-	    * Read test 
-	    */
-	   purge_buffer_cache();
-	   file_read(x);
+	   //if(verbose)
+	   //{
+	   //   printf("stat:    Files = %9lld ",stats[_STAT_STAT].counter);
+	   //   printf("Total Time = %12.9f seconds\n", stats[_STAT_STAT].total_time);
+	   //   printf("         Avg stat(s)/sec      = %12.2f (%12.9f seconds/op)\n",
+	   // 	stats[_STAT_STAT].counter/stats[_STAT_STAT].total_time,
+	   // 	stats[_STAT_STAT].total_time/stats[_STAT_STAT].counter);
+	   //   printf("         Best stat(s)/sec     = %12.2f (%12.9f seconds/op)\n",
+	   // 	1/stats[_STAT_STAT].best,stats[_STAT_STAT].best);
+	   //   printf("         Worst stat(s)/sec    = %12.2f (%12.9f seconds/op)\n\n",
+	   // 	1/stats[_STAT_STAT].worst,stats[_STAT_STAT].worst);
+	   //}
+	   ///*
+	   // * Read test 
+	   // */
+	   //purge_buffer_cache();
+	   //file_read(x);
 
-	   if(verbose)
-	   {
-	      printf("open:    Files = %9lld ",stats[_STAT_OPEN].counter);
-	      printf("Total Time = %12.9f seconds\n", stats[_STAT_OPEN].total_time);
-	      printf("         Avg open(s)/sec      = %12.2f (%12.9f seconds/op)\n",
-			stats[_STAT_OPEN].counter/stats[_STAT_OPEN].total_time,
-			stats[_STAT_OPEN].total_time/stats[_STAT_OPEN].counter);
-	      printf("         Best open(s)/sec     = %12.2f (%12.9f seconds/op)\n",
-			1/stats[_STAT_OPEN].best,stats[_STAT_OPEN].best);
-	      printf("         Worst open(s)/sec    = %12.2f (%12.9f seconds/op)\n\n",
-			1/stats[_STAT_OPEN].worst,stats[_STAT_OPEN].worst);
+	   //if(verbose)
+	   //{
+	   //   printf("open:    Files = %9lld ",stats[_STAT_OPEN].counter);
+	   //   printf("Total Time = %12.9f seconds\n", stats[_STAT_OPEN].total_time);
+	   //   printf("         Avg open(s)/sec      = %12.2f (%12.9f seconds/op)\n",
+	   // 	stats[_STAT_OPEN].counter/stats[_STAT_OPEN].total_time,
+	   // 	stats[_STAT_OPEN].total_time/stats[_STAT_OPEN].counter);
+	   //   printf("         Best open(s)/sec     = %12.2f (%12.9f seconds/op)\n",
+	   // 	1/stats[_STAT_OPEN].best,stats[_STAT_OPEN].best);
+	   //   printf("         Worst open(s)/sec    = %12.2f (%12.9f seconds/op)\n\n",
+	   // 	1/stats[_STAT_OPEN].worst,stats[_STAT_OPEN].worst);
 
-	      printf("read:    Files = %9lld ",stats[_STAT_READ].counter);
-	      printf("Total Time = %12.9f seconds\n", stats[_STAT_READ].total_time);
-	      printf("         Avg read(s)/sec      = %12.2f (%12.9f seconds/op)\n",
-			stats[_STAT_READ].counter/stats[_STAT_READ].total_time,
-			stats[_STAT_READ].total_time/stats[_STAT_READ].counter);
-	      printf("         Best read(s)/sec     = %12.2f (%12.9f seconds/op)\n",
-			1/stats[_STAT_READ].best,stats[_STAT_READ].best);
-	      printf("         Worst read(s)/sec    = %12.2f (%12.9f seconds/op)\n\n",
-			1/stats[_STAT_READ].worst,stats[_STAT_READ].worst);
-	   }
+	   //   printf("read:    Files = %9lld ",stats[_STAT_READ].counter);
+	   //   printf("Total Time = %12.9f seconds\n", stats[_STAT_READ].total_time);
+	   //   printf("         Avg read(s)/sec      = %12.2f (%12.9f seconds/op)\n",
+	   // 	stats[_STAT_READ].counter/stats[_STAT_READ].total_time,
+	   // 	stats[_STAT_READ].total_time/stats[_STAT_READ].counter);
+	   //   printf("         Best read(s)/sec     = %12.2f (%12.9f seconds/op)\n",
+	   // 	1/stats[_STAT_READ].best,stats[_STAT_READ].best);
+	   //   printf("         Worst read(s)/sec    = %12.2f (%12.9f seconds/op)\n\n",
+	   // 	1/stats[_STAT_READ].worst,stats[_STAT_READ].worst);
+	   //}
 
-	   /*
-	    * Access test 
-	    */
-	   purge_buffer_cache();
-	   file_access(x);
-	   if(verbose)
-	   {
-	      printf("access:  Files = %9lld ",stats[_STAT_ACCESS].counter);
-	      printf("Total Time = %12.9f seconds\n", stats[_STAT_ACCESS].total_time);
-	      printf("         Avg access(s)/sec    = %12.2f (%12.9f seconds/op)\n",
-			stats[_STAT_ACCESS].counter/stats[_STAT_ACCESS].total_time,
-			stats[_STAT_ACCESS].total_time/stats[_STAT_ACCESS].counter);
-	      printf("         Best access(s)/sec   = %12.2f (%12.9f seconds/op)\n",
-			1/stats[_STAT_ACCESS].best,stats[_STAT_ACCESS].best);
-	      printf("         Worst access(s)/sec  = %12.2f (%12.9f seconds/op)\n\n",
-			1/stats[_STAT_ACCESS].worst,stats[_STAT_ACCESS].worst);
-	   }
-	   /*
-	    * Chmod test 
-	    */
-	   purge_buffer_cache();
-	   file_chmod(x);
+	   //by ning
+	   ///*
+	   // * Access test 
+	   // */
+	   //purge_buffer_cache();
+	   //file_access(x);
+	   //if(verbose)
+	   //{
+	   //   printf("access:  Files = %9lld ",stats[_STAT_ACCESS].counter);
+	   //   printf("Total Time = %12.9f seconds\n", stats[_STAT_ACCESS].total_time);
+	   //   printf("         Avg access(s)/sec    = %12.2f (%12.9f seconds/op)\n",
+	   // 	stats[_STAT_ACCESS].counter/stats[_STAT_ACCESS].total_time,
+	   // 	stats[_STAT_ACCESS].total_time/stats[_STAT_ACCESS].counter);
+	   //   printf("         Best access(s)/sec   = %12.2f (%12.9f seconds/op)\n",
+	   // 	1/stats[_STAT_ACCESS].best,stats[_STAT_ACCESS].best);
+	   //   printf("         Worst access(s)/sec  = %12.2f (%12.9f seconds/op)\n\n",
+	   // 	1/stats[_STAT_ACCESS].worst,stats[_STAT_ACCESS].worst);
+	   //}
+	   //by ning
+	   ///*
+	   // * Chmod test 
+	   // */
+	   //purge_buffer_cache();
+	   //file_chmod(x);
 
-	   if(verbose)
-	   {
-	      printf("chmod:   Files = %9lld ",stats[_STAT_CHMOD].counter);
-	      printf("Total Time = %12.9f seconds\n", stats[_STAT_CHMOD].total_time);
-	      printf("         Avg chmod(s)/sec     = %12.2f (%12.9f seconds/op)\n",
-			stats[_STAT_CHMOD].counter/stats[_STAT_CHMOD].total_time,
-			stats[_STAT_CHMOD].total_time/stats[_STAT_CHMOD].counter);
-	      printf("         Best chmod(s)/sec    = %12.2f (%12.9f seconds/op)\n",
-			1/stats[_STAT_CHMOD].best,stats[_STAT_CHMOD].best);
-	      printf("         Worst chmod(s)/sec   = %12.2f (%12.9f seconds/op)\n\n",
-			1/stats[_STAT_CHMOD].worst,stats[_STAT_CHMOD].worst);
-	   }
+	   //if(verbose)
+	   //{
+	   //   printf("chmod:   Files = %9lld ",stats[_STAT_CHMOD].counter);
+	   //   printf("Total Time = %12.9f seconds\n", stats[_STAT_CHMOD].total_time);
+	   //   printf("         Avg chmod(s)/sec     = %12.2f (%12.9f seconds/op)\n",
+	   // 	stats[_STAT_CHMOD].counter/stats[_STAT_CHMOD].total_time,
+	   // 	stats[_STAT_CHMOD].total_time/stats[_STAT_CHMOD].counter);
+	   //   printf("         Best chmod(s)/sec    = %12.2f (%12.9f seconds/op)\n",
+	   // 	1/stats[_STAT_CHMOD].best,stats[_STAT_CHMOD].best);
+	   //   printf("         Worst chmod(s)/sec   = %12.2f (%12.9f seconds/op)\n\n",
+	   // 	1/stats[_STAT_CHMOD].worst,stats[_STAT_CHMOD].worst);
+	   //}
 	   /*
 	    * readdir test 
 	    */

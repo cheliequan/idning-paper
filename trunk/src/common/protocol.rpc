@@ -41,7 +41,8 @@ struct stat_request {
 }
 
 struct stat_response {
-    array struct[file_stat] stat_arr    = 1;
+    int rst_code                        = 1;
+    array struct[file_stat] stat_arr    = 2;
 }
 
 
@@ -50,7 +51,8 @@ struct setattr_request {
 }
 
 struct setattr_response {
-    array struct[file_stat] stat_arr    = 1;
+    int rst_code                        = 1;
+    array struct[file_stat] stat_arr    = 2;
 }
 
 struct ls_request {
@@ -58,7 +60,8 @@ struct ls_request {
 }
 
 struct ls_response {
-    array struct[file_stat] stat_arr    = 1;
+    int rst_code                        = 1;
+    array struct[file_stat] stat_arr    = 2;
 }
 
 /*create & mkdir*/
@@ -71,6 +74,7 @@ struct mknod_request {
 }
 
 struct mknod_response {
+    int rst_code                        = 2;
     array struct[file_stat] stat_arr    = 1;
 }
 
@@ -83,7 +87,8 @@ struct symlink_request {
 }
 
 struct symlink_response {
-    struct[file_stat] stat              = 1;
+    int rst_code                        = 1;
+    struct[file_stat] stat              = 2;
 }
 
 struct readlink_request {
@@ -91,7 +96,8 @@ struct readlink_request {
 }
 
 struct readlink_response {
-    string path                         = 1;
+    int rst_code                        = 1;
+    string path                         = 2;
 }
 
 struct lookup_request {
@@ -100,7 +106,8 @@ struct lookup_request {
 }
 
 struct lookup_response {
-    array struct[file_stat] stat_arr    = 1;
+    int rst_code                        = 1;
+    array struct[file_stat] stat_arr    = 2;
 }
 
 
@@ -110,7 +117,8 @@ struct unlink_request {
 }
 
 struct unlink_response {
-    optional int64 ino                  = 1;
+    int rst_code                        = 1;
+    optional int64 ino                  = 2;
 }
 
 
