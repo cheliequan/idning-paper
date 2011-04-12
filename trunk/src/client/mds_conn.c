@@ -73,7 +73,6 @@ static void mknod_cb(struct evrpc_status *status, struct mknod_request *request 
 int setattr_send_request(char *ip, int port, struct file_stat *stat_arr)
 {
     DBG();
-    int ret = 0;
     struct setattr_request *req = setattr_request_new();
     struct setattr_response *response = setattr_response_new();
 
@@ -85,17 +84,22 @@ int setattr_send_request(char *ip, int port, struct file_stat *stat_arr)
                         req, (marshal_func) setattr_request_marshal,
                         response, (unmarshal_func) setattr_response_unmarshal);
 
-    int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
-    if (cnt != 1) {
-        logging(LOG_ERROR, "setattr_send_request return cnt != 1, cnt= %d",
-                cnt);
-        ret = -1;
+    int rst = response->rst_code;
+    if (rst!=0){
+        logging(LOG_WARN, "setattr_send_request return rst != 0");
         goto done;
     }
+    int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
+    /*if (cnt != 1) {*/
+        /*logging(LOG_ERROR, "setattr_send_request return cnt != 1, cnt= %d",*/
+                /*cnt);*/
+        /*ret = -1;*/
+        /*goto done;*/
+    /*}*/
   done:
     setattr_request_free(req);
     setattr_response_free(response);
-    return ret;
+    return rst;
 
 }
 
@@ -117,8 +121,9 @@ int stat_send_request_async(char *ip, int port, uint64_t * ino_arr, int len, str
 int stat_send_request(char *ip, int port, uint64_t * ino_arr, int len,
                       struct file_stat *stat_arr)
 {
-    DBG();
-    int ret = 0;
+    logging(LOG_DEUBG, "stat_send_request, %s:%d, %"PRIu64"", ip, port ,ino_arr[0]);
+
+    int rst = 0;
     struct stat_request *req = stat_request_new();
     struct stat_response *response = stat_response_new();
     int i;
@@ -131,23 +136,25 @@ int stat_send_request(char *ip, int port, uint64_t * ino_arr, int len,
                         response, (unmarshal_func) stat_response_unmarshal);
 
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
-    if (cnt != len) {
-        ret = -1;
+    rst = response->rst_code;
+    if (cnt != len || rst!= 0) {
+        logging(LOG_WARN, "stat_send_request return rst != 0");
         goto done;
     }
     struct file_stat *stat;
     for (i = 0; i < len; i++) {
         EVTAG_ARRAY_GET(response, stat_arr, i, &stat);
         if (stat->ino == 0) {
-            ret = -1;
+            rst = -1;
             goto done;
         }
         file_stat_copy(stat_arr + i, stat);
+        log_file_stat("stat get file stat: ", stat);
     }
   done:
     stat_request_free(req);
     stat_response_free(response);
-    return ret;
+    return rst;
 }
 
 //seams same as stat_send_request
@@ -166,6 +173,11 @@ int ls_send_request(char *ip, int port, uint64_t ino,
     rpc_grneral_request(ip, port, "/.rpc.rpc_ls",
                         req, (marshal_func) ls_request_marshal,
                         response, (unmarshal_func) ls_response_unmarshal);
+    int rst = response->rst_code;
+    if (rst!=0){
+        logging(LOG_WARN, "ls_send_request return rst != 0");
+        goto done;
+    }
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
 
     int i;
@@ -181,13 +193,14 @@ int ls_send_request(char *ip, int port, uint64_t ino,
         file_stat_copy(stat_arr[i], stat);
         /*log_file_stat("ls get : ", stat);*/
     }
+done:
     ls_request_free(req);
     ls_response_free(response);
 
     *o_stat_arr = stat_arr;
     *o_cnt = cnt;
 
-    return cnt;
+    return rst;
 }
 
 /*struct mknod_reqeust{*/
@@ -254,13 +267,19 @@ int mknod_send_request(char *ip, int port,
                         req, (marshal_func) mknod_request_marshal,
                         response, (unmarshal_func) mknod_response_unmarshal);
 
+    int rst = response->rst_code;
+    if (rst!=0){
+        logging(LOG_WARN, "mknod_send_request return rst != 0");
+        goto done;
+    }
     struct file_stat *stat;
     EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
     file_stat_copy(o_stat, stat);
 
+done:
     mknod_request_free(req);
     mknod_response_free(response);
-    return 0;
+    return rst;
 }
 
 int symlink_send_request(char *ip, int port, uint64_t parent_ino, uint64_t ino, 
@@ -283,15 +302,21 @@ int symlink_send_request(char *ip, int port, uint64_t parent_ino, uint64_t ino,
                         req, (marshal_func) symlink_request_marshal,
                         response, (unmarshal_func) symlink_response_unmarshal);
 
+    int rst = response->rst_code;
+    if (rst!=0){
+        logging(LOG_WARN, "symlink_send_request return rst != 0");
+        goto done;
+    }
     struct file_stat *stat;
     EVTAG_GET(response, stat, &stat);
     file_stat_copy(o_stat, stat);
 
+done:
     symlink_request_free(req);
     symlink_response_free(response);
-    return 0;
+    return rst;
 }
-
+//FIXME 应该返回int
 const char *readlink_send_request(char *ip, int port, uint64_t ino)
 {
     DBG();
@@ -307,8 +332,17 @@ const char *readlink_send_request(char *ip, int port, uint64_t ino)
                         req, (marshal_func) readlink_request_marshal,
                         response, (unmarshal_func) readlink_response_unmarshal);
 
+    int rst = response->rst_code;
+    if (rst!=0){
+        logging(LOG_WARN, "readlink_send_request return rst != 0");
+        goto done;
+    }
     logging(LOG_DEUBG, "readlink , test : %s", response->path);
-    char *p = strdup(response->path);
+
+
+    char *p = NULL;
+done:
+    p = strdup(response->path);
     readlink_request_free(req);
     readlink_response_free(response);
     return p;
@@ -331,14 +365,20 @@ int lookup_send_request(char *ip, int port, uint64_t parent_ino,
                         req, (marshal_func) lookup_request_marshal,
                         response, (unmarshal_func) lookup_response_unmarshal);
 
+    int rst = response->rst_code;
+    if (rst!=0){
+        logging(LOG_WARN, "lookup_send_request return rst != 0");
+        goto done;
+    }
     struct file_stat *stat;
     EVTAG_ARRAY_GET(response, stat_arr, 0, &stat);
     file_stat_copy(o_stat, stat);
 
+done:
     lookup_request_free(req);
     lookup_response_free(response);
-
-    return 0;
+    
+    return rst;
 }
 
 int unlink_send_request(char *ip, int port, uint64_t parent_ino,
@@ -356,9 +396,10 @@ int unlink_send_request(char *ip, int port, uint64_t parent_ino,
     rpc_grneral_request(ip, port, "/.rpc.rpc_unlink",
                         req, (marshal_func) unlink_request_marshal,
                         response, (unmarshal_func) unlink_response_unmarshal);
+    int rst = response->rst_code;
     unlink_request_free(req);
     unlink_response_free(response);
-    return 0;
+    return rst;
 }
 
 int statfs_send_request(char *ip, int port, int *total_space, int *avail_space,

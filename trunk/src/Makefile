@@ -21,6 +21,9 @@ k : killall
 u:
 	-mkdir -p /tmp/a
 	-sudo umount /tmp/a -l
+	-sudo umount /tmp/b -l
+	-sudo umount /tmp/c -l
+	-sudo umount /tmp/d -l
 m: u
 	#./client/mount.out /tmp/a -d
 	./client/mount.out /tmp/a 
@@ -71,14 +74,16 @@ gcov:
 	gcov client/osd_conn.c -o client
 	gcov client/mds_conn.c -o client
 
-run:
-	gnome-terminal $(ARG) -e "./cmgr/cmgr.out" 						-t "cmgr" 	--geometry=60x10-0+0 
+run: all
+	gnome-terminal $(ARG) -e "./cmgr/cmgr.out" 						-t "cmgr" 	--geometry=60x20-0+0 
 	gnome-terminal $(ARG) -e "./mds/mds.out" 						-t "mds0" 	--geometry=120x20+0+000	
 	gnome-terminal $(ARG) -e "./mds/mds.out -c etc/mds.cfg.1" 		-t "mds1" 	--geometry=120x20+0+300	
 	gnome-terminal $(ARG) -e "./mds/mds.out -c etc/mds.cfg.2" 		-t "mds2" 	--geometry=120x20+0+900	&
+	#gnome-terminal $(ARG) -e "./mds/mds.out -c etc/mds.cfg.3" 		-t "mds3" 	--geometry=120x20+0+300	
+	#gnome-terminal $(ARG) -e "./mds/mds.out -c etc/mds.cfg.4" 		-t "mds4" 	--geometry=120x20+0+900	&
 	#
-	gnome-terminal $(ARG) -e "./osd/osd.out" 						-t "osd" 	--geometry=80x20-0+200 &
-	gnome-terminal $(ARG) -e "./osd/osd.out -c etc/osd.cfg.2" 		-t "osd2" 	--geometry=80x20-0+400 &
+	gnome-terminal $(ARG) -e "./osd/osd.out" 						-t "osd" 	--geometry=80x10-0+600 &
+	gnome-terminal $(ARG) -e "./osd/osd.out -c etc/osd.cfg.2" 		-t "osd2" 	--geometry=80x10-0+600 &
 
 rb: run-back
 run-back:

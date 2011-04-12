@@ -20,9 +20,15 @@ static void setattr_handler(EVRPC_STRUCT(rpc_setattr) * rpc, void *arg)
     int rst_code = fs_setattr(stat->ino, stat);
     EVTAG_ASSIGN(response, rst_code, rst_code);
 
+    if(rst_code != 0 ){
+        logging(LOG_WARN, "setattr_handler return rst_code != 0");
+        goto done;
+    }
+
     struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
     EVTAG_ASSIGN(t, ino, stat->ino);
     EVTAG_ASSIGN(t, size, stat->size);
+done:
 
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -37,13 +43,20 @@ static void stat_handler(EVRPC_STRUCT(rpc_stat) * rpc, void *arg)
     EVTAG_ARRAY_GET(request, ino_arr, 0, &ino);
     logging(LOG_DEUBG, "stat(%" PRIu64 ")", ino);
 
-    struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
 
     fsnode *n ;
     int rst_code = fs_stat(ino, &n);
     EVTAG_ASSIGN(response, rst_code, rst_code);
+    if(rst_code != 0 ){
+        logging(LOG_WARN, "stat_handler return rst_code != 0");
+        goto done;
+    }
+
+    struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
     fsnode_to_stat_copy(t, n);
-    log_file_stat("stat return : ", t);
+    log_file_stat("stat return ", t);
+done:
+
     EVRPC_REQUEST_DONE(rpc);
 }
 
@@ -59,6 +72,15 @@ static void ls_handler(EVRPC_STRUCT(rpc_stat) * rpc, void *arg)
     logging(LOG_DEUBG, "ls(%" PRIu64 ")", ino);
 
     fsnode *p = fsnode_hash_find(ino);
+    if(p == NULL ){
+        EVTAG_ASSIGN(response, rst_code, RST_CODE_NOT_FOUND);
+        logging(LOG_WARN, "ls_handler return rst_code != 0");
+        goto done;
+    }
+    
+
+
+
     struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
 
     EVTAG_ASSIGN(t, ino, p->ino);
@@ -79,17 +101,20 @@ static void ls_handler(EVRPC_STRUCT(rpc_stat) * rpc, void *arg)
     fsnode *n ;
     int rst_code = fs_ls(ino, &n);
     EVTAG_ASSIGN(response, rst_code, rst_code);
-    if (n != NULL) {
-        dlist_t *head = &(n->tree_dlist);
-        dlist_t *pl;
-        for (pl = head->next; pl != head; pl = pl->next) {
-
-            p = dlist_data(pl, fsnode, tree_dlist);
-            t = EVTAG_ARRAY_ADD(response, stat_arr);
-            fsnode_to_stat_copy(t, p);
-            log_file_stat("ls return : ", t);
-        }
+    if((rst_code != 0 )||(n==NULL) ){
+        logging(LOG_WARN, "ls_handler return rst_code != 0");
+        goto done;
     }
+    dlist_t *head = &(n->tree_dlist);
+    dlist_t *pl;
+    for (pl = head->next; pl != head; pl = pl->next) {
+
+        p = dlist_data(pl, fsnode, tree_dlist);
+        t = EVTAG_ARRAY_ADD(response, stat_arr);
+        fsnode_to_stat_copy(t, p);
+        log_file_stat("ls return : ", t);
+    }
+done:
     EVRPC_REQUEST_DONE(rpc);
 }
 
@@ -132,14 +157,15 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
                          request->mode, &n);
     EVTAG_ASSIGN(response, rst_code, rst_code);
 
+    if(rst_code != 0 ){
+        logging(LOG_WARN, "mknod_handler return rst_code != 0");
+        goto done;
+    }
+
 
     struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
     fsnode_to_stat_copy(t, n);
-    /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 8); */
-    /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 9); */
-
-    log_file_stat("mknode return ", t);
-
+    log_file_stat("mknod return ", t);
 
 
     //FIXME: this is just for debug. 
@@ -150,6 +176,7 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
     /*}*/
     //end
 
+done:
     EVRPC_REQUEST_DONE(rpc);
 }
 
@@ -168,12 +195,18 @@ static void symlink_handler(EVRPC_STRUCT(rpc_symlink) * rpc, void *arg)
     int rst_code = fs_symlink(request->parent_ino, request->ino, request->name, request->path, &n);
     EVTAG_ASSIGN(response, rst_code, rst_code);
 
+    if(rst_code != 0 ){
+        logging(LOG_WARN, "stat_handler return rst_code != 0");
+        goto done;
+    }
+
     struct file_stat *t;
     EVTAG_GET(response, stat, &t);
+
+
     fsnode_to_stat_copy(t, n);
-    /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 8); */
-    /*EVTAG_ARRAY_ADD_VALUE(t, pos_arr, 9); */
     log_file_stat("symlink return ", t);
+done:
 
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -190,11 +223,17 @@ static void readlink_handler(EVRPC_STRUCT(rpc_readlink) * rpc, void *arg)
     int rst_code = fs_readlink(request->ino, &p);
     EVTAG_ASSIGN(response, rst_code, rst_code);
 
+    if(rst_code != 0 ){
+        logging(LOG_WARN, "readlink_handler return rst_code != 0");
+        goto done;
+    }
+
     logging(LOG_DEUBG, "readlink(ino =%" PRIu64 ")", request->ino);
     logging(LOG_DEUBG, "readlink return : %s", p);
 
     EVTAG_ASSIGN(response, path, p);
 
+done:
     EVRPC_REQUEST_DONE(rpc);
 }
 
@@ -212,12 +251,16 @@ static void lookup_handler(EVRPC_STRUCT(rpc_lookup) * rpc, void *arg)
     fsnode *n ;
     int rst_code = fs_lookup(request->parent_ino, request->name, &n);
     EVTAG_ASSIGN(response, rst_code, rst_code);
+    if(rst_code != 0 ){
+        logging(LOG_WARN, "lookup_handler return rst_code != 0");
+        goto done;
+    }
 
     struct file_stat *t = EVTAG_ARRAY_ADD(response, stat_arr);
-
     fsnode_to_stat_copy(t, n);
-
     log_file_stat("lookup return ", t);
+done:
+
     EVRPC_REQUEST_DONE(rpc);
 }
 
@@ -234,6 +277,11 @@ static void unlink_handler(EVRPC_STRUCT(rpc_unlink) * rpc, void *arg)
 
     int rst_code = fs_unlink(request->parent_ino, request->name);
     EVTAG_ASSIGN(response, rst_code, rst_code);
+    if(rst_code != 0 ){
+        logging(LOG_WARN, "unlink_handler return rst_code != 0");
+        goto done;
+    }
+done:
 
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -318,6 +366,23 @@ void onexit()
     fs_store(mds_data_file());
 }
 
+double cpu_usage(){
+    static long double a[4], b[4],loadavg;
+    FILE *fp;
+
+    fp = fopen("/proc/stat","r");
+    fscanf(fp,"%*s %Lf %Lf %Lf %Lf",&b[0],&b[1],&b[2],&b[3]);
+
+    loadavg = ((b[0]+b[1]+b[2]) - (a[0]+a[1]+a[2])) / ((b[0]+b[1]+b[2]+b[3]) - (a[0]+a[1]+a[2]+a[3]));
+    a[0] = b[0];
+    a[1] = b[1];
+    a[2] = b[2];
+    a[3] = b[3];
+    fclose(fp);
+    return loadavg;
+
+}
+
 static void update_clustermap_from_cmgr_on_timer_cb(evutil_socket_t fd, short what, void *arg)
 { 
     static int load_max = 0; //max for now
@@ -328,23 +393,29 @@ static void update_clustermap_from_cmgr_on_timer_cb(evutil_socket_t fd, short wh
     mds_op_counter = 0;
 
     int load_old = get_self_machine_load();
-    int load_new = (int) (load_old * 0.9 + load_current * 0.1);
+    int load_new = 0;
+    if(load_current > load_new){
+        load_new = (int) (load_old * 0.9 + load_current * 0.1);
+    }else{
+        load_new = load_old*0.6 + load_current*0.4;
+    }
 
-    logging(LOG_INFO, "load_old: %d, load_current: %d, load_new: %d, load_max: %d", 
-            load_old,load_current, load_new, load_max);
+    /*logging(LOG_INFO, "load_old: %d, load_current: %d, load_new: %d, load_max: %d ",*/
+            /*load_old,load_current, load_new, load_max);*/
+    logging(LOG_INFO, "load_old: %d, load_current: %d, load_new: %d, load_max: %d, cpu:%lf",
+            load_old,load_current, load_new, load_max, cpu_usage());
 
     set_self_machine_load(load_new);
 
     ping_send_request();
 
 
-    if( (load_new > 1024) && (  1.0 * load_new/ load_max  > 0.55)){ // is about 0.9 max load for a long time
-        /*do_migration;*/
+    if( (load_new > migrate_threshold) && (  1.0 * load_new/ load_max  > migrate_precent)){ // is about 0.9 max load for a long time
         logging(LOG_WARN, "is going to migrate");
 
-
-        set_self_machine_load(-1);
+        set_self_machine_load(load_new/2);
         ping_send_request_force_update();
+        /*xxxx */
         do_migrate();
     }
 }
@@ -352,6 +423,7 @@ static void update_clustermap_from_cmgr_on_timer_cb(evutil_socket_t fd, short wh
 
 fsnode * locate_hot_sub_tree(fsnode * root){
     DBG();
+
     fsnode *n = root->data.ddata.children;
     fsnode *rst = n;
     int max_access_count = 0;
@@ -365,7 +437,7 @@ fsnode * locate_hot_sub_tree(fsnode * root){
                 rst = p;
                 max_access_count = p->access_counter;
             }
-            p->access_counter = 0; //FIXME: bug
+            p->access_counter = 0; 
         }
     }
     return rst;
@@ -384,11 +456,16 @@ void do_migrate2(fsnode * r){
  * */
 void do_migrate(){
     DBG();
+
     fsnode * n = fsnode_hash_find(FS_ROOT_INO);
+    if (n==NULL) //对于没有root的MDS，目前没实现,FIXME
+        return ;
     while(1){
         n = locate_hot_sub_tree(n);
+        if (n == NULL)
+            return ;
         if (n->tree_cnt < 10240) {// 1w
-            if (n == NULL)
+            if (n ->ino == FS_VROOT_INO || n->ino == FS_ROOT_INO)
                 return ;
             logging(LOG_INFO, "migrate on %"PRIu64". %s, tree_cnt : %d", n->ino, n->name, n->tree_cnt);
             do_migrate2(n);

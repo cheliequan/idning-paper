@@ -8,13 +8,32 @@ int attr_cache_init()
     return 0;
 }
 
+struct file_stat *attr_cache_lookup(uint64_t ino)
+{
+    struct file_stat *st = hashtable_lookup(attr_ht, &ino);
+    return st;
+}
+
 int attr_cache_add(struct file_stat *st)
 {
     assert(st->ino != 0);
     assert(st->parent_ino != 0);
-    log_file_stat("attr_cache_add: ", st);
+    struct file_stat *old = attr_cache_lookup(st->ino);
+    if (old){
 
-    hashtable_insert(attr_ht, &(st->ino), st);
+        old->size = st->size;
+        old->mode = st->mode;
+        old->pos_arr[0] = st ->pos_arr[0];
+        old->pos_arr[1] = st ->pos_arr[1];
+        old->name = strdup(st->name);
+        log_file_stat("attr_cache update instead insert !", old);
+
+    }else{
+        log_file_stat("attr_cache_add: ", st);
+        hashtable_insert(attr_ht, &(st->ino), st);
+    }
+
+
     return 0;
 }
 
@@ -23,8 +42,3 @@ int attr_cache_del(uint64_t ino)
     assert(0);
 }
 
-struct file_stat *attr_cache_lookup(uint64_t ino)
-{
-    struct file_stat *st = hashtable_lookup(attr_ht, &ino);
-    return st;
-}

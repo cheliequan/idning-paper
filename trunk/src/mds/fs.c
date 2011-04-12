@@ -119,6 +119,8 @@ int fs_init()
  * and it's every ancestor
  * */
 void fs_set_modify_flag(fsnode * n, int64_t cnt_inc){
+    if (n==NULL)
+        return;
     n->modifiy_flag = 1;
     while((n=n->parent) ){
         n->tree_cnt += cnt_inc;
@@ -129,6 +131,8 @@ void fs_set_modify_flag(fsnode * n, int64_t cnt_inc){
     }
 }
 void fs_set_visit_flag(fsnode * n){
+    if (n==NULL)
+        return;
     while((n=n->parent) ){
         n->access_counter ++;
         if (n->ino == FS_ROOT_INO || n->ino == FS_VROOT_INO)
@@ -242,14 +246,31 @@ void fs_del_tree_dfs(fsnode * root){
         head = &(children_head->tree_dlist);
         for (pl = head->next; pl != head; pl = pl->next) {
             p = dlist_data(pl, fsnode, tree_dlist);
-            fsnode_tree_remove(p);
-            fsnode_hash_remove(p);
-            /*free(p);*/
+            fs_del_tree_dfs(p);
+            /*free(p); FIXME*/
         }
     }
     fsnode_tree_remove(root);
     fsnode_hash_remove(root);
     free(root);
+}
+
+void fs_del_children_dfs(fsnode * root){
+    if(!root)
+        return;
+    dlist_t *head ;
+    dlist_t *pl;
+    fsnode *p;
+
+    if (S_ISDIR(root->mode) && root->data.ddata.children){
+        fsnode *children_head = root->data.ddata.children;
+        head = &(children_head->tree_dlist);
+        for (pl = head->next; pl != head; pl = pl->next) {
+            p = dlist_data(pl, fsnode, tree_dlist);
+            fs_del_tree_dfs(p);
+            /*free(p); FIXME*/
+        }
+    }
 }
 
 //NEW
@@ -259,6 +280,11 @@ int fs_unlink(uint64_t parent_ino, char *name)
             parent_ino, name);
 
     fsnode *n = fsnode_hash_find(parent_ino);
+
+    if (n == NULL) {
+        return RST_CODE_NOT_FOUND;
+    }
+
     fs_set_modify_flag(n, -1);
 
     fsnode *s ;
