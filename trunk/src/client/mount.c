@@ -10,6 +10,7 @@
 #include "attr_cache.h"
 
 static void fill_stbuf(struct stat* stbuf, struct file_stat * stat);
+int search_inode_over_all_mds(uint64_t ino);
 
 
 static int get_mid_of_ino(int ino)
@@ -64,6 +65,7 @@ static void dirbuf_add(fuse_req_t req, struct dirbuf *b, const char *name,
 }
 
 #define min(x, y) ((x) < (y) ? (x) : (y))
+#define max(x, y) ((x) > (y) ? (x) : (y))
 
 static int reply_buf_limited(fuse_req_t req, const char *buf, size_t bufsize,
                              off_t off, size_t maxsize)
@@ -104,6 +106,7 @@ static struct file_stat *get_attr_force1(uint64_t ino)
 }
 
 void get_attr_force(uint64_t ino){
+    logging(LOG_WARN, "get_attr_force( %"PRIu64")", ino);
     search_inode_over_all_mds(ino);
     /*get_attr_force1(ino);*/
 }
@@ -177,11 +180,13 @@ static void sfs_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
     memset(&e, 0, sizeof(e));
 
     struct file_stat *stat = file_stat_new();
+
+
+    get_attr_force(parent);
     struct machine *m = get_machine_of_inode(parent);
-    while (0 != lookup_send_request(m->ip, m->port, (uint64_t) parent, name, stat)){
-        get_attr_force(parent);
-        logging(LOG_WARN, "get_attr_force( %"PRIu64")", parent);
-    }
+
+    assert (0 == lookup_send_request(m->ip, m->port, (uint64_t) parent, name, stat));
+
     logging(LOG_DEUBG, "lookup(parent = %lu, name = %s) return inode: %lu",
             parent, name, e.ino);
     if (stat->ino) {
@@ -207,11 +212,9 @@ static void sfs_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     struct file_stat **stat_arr;
     int cnt;
 
+    get_attr_force(ino);
     struct machine *m = get_machine_of_inode(ino);
-    while( 0!= ls_send_request(m->ip, m->port, ino, &stat_arr, &cnt)){
-        get_attr_force(ino);
-        logging(LOG_WARN, "get_attr_force( %"PRIu64")", ino);
-    }
+    assert( 0== ls_send_request(m->ip, m->port, ino, &stat_arr, &cnt));
     int i;
     struct dirbuf b;
     memset(&b, 0, sizeof(b));
@@ -243,6 +246,10 @@ static void sfs_ll_open(fuse_req_t req, fuse_ino_t ino,
 void sfs_ll_readlink(fuse_req_t req, fuse_ino_t ino)
 {
     logging(LOG_DEUBG, "readlink(ino = %lu)", ino);
+
+    struct file_stat *cached = attr_cache_lookup(ino);
+    get_attr_force(cached->parent_ino);
+
     struct machine *m = get_machine_of_parent_inode(ino);
     //FIXME，检查返回值
     const char *path = readlink_send_request(m->ip, m->port, ino);
@@ -376,23 +383,8 @@ void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
         f_stat->ino = ino;
         f_stat->size = sizenow;
 
+        do_set_attr(f_stat->ino); //FIXME ，是否会导致iozone写文件size不变化(由于attr_cache有问题.)
 
-
-        struct file_stat *cached_parent = attr_cache_lookup(f_stat->parent_ino);
-        int i;
-        for (i=0;i<2; i++){
-            int mid = cached_parent->pos_arr[i];
-            struct machine *m = cluster_get_machine_by_mid(mid);
-            while( 0!=setattr_send_request(m->ip, m->port, f_stat)){
-                get_attr_force(f_stat->parent_ino);
-                logging(LOG_WARN, "get_attr_force( %"PRIu64")", f_stat->parent_ino);
-            }
-
-        }
-
-
-        /*struct machine *m = get_machine_of_parent_inode(f_stat->ino);*/
-        /*setattr_send_request(m->ip, m->port, f_stat);*/
     }
 
     fuse_reply_err(req, err);
@@ -403,7 +395,7 @@ int stat_mds_req_cb(struct mds_req_ctx * ctx, void* ptr){
     if (--ctx->count){
         return 1; 
     }
-    struct fuse_entry_param e;
+    /*struct fuse_entry_param e;*/
     struct file_stat * stat = (struct file_stat *) ptr;
     log_file_stat("stat return :", stat);
     if (stat->ino)
@@ -456,10 +448,14 @@ void sfs_ll_create_async(fuse_req_t req, fuse_ino_t parent, const char *name,
             name, mode);
     uint64_t ino = cmgr_get_uuid();
 
-    struct file_stat *cached_parent = attr_cache_lookup(parent);
     struct mds_req_ctx * ctx = mds_req_ctx_new(req, fi, 2, create_mds_req_cb);
+
+
+
+
     int i;
     for (i=0;i<2; i++){
+        struct file_stat *cached_parent = attr_cache_lookup(parent);
         int mid = cached_parent->pos_arr[i];
         struct machine *m = cluster_get_machine_by_mid(mid);
         mknod_send_request_async(m->ip, m->port, parent, ino, name, 0, S_IFREG, ctx);
@@ -476,19 +472,18 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
     struct fuse_entry_param e;
     uint64_t ino = cmgr_get_uuid();
 
-    struct file_stat *cached_parent = attr_cache_lookup(parent);
     struct file_stat *stat = file_stat_new();
 
+
+
+    get_attr_force(parent);
+    struct file_stat *cached_parent ;
+    cached_parent = attr_cache_lookup(parent);
     int i;
     for (i=0;i<2; i++){
         int mid = cached_parent->pos_arr[i];
         struct machine *m = cluster_get_machine_by_mid(mid);
-        while( 0!= mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFREG, stat)){
-            if(LOG_LEVEL == LOG_DEUBG)
-                sleep(1);
-            get_attr_force(parent); 
-            logging(LOG_WARN, "get_attr_force( %"PRIu64")", parent);
-        }
+        assert(0==mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFREG, stat)) ;
     }
 
     log_file_stat("create return :", stat);
@@ -515,21 +510,18 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
     logging(LOG_DEUBG, "mkdir(parent = %lu, name = %s, mode=%04o)", parent,
             name, mode);
     struct fuse_entry_param e;
-    /*struct machine *m = get_machine_of_parent_inode(parent);*/
     struct file_stat *stat = file_stat_new();
     uint64_t ino = cmgr_get_uuid();
 
 
-    struct file_stat *cached_parent = attr_cache_lookup(parent);
-
+    get_attr_force(parent);
+    struct file_stat *cached_parent ;
+    cached_parent = attr_cache_lookup(parent);
     int i;
     for (i=0;i<2; i++){
         int mid = cached_parent->pos_arr[i];
         struct machine *m = cluster_get_machine_by_mid(mid);
-        while(0!=mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFDIR, stat)) {
-            get_attr_force(parent);
-            logging(LOG_WARN, "get_attr_force( %"PRIu64")", parent);
-        }
+        assert(0==mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFDIR, stat)) ;
     }
 
     log_file_stat("create return :", stat);
@@ -555,18 +547,18 @@ void sfs_ll_symlink(fuse_req_t req, const char *path, fuse_ino_t parent,
     struct fuse_entry_param e;
     uint64_t ino = cmgr_get_uuid();
 
-    struct file_stat *cached_parent = attr_cache_lookup(parent);
     struct file_stat *stat = file_stat_new();
 
+    get_attr_force(parent);
+    struct file_stat *cached_parent ;
+    cached_parent = attr_cache_lookup(parent);
     int i;
     for (i=0;i<2; i++){
         int mid = cached_parent->pos_arr[i];
         struct machine *m = cluster_get_machine_by_mid(mid);
-        while(0!=symlink_send_request(m->ip, m->port, parent, ino, name, path, stat)){
-            get_attr_force(parent);
-            logging(LOG_WARN, "get_attr_force( %"PRIu64")", parent);
-        }
+        assert(0==  symlink_send_request(m->ip, m->port, parent, ino, name, path, stat) ) ;
     }
+
 
     log_file_stat("symlink return :", stat);
     attr_cache_add(stat);       //no free
@@ -583,6 +575,23 @@ void sfs_ll_symlink(fuse_req_t req, const char *path, fuse_ino_t parent,
     }
 }
 
+
+int do_set_attr(uint64_t ino){
+    struct file_stat *cached = attr_cache_lookup(ino);
+
+
+    get_attr_force(cached->parent_ino);
+    struct file_stat *cached_parent ;
+    cached_parent = attr_cache_lookup(cached->parent_ino);
+    int i;
+    for (i=0;i<2; i++){
+        int mid = cached_parent->pos_arr[i];
+        struct machine *m = cluster_get_machine_by_mid(mid);
+        assert(0==  setattr_send_request(m->ip, m->port, cached) ) ;
+    }
+
+    return 0;
+}
 /*
  * 包括st_atime
  * 包括st_mtime
@@ -618,19 +627,7 @@ void sfs_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf,
     }
 
 
-    struct file_stat *cached = attr_cache_lookup(ino);
-    struct file_stat *cached_parent = attr_cache_lookup(cached->parent_ino);
-
-    int i;
-    for (i=0;i<2; i++){
-        int mid = cached_parent->pos_arr[i];
-        struct machine *m = cluster_get_machine_by_mid(mid);
-        while( 0 != setattr_send_request(m->ip, m->port, old_stat)){
-            get_attr_force(cached_parent->ino);
-        logging(LOG_WARN, "get_attr_force( %"PRIu64")", cached_parent->ino);
-        }
-    }
-
+    do_set_attr(ino);
     struct stat stbuf;
     memset(&stbuf, 0, sizeof(stbuf));
     if (sfs_stat(ino, &stbuf) == -1)
@@ -644,17 +641,17 @@ static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
     logging(LOG_DEUBG, "unlink(parent = %lu, name = %s)", parent, name);
 
 
-    struct file_stat *cached_parent = attr_cache_lookup(parent);
 
+    get_attr_force(parent);
+    struct file_stat *cached_parent ;
+    cached_parent = attr_cache_lookup(parent);
     int i;
     for (i=0;i<2; i++){
         int mid = cached_parent->pos_arr[i];
         struct machine *m = cluster_get_machine_by_mid(mid);
-        while( 0!= unlink_send_request(m->ip, m->port, parent, name)){
-            get_attr_force(parent);
-            logging(LOG_WARN, "get_attr_force( %"PRIu64")", parent);
-        }
+        assert(0==  unlink_send_request(m->ip, m->port, parent, name) ) ;
     }
+
     fuse_reply_err(req, 0);
 }
 
@@ -715,21 +712,37 @@ int search_inode_over_all_mds(uint64_t ino)
     int64_t ino_arr[1] ;
     ino_arr[0] = ino;
 
+    int real_pos[2];
+    int real_pos_p = 0;
     cluster_get_mds_arr(&mds, &mds_cnt);
+    struct file_stat * stat;
     for (i = 0; i < mds_cnt; i++) {
-       struct file_stat *stat = file_stat_new();
+        stat = file_stat_new();
         /*EVTAG_ARRAY_ADD_VALUE(stat, pos_arr, mds[i]);*/
         struct machine *m = cluster_get_machine_by_mid(mds[i]);
 
         if (stat_send_request(m->ip, m->port, ino_arr, 1, stat) == RST_FOUND) {
             logging(LOG_INFO, "get inode %" PRIu64 " at mds (%d)", (uint64_t) ino,
                     mds[i]);
+            //处理split节点，split节点，可能返回3个位置. 放服务器端把. 服务器端，对split后剩下的节点，将不响应stat, 只在ls, 操作中列出，否则不出现. ,在服务器上从全局hash表删除.
             attr_cache_add(stat);   //no free
-
-            return 1;
+            real_pos[ real_pos_p++] = mds[i];
         }
-        file_stat_free(stat);
     }
+
+    stat = attr_cache_lookup(ino);
+    if (real_pos_p> 0){
+        if ( min(stat->pos_arr[0], stat->pos_arr[1])  == min(real_pos[0], real_pos[1])  && 
+                max(stat->pos_arr[0], stat->pos_arr[1])  == max(real_pos[0], real_pos[1])   ){
+            //same , do npthing 
+        }else{
+            /*xxxx;*/
+            stat->pos_arr[0] = real_pos[0];
+            stat->pos_arr[1] = real_pos[1];
+            do_set_attr(ino);
+        }
+    }
+
     return 0;
 }
 

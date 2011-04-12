@@ -89,7 +89,7 @@ int setattr_send_request(char *ip, int port, struct file_stat *stat_arr)
         logging(LOG_WARN, "setattr_send_request return rst != 0");
         goto done;
     }
-    int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
+    /*int cnt = EVTAG_ARRAY_LEN(response, stat_arr);*/
     /*if (cnt != 1) {*/
         /*logging(LOG_ERROR, "setattr_send_request return cnt != 1, cnt= %d",*/
                 /*cnt);*/

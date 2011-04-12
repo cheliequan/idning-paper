@@ -254,6 +254,19 @@ void cluster_get_osd_arr(int **o_arr, int *o_cnt)
     *o_cnt = osd_cnt;
 }
 
+/*already sort */
+struct machine *cluster_get_mds_with_max_load()
+{
+    int i;
+    for (i = 0; i < machine_cnt; i++) {
+        if ( (machines[i].type == MACHINE_MDS )){
+            logging(LOG_INFO, "cluster_get_mds_with_lowest_load() return (%d)!!", machines[i].mid);
+            return machines + i;
+        }
+    }
+    return NULL;
+}
+
 struct machine *cluster_get_mds_with_lowest_load()
 {
     logging(LOG_DEUBG, "cluster_get_mds_with_lowest_load()");
@@ -355,6 +368,9 @@ void cluster_dump()
 
 }
 
+/*
+load大的在前面.
+*/
 static int machines_load_cmp(const void *p1, const void *p2)
 {
     return ((struct machine *) p2)->load - ((struct machine *) p1)->load ;
