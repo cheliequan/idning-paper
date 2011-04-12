@@ -27,7 +27,7 @@
 //#define  LOG_LEVEL LOG_WARN
 //#endif
 
-#define  LOG_LEVEL LOG_DEUBG
+#define  LOG_LEVEL LOG_INFO
 
 int logging(int level, char *fmt, ...);
 int log_init(char *logfile);

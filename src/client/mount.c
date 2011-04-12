@@ -79,13 +79,13 @@ static int reply_buf_limited(fuse_req_t req, const char *buf, size_t bufsize,
 
 
 //FIXME: 如果被move了，该方法就不对
-static struct file_stat *get_attr_force1(uint64_t ino)
+static struct file_stat *enforce_cache1(uint64_t ino)
 {
 
     struct file_stat *cached = attr_cache_lookup(ino);
     while(1){
         int mid;
-        logging(LOG_DEUBG, "ning_ ensure get_attr_force1 %"PRIu64, ino);
+        logging(LOG_DEUBG, "ning_ ensure enforce_cache1 %"PRIu64, ino);
         mid = get_mid_of_ino(cached->parent_ino);
         //?? out of date??
         struct machine *m = cluster_get_machine_by_mid(mid);
@@ -96,19 +96,24 @@ static struct file_stat *get_attr_force1(uint64_t ino)
         if (0 == stat_send_request(m->ip, m->port, arr, 1, cached) )
             break;
         else{
-            get_attr_force1(cached->parent_ino);
-            logging(LOG_DEUBG, "get_attr_force1 err ,try to get it's parent  ");
+            enforce_cache1(cached->parent_ino);
+            logging(LOG_DEUBG, "enforce_cache1 err ,try to get it's parent  ");
 
         }
         log_file_stat("stat updated in cache:", cached);
     }
     return cached;
 }
+/*这就是迁移的代价，就是最终一致性罢？客户端访问时一致*/
+void enforce_cache(uint64_t ino){
+    ping_send_request();
 
-void get_attr_force(uint64_t ino){
-    logging(LOG_WARN, "get_attr_force( %"PRIu64")", ino);
+    struct file_stat *cached = attr_cache_lookup(ino);
+    if (cached->version == cluster_get_current_version())
+        return; //FIXME ,这是会有问题的，只要实际上发生迁移，version增加，而client没有获得此增加，就必然发生问题，为此，我将client联系cmgr的频率调大，为10次/s, 在前面ping一下.
+    logging(LOG_WARN, "really enforce_cache( %"PRIu64")", ino);
     search_inode_over_all_mds(ino);
-    /*get_attr_force1(ino);*/
+    /*enforce_cache1(ino);*/
 }
 
 /*
@@ -182,7 +187,7 @@ static void sfs_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
     struct file_stat *stat = file_stat_new();
 
 
-    get_attr_force(parent);
+    enforce_cache(parent);
     struct machine *m = get_machine_of_inode(parent);
 
     assert (0 == lookup_send_request(m->ip, m->port, (uint64_t) parent, name, stat));
@@ -212,7 +217,7 @@ static void sfs_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     struct file_stat **stat_arr;
     int cnt;
 
-    get_attr_force(ino);
+    enforce_cache(ino);
     struct machine *m = get_machine_of_inode(ino);
     assert( 0== ls_send_request(m->ip, m->port, ino, &stat_arr, &cnt));
     int i;
@@ -248,7 +253,7 @@ void sfs_ll_readlink(fuse_req_t req, fuse_ino_t ino)
     logging(LOG_DEUBG, "readlink(ino = %lu)", ino);
 
     struct file_stat *cached = attr_cache_lookup(ino);
-    get_attr_force(cached->parent_ino);
+    enforce_cache(cached->parent_ino);
 
     struct machine *m = get_machine_of_parent_inode(ino);
     //FIXME，检查返回值
@@ -476,7 +481,7 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
 
 
 
-    get_attr_force(parent);
+    enforce_cache(parent);
     struct file_stat *cached_parent ;
     cached_parent = attr_cache_lookup(parent);
     int i;
@@ -514,7 +519,7 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
     uint64_t ino = cmgr_get_uuid();
 
 
-    get_attr_force(parent);
+    enforce_cache(parent);
     struct file_stat *cached_parent ;
     cached_parent = attr_cache_lookup(parent);
     int i;
@@ -549,7 +554,7 @@ void sfs_ll_symlink(fuse_req_t req, const char *path, fuse_ino_t parent,
 
     struct file_stat *stat = file_stat_new();
 
-    get_attr_force(parent);
+    enforce_cache(parent);
     struct file_stat *cached_parent ;
     cached_parent = attr_cache_lookup(parent);
     int i;
@@ -580,7 +585,7 @@ int do_set_attr(uint64_t ino){
     struct file_stat *cached = attr_cache_lookup(ino);
 
 
-    get_attr_force(cached->parent_ino);
+    enforce_cache(cached->parent_ino);
     struct file_stat *cached_parent ;
     cached_parent = attr_cache_lookup(cached->parent_ino);
     int i;
@@ -642,7 +647,7 @@ static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
 
 
 
-    get_attr_force(parent);
+    enforce_cache(parent);
     struct file_stat *cached_parent ;
     cached_parent = attr_cache_lookup(parent);
     int i;

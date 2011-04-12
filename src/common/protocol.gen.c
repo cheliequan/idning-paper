@@ -992,6 +992,8 @@ static struct file_stat_access_ __file_stat_base = {
   file_stat_pos_arr_add,
   file_stat_parent_ino_assign,
   file_stat_parent_ino_get,
+  file_stat_version_assign,
+  file_stat_version_get,
 };
 
 struct file_stat *
@@ -1045,6 +1047,9 @@ file_stat_new_with_arg(void *unused)
   tmp->parent_ino = 0;
   tmp->parent_ino_set = 0;
 
+  tmp->version = 0;
+  tmp->version_set = 0;
+
   return (tmp);
 }
 
@@ -1085,6 +1090,7 @@ error:
   --msg->pos_arr_length;
   return (NULL);
 }
+
 
 
 int
@@ -1181,6 +1187,14 @@ file_stat_parent_ino_assign(struct file_stat *msg, const ev_uint64_t value)
 {
   msg->parent_ino_set = 1;
   msg->parent_ino = value;
+  return (0);
+}
+
+int
+file_stat_version_assign(struct file_stat *msg, const ev_uint32_t value)
+{
+  msg->version_set = 1;
+  msg->version = value;
   return (0);
 }
 
@@ -1284,6 +1298,15 @@ file_stat_parent_ino_get(struct file_stat *msg, ev_uint64_t *value)
   return (0);
 }
 
+int
+file_stat_version_get(struct file_stat *msg, ev_uint32_t *value)
+{
+  if (msg->version_set != 1)
+    return (-1);
+  *value = msg->version;
+  return (0);
+}
+
 void
 file_stat_clear(struct file_stat *tmp)
 {
@@ -1308,6 +1331,7 @@ file_stat_clear(struct file_stat *tmp)
     tmp->pos_arr_num_allocated = 0;
   }
   tmp->parent_ino_set = 0;
+  tmp->version_set = 0;
 }
 
 void
@@ -1361,6 +1385,9 @@ file_stat_marshal(struct evbuffer *evbuf, const struct file_stat *tmp){
   }
   if (tmp->parent_ino_set) {
     evtag_marshal_int64(evbuf, FILE_STAT_PARENT_INO, tmp->parent_ino);
+  }
+  if (tmp->version_set) {
+    evtag_marshal_int(evbuf, FILE_STAT_VERSION, tmp->version);
   }
 }
 
@@ -1496,6 +1523,17 @@ file_stat_unmarshal(struct file_stat *tmp,  struct evbuffer *evbuf)
           return (-1);
         }
         tmp->parent_ino_set = 1;
+        break;
+
+      case FILE_STAT_VERSION:
+
+        if (tmp->version_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, FILE_STAT_VERSION, &tmp->version) == -1) {
+          event_warnx("%s: failed to unmarshal version", __func__);
+          return (-1);
+        }
+        tmp->version_set = 1;
         break;
 
       default:

@@ -32,11 +32,13 @@ struct machine self_machine;
 void cluster_init();
 struct machine * cluster_add(char *ip, int port, char type, int mid);
 void cluster_remove(char *ip, int port);
-void cluster_printf(char *hint);
+void cluster_printf(int log_level, char *hint);
 void cluster_dump();
 static int cluster_uuid();
 void sort_mds_arr();
-
+int cluster_get_current_version(){
+    return cluster_version;
+}
 static char *cluster_type_str(int type)
 {
     switch (type) {
@@ -82,6 +84,11 @@ void ping_handler(EVRPC_STRUCT(rpc_ping) * rpc, void *arg)
     struct machine * m = cluster_add(remote_ip, remote_port, type, mid);
 
     m->load = ping->load;
+    if (ping_version == 0){ //MDS强制加version
+        cluster_version++;
+    }
+    if (type == MACHINE_MDS)
+        cluster_printf(LOG_INFO, "log load");
 
     if (cluster_version > ping_version) {   // new machine added to cluster
         EVTAG_ASSIGN(pong, version, cluster_version);
@@ -153,7 +160,7 @@ int ping_send_request_with_version(int req_version)
         machines[i].load = m->load;
     }
     sort_mds_arr();
-    cluster_printf("after pong & sort::");
+    cluster_printf(LOG_DEUBG, "after pong & sort::");
     cluster_dump();
 
   done:
@@ -215,11 +222,13 @@ void rpc_client_setup(char *self_host, int self_port, int self_type)
     self_machine.mid = new_mid;
 }
 
-void cluster_printf(char *hint)
+void cluster_printf(int log_level, char *hint)
 {
     char tmp[36000];
     char *p = tmp;
     int i;
+    if (log_level < LOG_LEVEL)
+        return;
 
     for (i = 0; i < machine_cnt; i++) {
         sprintf(p, "%6s%20s:%-6d(%5d) LOAD: %d\n", cluster_type_str(machines[i].type)
@@ -227,7 +236,7 @@ void cluster_printf(char *hint)
         while (*p)
             p++;
     }
-    logging(LOG_INFO, " %s clusters: v%d \n--------------\n%s\n------------\n",
+    logging(log_level, " %s clusters: v%d \n--------------\n%s\n------------\n",
             hint, cluster_version, tmp);
 }
 
@@ -320,7 +329,7 @@ static int cluster_uuid()
 struct machine *cluster_add(char *ip, int port, char type, int mid)
 {
     DBG();
-    cluster_printf("before cluster_add");
+    cluster_printf(LOG_DEUBG, "before cluster_add");
     int i;
     for (i = 0; i < machine_cnt; i++) {
         if (machines[i].port == port && (0 == strcmp((char *)machines[i].ip, ip)))  //already in array
@@ -333,7 +342,7 @@ struct machine *cluster_add(char *ip, int port, char type, int mid)
     machines[machine_cnt].type = type;
     machines[machine_cnt].mid = mid;
     machine_cnt++;
-    cluster_printf("after cluster_add");
+    cluster_printf(LOG_INFO, "after cluster_add, updated");
     //logging(LOG_DEUBG, "current machine_cnt : %d", machine_cnt);
 
     /*cluster_machine *m = cluster_machine_new(); */
