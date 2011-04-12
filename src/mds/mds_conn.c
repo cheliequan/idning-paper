@@ -1,9 +1,12 @@
 #include "sfs_common.h"
 #include "fs.h"
 
+#define MIGRITE_OP_ADD 1
+#define MIGRITE_OP_CHANGE 2
+
 
 struct evrpc_pool *mds_mds_conn_pool;
-struct event_base *mds_mds_ev_base;
+struct event_base *mds_mds_ev_base = NULL;
 
 // server side
 //
@@ -100,10 +103,28 @@ void migrate_cb(struct evrpc_status *status, struct migrate_request *req,
 
     }else{
 
+        /*if (req->op == MIGRITE_OP_ADD){*/
+            /*int *mds;*/
+            /*int mds_cnt;*/
+            /*cluster_get_mds_arr(&mds, &mds_cnt);*/
+            /*int i; */
+            /*int from_mds = req->from_mds;*/
+            /*int to_mds = req->to_mds;*/
+
+            /*for (i=0;i<mds_cnt;i++){//广播*/
+                /*if ((mds[i]!=from_mds) && (mds[i]!=to_mds)){*/
+                    /*struct machine *m = cluster_get_machine_by_mid(mds[0]);*/
+                    /*migrate_send_request_1(m->ip, m->port, root, from_mds, to_mds, MIGRITE_OP_CHANGE); */
+                /*}*/
+            /*}*/
+        /*}*/
         logging(LOG_INFO, "migrate return ok , trying to rm AND update subtree %s ", root->name);
         replace_pos(root, req->from_mds, req->to_mds);
         fs_del_children_dfs(root);
+        fsnode_hash_remove(root);  //将只响应ls.
+
         logging(LOG_INFO, "after rm AND update subtree %s : [%d, %d]", root->name, root->pos_arr[0], root->pos_arr[1]);
+
         
         event_base_loopexit(mds_mds_ev_base, NULL);
     }
@@ -130,7 +151,7 @@ void migrate_add_fsnode_dfs(struct migrate_request * req, fsnode * root){
     }
 }
 
-int migrate_send_request(char * ip, int port, fsnode * root, int from_mds, int to_mds)
+int migrate_send_request_1(char * ip, int port, fsnode * root, int from_mds, int to_mds, int op)
 {
     DBG();
     root->modifiy_flag = 0;
@@ -139,11 +160,13 @@ int migrate_send_request(char * ip, int port, fsnode * root, int from_mds, int t
     struct migrate_response * response = migrate_response_new();
     EVTAG_ASSIGN(req, from_mds, from_mds);
     EVTAG_ASSIGN(req, to_mds, to_mds);
+    EVTAG_ASSIGN(req, op, op);
 
     migrate_add_fsnode_dfs(req, root);
 
 // temp connection TODO
-    mds_mds_ev_base = event_base_new();
+    if (mds_mds_ev_base == NULL)
+        mds_mds_ev_base = event_base_new();
     mds_mds_conn_pool = evrpc_pool_new(mds_mds_ev_base);
     struct evhttp_connection * evcon = evhttp_connection_new(ip, port);
     evrpc_pool_add_connection(mds_mds_conn_pool, evcon);
@@ -153,6 +176,12 @@ int migrate_send_request(char * ip, int port, fsnode * root, int from_mds, int t
     event_base_dispatch(mds_mds_ev_base);
     return 0;
 }
+
+int migrate_send_request(char * ip, int port, fsnode * root, int from_mds, int to_mds){
+    migrate_send_request_1(ip, port, root, from_mds, to_mds, MIGRITE_OP_ADD);
+}
+
+
 
 /*void do_migrate(){*/
 

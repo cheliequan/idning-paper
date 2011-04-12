@@ -411,12 +411,21 @@ static void update_clustermap_from_cmgr_on_timer_cb(evutil_socket_t fd, short wh
 
 
     if( (load_new > migrate_threshold) && (  1.0 * load_new/ load_max  > migrate_precent)){ // is about 0.9 max load for a long time
-        logging(LOG_WARN, "is going to migrate");
+        logging(LOG_WARN, "it' overload ,will I migrate? ");
 
-        set_self_machine_load(load_new/2);
         ping_send_request_force_update();
-        /*xxxx */
-        do_migrate();
+        struct machine * self = get_self_machine();
+        struct machine * max = cluster_get_mds_with_max_load();
+
+        if (self->mid == max ->mid ){
+            /*xxxx */
+            logging(LOG_WARN, "YES, I'm the boss , do it ! migrate !");
+            do_migrate();
+            set_self_machine_load(load_new/2);
+        }else{
+            logging(LOG_WARN, "I'm not the biggest, no migrate");
+            
+        }
     }
 }
 

@@ -155,7 +155,11 @@ struct migrate_request {
     int from_mds                        = 1;
     int to_mds                          = 2;
     array struct[file_stat] stat_arr    = 3;
+    int op                              = 4; //migrate(1)  | change_pos(2)
 }
 struct migrate_response {
     int rst                             = 1;
 }
+
+
+

@@ -1283,6 +1283,7 @@ enum migrate_request_ {
   MIGRATE_REQUEST_FROM_MDS=1,
   MIGRATE_REQUEST_TO_MDS=2,
   MIGRATE_REQUEST_STAT_ARR=3,
+  MIGRATE_REQUEST_OP=4,
   MIGRATE_REQUEST_MAX_TAGS
 };
 
@@ -1295,6 +1296,8 @@ struct migrate_request_access_ {
   int (*stat_arr_assign)(struct migrate_request *, int, const struct file_stat*);
   int (*stat_arr_get)(struct migrate_request *, int, struct file_stat* *);
   struct file_stat*  (*stat_arr_add)(struct migrate_request *msg);
+  int (*op_assign)(struct migrate_request *, const ev_uint32_t);
+  int (*op_get)(struct migrate_request *, ev_uint32_t *);
 };
 
 struct migrate_request {
@@ -1305,10 +1308,12 @@ struct migrate_request {
   struct file_stat* *stat_arr;
   int stat_arr_length;
   int stat_arr_num_allocated;
+  ev_uint32_t op;
 
   ev_uint8_t from_mds_set;
   ev_uint8_t to_mds_set;
   ev_uint8_t stat_arr_set;
+  ev_uint8_t op_set;
 };
 
 struct migrate_request *migrate_request_new(void);
@@ -1329,6 +1334,8 @@ int migrate_request_to_mds_get(struct migrate_request *, ev_uint32_t *);
 int migrate_request_stat_arr_assign(struct migrate_request *, int, const struct file_stat*);
 int migrate_request_stat_arr_get(struct migrate_request *, int, struct file_stat* *);
 struct file_stat*  migrate_request_stat_arr_add(struct migrate_request *msg);
+int migrate_request_op_assign(struct migrate_request *, const ev_uint32_t);
+int migrate_request_op_get(struct migrate_request *, ev_uint32_t *);
 /* --- migrate_request done --- */
 
 /* Tag definition for migrate_response */

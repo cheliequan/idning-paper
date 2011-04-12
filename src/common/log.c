@@ -61,7 +61,7 @@ int log_init(char *logfile)
 inline int logging(int level, char *fmt, ...)
 {
     if (level<LOG_LEVEL) 
-        return;
+        return 0;
     char stmp[10240];
     char *buf = stmp;
     puttime(&buf);

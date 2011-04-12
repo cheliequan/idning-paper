@@ -50,4 +50,5 @@ const char *readlink_send_request(char *ip, int port, uint64_t ino);
 
 int mkfs_send_request(int mds1, int mds2);
 
+int stat_send_request_async(char *ip, int port, uint64_t * ino_arr, int len, struct mds_req_ctx * ctx);
 #endif

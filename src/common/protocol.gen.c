@@ -6169,6 +6169,8 @@ static struct migrate_request_access_ __migrate_request_base = {
   migrate_request_stat_arr_assign,
   migrate_request_stat_arr_get,
   migrate_request_stat_arr_add,
+  migrate_request_op_assign,
+  migrate_request_op_get,
 };
 
 struct migrate_request *
@@ -6197,6 +6199,9 @@ migrate_request_new_with_arg(void *unused)
   tmp->stat_arr_length = 0;
   tmp->stat_arr_num_allocated = 0;
   tmp->stat_arr_set = 0;
+
+  tmp->op = 0;
+  tmp->op_set = 0;
 
   return (tmp);
 }
@@ -6233,6 +6238,7 @@ error:
   --msg->stat_arr_length;
   return (NULL);
 }
+
 
 int
 migrate_request_from_mds_assign(struct migrate_request *msg, const ev_uint32_t value)
@@ -6283,6 +6289,14 @@ migrate_request_stat_arr_assign(struct migrate_request *msg, int off,
 }
 
 int
+migrate_request_op_assign(struct migrate_request *msg, const ev_uint32_t value)
+{
+  msg->op_set = 1;
+  msg->op = value;
+  return (0);
+}
+
+int
 migrate_request_from_mds_get(struct migrate_request *msg, ev_uint32_t *value)
 {
   if (msg->from_mds_set != 1)
@@ -6310,6 +6324,15 @@ migrate_request_stat_arr_get(struct migrate_request *msg, int offset,
   return (0);
 }
 
+int
+migrate_request_op_get(struct migrate_request *msg, ev_uint32_t *value)
+{
+  if (msg->op_set != 1)
+    return (-1);
+  *value = msg->op;
+  return (0);
+}
+
 void
 migrate_request_clear(struct migrate_request *tmp)
 {
@@ -6326,6 +6349,7 @@ migrate_request_clear(struct migrate_request *tmp)
     tmp->stat_arr_length = 0;
     tmp->stat_arr_num_allocated = 0;
   }
+  tmp->op_set = 0;
 }
 
 void
@@ -6358,6 +6382,7 @@ migrate_request_marshal(struct evbuffer *evbuf, const struct migrate_request *tm
       }
     }
   }
+  evtag_marshal_int(evbuf, MIGRATE_REQUEST_OP, tmp->op);
 }
 
 int
@@ -6409,6 +6434,17 @@ migrate_request_unmarshal(struct migrate_request *tmp,  struct evbuffer *evbuf)
         tmp->stat_arr_set = 1;
         break;
 
+      case MIGRATE_REQUEST_OP:
+
+        if (tmp->op_set)
+          return (-1);
+        if (evtag_unmarshal_int(evbuf, MIGRATE_REQUEST_OP, &tmp->op) == -1) {
+          event_warnx("%s: failed to unmarshal op", __func__);
+          return (-1);
+        }
+        tmp->op_set = 1;
+        break;
+
       default:
         return -1;
     }
@@ -6433,6 +6469,8 @@ migrate_request_complete(struct migrate_request *msg)
         return (-1);
     }
   }
+  if (!msg->op_set)
+    return (-1);
   return (0);
 }
 

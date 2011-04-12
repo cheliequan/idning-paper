@@ -17,9 +17,10 @@ struct file_stat *attr_cache_lookup(uint64_t ino)
 int attr_cache_add(struct file_stat *st)
 {
     assert(st->ino != 0);
-    assert(st->parent_ino != 0);
     struct file_stat *old = attr_cache_lookup(st->ino);
     if (old){
+        /*if (st->parent_ino == FS_VROOT_INO) //split 后的*/
+            
 
         old->size = st->size;
         old->mode = st->mode;
@@ -29,6 +30,7 @@ int attr_cache_add(struct file_stat *st)
         log_file_stat("attr_cache update instead insert !", old);
 
     }else{
+        assert(st->parent_ino != 0);
         log_file_stat("attr_cache_add: ", st);
         hashtable_insert(attr_ht, &(st->ino), st);
     }
