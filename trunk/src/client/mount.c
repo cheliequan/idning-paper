@@ -479,17 +479,22 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
 
     struct file_stat *stat = file_stat_new();
 
-
-
-    enforce_cache(parent);
-    struct file_stat *cached_parent ;
-    cached_parent = attr_cache_lookup(parent);
-    int i;
-    for (i=0;i<2; i++){
-        int mid = cached_parent->pos_arr[i];
-        struct machine *m = cluster_get_machine_by_mid(mid);
-        assert(0==mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFREG, stat)) ;
+    while(1){
+        enforce_cache(parent);
+        struct file_stat *cached_parent ;
+        cached_parent = attr_cache_lookup(parent);
+        int i;
+        int success = 1;
+        for (i=0;i<2; i++){
+            int mid = cached_parent->pos_arr[i];
+            struct machine *m = cluster_get_machine_by_mid(mid);
+            if (mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFREG, stat)  != 0) 
+                success = 0;
+        }
+        if (success)
+            break;
     }
+
 
     log_file_stat("create return :", stat);
     attr_cache_add(stat);       //no free
@@ -519,14 +524,20 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
     uint64_t ino = cmgr_get_uuid();
 
 
-    enforce_cache(parent);
-    struct file_stat *cached_parent ;
-    cached_parent = attr_cache_lookup(parent);
-    int i;
-    for (i=0;i<2; i++){
-        int mid = cached_parent->pos_arr[i];
-        struct machine *m = cluster_get_machine_by_mid(mid);
-        assert(0==mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFDIR, stat)) ;
+    while(1){
+        enforce_cache(parent);
+        struct file_stat *cached_parent ;
+        cached_parent = attr_cache_lookup(parent);
+        int i;
+        int success = 1;
+        for (i=0;i<2; i++){
+            int mid = cached_parent->pos_arr[i];
+            struct machine *m = cluster_get_machine_by_mid(mid);
+            if (mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFDIR, stat)  != 0) 
+                success = 0;
+        }
+        if (success)
+            break;
     }
 
     log_file_stat("create return :", stat);
@@ -554,15 +565,34 @@ void sfs_ll_symlink(fuse_req_t req, const char *path, fuse_ino_t parent,
 
     struct file_stat *stat = file_stat_new();
 
-    enforce_cache(parent);
-    struct file_stat *cached_parent ;
-    cached_parent = attr_cache_lookup(parent);
-    int i;
-    for (i=0;i<2; i++){
-        int mid = cached_parent->pos_arr[i];
-        struct machine *m = cluster_get_machine_by_mid(mid);
-        assert(0==  symlink_send_request(m->ip, m->port, parent, ino, name, path, stat) ) ;
+    
+    while(1){
+        enforce_cache(parent);
+        struct file_stat *cached_parent ;
+        cached_parent = attr_cache_lookup(parent);
+        int i;
+        int success = 1;
+        for (i=0;i<2; i++){
+            int mid = cached_parent->pos_arr[i];
+            struct machine *m = cluster_get_machine_by_mid(mid);
+            if ( symlink_send_request(m->ip, m->port, parent, ino, name, path, stat) != 0) 
+                success = 0;
+        }
+        if (success)
+            break;
     }
+
+
+
+    /*enforce_cache(parent);*/
+    /*struct file_stat *cached_parent ;*/
+    /*cached_parent = attr_cache_lookup(parent);*/
+    /*int i;*/
+    /*for (i=0;i<2; i++){*/
+        /*int mid = cached_parent->pos_arr[i];*/
+        /*struct machine *m = cluster_get_machine_by_mid(mid);*/
+        /*assert(0==  symlink_send_request(m->ip, m->port, parent, ino, name, path, stat) ) ;*/
+    /*}*/
 
 
     log_file_stat("symlink return :", stat);
@@ -580,20 +610,73 @@ void sfs_ll_symlink(fuse_req_t req, const char *path, fuse_ino_t parent,
     }
 }
 
+static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
+{
+    logging(LOG_DEUBG, "unlink(parent = %lu, name = %s)", parent, name);
+
+ 
+    while(1){
+        enforce_cache(parent);
+        struct file_stat *cached_parent ;
+        cached_parent = attr_cache_lookup(parent);
+        int i;
+        int success = 1;
+        for (i=0;i<2; i++){
+            int mid = cached_parent->pos_arr[i];
+            struct machine *m = cluster_get_machine_by_mid(mid);
+            if ( unlink_send_request(m->ip, m->port, parent, name) != 0) 
+                success = 0;
+        }
+        if (success)
+            break;
+    }
+
+
+
+
+    /*enforce_cache(parent);*/
+    /*struct file_stat *cached_parent ;*/
+    /*cached_parent = attr_cache_lookup(parent);*/
+    /*int i;*/
+    /*for (i=0;i<2; i++){*/
+        /*int mid = cached_parent->pos_arr[i];*/
+        /*struct machine *m = cluster_get_machine_by_mid(mid);*/
+        /*assert(0==  unlink_send_request(m->ip, m->port, parent, name) ) ;*/
+    /*}*/
+
+    fuse_reply_err(req, 0);
+}
+
 
 int do_set_attr(uint64_t ino){
     struct file_stat *cached = attr_cache_lookup(ino);
+    uint64_t parent = cached->parent_ino;
 
-
-    enforce_cache(cached->parent_ino);
-    struct file_stat *cached_parent ;
-    cached_parent = attr_cache_lookup(cached->parent_ino);
-    int i;
-    for (i=0;i<2; i++){
-        int mid = cached_parent->pos_arr[i];
-        struct machine *m = cluster_get_machine_by_mid(mid);
-        assert(0==  setattr_send_request(m->ip, m->port, cached) ) ;
+    while(1){
+        enforce_cache(parent);
+        struct file_stat *cached_parent ;
+        cached_parent = attr_cache_lookup(parent);
+        int i;
+        int success = 1;
+        for (i=0;i<2; i++){
+            int mid = cached_parent->pos_arr[i];
+            struct machine *m = cluster_get_machine_by_mid(mid);
+            if (setattr_send_request(m->ip, m->port, cached) != 0) 
+                success = 0;
+        }
+        if (success)
+            break;
     }
+
+    /*enforce_cache(cached->parent_ino);*/
+    /*struct file_stat *cached_parent ;*/
+    /*cached_parent = attr_cache_lookup(cached->parent_ino);*/
+    /*int i;*/
+    /*for (i=0;i<2; i++){*/
+        /*int mid = cached_parent->pos_arr[i];*/
+        /*struct machine *m = cluster_get_machine_by_mid(mid);*/
+        /*assert(0==  setattr_send_request(m->ip, m->port, cached) ) ;*/
+    /*}*/
 
     return 0;
 }
@@ -640,25 +723,6 @@ void sfs_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf,
     fuse_reply_attr(req, &stbuf, 1.0);
 }
 
-
-static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
-{
-    logging(LOG_DEUBG, "unlink(parent = %lu, name = %s)", parent, name);
-
-
-
-    enforce_cache(parent);
-    struct file_stat *cached_parent ;
-    cached_parent = attr_cache_lookup(parent);
-    int i;
-    for (i=0;i<2; i++){
-        int mid = cached_parent->pos_arr[i];
-        struct machine *m = cluster_get_machine_by_mid(mid);
-        assert(0==  unlink_send_request(m->ip, m->port, parent, name) ) ;
-    }
-
-    fuse_reply_err(req, 0);
-}
 
 void sfs_ll_release(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 {
