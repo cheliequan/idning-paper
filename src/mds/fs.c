@@ -306,7 +306,14 @@ int fs_mknod(uint64_t parent_ino, uint64_t ino, char *name, int type,
 {
     logging(LOG_DEUBG, "fs_mknod(parent_ino = %" PRIu64 " , name = %s)",
             parent_ino, name);
-    fsnode *n = fsnode_new();
+
+    //如果已经存在直接忽略，这样客户端如果在两个MDS上的一个创建的成功，另一个创建失败，就不用回滚.
+    fsnode *n ;
+    int rst_code = fs_lookup(parent_ino, name, &n); //也可用ino在hash表中找.
+    if (n!=NULL)
+        return 0;
+
+    n = fsnode_new();
     n->parent = fsnode_hash_find(parent_ino);
     if (n->parent == NULL) {
         return RST_CODE_NOT_FOUND;
