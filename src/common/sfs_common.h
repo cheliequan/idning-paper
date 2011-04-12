@@ -36,5 +36,13 @@
 #include "connection_pool.h"
 
 
+//#define migrate_threshold 1000
+//#define migrate_precent 0.75
+
+#define migrate_threshold 100
+#define migrate_precent 0
+
+
+
 
 #endif /* _SFS_COMMON_H_ */

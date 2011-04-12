@@ -106,3 +106,4 @@ int fs_init();
 
 int fs_load(char * path);
 int fs_store(char * path);
+void fs_del_children_dfs(fsnode * root);

@@ -74,6 +74,40 @@ static int reply_buf_limited(fuse_req_t req, const char *buf, size_t bufsize,
         return fuse_reply_buf(req, NULL, 0);
 }
 
+
+
+//FIXME: 如果被move了，该方法就不对
+static struct file_stat *get_attr_force1(uint64_t ino)
+{
+
+    struct file_stat *cached = attr_cache_lookup(ino);
+    while(1){
+        int mid;
+        logging(LOG_DEUBG, "ning_ ensure get_attr_force1 %"PRIu64, ino);
+        mid = get_mid_of_ino(cached->parent_ino);
+        //?? out of date??
+        struct machine *m = cluster_get_machine_by_mid(mid);
+        uint64_t arr[1];
+        arr[0] = ino;
+
+        log_file_stat("stat before updat in cache:", cached);
+        if (0 == stat_send_request(m->ip, m->port, arr, 1, cached) )
+            break;
+        else{
+            get_attr_force1(cached->parent_ino);
+            logging(LOG_DEUBG, "get_attr_force1 err ,try to get it's parent  ");
+
+        }
+        log_file_stat("stat updated in cache:", cached);
+    }
+    return cached;
+}
+
+void get_attr_force(uint64_t ino){
+    search_inode_over_all_mds(ino);
+    /*get_attr_force1(ino);*/
+}
+
 /*
  * get file_stat form cache  
  * if the cache is out of date
@@ -144,7 +178,10 @@ static void sfs_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
 
     struct file_stat *stat = file_stat_new();
     struct machine *m = get_machine_of_inode(parent);
-    lookup_send_request(m->ip, m->port, (uint64_t) parent, name, stat);
+    while (0 != lookup_send_request(m->ip, m->port, (uint64_t) parent, name, stat)){
+        get_attr_force(parent);
+        logging(LOG_WARN, "get_attr_force( %"PRIu64")", parent);
+    }
     logging(LOG_DEUBG, "lookup(parent = %lu, name = %s) return inode: %lu",
             parent, name, e.ino);
     if (stat->ino) {
@@ -171,7 +208,10 @@ static void sfs_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     int cnt;
 
     struct machine *m = get_machine_of_inode(ino);
-    ls_send_request(m->ip, m->port, ino, &stat_arr, &cnt);
+    while( 0!= ls_send_request(m->ip, m->port, ino, &stat_arr, &cnt)){
+        get_attr_force(ino);
+        logging(LOG_WARN, "get_attr_force( %"PRIu64")", ino);
+    }
     int i;
     struct dirbuf b;
     memset(&b, 0, sizeof(b));
@@ -204,6 +244,7 @@ void sfs_ll_readlink(fuse_req_t req, fuse_ino_t ino)
 {
     logging(LOG_DEUBG, "readlink(ino = %lu)", ino);
     struct machine *m = get_machine_of_parent_inode(ino);
+    //FIXME，检查返回值
     const char *path = readlink_send_request(m->ip, m->port, ino);
     logging(LOG_DEUBG, "sfs_ll_readlink get path: %s", path);
 
@@ -342,7 +383,11 @@ void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
         for (i=0;i<2; i++){
             int mid = cached_parent->pos_arr[i];
             struct machine *m = cluster_get_machine_by_mid(mid);
-            setattr_send_request(m->ip, m->port, f_stat);
+            while( 0!=setattr_send_request(m->ip, m->port, f_stat)){
+                get_attr_force(f_stat->parent_ino);
+                logging(LOG_WARN, "get_attr_force( %"PRIu64")", f_stat->parent_ino);
+            }
+
         }
 
 
@@ -352,7 +397,7 @@ void sfs_ll_flush(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
 
     fuse_reply_err(req, err);
 }
-
+/*async请求中，如果同时发了两个请求，要两个返回才返回.*/
 int stat_mds_req_cb(struct mds_req_ctx * ctx, void* ptr){
     DBG();
     if (--ctx->count){
@@ -368,6 +413,7 @@ int stat_mds_req_cb(struct mds_req_ctx * ctx, void* ptr){
 
 
 
+/*async请求中，如果同时发了两个请求，要两个返回才返回.*/
 int create_mds_req_cb(struct mds_req_ctx * ctx, void* ptr){
     DBG();
     if (--ctx->count){
@@ -437,7 +483,12 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
     for (i=0;i<2; i++){
         int mid = cached_parent->pos_arr[i];
         struct machine *m = cluster_get_machine_by_mid(mid);
-        mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFREG, stat);
+        while( 0!= mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFREG, stat)){
+            if(LOG_LEVEL == LOG_DEUBG)
+                sleep(1);
+            get_attr_force(parent); 
+            logging(LOG_WARN, "get_attr_force( %"PRIu64")", parent);
+        }
     }
 
     log_file_stat("create return :", stat);
@@ -475,7 +526,10 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
     for (i=0;i<2; i++){
         int mid = cached_parent->pos_arr[i];
         struct machine *m = cluster_get_machine_by_mid(mid);
-        mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFDIR, stat);
+        while(0!=mknod_send_request(m->ip, m->port, parent, ino, name, 0, S_IFDIR, stat)) {
+            get_attr_force(parent);
+            logging(LOG_WARN, "get_attr_force( %"PRIu64")", parent);
+        }
     }
 
     log_file_stat("create return :", stat);
@@ -508,7 +562,10 @@ void sfs_ll_symlink(fuse_req_t req, const char *path, fuse_ino_t parent,
     for (i=0;i<2; i++){
         int mid = cached_parent->pos_arr[i];
         struct machine *m = cluster_get_machine_by_mid(mid);
-        symlink_send_request(m->ip, m->port, parent, ino, name, path, stat);
+        while(0!=symlink_send_request(m->ip, m->port, parent, ino, name, path, stat)){
+            get_attr_force(parent);
+            logging(LOG_WARN, "get_attr_force( %"PRIu64")", parent);
+        }
     }
 
     log_file_stat("symlink return :", stat);
@@ -568,7 +625,10 @@ void sfs_ll_setattr(fuse_req_t req, fuse_ino_t ino, struct stat *in_stbuf,
     for (i=0;i<2; i++){
         int mid = cached_parent->pos_arr[i];
         struct machine *m = cluster_get_machine_by_mid(mid);
-        setattr_send_request(m->ip, m->port, old_stat);
+        while( 0 != setattr_send_request(m->ip, m->port, old_stat)){
+            get_attr_force(cached_parent->ino);
+        logging(LOG_WARN, "get_attr_force( %"PRIu64")", cached_parent->ino);
+        }
     }
 
     struct stat stbuf;
@@ -590,7 +650,10 @@ static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
     for (i=0;i<2; i++){
         int mid = cached_parent->pos_arr[i];
         struct machine *m = cluster_get_machine_by_mid(mid);
-        unlink_send_request(m->ip, m->port, parent, name);
+        while( 0!= unlink_send_request(m->ip, m->port, parent, name)){
+            get_attr_force(parent);
+            logging(LOG_WARN, "get_attr_force( %"PRIu64")", parent);
+        }
     }
     fuse_reply_err(req, 0);
 }
@@ -701,8 +764,8 @@ static struct fuse_lowlevel_ops sfs_ll_op = {
     .write =    sfs_ll_write,
     .setattr =  sfs_ll_setattr,
     .flush =    sfs_ll_flush,
-    .create =   sfs_ll_create_async,
-    /*.create =   sfs_ll_create,*/
+    /*.create =   sfs_ll_create_async,*/
+    .create =   sfs_ll_create,
     .mkdir =    sfs_ll_mkdir,
     .unlink =   sfs_ll_unlink,
     .rmdir =    sfs_ll_unlink,
@@ -742,9 +805,17 @@ int main(int argc, char *argv[])
     char *mountpoint = "/tmp/a";
     int err = -1;
 
-    //if (fuse_parse_cmdline(&args, &mountpoint, NULL, NULL) != -1 &&
-    if (fuse_parse_cmdline(&args, NULL, NULL, NULL) != -1 &&
-        (ch = fuse_mount(mountpoint, &args)) != NULL) {
+    /*fprintf(stderr, "fuse_parse_cmdline(&args, &mountpoint, NULL, NULL) = %d ", fuse_parse_cmdline(&args, &mountpoint, NULL, NULL));*/
+
+
+    if (fuse_parse_cmdline(&args, &mountpoint, NULL, NULL) != -1 ){
+        fprintf(stderr, "parsed mountpoint is : %s", mountpoint);
+        if(mountpoint == NULL){
+            mountpoint = "/tmp/a";
+            fprintf(stderr, "use /tmp/a as mount point " );
+        }
+        ch = fuse_mount(mountpoint, &args);
+
         struct fuse_session *se;
 
         se = fuse_lowlevel_new(&args, &sfs_ll_op, sizeof(sfs_ll_op), NULL);
@@ -758,7 +829,26 @@ int main(int argc, char *argv[])
             fuse_session_destroy(se);
         }
         fuse_unmount(mountpoint, ch);
+    
+    
+    
     }
+    /*if (fuse_parse_cmdline(&args, &mountpoint, NULL, NULL) != -1 &&*/
+        /*(ch = fuse_mount(mountpoint, &args)) != NULL) {*/
+        /*struct fuse_session *se;*/
+
+        /*se = fuse_lowlevel_new(&args, &sfs_ll_op, sizeof(sfs_ll_op), NULL);*/
+        /*if (se != NULL) {*/
+            /*if (fuse_set_signal_handlers(se) != -1) {*/
+                /*fuse_session_add_chan(se, ch);*/
+                /*err = fuse_session_loop(se);*/
+                /*fuse_remove_signal_handlers(se);*/
+                /*fuse_session_remove_chan(ch);*/
+            /*}*/
+            /*fuse_session_destroy(se);*/
+        /*}*/
+        /*fuse_unmount(mountpoint, ch);*/
+    /*}*/
     fuse_opt_free_args(&args);
 
     return err ? 1 : 0;

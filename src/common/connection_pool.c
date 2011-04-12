@@ -21,7 +21,7 @@ ConnectionPool *connection_pool_free(ConnectionPool * pool)
 void connection_pool_insert(ConnectionPool * pool, char *host, int port,
                             struct evhttp_connection *conn)
 {
-    logging(LOG_DEUBG, "connection_pool_insert on %s:%d", host, port);
+    logging(LOG_CONN, "connection_pool_insert on %s:%d", host, port);
     struct PoolEntry *e = malloc(sizeof(struct PoolEntry));
     e->conn = conn;
     sprintf(e->host_port, "%s:%d", host, port);
@@ -53,7 +53,7 @@ struct evhttp_connection *connection_pool_get_free_conn(ConnectionPool * pool,
 
     struct PoolEntry *old = hashtable_lookup(pool->ht, str);
     if (NULL == old) {
-        logging(LOG_DEUBG,
+        logging(LOG_CONN,
                 "_connection_pool_get_free_conn on %s:%d return NULL!!!!!",
                 host, port);
         return NULL;
@@ -70,7 +70,7 @@ struct evhttp_connection *connection_pool_get_free_conn(ConnectionPool * pool,
 
         return conn;
     }
-    logging(LOG_DEUBG,
+    logging(LOG_CONN,
             "connection_pool_get_free_conn on %s:%d return NULL!!!!!", host,
             port);
     return NULL;

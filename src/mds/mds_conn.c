@@ -29,6 +29,17 @@ void migrate_handler(EVRPC_STRUCT(rpc_migrate) * rpc, void *arg)
     int i;
 
 
+    //check if exist
+    for (i = 0; i < cnt; i++) {
+        EVTAG_ARRAY_GET(req, stat_arr, i, &stat);
+        if(fsnode_hash_find(stat->ino)){
+            EVTAG_ASSIGN(response, rst, 1);
+            EVRPC_REQUEST_DONE(rpc);
+            return;
+        }
+    }
+
+
     EVTAG_ARRAY_GET(req, stat_arr, 0, &stat);
     fsnode * n = fsnode_new();
     stat_to_fsnode_copy(n, stat);
@@ -51,7 +62,7 @@ void migrate_handler(EVRPC_STRUCT(rpc_migrate) * rpc, void *arg)
         fsnode_tree_insert(n->parent, n);
         replace_pos(n, req->from_mds, req->to_mds);
     }
-    EVTAG_ASSIGN(response, rst, 1);
+    EVTAG_ASSIGN(response, rst, 0);
 
     EVRPC_REQUEST_DONE(rpc);
 }
@@ -67,6 +78,11 @@ void migrate_cb(struct evrpc_status *status, struct migrate_request *req,
                     struct migrate_response *response, void *arg)
 {
     fsnode * root = (fsnode * )arg;
+    if (response -> rst != 0){
+        logging(LOG_INFO, "migrate return not zero, maybe confict ");
+        event_base_loopexit(mds_mds_ev_base, NULL);
+        return;
+    }
     if(root->modifiy_flag){
         /*invalid it at dest mds*/
         /*assert(0);*/
@@ -83,7 +99,12 @@ void migrate_cb(struct evrpc_status *status, struct migrate_request *req,
                             /*response, (unmarshal_func) unlink_response_unmarshal);*/
 
     }else{
+
+        logging(LOG_INFO, "migrate return ok , trying to rm AND update subtree %s ", root->name);
         replace_pos(root, req->from_mds, req->to_mds);
+        fs_del_children_dfs(root);
+        logging(LOG_INFO, "after rm AND update subtree %s : [%d, %d]", root->name, root->pos_arr[0], root->pos_arr[1]);
+        
         event_base_loopexit(mds_mds_ev_base, NULL);
     }
 }
@@ -113,7 +134,7 @@ int migrate_send_request(char * ip, int port, fsnode * root, int from_mds, int t
 {
     DBG();
     root->modifiy_flag = 0;
-    logging(LOG_DEUBG, "going to migrate from %d to %d , tree root is : %s", from_mds, to_mds, root->name);
+    logging(LOG_DEUBG, "going to migrate from %d to %d , %"PRIu64" tree root name is : %s", from_mds, to_mds, root->ino, root->name);
     struct migrate_request * req= migrate_request_new();
     struct migrate_response * response = migrate_response_new();
     EVTAG_ASSIGN(req, from_mds, from_mds);

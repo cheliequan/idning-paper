@@ -35,6 +35,7 @@ void cluster_remove(char *ip, int port);
 void cluster_printf(char *hint);
 void cluster_dump();
 static int cluster_uuid();
+void sort_mds_arr();
 
 static char *cluster_type_str(int type)
 {
@@ -151,7 +152,8 @@ int ping_send_request_with_version(int req_version)
         machines[i].mid = m->mid;
         machines[i].load = m->load;
     }
-    cluster_printf("after pong::");
+    sort_mds_arr();
+    cluster_printf("after pong & sort::");
     cluster_dump();
 
   done:
@@ -351,12 +353,21 @@ void cluster_dump()
             osd_arr[osd_cnt++] = machines[i].mid;
     }
 
-    /*pong_p -> machine_arrlength = machine_cnt; */
-    /*pong_p -> machine_arr = machines; */
+}
 
-    /*pong_buffer_len = pong_pack(pong_p, pong_buffer, 0); */
+static int machines_load_cmp(const void *p1, const void *p2)
+{
+    return ((struct machine *) p2)->load - ((struct machine *) p1)->load ;
+}
 
-    /*pong_buffer[pong_buffer_len] = 0; */
+void sort_mds_arr(){
+    qsort(machines, machine_cnt, sizeof(struct machine),
+            machines_load_cmp);
+
+    /*for (int i=0; i<machine_cnt;i++){*/
+
+    
+    /*}*/
 }
 
 /*void * cmgr_client_loop_func(void * ptr){*/
