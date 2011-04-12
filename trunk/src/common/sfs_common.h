@@ -36,12 +36,13 @@
 #include "connection_pool.h"
 
 
-#define migrate_threshold 1000
-#define migrate_precent 0.55
-#define migrate_count 50000
+//#define migrate_threshold 1000
+//#define migrate_precent 0.55
+//#define migrate_count 50000
 
-//#define migrate_threshold 100
-//#define migrate_precent 0
+#define migrate_threshold 100
+#define migrate_precent 0
+#define migrate_count 5000
 
 
 
