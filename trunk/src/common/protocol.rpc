@@ -33,7 +33,8 @@ struct file_stat {
     optional int   mtime                = 8;
     optional int   ctime                = 9;
     array int pos_arr                   = 10;
-    optional int64 parent_ino                    = 11;
+    optional int64 parent_ino           = 11;
+    optional int version                = 12; //for client , is the current cluster version when add into cache
 }
 
 struct stat_request {

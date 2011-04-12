@@ -48,7 +48,7 @@ static void stat_handler(EVRPC_STRUCT(rpc_stat) * rpc, void *arg)
     int rst_code = fs_stat(ino, &n);
     EVTAG_ASSIGN(response, rst_code, rst_code);
     if(rst_code != 0 ){
-        logging(LOG_WARN, "stat_handler return rst_code != 0");
+        logging(LOG_WARN, "stat_handler(%"PRIu64") return rst_code != 0", ino);
         goto done;
     }
 
@@ -473,7 +473,7 @@ void do_migrate(){
         n = locate_hot_sub_tree(n);
         if (n == NULL)
             return ;
-        if (n->tree_cnt < 10240) {// 1w
+        if (n->tree_cnt < migrate_count && n->tree_cnt > 10) {// 1w
             if (n ->ino == FS_VROOT_INO || n->ino == FS_ROOT_INO)
                 return ;
             logging(LOG_INFO, "migrate on %"PRIu64". %s, tree_cnt : %d", n->ino, n->name, n->tree_cnt);

@@ -24,6 +24,8 @@ int cluster_get_osd_cnt();
 
 void set_self_machine_load(int load);
 int get_self_machine_load();
+
+int cluster_get_current_version();
 struct machine *cluster_get_mds_with_lowest_load();
 struct machine *cluster_get_mds_with_max_load();
 struct machine * get_self_machine();

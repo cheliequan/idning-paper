@@ -27,12 +27,13 @@ int attr_cache_add(struct file_stat *st)
         old->pos_arr[0] = st ->pos_arr[0];
         old->pos_arr[1] = st ->pos_arr[1];
         old->name = strdup(st->name);
+        old->version = cluster_get_current_version();
         log_file_stat("attr_cache update instead insert !", old);
-
     }else{
         assert(st->parent_ino != 0);
-        log_file_stat("attr_cache_add: ", st);
+        st->version = cluster_get_current_version();
         hashtable_insert(attr_ht, &(st->ino), st);
+        log_file_stat("attr_cache_ inserted: ", st);
     }
 
 
