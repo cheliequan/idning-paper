@@ -1,0 +1,513 @@
+04-13-2011 17:43:34.274823 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 0, cpu:0.588811
+04-13-2011 17:43:36.274803 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 0, cpu:0.575916
+04-13-2011 17:43:37.813137 [WARN] <b78666c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:38.274805 [WARN] <b78666c0>load_old: 0, load_current: 3, load_new: 0, load_max: 3, cpu:0.580000
+04-13-2011 17:43:40.274812 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 3, cpu:0.616541
+04-13-2011 17:43:42.274811 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 3, cpu:0.553885
+04-13-2011 17:43:44.274844 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 3, cpu:0.578947
+04-13-2011 17:43:46.274815 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 3, cpu:0.571429
+04-13-2011 17:43:48.274817 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 3, cpu:0.586466
+04-13-2011 17:43:50.274802 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 3, cpu:0.573935
+04-13-2011 17:43:52.274808 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 3, cpu:0.557500
+04-13-2011 17:43:54.274325 [WARN] <b78666c0>load_old: 0, load_current: 24, load_new: 2, load_max: 24, cpu:0.796992
+04-13-2011 17:43:56.274297 [WARN] <b78666c0>load_old: 2, load_current: 7, load_new: 2, load_max: 24, cpu:0.581047
+04-13-2011 17:43:58.271890 [WARN] <b78666c0>load_old: 2, load_current: 1663, load_new: 168, load_max: 1663, cpu:0.816327
+04-13-2011 17:44:00.272108 [WARN] <b78666c0>load_old: 168, load_current: 4548, load_new: 606, load_max: 4548, cpu:1.000000
+04-13-2011 17:44:02.271453 [WARN] <b78666c0>load_old: 606, load_current: 4255, load_new: 970, load_max: 4548, cpu:1.000000
+04-13-2011 17:44:04.271873 [WARN] <b78666c0>load_old: 970, load_current: 3639, load_new: 1236, load_max: 4548, cpu:1.000000
+04-13-2011 17:44:06.271430 [WARN] <b78666c0>load_old: 1236, load_current: 3452, load_new: 1457, load_max: 4548, cpu:1.000000
+04-13-2011 17:44:08.271771 [WARN] <b78666c0>load_old: 1457, load_current: 3818, load_new: 1693, load_max: 4548, cpu:1.000000
+04-13-2011 17:44:10.272281 [WARN] <b78666c0>load_old: 1693, load_current: 3486, load_new: 1872, load_max: 4548, cpu:1.000000
+04-13-2011 17:44:12.271888 [WARN] <b78666c0>load_old: 1872, load_current: 3650, load_new: 2049, load_max: 4548, cpu:1.000000
+04-13-2011 17:44:14.272435 [WARN] <b78666c0>load_old: 2049, load_current: 3499, load_new: 2194, load_max: 4548, cpu:1.000000
+04-13-2011 17:44:16.272010 [WARN] <b78666c0>load_old: 2194, load_current: 3935, load_new: 2368, load_max: 4548, cpu:1.000000
+04-13-2011 17:44:18.271703 [WARN] <b78666c0>load_old: 2368, load_current: 3243, load_new: 2455, load_max: 4548, cpu:1.000000
+04-13-2011 17:44:20.271958 [WARN] <b78666c0>load_old: 2455, load_current: 3322, load_new: 2541, load_max: 4548, cpu:1.000000
+04-13-2011 17:44:20.272165 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:44:20.272368 [WARN] <b78666c0>YES, I'm the boss , do it ! migrate !
+04-13-2011 17:44:20.272387 [WARN] <b78666c0>migrate on 9869741. 2, tree_cnt : 3045
+04-13-2011 17:44:20.296152 [WARN] <b78666c0>stat_handler(9891119) return rst_code != 0
+04-13-2011 17:44:20.297710 [WARN] <b78666c0>stat_handler(9869741) return rst_code != 0
+04-13-2011 17:44:20.352323 [WARN] <b78666c0>stat_handler(9892322) return rst_code != 0
+04-13-2011 17:44:20.355148 [WARN] <b78666c0>stat_handler(9892337) return rst_code != 0
+04-13-2011 17:44:20.358035 [WARN] <b78666c0>stat_handler(9892453) return rst_code != 0
+04-13-2011 17:44:20.359766 [WARN] <b78666c0>stat_handler(9892452) return rst_code != 0
+04-13-2011 17:44:20.363097 [WARN] <b78666c0>stat_handler(9892468) return rst_code != 0
+04-13-2011 17:44:20.365875 [WARN] <b78666c0>stat_handler(9892483) return rst_code != 0
+04-13-2011 17:44:20.369021 [WARN] <b78666c0>stat_handler(9892498) return rst_code != 0
+04-13-2011 17:44:20.371893 [WARN] <b78666c0>stat_handler(9892513) return rst_code != 0
+04-13-2011 17:44:20.374837 [WARN] <b78666c0>stat_handler(9892528) return rst_code != 0
+04-13-2011 17:44:20.377565 [WARN] <b78666c0>stat_handler(9892643) return rst_code != 0
+04-13-2011 17:44:20.380414 [WARN] <b78666c0>stat_handler(9892658) return rst_code != 0
+04-13-2011 17:44:20.383475 [WARN] <b78666c0>stat_handler(9892673) return rst_code != 0
+04-13-2011 17:44:20.386404 [WARN] <b78666c0>stat_handler(9892688) return rst_code != 0
+04-13-2011 17:44:20.389153 [WARN] <b78666c0>stat_handler(9892703) return rst_code != 0
+04-13-2011 17:44:20.392047 [WARN] <b78666c0>stat_handler(9892718) return rst_code != 0
+04-13-2011 17:44:20.394914 [WARN] <b78666c0>stat_handler(9892733) return rst_code != 0
+04-13-2011 17:44:20.397576 [WARN] <b78666c0>stat_handler(9892848) return rst_code != 0
+04-13-2011 17:44:20.400621 [WARN] <b78666c0>stat_handler(9892864) return rst_code != 0
+04-13-2011 17:44:20.402139 [WARN] <b78666c0>stat_handler(9892863) return rst_code != 0
+04-13-2011 17:44:20.405437 [WARN] <b78666c0>stat_handler(9892879) return rst_code != 0
+04-13-2011 17:44:20.408436 [WARN] <b78666c0>stat_handler(9892894) return rst_code != 0
+04-13-2011 17:44:20.411459 [WARN] <b78666c0>stat_handler(9892909) return rst_code != 0
+04-13-2011 17:44:20.414058 [WARN] <b78666c0>stat_handler(9892924) return rst_code != 0
+04-13-2011 17:44:20.416754 [WARN] <b78666c0>stat_handler(9892939) return rst_code != 0
+04-13-2011 17:44:20.419356 [WARN] <b78666c0>stat_handler(9893054) return rst_code != 0
+04-13-2011 17:44:20.422179 [WARN] <b78666c0>stat_handler(9893069) return rst_code != 0
+04-13-2011 17:44:20.425016 [WARN] <b78666c0>stat_handler(9893084) return rst_code != 0
+04-13-2011 17:44:20.427834 [WARN] <b78666c0>stat_handler(9893099) return rst_code != 0
+04-13-2011 17:44:20.430620 [WARN] <b78666c0>stat_handler(9893114) return rst_code != 0
+04-13-2011 17:44:20.433425 [WARN] <b78666c0>stat_handler(9893129) return rst_code != 0
+04-13-2011 17:44:20.436291 [WARN] <b78666c0>stat_handler(9893244) return rst_code != 0
+04-13-2011 17:44:20.439028 [WARN] <b78666c0>stat_handler(9893259) return rst_code != 0
+04-13-2011 17:44:20.441871 [WARN] <b78666c0>stat_handler(9893275) return rst_code != 0
+04-13-2011 17:44:20.443541 [WARN] <b78666c0>stat_handler(9893274) return rst_code != 0
+04-13-2011 17:44:20.446617 [WARN] <b78666c0>stat_handler(9893290) return rst_code != 0
+04-13-2011 17:44:20.449625 [WARN] <b78666c0>stat_handler(9893305) return rst_code != 0
+04-13-2011 17:44:20.452564 [WARN] <b78666c0>stat_handler(9893320) return rst_code != 0
+04-13-2011 17:44:20.455564 [WARN] <b78666c0>stat_handler(9893335) return rst_code != 0
+04-13-2011 17:44:20.458375 [WARN] <b78666c0>stat_handler(9893550) return rst_code != 0
+04-13-2011 17:44:20.461477 [WARN] <b78666c0>stat_handler(9893565) return rst_code != 0
+04-13-2011 17:44:20.464352 [WARN] <b78666c0>stat_handler(9893580) return rst_code != 0
+04-13-2011 17:44:20.467132 [WARN] <b78666c0>stat_handler(9893595) return rst_code != 0
+04-13-2011 17:44:20.469955 [WARN] <b78666c0>stat_handler(9893610) return rst_code != 0
+04-13-2011 17:44:20.472815 [WARN] <b78666c0>stat_handler(9893625) return rst_code != 0
+04-13-2011 17:44:20.475449 [WARN] <b78666c0>stat_handler(9893640) return rst_code != 0
+04-13-2011 17:44:20.478080 [WARN] <b78666c0>stat_handler(9893655) return rst_code != 0
+04-13-2011 17:44:20.481286 [WARN] <b78666c0>stat_handler(9893670) return rst_code != 0
+04-13-2011 17:44:20.483886 [WARN] <b78666c0>stat_handler(9888031) return rst_code != 0
+04-13-2011 17:44:20.501757 [WARN] <b78666c0>stat_handler(9888247) return rst_code != 0
+04-13-2011 17:44:20.518961 [WARN] <b78666c0>stat_handler(9888262) return rst_code != 0
+04-13-2011 17:44:20.535331 [WARN] <b78666c0>stat_handler(9888277) return rst_code != 0
+04-13-2011 17:44:20.551990 [WARN] <b78666c0>stat_handler(9888292) return rst_code != 0
+04-13-2011 17:44:20.568629 [WARN] <b78666c0>stat_handler(9888307) return rst_code != 0
+04-13-2011 17:44:20.586092 [WARN] <b78666c0>stat_handler(9888322) return rst_code != 0
+04-13-2011 17:44:20.602879 [WARN] <b78666c0>stat_handler(9888337) return rst_code != 0
+04-13-2011 17:44:20.619307 [WARN] <b78666c0>stat_handler(9888352) return rst_code != 0
+04-13-2011 17:44:20.636009 [WARN] <b78666c0>stat_handler(9888367) return rst_code != 0
+04-13-2011 17:44:20.653063 [WARN] <b78666c0>stat_handler(9888382) return rst_code != 0
+04-13-2011 17:44:20.670034 [WARN] <b78666c0>stat_handler(9888397) return rst_code != 0
+04-13-2011 17:44:20.686336 [WARN] <b78666c0>stat_handler(9888412) return rst_code != 0
+04-13-2011 17:44:20.703214 [WARN] <b78666c0>stat_handler(9888427) return rst_code != 0
+04-13-2011 17:44:20.721050 [WARN] <b78666c0>stat_handler(9888443) return rst_code != 0
+04-13-2011 17:44:20.722588 [WARN] <b78666c0>stat_handler(9888442) return rst_code != 0
+04-13-2011 17:44:20.740539 [WARN] <b78666c0>stat_handler(9888458) return rst_code != 0
+04-13-2011 17:44:20.757816 [WARN] <b78666c0>stat_handler(9888473) return rst_code != 0
+04-13-2011 17:44:20.775364 [WARN] <b78666c0>stat_handler(9888488) return rst_code != 0
+04-13-2011 17:44:20.792874 [WARN] <b78666c0>stat_handler(9888503) return rst_code != 0
+04-13-2011 17:44:20.810238 [WARN] <b78666c0>stat_handler(9888518) return rst_code != 0
+04-13-2011 17:44:20.827015 [WARN] <b78666c0>stat_handler(9888533) return rst_code != 0
+04-13-2011 17:44:20.844280 [WARN] <b78666c0>stat_handler(9888548) return rst_code != 0
+04-13-2011 17:44:20.862484 [WARN] <b78666c0>stat_handler(9888563) return rst_code != 0
+04-13-2011 17:44:20.879672 [WARN] <b78666c0>stat_handler(9888578) return rst_code != 0
+04-13-2011 17:44:20.897262 [WARN] <b78666c0>stat_handler(9888593) return rst_code != 0
+04-13-2011 17:44:20.914363 [WARN] <b78666c0>stat_handler(9888608) return rst_code != 0
+04-13-2011 17:44:20.931629 [WARN] <b78666c0>stat_handler(9888623) return rst_code != 0
+04-13-2011 17:44:20.948730 [WARN] <b78666c0>stat_handler(9888638) return rst_code != 0
+04-13-2011 17:44:20.966924 [WARN] <b78666c0>stat_handler(9888754) return rst_code != 0
+04-13-2011 17:44:20.968566 [WARN] <b78666c0>stat_handler(9888753) return rst_code != 0
+04-13-2011 17:44:20.986019 [WARN] <b78666c0>stat_handler(9888769) return rst_code != 0
+04-13-2011 17:44:21.005536 [WARN] <b78666c0>stat_handler(9888784) return rst_code != 0
+04-13-2011 17:44:21.022831 [WARN] <b78666c0>stat_handler(9888799) return rst_code != 0
+04-13-2011 17:44:21.039940 [WARN] <b78666c0>stat_handler(9888814) return rst_code != 0
+04-13-2011 17:44:21.057494 [WARN] <b78666c0>stat_handler(9888829) return rst_code != 0
+04-13-2011 17:44:21.075046 [WARN] <b78666c0>stat_handler(9888944) return rst_code != 0
+04-13-2011 17:44:21.092090 [WARN] <b78666c0>stat_handler(9888959) return rst_code != 0
+04-13-2011 17:44:21.109344 [WARN] <b78666c0>stat_handler(9888974) return rst_code != 0
+04-13-2011 17:44:21.126639 [WARN] <b78666c0>stat_handler(9888989) return rst_code != 0
+04-13-2011 17:44:21.143872 [WARN] <b78666c0>stat_handler(9889004) return rst_code != 0
+04-13-2011 17:44:21.161101 [WARN] <b78666c0>stat_handler(9889019) return rst_code != 0
+04-13-2011 17:44:21.178351 [WARN] <b78666c0>stat_handler(9889034) return rst_code != 0
+04-13-2011 17:44:22.271847 [WARN] <b78666c0>load_old: 1270, load_current: 2687, load_new: 1411, load_max: 4548, cpu:1.000000
+04-13-2011 17:44:23.108238 [WARN] <b78666c0>mknod_handler return rst_code != 0
+04-13-2011 17:44:23.108870 [WARN] <b78666c0>mknod_handler return rst_code != 0
+04-13-2011 17:44:24.271639 [WARN] <b78666c0>load_old: 1411, load_current: 3440, load_new: 1613, load_max: 4548, cpu:0.997403
+04-13-2011 17:44:26.271564 [WARN] <b78666c0>load_old: 1613, load_current: 4094, load_new: 1861, load_max: 4548, cpu:1.000000
+04-13-2011 17:44:28.271670 [WARN] <b78666c0>load_old: 1861, load_current: 4555, load_new: 2130, load_max: 4555, cpu:1.000000
+04-13-2011 17:44:30.271748 [WARN] <b78666c0>load_old: 2130, load_current: 3500, load_new: 2267, load_max: 4555, cpu:1.000000
+04-13-2011 17:44:32.271842 [WARN] <b78666c0>load_old: 2267, load_current: 3431, load_new: 2383, load_max: 4555, cpu:1.000000
+04-13-2011 17:44:34.271489 [WARN] <b78666c0>load_old: 2383, load_current: 3328, load_new: 2477, load_max: 4555, cpu:1.000000
+04-13-2011 17:44:36.271790 [WARN] <b78666c0>load_old: 2477, load_current: 3447, load_new: 2574, load_max: 4555, cpu:1.000000
+04-13-2011 17:44:36.272077 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:44:36.272275 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:44:38.271431 [WARN] <b78666c0>load_old: 2574, load_current: 3462, load_new: 2662, load_max: 4555, cpu:1.000000
+04-13-2011 17:44:38.273189 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:44:38.273682 [WARN] <b78666c0>YES, I'm the boss , do it ! migrate !
+04-13-2011 17:44:38.273730 [WARN] <b78666c0>migrate on 9869740. 1, tree_cnt : 2966
+04-13-2011 17:44:38.297440 [WARN] <b78666c0>stat_handler(9908994) return rst_code != 0
+04-13-2011 17:44:38.298488 [WARN] <b78666c0>stat_handler(9908897) return rst_code != 0
+04-13-2011 17:44:38.299289 [WARN] <b78666c0>stat_handler(9869740) return rst_code != 0
+04-13-2011 17:44:38.306769 [WARN] <b78666c0>mknod_handler return rst_code != 0
+04-13-2011 17:44:38.307144 [WARN] <b78666c0>mknod_handler return rst_code != 0
+04-13-2011 17:44:40.274310 [WARN] <b78666c0>load_old: 1331, load_current: 7, load_new: 1198, load_max: 4555, cpu:0.576060
+04-13-2011 17:44:42.274311 [WARN] <b78666c0>load_old: 1198, load_current: 0, load_new: 718, load_max: 4555, cpu:0.555000
+04-13-2011 17:44:44.274318 [WARN] <b78666c0>load_old: 718, load_current: 0, load_new: 430, load_max: 4555, cpu:0.554430
+04-13-2011 17:44:46.274313 [WARN] <b78666c0>load_old: 430, load_current: 0, load_new: 257, load_max: 4555, cpu:0.557500
+04-13-2011 17:44:48.278310 [WARN] <b78666c0>load_old: 257, load_current: 0, load_new: 154, load_max: 4555, cpu:0.644110
+04-13-2011 17:44:50.275777 [WARN] <b78666c0>load_old: 154, load_current: 0, load_new: 92, load_max: 4555, cpu:0.558897
+04-13-2011 17:44:52.271412 [WARN] <b78666c0>load_old: 92, load_current: 0, load_new: 55, load_max: 4555, cpu:0.564557
+04-13-2011 17:44:54.271642 [WARN] <b78666c0>load_old: 55, load_current: 0, load_new: 32, load_max: 4555, cpu:0.556110
+04-13-2011 17:44:56.276381 [WARN] <b78666c0>load_old: 32, load_current: 0, load_new: 19, load_max: 4555, cpu:0.550000
+04-13-2011 17:44:58.278068 [WARN] <b78666c0>load_old: 19, load_current: 0, load_new: 11, load_max: 4555, cpu:0.553885
+04-13-2011 17:45:00.278305 [WARN] <b78666c0>load_old: 11, load_current: 0, load_new: 6, load_max: 4555, cpu:0.547500
+04-13-2011 17:45:02.275164 [WARN] <b78666c0>load_old: 6, load_current: 0, load_new: 3, load_max: 4555, cpu:0.566085
+04-13-2011 17:45:04.277979 [WARN] <b78666c0>load_old: 3, load_current: 0, load_new: 1, load_max: 4555, cpu:0.578947
+04-13-2011 17:45:06.275841 [WARN] <b78666c0>load_old: 1, load_current: 0, load_new: 0, load_max: 4555, cpu:0.560000
+04-13-2011 17:45:08.274303 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.553885
+04-13-2011 17:45:10.274315 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.557789
+04-13-2011 17:45:12.274311 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.550000
+04-13-2011 17:45:14.274322 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.566085
+04-13-2011 17:45:16.274324 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.587786
+04-13-2011 17:45:18.274312 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.588556
+04-13-2011 17:45:20.274312 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.648810
+04-13-2011 17:45:22.274804 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.922794
+04-13-2011 17:45:24.274807 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.786477
+04-13-2011 17:45:26.274796 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.568528
+04-13-2011 17:45:28.274816 [WARN] <b78666c0>load_old: 0, load_current: 24, load_new: 2, load_max: 4555, cpu:0.903743
+04-13-2011 17:45:30.274822 [WARN] <b78666c0>load_old: 2, load_current: 7, load_new: 2, load_max: 4555, cpu:0.585427
+04-13-2011 17:45:32.274811 [WARN] <b78666c0>load_old: 2, load_current: 0, load_new: 1, load_max: 4555, cpu:0.570332
+04-13-2011 17:45:34.274811 [WARN] <b78666c0>load_old: 1, load_current: 0, load_new: 0, load_max: 4555, cpu:0.600000
+04-13-2011 17:45:36.274809 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.583960
+04-13-2011 17:45:38.274811 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.588972
+04-13-2011 17:45:40.274307 [WARN] <b78666c0>load_old: 0, load_current: 16, load_new: 1, load_max: 4555, cpu:0.672823
+04-13-2011 17:45:42.271855 [WARN] <b78666c0>load_old: 1, load_current: 3429, load_new: 343, load_max: 4555, cpu:1.000000
+04-13-2011 17:45:44.271845 [WARN] <b78666c0>load_old: 343, load_current: 4364, load_new: 745, load_max: 4555, cpu:1.000000
+04-13-2011 17:45:46.271627 [WARN] <b78666c0>load_old: 745, load_current: 3407, load_new: 1011, load_max: 4555, cpu:0.997436
+04-13-2011 17:45:48.271685 [WARN] <b78666c0>load_old: 1011, load_current: 3474, load_new: 1257, load_max: 4555, cpu:1.000000
+04-13-2011 17:45:50.272324 [WARN] <b78666c0>load_old: 1257, load_current: 3365, load_new: 1467, load_max: 4555, cpu:1.000000
+04-13-2011 17:45:52.271713 [WARN] <b78666c0>load_old: 1467, load_current: 3372, load_new: 1657, load_max: 4555, cpu:1.000000
+04-13-2011 17:45:54.272042 [WARN] <b78666c0>load_old: 1657, load_current: 3050, load_new: 1796, load_max: 4555, cpu:1.000000
+04-13-2011 17:45:56.272250 [WARN] <b78666c0>load_old: 1796, load_current: 3674, load_new: 1983, load_max: 4555, cpu:1.000000
+04-13-2011 17:45:58.271444 [WARN] <b78666c0>load_old: 1983, load_current: 3308, load_new: 2115, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:00.271506 [WARN] <b78666c0>load_old: 2115, load_current: 2785, load_new: 2182, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:02.272378 [WARN] <b78666c0>load_old: 2182, load_current: 3560, load_new: 2319, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:04.271824 [WARN] <b78666c0>load_old: 2319, load_current: 3385, load_new: 2425, load_max: 4555, cpu:0.997389
+04-13-2011 17:46:06.271903 [WARN] <b78666c0>load_old: 2425, load_current: 3252, load_new: 2507, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:06.272658 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:06.272866 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:08.272156 [WARN] <b78666c0>load_old: 2507, load_current: 2675, load_new: 2523, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:08.272891 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:08.273697 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:10.272291 [WARN] <b78666c0>load_old: 2523, load_current: 3234, load_new: 2594, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:10.273938 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:10.274186 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:12.271432 [WARN] <b78666c0>load_old: 2594, load_current: 3724, load_new: 2707, load_max: 4555, cpu:0.997361
+04-13-2011 17:46:12.272166 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:12.272836 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:14.272172 [WARN] <b78666c0>load_old: 2707, load_current: 3181, load_new: 2754, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:14.273073 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:14.273299 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:16.271573 [WARN] <b78666c0>load_old: 2754, load_current: 3161, load_new: 2794, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:16.272394 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:16.272720 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:18.272357 [WARN] <b78666c0>load_old: 2794, load_current: 3226, load_new: 2837, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:18.273298 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:18.273553 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:20.271640 [WARN] <b78666c0>load_old: 2837, load_current: 2718, load_new: 2825, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:20.272449 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:20.273270 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:22.271692 [WARN] <b78666c0>load_old: 2825, load_current: 3465, load_new: 2889, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:22.272429 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:22.273134 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:24.272053 [WARN] <b78666c0>load_old: 2889, load_current: 3464, load_new: 2946, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:24.272855 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:24.273257 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:26.271700 [WARN] <b78666c0>load_old: 2946, load_current: 3167, load_new: 2968, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:26.272527 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:26.273099 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:28.271618 [WARN] <b78666c0>load_old: 2968, load_current: 3126, load_new: 2983, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:28.272455 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:28.273024 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:30.272442 [WARN] <b78666c0>load_old: 2983, load_current: 2920, load_new: 2976, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:30.273199 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:30.273404 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:32.271704 [WARN] <b78666c0>load_old: 2976, load_current: 3014, load_new: 2979, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:32.272715 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:32.273155 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:34.271533 [WARN] <b78666c0>load_old: 2979, load_current: 2674, load_new: 2948, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:34.272141 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:34.272910 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:36.271761 [WARN] <b78666c0>load_old: 2948, load_current: 3472, load_new: 3000, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:36.272610 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:36.273466 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:38.272751 [WARN] <b78666c0>load_old: 3000, load_current: 3432, load_new: 3043, load_max: 4555, cpu:0.994778
+04-13-2011 17:46:38.273523 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:38.273745 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:40.271560 [WARN] <b78666c0>load_old: 3043, load_current: 3139, load_new: 3052, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:40.272480 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:40.272791 [WARN] <b78666c0>YES, I'm the boss , do it ! migrate !
+04-13-2011 17:46:40.272809 [WARN] <b78666c0>migrate on 9909043. 4, tree_cnt : 454
+04-13-2011 17:46:40.276014 [WARN] <b78666c0>mknod_handler return rst_code != 0
+04-13-2011 17:46:40.277234 [WARN] <b78666c0>stat_handler(9958123) return rst_code != 0
+04-13-2011 17:46:40.281520 [WARN] <b78666c0>stat_handler(9958026) return rst_code != 0
+04-13-2011 17:46:40.283866 [WARN] <b78666c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:40.305468 [WARN] <b78666c0>mknod_handler return rst_code != 0
+04-13-2011 17:46:40.306611 [WARN] <b78666c0>mknod_handler return rst_code != 0
+04-13-2011 17:46:42.271444 [WARN] <b78666c0>load_old: 1526, load_current: 3613, load_new: 1734, load_max: 4555, cpu:0.984496
+04-13-2011 17:46:44.272190 [WARN] <b78666c0>load_old: 1734, load_current: 3541, load_new: 1914, load_max: 4555, cpu:0.992208
+04-13-2011 17:46:46.271653 [WARN] <b78666c0>load_old: 1914, load_current: 3522, load_new: 2074, load_max: 4555, cpu:0.976440
+04-13-2011 17:46:48.271562 [WARN] <b78666c0>load_old: 2074, load_current: 3596, load_new: 2226, load_max: 4555, cpu:0.997389
+04-13-2011 17:46:50.271741 [WARN] <b78666c0>load_old: 2226, load_current: 3952, load_new: 2398, load_max: 4555, cpu:0.984416
+04-13-2011 17:46:52.271443 [WARN] <b78666c0>load_old: 2398, load_current: 3482, load_new: 2506, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:52.271690 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:52.271898 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:54.271826 [WARN] <b78666c0>load_old: 2506, load_current: 3399, load_new: 2595, load_max: 4555, cpu:0.997382
+04-13-2011 17:46:54.272044 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:54.272250 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:56.271545 [WARN] <b78666c0>load_old: 2595, load_current: 3170, load_new: 2652, load_max: 4555, cpu:1.000000
+04-13-2011 17:46:56.271756 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:56.271984 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:46:58.271981 [WARN] <b78666c0>load_old: 2652, load_current: 3702, load_new: 2757, load_max: 4555, cpu:0.987179
+04-13-2011 17:46:58.272200 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:46:58.272407 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:00.271981 [WARN] <b78666c0>load_old: 2757, load_current: 3037, load_new: 2785, load_max: 4555, cpu:0.997409
+04-13-2011 17:47:00.272364 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:00.272716 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:02.272297 [WARN] <b78666c0>load_old: 2785, load_current: 3395, load_new: 2846, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:02.272668 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:02.272869 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:04.272246 [WARN] <b78666c0>load_old: 2846, load_current: 3499, load_new: 2911, load_max: 4555, cpu:0.994832
+04-13-2011 17:47:04.272514 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:04.272715 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:06.272199 [WARN] <b78666c0>load_old: 2911, load_current: 3668, load_new: 2986, load_max: 4555, cpu:0.997403
+04-13-2011 17:47:06.273463 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:06.273840 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:08.272109 [WARN] <b78666c0>load_old: 2986, load_current: 3569, load_new: 3044, load_max: 4555, cpu:0.997403
+04-13-2011 17:47:08.272377 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:08.272594 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:10.271924 [WARN] <b78666c0>load_old: 3044, load_current: 3719, load_new: 3111, load_max: 4555, cpu:0.994792
+04-13-2011 17:47:10.272202 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:10.272403 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:12.271727 [WARN] <b78666c0>load_old: 3111, load_current: 3483, load_new: 3148, load_max: 4555, cpu:0.994723
+04-13-2011 17:47:12.272032 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:12.272233 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:14.271451 [WARN] <b78666c0>load_old: 3148, load_current: 3254, load_new: 3158, load_max: 4555, cpu:0.994819
+04-13-2011 17:47:14.271750 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:14.272001 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:16.272708 [WARN] <b78666c0>load_old: 3158, load_current: 3374, load_new: 3179, load_max: 4555, cpu:0.997354
+04-13-2011 17:47:16.273055 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:16.273410 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:18.271462 [WARN] <b78666c0>load_old: 3179, load_current: 2760, load_new: 3137, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:18.271736 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:18.271935 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:20.271724 [WARN] <b78666c0>load_old: 3137, load_current: 3774, load_new: 3200, load_max: 4555, cpu:0.992105
+04-13-2011 17:47:20.272186 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:20.272422 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:22.271982 [WARN] <b78666c0>load_old: 3200, load_current: 3806, load_new: 3260, load_max: 4555, cpu:0.989583
+04-13-2011 17:47:22.272255 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:22.272473 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:24.272455 [WARN] <b78666c0>load_old: 3260, load_current: 3353, load_new: 3269, load_max: 4555, cpu:0.994737
+04-13-2011 17:47:24.272825 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:24.273042 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:26.271425 [WARN] <b78666c0>load_old: 3269, load_current: 3508, load_new: 3292, load_max: 4555, cpu:0.992288
+04-13-2011 17:47:26.271699 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:26.271899 [WARN] <b78666c0>YES, I'm the boss , do it ! migrate !
+04-13-2011 17:47:26.271918 [WARN] <b78666c0>migrate on 9909042. 3, tree_cnt : 653
+04-13-2011 17:47:26.277623 [WARN] <b78666c0>stat_handler(9998683) return rst_code != 0
+04-13-2011 17:47:26.280664 [WARN] <b78666c0>stat_handler(9998430) return rst_code != 0
+04-13-2011 17:47:26.283554 [WARN] <b78666c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:26.323773 [WARN] <b78666c0>mknod_handler return rst_code != 0
+04-13-2011 17:47:26.324843 [WARN] <b78666c0>mknod_handler return rst_code != 0
+04-13-2011 17:47:28.271620 [WARN] <b78666c0>load_old: 1646, load_current: 3418, load_new: 1823, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:30.272378 [WARN] <b78666c0>load_old: 1823, load_current: 3178, load_new: 1958, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:32.272132 [WARN] <b78666c0>load_old: 1958, load_current: 3029, load_new: 2065, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:34.271680 [WARN] <b78666c0>load_old: 2065, load_current: 2673, load_new: 2125, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:36.271780 [WARN] <b78666c0>load_old: 2125, load_current: 3122, load_new: 2224, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:38.272426 [WARN] <b78666c0>load_old: 2224, load_current: 3480, load_new: 2349, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:40.271943 [WARN] <b78666c0>load_old: 2349, load_current: 3346, load_new: 2448, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:42.272071 [WARN] <b78666c0>load_old: 2448, load_current: 3421, load_new: 2545, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:42.272333 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:42.272687 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:44.271614 [WARN] <b78666c0>load_old: 2545, load_current: 3090, load_new: 2599, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:44.271842 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:44.272147 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:46.272502 [WARN] <b78666c0>load_old: 2599, load_current: 3086, load_new: 2647, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:46.272742 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:46.272951 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:48.271423 [WARN] <b78666c0>load_old: 2647, load_current: 3307, load_new: 2713, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:48.271634 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:48.271839 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:50.271640 [WARN] <b78666c0>load_old: 2713, load_current: 2817, load_new: 2723, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:50.271867 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:50.272077 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:52.271624 [WARN] <b78666c0>load_old: 2723, load_current: 2291, load_new: 2679, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:52.271948 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:52.272364 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:54.272058 [WARN] <b78666c0>load_old: 2679, load_current: 3267, load_new: 2737, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:54.272331 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:54.272550 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:56.272074 [WARN] <b78666c0>load_old: 2737, load_current: 3310, load_new: 2794, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:56.272349 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:56.272551 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:47:58.271480 [WARN] <b78666c0>load_old: 2794, load_current: 3339, load_new: 2848, load_max: 4555, cpu:1.000000
+04-13-2011 17:47:58.271789 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:47:58.271991 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:00.271933 [WARN] <b78666c0>load_old: 2848, load_current: 3356, load_new: 2898, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:00.272208 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:00.272408 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:02.271541 [WARN] <b78666c0>load_old: 2898, load_current: 3295, load_new: 2937, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:02.271811 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:02.272011 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:04.272023 [WARN] <b78666c0>load_old: 2937, load_current: 2948, load_new: 2938, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:04.273083 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:04.273295 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:06.271446 [WARN] <b78666c0>load_old: 2938, load_current: 2930, load_new: 2937, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:06.272049 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:06.272398 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:08.272249 [WARN] <b78666c0>load_old: 2937, load_current: 3063, load_new: 2949, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:08.272550 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:08.272752 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:10.271521 [WARN] <b78666c0>load_old: 2949, load_current: 3140, load_new: 2968, load_max: 4555, cpu:0.997396
+04-13-2011 17:48:10.271936 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:10.272289 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:12.271581 [WARN] <b78666c0>load_old: 2968, load_current: 2226, load_new: 2893, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:12.271864 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:12.272069 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:14.271924 [WARN] <b78666c0>load_old: 2893, load_current: 3116, load_new: 2915, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:14.272304 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:14.272504 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:16.271780 [WARN] <b78666c0>load_old: 2915, load_current: 3286, load_new: 2952, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:16.272161 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:16.272474 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:18.271948 [WARN] <b78666c0>load_old: 2952, load_current: 3353, load_new: 2992, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:18.272367 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:18.272623 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:20.272357 [WARN] <b78666c0>load_old: 2992, load_current: 3234, load_new: 3016, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:20.272665 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:20.273015 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:22.272257 [WARN] <b78666c0>load_old: 3016, load_current: 3383, load_new: 3052, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:22.272608 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:22.272807 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:24.272469 [WARN] <b78666c0>load_old: 3052, load_current: 3030, load_new: 3049, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:24.272744 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:24.273118 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:26.272090 [WARN] <b78666c0>load_old: 3049, load_current: 3055, load_new: 3049, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:26.272450 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:26.272652 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:28.271437 [WARN] <b78666c0>load_old: 3049, load_current: 3069, load_new: 3051, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:28.271704 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:28.271904 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:30.271464 [WARN] <b78666c0>load_old: 3051, load_current: 3258, load_new: 3071, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:30.271757 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:30.271975 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:32.272173 [WARN] <b78666c0>load_old: 3071, load_current: 3445, load_new: 3108, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:32.272531 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:32.272885 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:34.272802 [WARN] <b78666c0>load_old: 3108, load_current: 2695, load_new: 3066, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:34.273023 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:34.273300 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:36.271784 [WARN] <b78666c0>load_old: 3066, load_current: 2122, load_new: 2971, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:36.272084 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:36.272412 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:38.271526 [WARN] <b78666c0>load_old: 2971, load_current: 3462, load_new: 3020, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:38.271850 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:38.272163 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:40.271874 [WARN] <b78666c0>load_old: 3020, load_current: 3645, load_new: 3082, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:40.272484 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:40.272755 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:42.272039 [WARN] <b78666c0>load_old: 3082, load_current: 3263, load_new: 3100, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:42.272249 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:42.272452 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:44.271510 [WARN] <b78666c0>load_old: 3100, load_current: 3658, load_new: 3155, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:44.271743 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:44.271951 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:46.271766 [WARN] <b78666c0>load_old: 3155, load_current: 4117, load_new: 3251, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:46.272071 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:46.272272 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:48.272057 [WARN] <b78666c0>load_old: 3251, load_current: 4044, load_new: 3330, load_max: 4555, cpu:0.997368
+04-13-2011 17:48:48.272430 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:48.272640 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:48:50.271683 [WARN] <b78666c0>load_old: 3330, load_current: 4389, load_new: 3435, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:50.271956 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:48:50.272159 [WARN] <b78666c0>YES, I'm the boss , do it ! migrate !
+04-13-2011 17:48:50.272178 [WARN] <b78666c0>migrate on 9909041. 2, tree_cnt : 5249
+04-13-2011 17:48:50.328791 [WARN] <b78666c0>stat_handler(10069844) return rst_code != 0
+04-13-2011 17:48:50.330919 [WARN] <b78666c0>stat_handler(10068906) return rst_code != 0
+04-13-2011 17:48:50.337042 [WARN] <b78666c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:48:50.345813 [WARN] <b78666c0>mknod_handler return rst_code != 0
+04-13-2011 17:48:50.346438 [WARN] <b78666c0>mknod_handler return rst_code != 0
+04-13-2011 17:48:52.271971 [WARN] <b78666c0>load_old: 1717, load_current: 2967, load_new: 1842, load_max: 4555, cpu:0.994366
+04-13-2011 17:48:54.271713 [WARN] <b78666c0>load_old: 1842, load_current: 3055, load_new: 1963, load_max: 4555, cpu:1.000000
+04-13-2011 17:48:56.271734 [WARN] <b78666c0>load_old: 1963, load_current: 2456, load_new: 2012, load_max: 4555, cpu:0.997409
+04-13-2011 17:48:58.271631 [WARN] <b78666c0>load_old: 2012, load_current: 3321, load_new: 2142, load_max: 4555, cpu:1.000000
+04-13-2011 17:49:00.271851 [WARN] <b78666c0>load_old: 2142, load_current: 3258, load_new: 2253, load_max: 4555, cpu:1.000000
+04-13-2011 17:49:02.271518 [WARN] <b78666c0>load_old: 2253, load_current: 3132, load_new: 2340, load_max: 4555, cpu:1.000000
+04-13-2011 17:49:04.274838 [WARN] <b78666c0>load_old: 2340, load_current: 721, load_new: 2178, load_max: 4555, cpu:0.697733
+04-13-2011 17:49:06.274815 [WARN] <b78666c0>load_old: 2178, load_current: 0, load_new: 1306, load_max: 4555, cpu:0.610127
+04-13-2011 17:49:08.274802 [WARN] <b78666c0>load_old: 1306, load_current: 0, load_new: 783, load_max: 4555, cpu:0.603535
+04-13-2011 17:49:10.274601 [WARN] <b78666c0>load_old: 783, load_current: 0, load_new: 469, load_max: 4555, cpu:0.724311
+04-13-2011 17:49:12.274847 [WARN] <b78666c0>load_old: 469, load_current: 0, load_new: 281, load_max: 4555, cpu:0.552500
+04-13-2011 17:49:14.274791 [WARN] <b78666c0>load_old: 281, load_current: 0, load_new: 168, load_max: 4555, cpu:0.627204
+04-13-2011 17:49:16.275138 [WARN] <b78666c0>load_old: 168, load_current: 0, load_new: 100, load_max: 4555, cpu:0.565327
+04-13-2011 17:49:18.274804 [WARN] <b78666c0>load_old: 100, load_current: 0, load_new: 59, load_max: 4555, cpu:0.569620
+04-13-2011 17:49:20.274810 [WARN] <b78666c0>load_old: 59, load_current: 0, load_new: 35, load_max: 4555, cpu:0.563910
+04-13-2011 17:49:22.274806 [WARN] <b78666c0>load_old: 35, load_current: 0, load_new: 20, load_max: 4555, cpu:0.625000
+04-13-2011 17:49:24.274813 [WARN] <b78666c0>load_old: 20, load_current: 0, load_new: 11, load_max: 4555, cpu:0.597990
+04-13-2011 17:49:26.274819 [WARN] <b78666c0>load_old: 11, load_current: 0, load_new: 6, load_max: 4555, cpu:0.585427
+04-13-2011 17:49:28.274811 [WARN] <b78666c0>load_old: 6, load_current: 0, load_new: 3, load_max: 4555, cpu:0.570000
+04-13-2011 17:49:30.274804 [WARN] <b78666c0>load_old: 3, load_current: 0, load_new: 1, load_max: 4555, cpu:0.545000
+04-13-2011 17:49:32.274785 [WARN] <b78666c0>load_old: 1, load_current: 1, load_new: 1, load_max: 4555, cpu:0.630653
+04-13-2011 17:49:34.271779 [WARN] <b78666c0>load_old: 1, load_current: 2665, load_new: 267, load_max: 4555, cpu:1.000000
+04-13-2011 17:49:36.272032 [WARN] <b78666c0>load_old: 267, load_current: 3818, load_new: 622, load_max: 4555, cpu:1.000000
+04-13-2011 17:49:38.271706 [WARN] <b78666c0>load_old: 622, load_current: 3758, load_new: 935, load_max: 4555, cpu:1.000000
+04-13-2011 17:49:40.271847 [WARN] <b78666c0>load_old: 935, load_current: 3175, load_new: 1159, load_max: 4555, cpu:1.000000
+04-13-2011 17:49:42.271685 [WARN] <b78666c0>load_old: 1159, load_current: 3028, load_new: 1345, load_max: 4555, cpu:1.000000
+04-13-2011 17:49:44.271800 [WARN] <b78666c0>load_old: 1345, load_current: 3332, load_new: 1543, load_max: 4555, cpu:1.000000
+04-13-2011 17:49:46.271861 [WARN] <b78666c0>load_old: 1543, load_current: 3273, load_new: 1716, load_max: 4555, cpu:1.000000
+04-13-2011 17:49:48.271482 [WARN] <b78666c0>load_old: 1716, load_current: 3329, load_new: 1877, load_max: 4555, cpu:1.000000
+04-13-2011 17:49:50.271434 [WARN] <b78666c0>load_old: 1877, load_current: 3212, load_new: 2010, load_max: 4555, cpu:1.000000
+04-13-2011 17:49:52.271624 [WARN] <b78666c0>load_old: 2010, load_current: 3433, load_new: 2152, load_max: 4555, cpu:1.000000
+04-13-2011 17:49:54.271442 [WARN] <b78666c0>load_old: 2152, load_current: 2951, load_new: 2231, load_max: 4555, cpu:1.000000
+04-13-2011 17:49:56.271824 [WARN] <b78666c0>load_old: 2231, load_current: 3632, load_new: 2371, load_max: 4555, cpu:1.000000
+04-13-2011 17:49:58.272059 [WARN] <b78666c0>load_old: 2371, load_current: 3258, load_new: 2459, load_max: 4555, cpu:1.000000
+04-13-2011 17:50:00.271867 [WARN] <b78666c0>load_old: 2459, load_current: 2783, load_new: 2491, load_max: 4555, cpu:1.000000
+04-13-2011 17:50:02.271795 [WARN] <b78666c0>load_old: 2491, load_current: 3576, load_new: 2599, load_max: 4555, cpu:1.000000
+04-13-2011 17:50:02.272015 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:50:02.272222 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:50:04.271635 [WARN] <b78666c0>load_old: 2599, load_current: 3231, load_new: 2662, load_max: 4555, cpu:1.000000
+04-13-2011 17:50:04.271903 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:50:04.272104 [WARN] <b78666c0>I'm not the biggest, no migrate
+04-13-2011 17:50:06.271583 [WARN] <b78666c0>load_old: 2662, load_current: 2505, load_new: 2646, load_max: 4555, cpu:1.000000
+04-13-2011 17:50:06.271800 [WARN] <b78666c0>it' overload ,will I migrate? 
+04-13-2011 17:50:06.272007 [WARN] <b78666c0>YES, I'm the boss , do it ! migrate !
+04-13-2011 17:50:06.272026 [WARN] <b78666c0>migrate on 9909040. 1, tree_cnt : 4642
+04-13-2011 17:50:06.313995 [WARN] <b78666c0>stat_handler(10107191) return rst_code != 0
+04-13-2011 17:50:06.315372 [WARN] <b78666c0>stat_handler(10107076) return rst_code != 0
+04-13-2011 17:50:06.316454 [WARN] <b78666c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:50:06.330124 [WARN] <b78666c0>mknod_handler return rst_code != 0
+04-13-2011 17:50:06.341703 [WARN] <b78666c0>mknod_handler return rst_code != 0
+04-13-2011 17:50:08.274776 [WARN] <b78666c0>load_old: 1323, load_current: 7, load_new: 1191, load_max: 4555, cpu:0.585000
+04-13-2011 17:50:10.274811 [WARN] <b78666c0>load_old: 1191, load_current: 0, load_new: 714, load_max: 4555, cpu:0.572500
+04-13-2011 17:50:12.274811 [WARN] <b78666c0>load_old: 714, load_current: 0, load_new: 428, load_max: 4555, cpu:0.567500
+04-13-2011 17:50:14.274879 [WARN] <b78666c0>load_old: 428, load_current: 0, load_new: 256, load_max: 4555, cpu:0.566416
+04-13-2011 17:50:16.274808 [WARN] <b78666c0>load_old: 256, load_current: 0, load_new: 153, load_max: 4555, cpu:0.570000
+04-13-2011 17:50:18.274800 [WARN] <b78666c0>load_old: 153, load_current: 0, load_new: 91, load_max: 4555, cpu:0.569270
+04-13-2011 17:50:20.274810 [WARN] <b78666c0>load_old: 91, load_current: 0, load_new: 54, load_max: 4555, cpu:0.570352
+04-13-2011 17:50:22.274813 [WARN] <b78666c0>load_old: 54, load_current: 0, load_new: 32, load_max: 4555, cpu:0.551378
+04-13-2011 17:50:24.274811 [WARN] <b78666c0>load_old: 32, load_current: 0, load_new: 19, load_max: 4555, cpu:0.693267
+04-13-2011 17:50:26.274874 [WARN] <b78666c0>load_old: 19, load_current: 0, load_new: 11, load_max: 4555, cpu:0.596491
+04-13-2011 17:50:28.274803 [WARN] <b78666c0>load_old: 11, load_current: 0, load_new: 6, load_max: 4555, cpu:0.562814
+04-13-2011 17:50:30.274617 [WARN] <b78666c0>load_old: 6, load_current: 0, load_new: 3, load_max: 4555, cpu:0.557500
+04-13-2011 17:50:32.274808 [WARN] <b78666c0>load_old: 3, load_current: 0, load_new: 1, load_max: 4555, cpu:0.552764
+04-13-2011 17:50:34.274802 [WARN] <b78666c0>load_old: 1, load_current: 0, load_new: 0, load_max: 4555, cpu:0.551378
+04-13-2011 17:50:36.274730 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.559194
+04-13-2011 17:50:38.274803 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.563910
+04-13-2011 17:50:40.274802 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.550000
+04-13-2011 17:50:42.274449 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.562814
+04-13-2011 17:50:44.274615 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.557500
+04-13-2011 17:50:46.274802 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.563910
+04-13-2011 17:50:48.274805 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.553616
+04-13-2011 17:50:50.274811 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.548872
+04-13-2011 17:50:52.274807 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.545000
+04-13-2011 17:50:54.274808 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.581454
+04-13-2011 17:50:56.274809 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.557500
+04-13-2011 17:50:58.274808 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.630923
+04-13-2011 17:51:00.274804 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.565327
+04-13-2011 17:51:02.274807 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.566416
+04-13-2011 17:51:04.274815 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.635910
+04-13-2011 17:51:06.274804 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.572500
+04-13-2011 17:51:08.274806 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.578283
+04-13-2011 17:51:10.274810 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.565327
+04-13-2011 17:51:12.274809 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.567839
+04-13-2011 17:51:14.274843 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.573232
+04-13-2011 17:51:16.274810 [WARN] <b78666c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4555, cpu:0.561404

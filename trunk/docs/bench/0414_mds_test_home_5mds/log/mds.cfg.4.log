@@ -1,0 +1,1483 @@
+04-13-2011 17:43:35.002804 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 0, cpu:0.588809
+04-13-2011 17:43:37.082805 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 0, cpu:0.585427
+04-13-2011 17:43:37.814066 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:37.814914 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:39.002957 [WARN] <b77c46c0>load_old: 0, load_current: 2, load_new: 0, load_max: 2, cpu:0.626632
+04-13-2011 17:43:41.002296 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 2, cpu:0.560000
+04-13-2011 17:43:43.002406 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 2, cpu:0.575377
+04-13-2011 17:43:45.003461 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 2, cpu:0.545000
+04-13-2011 17:43:47.002800 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 2, cpu:0.585427
+04-13-2011 17:43:49.002888 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 2, cpu:0.593985
+04-13-2011 17:43:51.002886 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 2, cpu:0.557500
+04-13-2011 17:43:53.002893 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 2, cpu:0.585000
+04-13-2011 17:43:53.975154 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:53.977946 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:53.991350 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:53.992773 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.011378 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.016609 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.023788 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.025640 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.049739 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.051462 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.062938 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.063774 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.078036 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.080646 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.091264 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.092118 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.306151 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.307583 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.309128 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.310577 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.311991 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.313341 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:54.314654 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:43:55.002407 [WARN] <b77c46c0>load_old: 0, load_current: 23, load_new: 2, load_max: 23, cpu:0.794486
+04-13-2011 17:43:57.002408 [WARN] <b77c46c0>load_old: 2, load_current: 0, load_new: 1, load_max: 23, cpu:0.567500
+04-13-2011 17:43:59.002394 [WARN] <b77c46c0>load_old: 1, load_current: 0, load_new: 0, load_max: 23, cpu:0.976744
+04-13-2011 17:44:01.002449 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 23, cpu:1.000000
+04-13-2011 17:44:03.002347 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 23, cpu:1.000000
+04-13-2011 17:44:05.006359 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 23, cpu:1.000000
+04-13-2011 17:44:07.002398 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 23, cpu:1.000000
+04-13-2011 17:44:09.002400 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 23, cpu:1.000000
+04-13-2011 17:44:11.002470 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 23, cpu:1.000000
+04-13-2011 17:44:13.003176 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 23, cpu:1.000000
+04-13-2011 17:44:15.003181 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 23, cpu:1.000000
+04-13-2011 17:44:15.997157 [WARN] <b77c46c0>stat_handler(9886617) return rst_code != 0
+04-13-2011 17:44:15.997229 [WARN] <b77c46c0>stat_handler(9886925) return rst_code != 0
+04-13-2011 17:44:16.004132 [WARN] <b77c46c0>stat_handler(9886432) return rst_code != 0
+04-13-2011 17:44:16.009456 [WARN] <b77c46c0>stat_handler(9886882) return rst_code != 0
+04-13-2011 17:44:16.109902 [WARN] <b77c46c0>stat_handler(9869740) return rst_code != 0
+04-13-2011 17:44:16.159200 [WARN] <b77c46c0>stat_handler(9869741) return rst_code != 0
+04-13-2011 17:44:17.003189 [WARN] <b77c46c0>load_old: 0, load_current: 6, load_new: 0, load_max: 23, cpu:1.000000
+04-13-2011 17:44:17.382540 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:44:18.624080 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:44:19.002404 [WARN] <b77c46c0>load_old: 0, load_current: 2, load_new: 0, load_max: 23, cpu:1.000000
+04-13-2011 17:44:20.297439 [WARN] <b77c46c0>stat_handler(9891119) return rst_code != 0
+04-13-2011 17:44:20.298191 [WARN] <b77c46c0>stat_handler(9893906) return rst_code != 0
+04-13-2011 17:44:20.302636 [WARN] <b77c46c0>stat_handler(9869741) return rst_code != 0
+04-13-2011 17:44:20.303337 [WARN] <b77c46c0>stat_handler(9893890) return rst_code != 0
+04-13-2011 17:44:20.309185 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:44:20.353405 [WARN] <b77c46c0>stat_handler(9892322) return rst_code != 0
+04-13-2011 17:44:20.356231 [WARN] <b77c46c0>stat_handler(9892337) return rst_code != 0
+04-13-2011 17:44:20.359235 [WARN] <b77c46c0>stat_handler(9892453) return rst_code != 0
+04-13-2011 17:44:20.360727 [WARN] <b77c46c0>stat_handler(9892452) return rst_code != 0
+04-13-2011 17:44:20.364125 [WARN] <b77c46c0>stat_handler(9892468) return rst_code != 0
+04-13-2011 17:44:20.367074 [WARN] <b77c46c0>stat_handler(9892483) return rst_code != 0
+04-13-2011 17:44:20.370184 [WARN] <b77c46c0>stat_handler(9892498) return rst_code != 0
+04-13-2011 17:44:20.373071 [WARN] <b77c46c0>stat_handler(9892513) return rst_code != 0
+04-13-2011 17:44:20.375940 [WARN] <b77c46c0>stat_handler(9892528) return rst_code != 0
+04-13-2011 17:44:20.378488 [WARN] <b77c46c0>stat_handler(9892643) return rst_code != 0
+04-13-2011 17:44:20.381498 [WARN] <b77c46c0>stat_handler(9892658) return rst_code != 0
+04-13-2011 17:44:20.384576 [WARN] <b77c46c0>stat_handler(9892673) return rst_code != 0
+04-13-2011 17:44:20.387273 [WARN] <b77c46c0>stat_handler(9892688) return rst_code != 0
+04-13-2011 17:44:20.390333 [WARN] <b77c46c0>stat_handler(9892703) return rst_code != 0
+04-13-2011 17:44:20.393074 [WARN] <b77c46c0>stat_handler(9892718) return rst_code != 0
+04-13-2011 17:44:20.395857 [WARN] <b77c46c0>stat_handler(9892733) return rst_code != 0
+04-13-2011 17:44:20.398594 [WARN] <b77c46c0>stat_handler(9892848) return rst_code != 0
+04-13-2011 17:44:20.401722 [WARN] <b77c46c0>stat_handler(9892864) return rst_code != 0
+04-13-2011 17:44:20.403223 [WARN] <b77c46c0>stat_handler(9892863) return rst_code != 0
+04-13-2011 17:44:20.406686 [WARN] <b77c46c0>stat_handler(9892879) return rst_code != 0
+04-13-2011 17:44:20.409580 [WARN] <b77c46c0>stat_handler(9892894) return rst_code != 0
+04-13-2011 17:44:20.412386 [WARN] <b77c46c0>stat_handler(9892909) return rst_code != 0
+04-13-2011 17:44:20.415059 [WARN] <b77c46c0>stat_handler(9892924) return rst_code != 0
+04-13-2011 17:44:20.417700 [WARN] <b77c46c0>stat_handler(9892939) return rst_code != 0
+04-13-2011 17:44:20.420409 [WARN] <b77c46c0>stat_handler(9893054) return rst_code != 0
+04-13-2011 17:44:20.423271 [WARN] <b77c46c0>stat_handler(9893069) return rst_code != 0
+04-13-2011 17:44:20.426049 [WARN] <b77c46c0>stat_handler(9893084) return rst_code != 0
+04-13-2011 17:44:20.428806 [WARN] <b77c46c0>stat_handler(9893099) return rst_code != 0
+04-13-2011 17:44:20.431632 [WARN] <b77c46c0>stat_handler(9893114) return rst_code != 0
+04-13-2011 17:44:20.434612 [WARN] <b77c46c0>stat_handler(9893129) return rst_code != 0
+04-13-2011 17:44:20.437278 [WARN] <b77c46c0>stat_handler(9893244) return rst_code != 0
+04-13-2011 17:44:20.440029 [WARN] <b77c46c0>stat_handler(9893259) return rst_code != 0
+04-13-2011 17:44:20.443035 [WARN] <b77c46c0>stat_handler(9893275) return rst_code != 0
+04-13-2011 17:44:20.444546 [WARN] <b77c46c0>stat_handler(9893274) return rst_code != 0
+04-13-2011 17:44:20.447668 [WARN] <b77c46c0>stat_handler(9893290) return rst_code != 0
+04-13-2011 17:44:20.450728 [WARN] <b77c46c0>stat_handler(9893305) return rst_code != 0
+04-13-2011 17:44:20.453746 [WARN] <b77c46c0>stat_handler(9893320) return rst_code != 0
+04-13-2011 17:44:20.456606 [WARN] <b77c46c0>stat_handler(9893335) return rst_code != 0
+04-13-2011 17:44:20.459577 [WARN] <b77c46c0>stat_handler(9893550) return rst_code != 0
+04-13-2011 17:44:20.462482 [WARN] <b77c46c0>stat_handler(9893565) return rst_code != 0
+04-13-2011 17:44:20.465308 [WARN] <b77c46c0>stat_handler(9893580) return rst_code != 0
+04-13-2011 17:44:20.468117 [WARN] <b77c46c0>stat_handler(9893595) return rst_code != 0
+04-13-2011 17:44:20.471059 [WARN] <b77c46c0>stat_handler(9893610) return rst_code != 0
+04-13-2011 17:44:20.473762 [WARN] <b77c46c0>stat_handler(9893625) return rst_code != 0
+04-13-2011 17:44:20.476446 [WARN] <b77c46c0>stat_handler(9893640) return rst_code != 0
+04-13-2011 17:44:20.479345 [WARN] <b77c46c0>stat_handler(9893655) return rst_code != 0
+04-13-2011 17:44:20.482265 [WARN] <b77c46c0>stat_handler(9893670) return rst_code != 0
+04-13-2011 17:44:20.484998 [WARN] <b77c46c0>stat_handler(9888031) return rst_code != 0
+04-13-2011 17:44:20.502752 [WARN] <b77c46c0>stat_handler(9888247) return rst_code != 0
+04-13-2011 17:44:20.519112 [WARN] <b77c46c0>stat_handler(9869740) return rst_code != 0
+04-13-2011 17:44:20.519967 [WARN] <b77c46c0>stat_handler(9888262) return rst_code != 0
+04-13-2011 17:44:20.536419 [WARN] <b77c46c0>stat_handler(9888277) return rst_code != 0
+04-13-2011 17:44:20.553098 [WARN] <b77c46c0>stat_handler(9888292) return rst_code != 0
+04-13-2011 17:44:20.569833 [WARN] <b77c46c0>stat_handler(9888307) return rst_code != 0
+04-13-2011 17:44:20.587045 [WARN] <b77c46c0>stat_handler(9888322) return rst_code != 0
+04-13-2011 17:44:20.603921 [WARN] <b77c46c0>stat_handler(9888337) return rst_code != 0
+04-13-2011 17:44:20.620508 [WARN] <b77c46c0>stat_handler(9888352) return rst_code != 0
+04-13-2011 17:44:20.637224 [WARN] <b77c46c0>stat_handler(9888367) return rst_code != 0
+04-13-2011 17:44:20.654250 [WARN] <b77c46c0>stat_handler(9888382) return rst_code != 0
+04-13-2011 17:44:20.671158 [WARN] <b77c46c0>stat_handler(9888397) return rst_code != 0
+04-13-2011 17:44:20.687363 [WARN] <b77c46c0>stat_handler(9888412) return rst_code != 0
+04-13-2011 17:44:20.704396 [WARN] <b77c46c0>stat_handler(9888427) return rst_code != 0
+04-13-2011 17:44:20.718279 [WARN] <b77c46c0>stat_handler(9893023) return rst_code != 0
+04-13-2011 17:44:20.720593 [WARN] <b77c46c0>stat_handler(9893038) return rst_code != 0
+04-13-2011 17:44:20.721953 [WARN] <b77c46c0>stat_handler(9888443) return rst_code != 0
+04-13-2011 17:44:20.722717 [WARN] <b77c46c0>stat_handler(9893153) return rst_code != 0
+04-13-2011 17:44:20.723479 [WARN] <b77c46c0>stat_handler(9888442) return rst_code != 0
+04-13-2011 17:44:20.724893 [WARN] <b77c46c0>stat_handler(9893169) return rst_code != 0
+04-13-2011 17:44:20.727048 [WARN] <b77c46c0>stat_handler(9893184) return rst_code != 0
+04-13-2011 17:44:20.729241 [WARN] <b77c46c0>stat_handler(9893199) return rst_code != 0
+04-13-2011 17:44:20.731644 [WARN] <b77c46c0>stat_handler(9893214) return rst_code != 0
+04-13-2011 17:44:20.733778 [WARN] <b77c46c0>stat_handler(9893229) return rst_code != 0
+04-13-2011 17:44:20.736049 [WARN] <b77c46c0>stat_handler(9893344) return rst_code != 0
+04-13-2011 17:44:20.738498 [WARN] <b77c46c0>stat_handler(9893359) return rst_code != 0
+04-13-2011 17:44:20.740977 [WARN] <b77c46c0>stat_handler(9893374) return rst_code != 0
+04-13-2011 17:44:20.741629 [WARN] <b77c46c0>stat_handler(9888458) return rst_code != 0
+04-13-2011 17:44:20.743026 [WARN] <b77c46c0>stat_handler(9893389) return rst_code != 0
+04-13-2011 17:44:20.745057 [WARN] <b77c46c0>stat_handler(9893404) return rst_code != 0
+04-13-2011 17:44:20.747131 [WARN] <b77c46c0>stat_handler(9893419) return rst_code != 0
+04-13-2011 17:44:20.749495 [WARN] <b77c46c0>stat_handler(9893434) return rst_code != 0
+04-13-2011 17:44:20.751868 [WARN] <b77c46c0>stat_handler(9893449) return rst_code != 0
+04-13-2011 17:44:20.754130 [WARN] <b77c46c0>stat_handler(9893464) return rst_code != 0
+04-13-2011 17:44:20.756239 [WARN] <b77c46c0>stat_handler(9893480) return rst_code != 0
+04-13-2011 17:44:20.758571 [WARN] <b77c46c0>stat_handler(9893495) return rst_code != 0
+04-13-2011 17:44:20.758950 [WARN] <b77c46c0>stat_handler(9888473) return rst_code != 0
+04-13-2011 17:44:20.761127 [WARN] <b77c46c0>stat_handler(9893510) return rst_code != 0
+04-13-2011 17:44:20.763408 [WARN] <b77c46c0>stat_handler(9893525) return rst_code != 0
+04-13-2011 17:44:20.765415 [WARN] <b77c46c0>stat_handler(9893740) return rst_code != 0
+04-13-2011 17:44:20.767411 [WARN] <b77c46c0>stat_handler(9893755) return rst_code != 0
+04-13-2011 17:44:20.769601 [WARN] <b77c46c0>stat_handler(9893770) return rst_code != 0
+04-13-2011 17:44:20.772079 [WARN] <b77c46c0>stat_handler(9893785) return rst_code != 0
+04-13-2011 17:44:20.774358 [WARN] <b77c46c0>stat_handler(9893800) return rst_code != 0
+04-13-2011 17:44:20.776355 [WARN] <b77c46c0>stat_handler(9893815) return rst_code != 0
+04-13-2011 17:44:20.776474 [WARN] <b77c46c0>stat_handler(9888488) return rst_code != 0
+04-13-2011 17:44:20.778520 [WARN] <b77c46c0>stat_handler(9893830) return rst_code != 0
+04-13-2011 17:44:20.781115 [WARN] <b77c46c0>stat_handler(9893845) return rst_code != 0
+04-13-2011 17:44:20.783202 [WARN] <b77c46c0>stat_handler(9893860) return rst_code != 0
+04-13-2011 17:44:20.785315 [WARN] <b77c46c0>stat_handler(9893875) return rst_code != 0
+04-13-2011 17:44:20.787543 [WARN] <b77c46c0>stat_handler(9893891) return rst_code != 0
+04-13-2011 17:44:20.793940 [WARN] <b77c46c0>stat_handler(9888503) return rst_code != 0
+04-13-2011 17:44:20.811162 [WARN] <b77c46c0>stat_handler(9888518) return rst_code != 0
+04-13-2011 17:44:20.828061 [WARN] <b77c46c0>stat_handler(9888533) return rst_code != 0
+04-13-2011 17:44:20.845507 [WARN] <b77c46c0>stat_handler(9888548) return rst_code != 0
+04-13-2011 17:44:20.863616 [WARN] <b77c46c0>stat_handler(9888563) return rst_code != 0
+04-13-2011 17:44:20.881021 [WARN] <b77c46c0>stat_handler(9888578) return rst_code != 0
+04-13-2011 17:44:20.898413 [WARN] <b77c46c0>stat_handler(9888593) return rst_code != 0
+04-13-2011 17:44:20.915392 [WARN] <b77c46c0>stat_handler(9888608) return rst_code != 0
+04-13-2011 17:44:20.932659 [WARN] <b77c46c0>stat_handler(9888623) return rst_code != 0
+04-13-2011 17:44:20.949754 [WARN] <b77c46c0>stat_handler(9888638) return rst_code != 0
+04-13-2011 17:44:20.968011 [WARN] <b77c46c0>stat_handler(9888754) return rst_code != 0
+04-13-2011 17:44:20.969456 [WARN] <b77c46c0>stat_handler(9888753) return rst_code != 0
+04-13-2011 17:44:20.987171 [WARN] <b77c46c0>stat_handler(9888769) return rst_code != 0
+04-13-2011 17:44:21.002412 [WARN] <b77c46c0>load_old: 0, load_current: 117, load_new: 11, load_max: 117, cpu:1.000000
+04-13-2011 17:44:21.006597 [WARN] <b77c46c0>stat_handler(9888784) return rst_code != 0
+04-13-2011 17:44:21.023912 [WARN] <b77c46c0>stat_handler(9888799) return rst_code != 0
+04-13-2011 17:44:21.041156 [WARN] <b77c46c0>stat_handler(9888814) return rst_code != 0
+04-13-2011 17:44:21.058600 [WARN] <b77c46c0>stat_handler(9888829) return rst_code != 0
+04-13-2011 17:44:21.076140 [WARN] <b77c46c0>stat_handler(9888944) return rst_code != 0
+04-13-2011 17:44:21.093201 [WARN] <b77c46c0>stat_handler(9888959) return rst_code != 0
+04-13-2011 17:44:21.110440 [WARN] <b77c46c0>stat_handler(9888974) return rst_code != 0
+04-13-2011 17:44:21.127703 [WARN] <b77c46c0>stat_handler(9888989) return rst_code != 0
+04-13-2011 17:44:21.144910 [WARN] <b77c46c0>stat_handler(9889004) return rst_code != 0
+04-13-2011 17:44:21.162319 [WARN] <b77c46c0>stat_handler(9889019) return rst_code != 0
+04-13-2011 17:44:21.179423 [WARN] <b77c46c0>stat_handler(9889034) return rst_code != 0
+04-13-2011 17:44:21.836368 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:44:23.002366 [WARN] <b77c46c0>load_old: 11, load_current: 12, load_new: 11, load_max: 117, cpu:1.000000
+04-13-2011 17:44:25.002445 [WARN] <b77c46c0>load_old: 11, load_current: 0, load_new: 6, load_max: 117, cpu:0.997396
+04-13-2011 17:44:27.006359 [WARN] <b77c46c0>load_old: 6, load_current: 0, load_new: 3, load_max: 117, cpu:1.000000
+04-13-2011 17:44:29.006338 [WARN] <b77c46c0>load_old: 3, load_current: 0, load_new: 1, load_max: 117, cpu:1.000000
+04-13-2011 17:44:31.002345 [WARN] <b77c46c0>load_old: 1, load_current: 0, load_new: 0, load_max: 117, cpu:1.000000
+04-13-2011 17:44:33.002340 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 117, cpu:1.000000
+04-13-2011 17:44:35.006345 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 117, cpu:1.000000
+04-13-2011 17:44:36.998970 [WARN] <b77c46c0>load_old: 0, load_current: 3528, load_new: 352, load_max: 3528, cpu:1.000000
+04-13-2011 17:44:38.300406 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:44:39.002481 [WARN] <b77c46c0>load_old: 352, load_current: 4381, load_new: 754, load_max: 4381, cpu:0.865140
+04-13-2011 17:44:41.002402 [WARN] <b77c46c0>load_old: 754, load_current: 0, load_new: 452, load_max: 4381, cpu:0.546366
+04-13-2011 17:44:43.002404 [WARN] <b77c46c0>load_old: 452, load_current: 0, load_new: 271, load_max: 4381, cpu:0.552500
+04-13-2011 17:44:45.002403 [WARN] <b77c46c0>load_old: 271, load_current: 0, load_new: 162, load_max: 4381, cpu:0.553030
+04-13-2011 17:44:47.002405 [WARN] <b77c46c0>load_old: 162, load_current: 0, load_new: 97, load_max: 4381, cpu:0.563910
+04-13-2011 17:44:49.003251 [WARN] <b77c46c0>load_old: 97, load_current: 0, load_new: 58, load_max: 4381, cpu:0.642500
+04-13-2011 17:44:50.999773 [WARN] <b77c46c0>load_old: 58, load_current: 0, load_new: 34, load_max: 4381, cpu:0.562025
+04-13-2011 17:44:53.001347 [WARN] <b77c46c0>load_old: 34, load_current: 0, load_new: 20, load_max: 4381, cpu:0.556391
+04-13-2011 17:44:55.001345 [WARN] <b77c46c0>load_old: 20, load_current: 0, load_new: 11, load_max: 4381, cpu:0.557500
+04-13-2011 17:44:57.001335 [WARN] <b77c46c0>load_old: 11, load_current: 0, load_new: 6, load_max: 4381, cpu:0.556391
+04-13-2011 17:44:59.001336 [WARN] <b77c46c0>load_old: 6, load_current: 0, load_new: 3, load_max: 4381, cpu:0.545000
+04-13-2011 17:45:01.001344 [WARN] <b77c46c0>load_old: 3, load_current: 0, load_new: 1, load_max: 4381, cpu:0.556110
+04-13-2011 17:45:03.003181 [WARN] <b77c46c0>load_old: 1, load_current: 0, load_new: 0, load_max: 4381, cpu:0.561097
+04-13-2011 17:45:05.001338 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.586902
+04-13-2011 17:45:07.001111 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.553885
+04-13-2011 17:45:09.001997 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.553616
+04-13-2011 17:45:11.002860 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.550000
+04-13-2011 17:45:13.002801 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.560000
+04-13-2011 17:45:15.003154 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.565327
+04-13-2011 17:45:17.003108 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.613941
+04-13-2011 17:45:19.002828 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.592287
+04-13-2011 17:45:21.002399 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.714706
+04-13-2011 17:45:23.002405 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:1.000000
+04-13-2011 17:45:25.002447 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.646552
+04-13-2011 17:45:27.002827 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.712366
+04-13-2011 17:45:27.764898 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:27.764982 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:27.765057 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:27.767177 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:27.767223 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:27.767306 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:27.767585 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:27.767882 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:27.769093 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:27.769648 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:27.786820 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:27.787619 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:27.793262 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:27.794032 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:27.821892 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:27.822715 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:28.881550 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:28.883052 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:28.884586 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:28.886177 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:28.887525 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:28.888747 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:28.889989 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:45:29.002805 [WARN] <b77c46c0>load_old: 0, load_current: 23, load_new: 2, load_max: 4381, cpu:0.761421
+04-13-2011 17:45:31.002801 [WARN] <b77c46c0>load_old: 2, load_current: 0, load_new: 1, load_max: 4381, cpu:0.567500
+04-13-2011 17:45:33.002795 [WARN] <b77c46c0>load_old: 1, load_current: 0, load_new: 0, load_max: 4381, cpu:0.583979
+04-13-2011 17:45:35.002808 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.620513
+04-13-2011 17:45:37.002802 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.571788
+04-13-2011 17:45:39.002799 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.570352
+04-13-2011 17:45:41.003091 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.841689
+04-13-2011 17:45:43.003084 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:1.000000
+04-13-2011 17:45:45.003086 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:1.000000
+04-13-2011 17:45:47.003179 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:0.997416
+04-13-2011 17:45:49.003083 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:1.000000
+04-13-2011 17:45:51.003087 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:1.000000
+04-13-2011 17:45:53.003089 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:1.000000
+04-13-2011 17:45:55.003110 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:1.000000
+04-13-2011 17:45:57.003103 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:1.000000
+04-13-2011 17:45:59.003091 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:01.002833 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:01.997531 [WARN] <b77c46c0>stat_handler(9926336) return rst_code != 0
+04-13-2011 17:46:02.008770 [WARN] <b77c46c0>stat_handler(9926616) return rst_code != 0
+04-13-2011 17:46:02.009584 [WARN] <b77c46c0>stat_handler(9926437) return rst_code != 0
+04-13-2011 17:46:02.010383 [WARN] <b77c46c0>stat_handler(9926524) return rst_code != 0
+04-13-2011 17:46:02.023670 [WARN] <b77c46c0>stat_handler(9926103) return rst_code != 0
+04-13-2011 17:46:02.025805 [WARN] <b77c46c0>stat_handler(9926219) return rst_code != 0
+04-13-2011 17:46:02.026897 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:02.029297 [WARN] <b77c46c0>stat_handler(9926436) return rst_code != 0
+04-13-2011 17:46:02.082168 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:02.188040 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:02.297697 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:03.002833 [WARN] <b77c46c0>load_old: 0, load_current: 11, load_new: 1, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:05.002808 [WARN] <b77c46c0>load_old: 1, load_current: 0, load_new: 0, load_max: 4381, cpu:0.997382
+04-13-2011 17:46:06.274422 [WARN] <b77c46c0>stat_handler(9933698) return rst_code != 0
+04-13-2011 17:46:06.275660 [WARN] <b77c46c0>stat_handler(9933864) return rst_code != 0
+04-13-2011 17:46:06.276536 [WARN] <b77c46c0>stat_handler(9933611) return rst_code != 0
+04-13-2011 17:46:06.277422 [WARN] <b77c46c0>stat_handler(9933788) return rst_code != 0
+04-13-2011 17:46:06.292841 [WARN] <b77c46c0>stat_handler(9933267) return rst_code != 0
+04-13-2011 17:46:06.294178 [WARN] <b77c46c0>stat_handler(9933383) return rst_code != 0
+04-13-2011 17:46:06.299462 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:06.309664 [WARN] <b77c46c0>stat_handler(9933524) return rst_code != 0
+04-13-2011 17:46:06.328076 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:06.392811 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:06.566057 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:07.002869 [WARN] <b77c46c0>load_old: 0, load_current: 11, load_new: 1, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:08.274860 [WARN] <b77c46c0>stat_handler(9934597) return rst_code != 0
+04-13-2011 17:46:08.276024 [WARN] <b77c46c0>stat_handler(9928768) return rst_code != 0
+04-13-2011 17:46:08.277096 [WARN] <b77c46c0>stat_handler(9928869) return rst_code != 0
+04-13-2011 17:46:08.278696 [WARN] <b77c46c0>stat_handler(9928782) return rst_code != 0
+04-13-2011 17:46:08.279289 [WARN] <b77c46c0>stat_handler(9929073) return rst_code != 0
+04-13-2011 17:46:08.299777 [WARN] <b77c46c0>stat_handler(9928668) return rst_code != 0
+04-13-2011 17:46:08.302329 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:08.303869 [WARN] <b77c46c0>stat_handler(9929086) return rst_code != 0
+04-13-2011 17:46:08.305960 [WARN] <b77c46c0>stat_handler(9928868) return rst_code != 0
+04-13-2011 17:46:08.308876 [WARN] <b77c46c0>stat_handler(9928882) return rst_code != 0
+04-13-2011 17:46:08.311316 [WARN] <b77c46c0>stat_handler(9928795) return rst_code != 0
+04-13-2011 17:46:08.318479 [WARN] <b77c46c0>stat_handler(9935420) return rst_code != 0
+04-13-2011 17:46:08.321324 [WARN] <b77c46c0>stat_handler(9935433) return rst_code != 0
+04-13-2011 17:46:08.324344 [WARN] <b77c46c0>stat_handler(9935746) return rst_code != 0
+04-13-2011 17:46:08.327137 [WARN] <b77c46c0>stat_handler(9935759) return rst_code != 0
+04-13-2011 17:46:08.329810 [WARN] <b77c46c0>stat_handler(9935772) return rst_code != 0
+04-13-2011 17:46:08.332677 [WARN] <b77c46c0>stat_handler(9935785) return rst_code != 0
+04-13-2011 17:46:08.336322 [WARN] <b77c46c0>stat_handler(9935798) return rst_code != 0
+04-13-2011 17:46:08.338992 [WARN] <b77c46c0>stat_handler(9935812) return rst_code != 0
+04-13-2011 17:46:08.340293 [WARN] <b77c46c0>stat_handler(9929099) return rst_code != 0
+04-13-2011 17:46:08.341782 [WARN] <b77c46c0>stat_handler(9935825) return rst_code != 0
+04-13-2011 17:46:08.344968 [WARN] <b77c46c0>stat_handler(9935838) return rst_code != 0
+04-13-2011 17:46:08.345882 [WARN] <b77c46c0>stat_handler(9928895) return rst_code != 0
+04-13-2011 17:46:08.348181 [WARN] <b77c46c0>stat_handler(9928808) return rst_code != 0
+04-13-2011 17:46:08.348783 [WARN] <b77c46c0>stat_handler(9936151) return rst_code != 0
+04-13-2011 17:46:08.351538 [WARN] <b77c46c0>stat_handler(9936164) return rst_code != 0
+04-13-2011 17:46:08.355097 [WARN] <b77c46c0>stat_handler(9936177) return rst_code != 0
+04-13-2011 17:46:08.357924 [WARN] <b77c46c0>stat_handler(9936190) return rst_code != 0
+04-13-2011 17:46:08.360671 [WARN] <b77c46c0>stat_handler(9936203) return rst_code != 0
+04-13-2011 17:46:08.363576 [WARN] <b77c46c0>stat_handler(9936216) return rst_code != 0
+04-13-2011 17:46:08.367504 [WARN] <b77c46c0>stat_handler(9936229) return rst_code != 0
+04-13-2011 17:46:08.372580 [WARN] <b77c46c0>stat_handler(9936542) return rst_code != 0
+04-13-2011 17:46:08.377393 [WARN] <b77c46c0>stat_handler(9936555) return rst_code != 0
+04-13-2011 17:46:08.378110 [WARN] <b77c46c0>stat_handler(9929112) return rst_code != 0
+04-13-2011 17:46:08.379035 [WARN] <b77c46c0>stat_handler(9928908) return rst_code != 0
+04-13-2011 17:46:08.380269 [WARN] <b77c46c0>stat_handler(9928821) return rst_code != 0
+04-13-2011 17:46:08.384106 [WARN] <b77c46c0>stat_handler(9928985) return rst_code != 0
+04-13-2011 17:46:08.408420 [WARN] <b77c46c0>stat_handler(9928921) return rst_code != 0
+04-13-2011 17:46:08.410984 [WARN] <b77c46c0>stat_handler(9928834) return rst_code != 0
+04-13-2011 17:46:08.414690 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:08.418708 [WARN] <b77c46c0>stat_handler(9929126) return rst_code != 0
+04-13-2011 17:46:08.420378 [WARN] <b77c46c0>stat_handler(9928984) return rst_code != 0
+04-13-2011 17:46:08.423741 [WARN] <b77c46c0>stat_handler(9928998) return rst_code != 0
+04-13-2011 17:46:08.437971 [WARN] <b77c46c0>stat_handler(9928934) return rst_code != 0
+04-13-2011 17:46:08.439358 [WARN] <b77c46c0>stat_handler(9929147) return rst_code != 0
+04-13-2011 17:46:08.451049 [WARN] <b77c46c0>stat_handler(9929125) return rst_code != 0
+04-13-2011 17:46:08.456035 [WARN] <b77c46c0>stat_handler(9929139) return rst_code != 0
+04-13-2011 17:46:08.460164 [WARN] <b77c46c0>stat_handler(9929011) return rst_code != 0
+04-13-2011 17:46:08.467952 [WARN] <b77c46c0>stat_handler(9929247) return rst_code != 0
+04-13-2011 17:46:08.469185 [WARN] <b77c46c0>stat_handler(9929160) return rst_code != 0
+04-13-2011 17:46:08.487324 [WARN] <b77c46c0>stat_handler(9929452) return rst_code != 0
+04-13-2011 17:46:08.492764 [WARN] <b77c46c0>stat_handler(9929024) return rst_code != 0
+04-13-2011 17:46:08.497342 [WARN] <b77c46c0>stat_handler(9929260) return rst_code != 0
+04-13-2011 17:46:08.499796 [WARN] <b77c46c0>stat_handler(9929173) return rst_code != 0
+04-13-2011 17:46:08.518180 [WARN] <b77c46c0>stat_handler(9929465) return rst_code != 0
+04-13-2011 17:46:08.523117 [WARN] <b77c46c0>stat_handler(9929037) return rst_code != 0
+04-13-2011 17:46:08.528255 [WARN] <b77c46c0>stat_handler(9929273) return rst_code != 0
+04-13-2011 17:46:08.530454 [WARN] <b77c46c0>stat_handler(9929186) return rst_code != 0
+04-13-2011 17:46:08.550814 [WARN] <b77c46c0>stat_handler(9929478) return rst_code != 0
+04-13-2011 17:46:08.556546 [WARN] <b77c46c0>stat_handler(9929350) return rst_code != 0
+04-13-2011 17:46:08.560050 [WARN] <b77c46c0>stat_handler(9929286) return rst_code != 0
+04-13-2011 17:46:08.562602 [WARN] <b77c46c0>stat_handler(9929199) return rst_code != 0
+04-13-2011 17:46:08.585565 [WARN] <b77c46c0>stat_handler(9929491) return rst_code != 0
+04-13-2011 17:46:08.588142 [WARN] <b77c46c0>stat_handler(9929363) return rst_code != 0
+04-13-2011 17:46:08.590247 [WARN] <b77c46c0>stat_handler(9929299) return rst_code != 0
+04-13-2011 17:46:08.594156 [WARN] <b77c46c0>stat_handler(9929212) return rst_code != 0
+04-13-2011 17:46:08.616376 [WARN] <b77c46c0>stat_handler(9929504) return rst_code != 0
+04-13-2011 17:46:08.619221 [WARN] <b77c46c0>stat_handler(9929376) return rst_code != 0
+04-13-2011 17:46:08.620752 [WARN] <b77c46c0>stat_handler(9929312) return rst_code != 0
+04-13-2011 17:46:08.624644 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:08.626595 [WARN] <b77c46c0>stat_handler(9929226) return rst_code != 0
+04-13-2011 17:46:08.648197 [WARN] <b77c46c0>stat_handler(9929517) return rst_code != 0
+04-13-2011 17:46:08.651072 [WARN] <b77c46c0>stat_handler(9929389) return rst_code != 0
+04-13-2011 17:46:08.652618 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:08.654802 [WARN] <b77c46c0>stat_handler(9929326) return rst_code != 0
+04-13-2011 17:46:08.657148 [WARN] <b77c46c0>stat_handler(9929225) return rst_code != 0
+04-13-2011 17:46:08.658937 [WARN] <b77c46c0>stat_handler(9929239) return rst_code != 0
+04-13-2011 17:46:08.679614 [WARN] <b77c46c0>stat_handler(9929325) return rst_code != 0
+04-13-2011 17:46:08.681457 [WARN] <b77c46c0>stat_handler(9929339) return rst_code != 0
+04-13-2011 17:46:08.685682 [WARN] <b77c46c0>stat_handler(9929530) return rst_code != 0
+04-13-2011 17:46:08.687316 [WARN] <b77c46c0>stat_handler(9929402) return rst_code != 0
+04-13-2011 17:46:08.691165 [WARN] <b77c46c0>stat_handler(9929552) return rst_code != 0
+04-13-2011 17:46:08.711960 [WARN] <b77c46c0>stat_handler(9929652) return rst_code != 0
+04-13-2011 17:46:08.716280 [WARN] <b77c46c0>stat_handler(9929843) return rst_code != 0
+04-13-2011 17:46:08.717757 [WARN] <b77c46c0>stat_handler(9929415) return rst_code != 0
+04-13-2011 17:46:08.721833 [WARN] <b77c46c0>stat_handler(9929565) return rst_code != 0
+04-13-2011 17:46:08.743285 [WARN] <b77c46c0>stat_handler(9929665) return rst_code != 0
+04-13-2011 17:46:08.748541 [WARN] <b77c46c0>stat_handler(9929856) return rst_code != 0
+04-13-2011 17:46:08.749861 [WARN] <b77c46c0>stat_handler(9929428) return rst_code != 0
+04-13-2011 17:46:08.752284 [WARN] <b77c46c0>stat_handler(9929578) return rst_code != 0
+04-13-2011 17:46:08.775172 [WARN] <b77c46c0>stat_handler(9929678) return rst_code != 0
+04-13-2011 17:46:08.782298 [WARN] <b77c46c0>stat_handler(9929742) return rst_code != 0
+04-13-2011 17:46:08.783166 [WARN] <b77c46c0>stat_handler(9929869) return rst_code != 0
+04-13-2011 17:46:08.783949 [WARN] <b77c46c0>stat_handler(9929591) return rst_code != 0
+04-13-2011 17:46:08.806422 [WARN] <b77c46c0>stat_handler(9929691) return rst_code != 0
+04-13-2011 17:46:08.811857 [WARN] <b77c46c0>stat_handler(9929741) return rst_code != 0
+04-13-2011 17:46:08.813833 [WARN] <b77c46c0>stat_handler(9929604) return rst_code != 0
+04-13-2011 17:46:08.817408 [WARN] <b77c46c0>stat_handler(9929755) return rst_code != 0
+04-13-2011 17:46:08.835351 [WARN] <b77c46c0>stat_handler(9929704) return rst_code != 0
+04-13-2011 17:46:08.842936 [WARN] <b77c46c0>stat_handler(9929617) return rst_code != 0
+04-13-2011 17:46:08.850399 [WARN] <b77c46c0>stat_handler(9929768) return rst_code != 0
+04-13-2011 17:46:08.865783 [WARN] <b77c46c0>stat_handler(9929717) return rst_code != 0
+04-13-2011 17:46:08.873014 [WARN] <b77c46c0>stat_handler(9929630) return rst_code != 0
+04-13-2011 17:46:08.882797 [WARN] <b77c46c0>stat_handler(9929781) return rst_code != 0
+04-13-2011 17:46:08.897407 [WARN] <b77c46c0>stat_handler(9929730) return rst_code != 0
+04-13-2011 17:46:08.902553 [WARN] <b77c46c0>stat_handler(9929943) return rst_code != 0
+04-13-2011 17:46:08.914128 [WARN] <b77c46c0>stat_handler(9929794) return rst_code != 0
+04-13-2011 17:46:08.928862 [WARN] <b77c46c0>stat_handler(9930043) return rst_code != 0
+04-13-2011 17:46:08.945562 [WARN] <b77c46c0>stat_handler(9929807) return rst_code != 0
+04-13-2011 17:46:08.976789 [WARN] <b77c46c0>stat_handler(9929820) return rst_code != 0
+04-13-2011 17:46:08.990088 [WARN] <b77c46c0>stat_handler(9929833) return rst_code != 0
+04-13-2011 17:46:08.999073 [WARN] <b77c46c0>load_old: 1, load_current: 111, load_new: 12, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:10.275895 [WARN] <b77c46c0>stat_handler(9932245) return rst_code != 0
+04-13-2011 17:46:10.277016 [WARN] <b77c46c0>stat_handler(9931817) return rst_code != 0
+04-13-2011 17:46:10.277488 [WARN] <b77c46c0>stat_handler(9931980) return rst_code != 0
+04-13-2011 17:46:10.277977 [WARN] <b77c46c0>stat_handler(9932067) return rst_code != 0
+04-13-2011 17:46:10.278864 [WARN] <b77c46c0>stat_handler(9931853) return rst_code != 0
+04-13-2011 17:46:10.280423 [WARN] <b77c46c0>stat_handler(9931412) return rst_code != 0
+04-13-2011 17:46:10.302167 [WARN] <b77c46c0>stat_handler(9932053) return rst_code != 0
+04-13-2011 17:46:10.311320 [WARN] <b77c46c0>stat_handler(9931953) return rst_code != 0
+04-13-2011 17:46:10.384692 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:10.410501 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:10.578738 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:10.603020 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:11.002302 [WARN] <b77c46c0>load_old: 12, load_current: 12, load_new: 12, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:12.274527 [WARN] <b77c46c0>stat_handler(9935874) return rst_code != 0
+04-13-2011 17:46:12.275864 [WARN] <b77c46c0>stat_handler(9935609) return rst_code != 0
+04-13-2011 17:46:12.275910 [WARN] <b77c46c0>stat_handler(9935746) return rst_code != 0
+04-13-2011 17:46:12.276354 [WARN] <b77c46c0>stat_handler(9935696) return rst_code != 0
+04-13-2011 17:46:12.279786 [WARN] <b77c46c0>stat_handler(9935354) return rst_code != 0
+04-13-2011 17:46:12.283944 [WARN] <b77c46c0>stat_handler(9935495) return rst_code != 0
+04-13-2011 17:46:12.308322 [WARN] <b77c46c0>stat_handler(9935595) return rst_code != 0
+04-13-2011 17:46:12.309961 [WARN] <b77c46c0>stat_handler(9935695) return rst_code != 0
+04-13-2011 17:46:12.404798 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:12.422392 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:12.579743 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:12.615626 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:13.002466 [WARN] <b77c46c0>load_old: 12, load_current: 12, load_new: 12, load_max: 4381, cpu:0.997382
+04-13-2011 17:46:14.275032 [WARN] <b77c46c0>stat_handler(9938800) return rst_code != 0
+04-13-2011 17:46:14.275906 [WARN] <b77c46c0>stat_handler(9938732) return rst_code != 0
+04-13-2011 17:46:14.276867 [WARN] <b77c46c0>stat_handler(9938970) return rst_code != 0
+04-13-2011 17:46:14.277914 [WARN] <b77c46c0>stat_handler(9938886) return rst_code != 0
+04-13-2011 17:46:14.280621 [WARN] <b77c46c0>stat_handler(9938717) return rst_code != 0
+04-13-2011 17:46:14.299590 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:14.307264 [WARN] <b77c46c0>stat_handler(9938401) return rst_code != 0
+04-13-2011 17:46:14.308543 [WARN] <b77c46c0>stat_handler(9938501) return rst_code != 0
+04-13-2011 17:46:14.482548 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:14.518349 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:14.667147 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:15.002401 [WARN] <b77c46c0>load_old: 12, load_current: 11, load_new: 11, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:16.274575 [WARN] <b77c46c0>stat_handler(9942074) return rst_code != 0
+04-13-2011 17:46:16.275425 [WARN] <b77c46c0>stat_handler(9941988) return rst_code != 0
+04-13-2011 17:46:16.276711 [WARN] <b77c46c0>stat_handler(9942159) return rst_code != 0
+04-13-2011 17:46:16.277161 [WARN] <b77c46c0>stat_handler(9941920) return rst_code != 0
+04-13-2011 17:46:16.279844 [WARN] <b77c46c0>stat_handler(9941849) return rst_code != 0
+04-13-2011 17:46:16.304502 [WARN] <b77c46c0>stat_handler(9941816) return rst_code != 0
+04-13-2011 17:46:16.305763 [WARN] <b77c46c0>stat_handler(9941233) return rst_code != 0
+04-13-2011 17:46:16.308389 [WARN] <b77c46c0>stat_handler(9941333) return rst_code != 0
+04-13-2011 17:46:16.343506 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:16.380875 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:16.532214 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:16.622658 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:17.002423 [WARN] <b77c46c0>load_old: 11, load_current: 12, load_new: 11, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:18.275804 [WARN] <b77c46c0>stat_handler(9945361) return rst_code != 0
+04-13-2011 17:46:18.276791 [WARN] <b77c46c0>stat_handler(9945191) return rst_code != 0
+04-13-2011 17:46:18.277983 [WARN] <b77c46c0>stat_handler(9945263) return rst_code != 0
+04-13-2011 17:46:18.278958 [WARN] <b77c46c0>stat_handler(9945122) return rst_code != 0
+04-13-2011 17:46:18.281627 [WARN] <b77c46c0>stat_handler(9944948) return rst_code != 0
+04-13-2011 17:46:18.285648 [WARN] <b77c46c0>stat_handler(9945248) return rst_code != 0
+04-13-2011 17:46:18.296038 [WARN] <b77c46c0>stat_handler(9945148) return rst_code != 0
+04-13-2011 17:46:18.299802 [WARN] <b77c46c0>stat_handler(9944681) return rst_code != 0
+04-13-2011 17:46:18.372037 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:18.425670 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:18.622611 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:18.684380 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:18.862076 [WARN] <b77c46c0>stat_handler(9944620) return rst_code != 0
+04-13-2011 17:46:18.865062 [WARN] <b77c46c0>stat_handler(9944634) return rst_code != 0
+04-13-2011 17:46:18.870999 [WARN] <b77c46c0>stat_handler(9944949) return rst_code != 0
+04-13-2011 17:46:18.879674 [WARN] <b77c46c0>stat_handler(9944963) return rst_code != 0
+04-13-2011 17:46:18.886505 [WARN] <b77c46c0>stat_handler(9944977) return rst_code != 0
+04-13-2011 17:46:18.896927 [WARN] <b77c46c0>stat_handler(9944991) return rst_code != 0
+04-13-2011 17:46:18.901723 [WARN] <b77c46c0>stat_handler(9945005) return rst_code != 0
+04-13-2011 17:46:18.907991 [WARN] <b77c46c0>stat_handler(9945019) return rst_code != 0
+04-13-2011 17:46:18.911304 [WARN] <b77c46c0>stat_handler(9945033) return rst_code != 0
+04-13-2011 17:46:18.915068 [WARN] <b77c46c0>stat_handler(9945347) return rst_code != 0
+04-13-2011 17:46:19.002841 [WARN] <b77c46c0>load_old: 11, load_current: 22, load_new: 12, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:19.101607 [WARN] <b77c46c0>stat_handler(9944834) return rst_code != 0
+04-13-2011 17:46:19.104165 [WARN] <b77c46c0>stat_handler(9945149) return rst_code != 0
+04-13-2011 17:46:19.107753 [WARN] <b77c46c0>stat_handler(9945163) return rst_code != 0
+04-13-2011 17:46:19.109923 [WARN] <b77c46c0>stat_handler(9945177) return rst_code != 0
+04-13-2011 17:46:19.147217 [WARN] <b77c46c0>stat_handler(9944934) return rst_code != 0
+04-13-2011 17:46:19.150073 [WARN] <b77c46c0>stat_handler(9945249) return rst_code != 0
+04-13-2011 17:46:20.274279 [WARN] <b77c46c0>stat_handler(9938305) return rst_code != 0
+04-13-2011 17:46:20.275568 [WARN] <b77c46c0>stat_handler(9938373) return rst_code != 0
+04-13-2011 17:46:20.276207 [WARN] <b77c46c0>stat_handler(9938459) return rst_code != 0
+04-13-2011 17:46:20.277530 [WARN] <b77c46c0>stat_handler(9938600) return rst_code != 0
+04-13-2011 17:46:20.284447 [WARN] <b77c46c0>stat_handler(9938201) return rst_code != 0
+04-13-2011 17:46:20.298585 [WARN] <b77c46c0>stat_handler(9937618) return rst_code != 0
+04-13-2011 17:46:20.301863 [WARN] <b77c46c0>stat_handler(9937718) return rst_code != 0
+04-13-2011 17:46:20.307251 [WARN] <b77c46c0>stat_handler(9937934) return rst_code != 0
+04-13-2011 17:46:20.332936 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:20.368059 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:20.447760 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:20.533225 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:21.002871 [WARN] <b77c46c0>load_old: 12, load_current: 18, load_new: 12, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:22.274844 [WARN] <b77c46c0>stat_handler(9942173) return rst_code != 0
+04-13-2011 17:46:22.276089 [WARN] <b77c46c0>stat_handler(9941632) return rst_code != 0
+04-13-2011 17:46:22.277160 [WARN] <b77c46c0>stat_handler(9941864) return rst_code != 0
+04-13-2011 17:46:22.278269 [WARN] <b77c46c0>stat_handler(9941718) return rst_code != 0
+04-13-2011 17:46:22.290228 [WARN] <b77c46c0>stat_handler(9941233) return rst_code != 0
+04-13-2011 17:46:22.293636 [WARN] <b77c46c0>stat_handler(9941333) return rst_code != 0
+04-13-2011 17:46:22.298600 [WARN] <b77c46c0>stat_handler(9941849) return rst_code != 0
+04-13-2011 17:46:22.309111 [WARN] <b77c46c0>stat_handler(9941816) return rst_code != 0
+04-13-2011 17:46:22.453191 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:22.488966 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:22.565951 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:22.652872 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:23.002859 [WARN] <b77c46c0>load_old: 12, load_current: 12, load_new: 12, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:24.274556 [WARN] <b77c46c0>stat_handler(9945122) return rst_code != 0
+04-13-2011 17:46:24.275512 [WARN] <b77c46c0>stat_handler(9945191) return rst_code != 0
+04-13-2011 17:46:24.276490 [WARN] <b77c46c0>stat_handler(9945432) return rst_code != 0
+04-13-2011 17:46:24.277556 [WARN] <b77c46c0>stat_handler(9945277) return rst_code != 0
+04-13-2011 17:46:24.280265 [WARN] <b77c46c0>stat_handler(9945148) return rst_code != 0
+04-13-2011 17:46:24.284809 [WARN] <b77c46c0>stat_handler(9945248) return rst_code != 0
+04-13-2011 17:46:24.287494 [WARN] <b77c46c0>stat_handler(9944681) return rst_code != 0
+04-13-2011 17:46:24.308405 [WARN] <b77c46c0>stat_handler(9945431) return rst_code != 0
+04-13-2011 17:46:24.355016 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:24.588430 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:24.625751 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:24.800107 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:25.004165 [WARN] <b77c46c0>load_old: 12, load_current: 12, load_new: 12, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:26.274734 [WARN] <b77c46c0>stat_handler(9948480) return rst_code != 0
+04-13-2011 17:46:26.275637 [WARN] <b77c46c0>stat_handler(9948565) return rst_code != 0
+04-13-2011 17:46:26.276484 [WARN] <b77c46c0>stat_handler(9948320) return rst_code != 0
+04-13-2011 17:46:26.277622 [WARN] <b77c46c0>stat_handler(9948415) return rst_code != 0
+04-13-2011 17:46:26.288756 [WARN] <b77c46c0>stat_handler(9948464) return rst_code != 0
+04-13-2011 17:46:26.289699 [WARN] <b77c46c0>stat_handler(9948564) return rst_code != 0
+04-13-2011 17:46:26.301101 [WARN] <b77c46c0>stat_handler(9947964) return rst_code != 0
+04-13-2011 17:46:26.314266 [WARN] <b77c46c0>stat_handler(9947869) return rst_code != 0
+04-13-2011 17:46:26.415831 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:26.429516 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:26.753026 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:26.790703 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:27.002865 [WARN] <b77c46c0>load_old: 12, load_current: 12, load_new: 12, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:28.274383 [WARN] <b77c46c0>stat_handler(9951663) return rst_code != 0
+04-13-2011 17:46:28.275372 [WARN] <b77c46c0>stat_handler(9951599) return rst_code != 0
+04-13-2011 17:46:28.276982 [WARN] <b77c46c0>stat_handler(9951748) return rst_code != 0
+04-13-2011 17:46:28.277936 [WARN] <b77c46c0>stat_handler(9951489) return rst_code != 0
+04-13-2011 17:46:28.286117 [WARN] <b77c46c0>stat_handler(9951113) return rst_code != 0
+04-13-2011 17:46:28.298378 [WARN] <b77c46c0>stat_handler(9950897) return rst_code != 0
+04-13-2011 17:46:28.301895 [WARN] <b77c46c0>stat_handler(9950997) return rst_code != 0
+04-13-2011 17:46:28.320409 [WARN] <b77c46c0>stat_handler(9951208) return rst_code != 0
+04-13-2011 17:46:28.408044 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:28.464012 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:28.673518 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:28.684970 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:29.002941 [WARN] <b77c46c0>load_old: 12, load_current: 12, load_new: 12, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:30.274805 [WARN] <b77c46c0>stat_handler(9954327) return rst_code != 0
+04-13-2011 17:46:30.275735 [WARN] <b77c46c0>stat_handler(9954487) return rst_code != 0
+04-13-2011 17:46:30.276624 [WARN] <b77c46c0>stat_handler(9954572) return rst_code != 0
+04-13-2011 17:46:30.277565 [WARN] <b77c46c0>stat_handler(9954422) return rst_code != 0
+04-13-2011 17:46:30.291607 [WARN] <b77c46c0>stat_handler(9954441) return rst_code != 0
+04-13-2011 17:46:30.294910 [WARN] <b77c46c0>stat_handler(9954541) return rst_code != 0
+04-13-2011 17:46:30.305334 [WARN] <b77c46c0>stat_handler(9953941) return rst_code != 0
+04-13-2011 17:46:30.316288 [WARN] <b77c46c0>stat_handler(9953846) return rst_code != 0
+04-13-2011 17:46:30.344639 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:30.355081 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:30.678372 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:30.718352 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:31.002814 [WARN] <b77c46c0>load_old: 12, load_current: 12, load_new: 12, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:32.274512 [WARN] <b77c46c0>stat_handler(9952740) return rst_code != 0
+04-13-2011 17:46:32.275538 [WARN] <b77c46c0>stat_handler(9957655) return rst_code != 0
+04-13-2011 17:46:32.276453 [WARN] <b77c46c0>stat_handler(9957570) return rst_code != 0
+04-13-2011 17:46:32.277703 [WARN] <b77c46c0>stat_handler(9957496) return rst_code != 0
+04-13-2011 17:46:32.281885 [WARN] <b77c46c0>stat_handler(9952019) return rst_code != 0
+04-13-2011 17:46:32.282773 [WARN] <b77c46c0>stat_handler(9957090) return rst_code != 0
+04-13-2011 17:46:32.292597 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:32.295310 [WARN] <b77c46c0>stat_handler(9956974) return rst_code != 0
+04-13-2011 17:46:32.297856 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:32.338790 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:32.431640 [WARN] <b77c46c0>stat_handler(9956390) return rst_code != 0
+04-13-2011 17:46:32.436524 [WARN] <b77c46c0>stat_handler(9956405) return rst_code != 0
+04-13-2011 17:46:32.440760 [WARN] <b77c46c0>stat_handler(9956420) return rst_code != 0
+04-13-2011 17:46:32.444315 [WARN] <b77c46c0>stat_handler(9956435) return rst_code != 0
+04-13-2011 17:46:32.447865 [WARN] <b77c46c0>stat_handler(9956750) return rst_code != 0
+04-13-2011 17:46:32.452033 [WARN] <b77c46c0>stat_handler(9956765) return rst_code != 0
+04-13-2011 17:46:32.456415 [WARN] <b77c46c0>stat_handler(9956780) return rst_code != 0
+04-13-2011 17:46:32.460015 [WARN] <b77c46c0>stat_handler(9956795) return rst_code != 0
+04-13-2011 17:46:32.463685 [WARN] <b77c46c0>stat_handler(9956810) return rst_code != 0
+04-13-2011 17:46:32.468017 [WARN] <b77c46c0>stat_handler(9956825) return rst_code != 0
+04-13-2011 17:46:32.471624 [WARN] <b77c46c0>stat_handler(9957140) return rst_code != 0
+04-13-2011 17:46:32.475605 [WARN] <b77c46c0>stat_handler(9957155) return rst_code != 0
+04-13-2011 17:46:32.479747 [WARN] <b77c46c0>stat_handler(9957170) return rst_code != 0
+04-13-2011 17:46:32.483258 [WARN] <b77c46c0>stat_handler(9945431) return rst_code != 0
+04-13-2011 17:46:32.515657 [WARN] <b77c46c0>stat_handler(9945947) return rst_code != 0
+04-13-2011 17:46:32.532057 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:32.547098 [WARN] <b77c46c0>stat_handler(9945962) return rst_code != 0
+04-13-2011 17:46:32.576546 [WARN] <b77c46c0>stat_handler(9945977) return rst_code != 0
+04-13-2011 17:46:32.607175 [WARN] <b77c46c0>stat_handler(9945992) return rst_code != 0
+04-13-2011 17:46:32.636634 [WARN] <b77c46c0>stat_handler(9946007) return rst_code != 0
+04-13-2011 17:46:32.666245 [WARN] <b77c46c0>stat_handler(9946022) return rst_code != 0
+04-13-2011 17:46:32.695307 [WARN] <b77c46c0>stat_handler(9946037) return rst_code != 0
+04-13-2011 17:46:32.724708 [WARN] <b77c46c0>stat_handler(9946052) return rst_code != 0
+04-13-2011 17:46:32.754222 [WARN] <b77c46c0>stat_handler(9946067) return rst_code != 0
+04-13-2011 17:46:32.783627 [WARN] <b77c46c0>stat_handler(9946082) return rst_code != 0
+04-13-2011 17:46:32.812589 [WARN] <b77c46c0>stat_handler(9946097) return rst_code != 0
+04-13-2011 17:46:32.834383 [WARN] <b77c46c0>stat_handler(9956920) return rst_code != 0
+04-13-2011 17:46:32.837666 [WARN] <b77c46c0>stat_handler(9956935) return rst_code != 0
+04-13-2011 17:46:32.840935 [WARN] <b77c46c0>stat_handler(9957250) return rst_code != 0
+04-13-2011 17:46:32.843030 [WARN] <b77c46c0>stat_handler(9946112) return rst_code != 0
+04-13-2011 17:46:32.844406 [WARN] <b77c46c0>stat_handler(9957265) return rst_code != 0
+04-13-2011 17:46:32.847604 [WARN] <b77c46c0>stat_handler(9957280) return rst_code != 0
+04-13-2011 17:46:32.850979 [WARN] <b77c46c0>stat_handler(9957295) return rst_code != 0
+04-13-2011 17:46:32.854226 [WARN] <b77c46c0>stat_handler(9957310) return rst_code != 0
+04-13-2011 17:46:32.859277 [WARN] <b77c46c0>stat_handler(9957325) return rst_code != 0
+04-13-2011 17:46:32.862512 [WARN] <b77c46c0>stat_handler(9957540) return rst_code != 0
+04-13-2011 17:46:32.865780 [WARN] <b77c46c0>stat_handler(9957555) return rst_code != 0
+04-13-2011 17:46:32.878149 [WARN] <b77c46c0>stat_handler(9946127) return rst_code != 0
+04-13-2011 17:46:32.886974 [WARN] <b77c46c0>stat_handler(9957020) return rst_code != 0
+04-13-2011 17:46:32.890108 [WARN] <b77c46c0>stat_handler(9957035) return rst_code != 0
+04-13-2011 17:46:32.893311 [WARN] <b77c46c0>stat_handler(9957350) return rst_code != 0
+04-13-2011 17:46:32.896914 [WARN] <b77c46c0>stat_handler(9957365) return rst_code != 0
+04-13-2011 17:46:32.899910 [WARN] <b77c46c0>stat_handler(9957380) return rst_code != 0
+04-13-2011 17:46:32.903118 [WARN] <b77c46c0>stat_handler(9957395) return rst_code != 0
+04-13-2011 17:46:32.906818 [WARN] <b77c46c0>stat_handler(9957410) return rst_code != 0
+04-13-2011 17:46:32.910024 [WARN] <b77c46c0>stat_handler(9957425) return rst_code != 0
+04-13-2011 17:46:32.913430 [WARN] <b77c46c0>stat_handler(9957640) return rst_code != 0
+04-13-2011 17:46:32.916094 [WARN] <b77c46c0>stat_handler(9946343) return rst_code != 0
+04-13-2011 17:46:32.947117 [WARN] <b77c46c0>stat_handler(9946342) return rst_code != 0
+04-13-2011 17:46:32.950939 [WARN] <b77c46c0>stat_handler(9946358) return rst_code != 0
+04-13-2011 17:46:32.983490 [WARN] <b77c46c0>stat_handler(9946373) return rst_code != 0
+04-13-2011 17:46:33.002889 [WARN] <b77c46c0>load_old: 12, load_current: 61, load_new: 16, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:33.072824 [WARN] <b77c46c0>stat_handler(9957136) return rst_code != 0
+04-13-2011 17:46:33.076029 [WARN] <b77c46c0>stat_handler(9957451) return rst_code != 0
+04-13-2011 17:46:33.079113 [WARN] <b77c46c0>stat_handler(9957466) return rst_code != 0
+04-13-2011 17:46:33.082378 [WARN] <b77c46c0>stat_handler(9957481) return rst_code != 0
+04-13-2011 17:46:34.274215 [WARN] <b77c46c0>stat_handler(9948260) return rst_code != 0
+04-13-2011 17:46:34.275327 [WARN] <b77c46c0>stat_handler(9948204) return rst_code != 0
+04-13-2011 17:46:34.275372 [WARN] <b77c46c0>stat_handler(9947964) return rst_code != 0
+04-13-2011 17:46:34.276464 [WARN] <b77c46c0>stat_handler(9948119) return rst_code != 0
+04-13-2011 17:46:34.287174 [WARN] <b77c46c0>stat_handler(9947653) return rst_code != 0
+04-13-2011 17:46:34.290732 [WARN] <b77c46c0>stat_handler(9947753) return rst_code != 0
+04-13-2011 17:46:34.303786 [WARN] <b77c46c0>stat_handler(9947869) return rst_code != 0
+04-13-2011 17:46:34.358192 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:34.380115 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:34.396569 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:34.544877 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:35.002898 [WARN] <b77c46c0>load_old: 16, load_current: 15, load_new: 15, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:36.274925 [WARN] <b77c46c0>stat_handler(9950897) return rst_code != 0
+04-13-2011 17:46:36.275821 [WARN] <b77c46c0>stat_handler(9950997) return rst_code != 0
+04-13-2011 17:46:36.276987 [WARN] <b77c46c0>stat_handler(9951989) return rst_code != 0
+04-13-2011 17:46:36.278201 [WARN] <b77c46c0>stat_handler(9951519) return rst_code != 0
+04-13-2011 17:46:36.290779 [WARN] <b77c46c0>stat_handler(9951113) return rst_code != 0
+04-13-2011 17:46:36.297694 [WARN] <b77c46c0>stat_handler(9951208) return rst_code != 0
+04-13-2011 17:46:36.314168 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:36.333872 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:36.350016 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:36.525422 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:37.002845 [WARN] <b77c46c0>load_old: 15, load_current: 10, load_new: 14, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:38.035882 [WARN] <b77c46c0>stat_handler(9954813) return rst_code != 0
+04-13-2011 17:46:38.037273 [WARN] <b77c46c0>stat_handler(9954517) return rst_code != 0
+04-13-2011 17:46:38.038307 [WARN] <b77c46c0>stat_handler(9954642) return rst_code != 0
+04-13-2011 17:46:38.041295 [WARN] <b77c46c0>stat_handler(9954602) return rst_code != 0
+04-13-2011 17:46:38.043138 [WARN] <b77c46c0>stat_handler(9953846) return rst_code != 0
+04-13-2011 17:46:38.044503 [WARN] <b77c46c0>stat_handler(9954752) return rst_code != 0
+04-13-2011 17:46:38.045756 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:38.057120 [WARN] <b77c46c0>stat_handler(9954541) return rst_code != 0
+04-13-2011 17:46:38.063540 [WARN] <b77c46c0>stat_handler(9954441) return rst_code != 0
+04-13-2011 17:46:38.275323 [WARN] <b77c46c0>stat_handler(9955022) return rst_code != 0
+04-13-2011 17:46:38.276330 [WARN] <b77c46c0>stat_handler(9955078) return rst_code != 0
+04-13-2011 17:46:38.277229 [WARN] <b77c46c0>stat_handler(9955548) return rst_code != 0
+04-13-2011 17:46:38.278222 [WARN] <b77c46c0>stat_handler(9954937) return rst_code != 0
+04-13-2011 17:46:38.297853 [WARN] <b77c46c0>stat_handler(9954441) return rst_code != 0
+04-13-2011 17:46:38.299860 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:38.301617 [WARN] <b77c46c0>stat_handler(9954752) return rst_code != 0
+04-13-2011 17:46:38.304235 [WARN] <b77c46c0>stat_handler(9909043) return rst_code != 0
+04-13-2011 17:46:38.308372 [WARN] <b77c46c0>stat_handler(9954541) return rst_code != 0
+04-13-2011 17:46:38.321744 [WARN] <b77c46c0>stat_handler(9954657) return rst_code != 0
+04-13-2011 17:46:38.355789 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:38.562384 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:39.002462 [WARN] <b77c46c0>load_old: 14, load_current: 21, load_new: 14, load_max: 4381, cpu:0.994792
+04-13-2011 17:46:40.278976 [WARN] <b77c46c0>stat_handler(9958350) return rst_code != 0
+04-13-2011 17:46:40.279975 [WARN] <b77c46c0>stat_handler(9958214) return rst_code != 0
+04-13-2011 17:46:40.280844 [WARN] <b77c46c0>stat_handler(9958298) return rst_code != 0
+04-13-2011 17:46:40.285852 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:46:40.294542 [WARN] <b77c46c0>stat_handler(9957585) return rst_code != 0
+04-13-2011 17:46:40.300213 [WARN] <b77c46c0>stat_handler(9957801) return rst_code != 0
+04-13-2011 17:46:40.301378 [WARN] <b77c46c0>stat_handler(9957685) return rst_code != 0
+04-13-2011 17:46:40.491174 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:40.522917 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:40.648768 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:41.002390 [WARN] <b77c46c0>load_old: 14, load_current: 21, load_new: 14, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:43.002400 [WARN] <b77c46c0>load_old: 14, load_current: 0, load_new: 8, load_max: 4381, cpu:0.981865
+04-13-2011 17:46:45.002866 [WARN] <b77c46c0>load_old: 8, load_current: 0, load_new: 4, load_max: 4381, cpu:0.981818
+04-13-2011 17:46:47.006984 [WARN] <b77c46c0>load_old: 4, load_current: 0, load_new: 2, load_max: 4381, cpu:0.989529
+04-13-2011 17:46:49.003138 [WARN] <b77c46c0>load_old: 2, load_current: 0, load_new: 1, load_max: 4381, cpu:0.989556
+04-13-2011 17:46:51.003095 [WARN] <b77c46c0>load_old: 1, load_current: 0, load_new: 0, load_max: 4381, cpu:0.992228
+04-13-2011 17:46:52.273868 [WARN] <b77c46c0>stat_handler(9968675) return rst_code != 0
+04-13-2011 17:46:52.273971 [WARN] <b77c46c0>stat_handler(9969371) return rst_code != 0
+04-13-2011 17:46:52.279863 [WARN] <b77c46c0>stat_handler(9969322) return rst_code != 0
+04-13-2011 17:46:52.284335 [WARN] <b77c46c0>stat_handler(9968800) return rst_code != 0
+04-13-2011 17:46:52.318450 [WARN] <b77c46c0>stat_handler(9968600) return rst_code != 0
+04-13-2011 17:46:52.374437 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:52.397320 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:52.402606 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:53.002795 [WARN] <b77c46c0>load_old: 0, load_current: 8, load_new: 0, load_max: 4381, cpu:1.000000
+04-13-2011 17:46:54.275717 [WARN] <b77c46c0>stat_handler(9972514) return rst_code != 0
+04-13-2011 17:46:54.275774 [WARN] <b77c46c0>stat_handler(9972614) return rst_code != 0
+04-13-2011 17:46:54.275854 [WARN] <b77c46c0>stat_handler(9972674) return rst_code != 0
+04-13-2011 17:46:54.280753 [WARN] <b77c46c0>stat_handler(9971892) return rst_code != 0
+04-13-2011 17:46:54.297037 [WARN] <b77c46c0>stat_handler(9971992) return rst_code != 0
+04-13-2011 17:46:54.301628 [WARN] <b77c46c0>stat_handler(9971835) return rst_code != 0
+04-13-2011 17:46:54.336801 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:54.346741 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:54.364098 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:55.002441 [WARN] <b77c46c0>load_old: 0, load_current: 9, load_new: 0, load_max: 4381, cpu:0.997389
+04-13-2011 17:46:56.274656 [WARN] <b77c46c0>stat_handler(9975789) return rst_code != 0
+04-13-2011 17:46:56.274725 [WARN] <b77c46c0>stat_handler(9975127) return rst_code != 0
+04-13-2011 17:46:56.274887 [WARN] <b77c46c0>stat_handler(9975872) return rst_code != 0
+04-13-2011 17:46:56.282787 [WARN] <b77c46c0>stat_handler(9975184) return rst_code != 0
+04-13-2011 17:46:56.297363 [WARN] <b77c46c0>stat_handler(9975284) return rst_code != 0
+04-13-2011 17:46:56.366106 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:56.411410 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:56.442865 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:57.003095 [WARN] <b77c46c0>load_old: 0, load_current: 8, load_new: 0, load_max: 4381, cpu:0.997409
+04-13-2011 17:46:58.274973 [WARN] <b77c46c0>stat_handler(9979418) return rst_code != 0
+04-13-2011 17:46:58.275025 [WARN] <b77c46c0>stat_handler(9979318) return rst_code != 0
+04-13-2011 17:46:58.275085 [WARN] <b77c46c0>stat_handler(9979510) return rst_code != 0
+04-13-2011 17:46:58.281841 [WARN] <b77c46c0>stat_handler(9979492) return rst_code != 0
+04-13-2011 17:46:58.282614 [WARN] <b77c46c0>stat_handler(9979249) return rst_code != 0
+04-13-2011 17:46:58.298936 [WARN] <b77c46c0>stat_handler(9979349) return rst_code != 0
+04-13-2011 17:46:58.588445 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:46:58.596125 [WARN] <b77c46c0>stat_handler(9979997) return rst_code != 0
+04-13-2011 17:46:58.596242 [WARN] <b77c46c0>stat_handler(9980088) return rst_code != 0
+04-13-2011 17:46:58.596354 [WARN] <b77c46c0>stat_handler(9979923) return rst_code != 0
+04-13-2011 17:46:58.609021 [WARN] <b77c46c0>stat_handler(9979349) return rst_code != 0
+04-13-2011 17:46:58.615547 [WARN] <b77c46c0>stat_handler(9979492) return rst_code != 0
+04-13-2011 17:46:58.627755 [WARN] <b77c46c0>stat_handler(9979922) return rst_code != 0
+04-13-2011 17:46:58.644281 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:46:58.716033 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:46:59.003093 [WARN] <b77c46c0>load_old: 0, load_current: 15, load_new: 1, load_max: 4381, cpu:0.989664
+04-13-2011 17:46:59.044833 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:00.275534 [WARN] <b77c46c0>stat_handler(9969322) return rst_code != 0
+04-13-2011 17:47:00.275591 [WARN] <b77c46c0>stat_handler(9969439) return rst_code != 0
+04-13-2011 17:47:00.275669 [WARN] <b77c46c0>stat_handler(9974472) return rst_code != 0
+04-13-2011 17:47:00.279276 [WARN] <b77c46c0>stat_handler(9974454) return rst_code != 0
+04-13-2011 17:47:00.280501 [WARN] <b77c46c0>stat_handler(9968800) return rst_code != 0
+04-13-2011 17:47:00.283014 [WARN] <b77c46c0>stat_handler(9969556) return rst_code != 0
+04-13-2011 17:47:00.284136 [WARN] <b77c46c0>stat_handler(9968600) return rst_code != 0
+04-13-2011 17:47:00.286094 [WARN] <b77c46c0>stat_handler(9969339) return rst_code != 0
+04-13-2011 17:47:00.307734 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:00.311220 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:00.314775 [WARN] <b77c46c0>stat_handler(9969574) return rst_code != 0
+04-13-2011 17:47:00.315706 [WARN] <b77c46c0>stat_handler(9969456) return rst_code != 0
+04-13-2011 17:47:00.342295 [WARN] <b77c46c0>stat_handler(9969573) return rst_code != 0
+04-13-2011 17:47:00.344356 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:00.345224 [WARN] <b77c46c0>stat_handler(9969591) return rst_code != 0
+04-13-2011 17:47:00.348039 [WARN] <b77c46c0>stat_handler(9969474) return rst_code != 0
+04-13-2011 17:47:00.375945 [WARN] <b77c46c0>stat_handler(9969608) return rst_code != 0
+04-13-2011 17:47:00.377130 [WARN] <b77c46c0>stat_handler(9969473) return rst_code != 0
+04-13-2011 17:47:00.380367 [WARN] <b77c46c0>stat_handler(9969491) return rst_code != 0
+04-13-2011 17:47:00.405154 [WARN] <b77c46c0>stat_handler(9969625) return rst_code != 0
+04-13-2011 17:47:00.409543 [WARN] <b77c46c0>stat_handler(9969508) return rst_code != 0
+04-13-2011 17:47:00.463353 [WARN] <b77c46c0>stat_handler(9969859) return rst_code != 0
+04-13-2011 17:47:00.466881 [WARN] <b77c46c0>stat_handler(9969742) return rst_code != 0
+04-13-2011 17:47:00.492554 [WARN] <b77c46c0>stat_handler(9969876) return rst_code != 0
+04-13-2011 17:47:00.496044 [WARN] <b77c46c0>stat_handler(9969759) return rst_code != 0
+04-13-2011 17:47:00.522514 [WARN] <b77c46c0>stat_handler(9969893) return rst_code != 0
+04-13-2011 17:47:00.525633 [WARN] <b77c46c0>stat_handler(9969776) return rst_code != 0
+04-13-2011 17:47:00.554672 [WARN] <b77c46c0>stat_handler(9969793) return rst_code != 0
+04-13-2011 17:47:00.581775 [WARN] <b77c46c0>stat_handler(9981843) return rst_code != 0
+04-13-2011 17:47:00.585958 [WARN] <b77c46c0>stat_handler(9981860) return rst_code != 0
+04-13-2011 17:47:00.589991 [WARN] <b77c46c0>stat_handler(9981877) return rst_code != 0
+04-13-2011 17:47:00.594201 [WARN] <b77c46c0>stat_handler(9981894) return rst_code != 0
+04-13-2011 17:47:00.595717 [WARN] <b77c46c0>stat_handler(9969927) return rst_code != 0
+04-13-2011 17:47:00.596330 [WARN] <b77c46c0>stat_handler(9969810) return rst_code != 0
+04-13-2011 17:47:00.598117 [WARN] <b77c46c0>stat_handler(9981912) return rst_code != 0
+04-13-2011 17:47:00.601862 [WARN] <b77c46c0>stat_handler(9981929) return rst_code != 0
+04-13-2011 17:47:00.605430 [WARN] <b77c46c0>stat_handler(9981946) return rst_code != 0
+04-13-2011 17:47:00.609337 [WARN] <b77c46c0>stat_handler(9981963) return rst_code != 0
+04-13-2011 17:47:00.611524 [WARN] <b77c46c0>stat_handler(9969573) return rst_code != 0
+04-13-2011 17:47:00.613025 [WARN] <b77c46c0>stat_handler(9981980) return rst_code != 0
+04-13-2011 17:47:00.615215 [WARN] <b77c46c0>stat_handler(9969473) return rst_code != 0
+04-13-2011 17:47:00.616558 [WARN] <b77c46c0>stat_handler(9981997) return rst_code != 0
+04-13-2011 17:47:00.620598 [WARN] <b77c46c0>stat_handler(9982014) return rst_code != 0
+04-13-2011 17:47:00.624382 [WARN] <b77c46c0>stat_handler(9982031) return rst_code != 0
+04-13-2011 17:47:00.628311 [WARN] <b77c46c0>stat_handler(9982048) return rst_code != 0
+04-13-2011 17:47:00.632317 [WARN] <b77c46c0>stat_handler(9982065) return rst_code != 0
+04-13-2011 17:47:00.635930 [WARN] <b77c46c0>stat_handler(9982082) return rst_code != 0
+04-13-2011 17:47:00.640034 [WARN] <b77c46c0>stat_handler(9982099) return rst_code != 0
+04-13-2011 17:47:00.643828 [WARN] <b77c46c0>stat_handler(9982116) return rst_code != 0
+04-13-2011 17:47:00.648041 [WARN] <b77c46c0>stat_handler(9982133) return rst_code != 0
+04-13-2011 17:47:00.652179 [WARN] <b77c46c0>stat_handler(9982150) return rst_code != 0
+04-13-2011 17:47:00.655440 [WARN] <b77c46c0>stat_handler(9982167) return rst_code != 0
+04-13-2011 17:47:00.659119 [WARN] <b77c46c0>stat_handler(9969017) return rst_code != 0
+04-13-2011 17:47:00.688563 [WARN] <b77c46c0>stat_handler(9969016) return rst_code != 0
+04-13-2011 17:47:00.691935 [WARN] <b77c46c0>stat_handler(9969034) return rst_code != 0
+04-13-2011 17:47:00.776900 [WARN] <b77c46c0>stat_handler(9969685) return rst_code != 0
+04-13-2011 17:47:00.785257 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:00.806912 [WARN] <b77c46c0>stat_handler(9969702) return rst_code != 0
+04-13-2011 17:47:00.814606 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:00.837282 [WARN] <b77c46c0>stat_handler(9969719) return rst_code != 0
+04-13-2011 17:47:00.867343 [WARN] <b77c46c0>stat_handler(9969736) return rst_code != 0
+04-13-2011 17:47:00.896377 [WARN] <b77c46c0>stat_handler(9969953) return rst_code != 0
+04-13-2011 17:47:00.926510 [WARN] <b77c46c0>stat_handler(9969970) return rst_code != 0
+04-13-2011 17:47:00.956042 [WARN] <b77c46c0>stat_handler(9969987) return rst_code != 0
+04-13-2011 17:47:00.986418 [WARN] <b77c46c0>stat_handler(9970004) return rst_code != 0
+04-13-2011 17:47:01.002447 [WARN] <b77c46c0>load_old: 1, load_current: 66, load_new: 7, load_max: 4381, cpu:0.997403
+04-13-2011 17:47:01.021010 [WARN] <b77c46c0>stat_handler(9970021) return rst_code != 0
+04-13-2011 17:47:01.051423 [WARN] <b77c46c0>stat_handler(9970038) return rst_code != 0
+04-13-2011 17:47:01.081957 [WARN] <b77c46c0>stat_handler(9970255) return rst_code != 0
+04-13-2011 17:47:01.126001 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:02.275034 [WARN] <b77c46c0>stat_handler(9972934) return rst_code != 0
+04-13-2011 17:47:02.276239 [WARN] <b77c46c0>stat_handler(9972817) return rst_code != 0
+04-13-2011 17:47:02.276390 [WARN] <b77c46c0>stat_handler(9972355) return rst_code != 0
+04-13-2011 17:47:02.282397 [WARN] <b77c46c0>stat_handler(9972865) return rst_code != 0
+04-13-2011 17:47:02.296101 [WARN] <b77c46c0>stat_handler(9972765) return rst_code != 0
+04-13-2011 17:47:02.300620 [WARN] <b77c46c0>stat_handler(9971835) return rst_code != 0
+04-13-2011 17:47:02.549072 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:02.597039 [WARN] <b77c46c0>stat_handler(9973521) return rst_code != 0
+04-13-2011 17:47:02.597186 [WARN] <b77c46c0>stat_handler(9973387) return rst_code != 0
+04-13-2011 17:47:02.597316 [WARN] <b77c46c0>stat_handler(9972726) return rst_code != 0
+04-13-2011 17:47:02.600666 [WARN] <b77c46c0>stat_handler(9972765) return rst_code != 0
+04-13-2011 17:47:02.615055 [WARN] <b77c46c0>stat_handler(9972708) return rst_code != 0
+04-13-2011 17:47:02.616892 [WARN] <b77c46c0>stat_handler(9972865) return rst_code != 0
+04-13-2011 17:47:02.620135 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:02.662017 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:02.984581 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:03.002300 [WARN] <b77c46c0>load_old: 7, load_current: 20, load_new: 8, load_max: 4381, cpu:0.994819
+04-13-2011 17:47:04.275203 [WARN] <b77c46c0>stat_handler(9976511) return rst_code != 0
+04-13-2011 17:47:04.275341 [WARN] <b77c46c0>stat_handler(9976277) return rst_code != 0
+04-13-2011 17:47:04.275488 [WARN] <b77c46c0>stat_handler(9975698) return rst_code != 0
+04-13-2011 17:47:04.288434 [WARN] <b77c46c0>stat_handler(9976057) return rst_code != 0
+04-13-2011 17:47:04.290772 [WARN] <b77c46c0>stat_handler(9975127) return rst_code != 0
+04-13-2011 17:47:04.293649 [WARN] <b77c46c0>stat_handler(9976157) return rst_code != 0
+04-13-2011 17:47:04.422491 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:04.464146 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:04.471491 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:04.596271 [WARN] <b77c46c0>stat_handler(9977082) return rst_code != 0
+04-13-2011 17:47:04.596443 [WARN] <b77c46c0>stat_handler(9977016) return rst_code != 0
+04-13-2011 17:47:04.596929 [WARN] <b77c46c0>stat_handler(9976386) return rst_code != 0
+04-13-2011 17:47:04.603712 [WARN] <b77c46c0>stat_handler(9976730) return rst_code != 0
+04-13-2011 17:47:04.604581 [WARN] <b77c46c0>stat_handler(9976000) return rst_code != 0
+04-13-2011 17:47:04.618019 [WARN] <b77c46c0>stat_handler(9976830) return rst_code != 0
+04-13-2011 17:47:04.864817 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:04.905227 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:04.909221 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:05.002450 [WARN] <b77c46c0>load_old: 8, load_current: 18, load_new: 9, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:06.275180 [WARN] <b77c46c0>stat_handler(9980105) return rst_code != 0
+04-13-2011 17:47:06.276272 [WARN] <b77c46c0>stat_handler(9979510) return rst_code != 0
+04-13-2011 17:47:06.277425 [WARN] <b77c46c0>stat_handler(9979905) return rst_code != 0
+04-13-2011 17:47:06.279448 [WARN] <b77c46c0>stat_handler(9979349) return rst_code != 0
+04-13-2011 17:47:06.280833 [WARN] <b77c46c0>stat_handler(9979249) return rst_code != 0
+04-13-2011 17:47:06.282114 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:06.283599 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:06.286586 [WARN] <b77c46c0>stat_handler(9979492) return rst_code != 0
+04-13-2011 17:47:06.596309 [WARN] <b77c46c0>stat_handler(9980693) return rst_code != 0
+04-13-2011 17:47:06.597432 [WARN] <b77c46c0>stat_handler(9979997) return rst_code != 0
+04-13-2011 17:47:06.598382 [WARN] <b77c46c0>stat_handler(9980493) return rst_code != 0
+04-13-2011 17:47:06.618126 [WARN] <b77c46c0>stat_handler(9980122) return rst_code != 0
+04-13-2011 17:47:06.618325 [WARN] <b77c46c0>stat_handler(9979922) return rst_code != 0
+04-13-2011 17:47:06.626471 [WARN] <b77c46c0>stat_handler(9979492) return rst_code != 0
+04-13-2011 17:47:06.717807 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:06.766575 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:06.766830 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:07.002338 [WARN] <b77c46c0>load_old: 9, load_current: 17, load_new: 9, load_max: 4381, cpu:0.997423
+04-13-2011 17:47:08.275445 [WARN] <b77c46c0>stat_handler(9983401) return rst_code != 0
+04-13-2011 17:47:08.275497 [WARN] <b77c46c0>stat_handler(9983464) return rst_code != 0
+04-13-2011 17:47:08.275560 [WARN] <b77c46c0>stat_handler(9983329) return rst_code != 0
+04-13-2011 17:47:08.283588 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:08.288846 [WARN] <b77c46c0>stat_handler(9983382) return rst_code != 0
+04-13-2011 17:47:08.325251 [WARN] <b77c46c0>stat_handler(9982184) return rst_code != 0
+04-13-2011 17:47:08.565581 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:08.596616 [WARN] <b77c46c0>stat_handler(9983992) return rst_code != 0
+04-13-2011 17:47:08.597447 [WARN] <b77c46c0>stat_handler(9984153) return rst_code != 0
+04-13-2011 17:47:08.598431 [WARN] <b77c46c0>stat_handler(9984063) return rst_code != 0
+04-13-2011 17:47:08.601632 [WARN] <b77c46c0>stat_handler(9983482) return rst_code != 0
+04-13-2011 17:47:08.603570 [WARN] <b77c46c0>stat_handler(9983991) return rst_code != 0
+04-13-2011 17:47:08.636459 [WARN] <b77c46c0>stat_handler(9983382) return rst_code != 0
+04-13-2011 17:47:08.677509 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:08.814968 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:09.003226 [WARN] <b77c46c0>load_old: 9, load_current: 15, load_new: 9, load_max: 4381, cpu:0.997403
+04-13-2011 17:47:09.205131 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:10.273263 [WARN] <b77c46c0>stat_handler(9987121) return rst_code != 0
+04-13-2011 17:47:10.276314 [WARN] <b77c46c0>stat_handler(9987029) return rst_code != 0
+04-13-2011 17:47:10.276899 [WARN] <b77c46c0>stat_handler(9987147) return rst_code != 0
+04-13-2011 17:47:10.281923 [WARN] <b77c46c0>stat_handler(9986812) return rst_code != 0
+04-13-2011 17:47:10.297052 [WARN] <b77c46c0>stat_handler(9987010) return rst_code != 0
+04-13-2011 17:47:10.315437 [WARN] <b77c46c0>stat_handler(9986910) return rst_code != 0
+04-13-2011 17:47:10.534008 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:10.596360 [WARN] <b77c46c0>stat_handler(9987763) return rst_code != 0
+04-13-2011 17:47:10.597136 [WARN] <b77c46c0>stat_handler(9987856) return rst_code != 0
+04-13-2011 17:47:10.598137 [WARN] <b77c46c0>stat_handler(9987945) return rst_code != 0
+04-13-2011 17:47:10.616616 [WARN] <b77c46c0>stat_handler(9987010) return rst_code != 0
+04-13-2011 17:47:10.619308 [WARN] <b77c46c0>stat_handler(9986910) return rst_code != 0
+04-13-2011 17:47:10.637052 [WARN] <b77c46c0>stat_handler(9987719) return rst_code != 0
+04-13-2011 17:47:10.692931 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:10.726774 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:11.002460 [WARN] <b77c46c0>load_old: 9, load_current: 16, load_new: 9, load_max: 4381, cpu:0.989556
+04-13-2011 17:47:11.131122 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:12.274998 [WARN] <b77c46c0>stat_handler(9990584) return rst_code != 0
+04-13-2011 17:47:12.275268 [WARN] <b77c46c0>stat_handler(9990502) return rst_code != 0
+04-13-2011 17:47:12.275523 [WARN] <b77c46c0>stat_handler(9990659) return rst_code != 0
+04-13-2011 17:47:12.283710 [WARN] <b77c46c0>stat_handler(9989731) return rst_code != 0
+04-13-2011 17:47:12.287627 [WARN] <b77c46c0>stat_handler(9990640) return rst_code != 0
+04-13-2011 17:47:12.295785 [WARN] <b77c46c0>stat_handler(9989631) return rst_code != 0
+04-13-2011 17:47:12.320319 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:12.365298 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:12.596562 [WARN] <b77c46c0>stat_handler(9991021) return rst_code != 0
+04-13-2011 17:47:12.596814 [WARN] <b77c46c0>stat_handler(9991147) return rst_code != 0
+04-13-2011 17:47:12.596941 [WARN] <b77c46c0>stat_handler(9991065) return rst_code != 0
+04-13-2011 17:47:12.608464 [WARN] <b77c46c0>stat_handler(9990538) return rst_code != 0
+04-13-2011 17:47:12.615334 [WARN] <b77c46c0>stat_handler(9990640) return rst_code != 0
+04-13-2011 17:47:12.622581 [WARN] <b77c46c0>stat_handler(9990638) return rst_code != 0
+04-13-2011 17:47:12.832458 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:12.922600 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:12.970340 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:13.002360 [WARN] <b77c46c0>load_old: 9, load_current: 18, load_new: 9, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:14.273050 [WARN] <b77c46c0>stat_handler(9993632) return rst_code != 0
+04-13-2011 17:47:14.273271 [WARN] <b77c46c0>stat_handler(9993842) return rst_code != 0
+04-13-2011 17:47:14.273403 [WARN] <b77c46c0>stat_handler(9993804) return rst_code != 0
+04-13-2011 17:47:14.276602 [WARN] <b77c46c0>stat_handler(9993559) return rst_code != 0
+04-13-2011 17:47:14.277151 [WARN] <b77c46c0>stat_handler(9993459) return rst_code != 0
+04-13-2011 17:47:14.286233 [WARN] <b77c46c0>stat_handler(9993361) return rst_code != 0
+04-13-2011 17:47:14.457166 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:14.573578 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:14.596348 [WARN] <b77c46c0>stat_handler(9993559) return rst_code != 0
+04-13-2011 17:47:14.596577 [WARN] <b77c46c0>stat_handler(9994223) return rst_code != 0
+04-13-2011 17:47:14.597292 [WARN] <b77c46c0>stat_handler(9994367) return rst_code != 0
+04-13-2011 17:47:14.607011 [WARN] <b77c46c0>stat_handler(9994168) return rst_code != 0
+04-13-2011 17:47:14.615443 [WARN] <b77c46c0>stat_handler(9994366) return rst_code != 0
+04-13-2011 17:47:14.666870 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:15.002415 [WARN] <b77c46c0>load_old: 9, load_current: 14, load_new: 9, load_max: 4381, cpu:0.994778
+04-13-2011 17:47:15.071217 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:15.174506 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:16.275876 [WARN] <b77c46c0>stat_handler(9984389) return rst_code != 0
+04-13-2011 17:47:16.276020 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:16.276152 [WARN] <b77c46c0>stat_handler(9997298) return rst_code != 0
+04-13-2011 17:47:16.286986 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:16.305326 [WARN] <b77c46c0>stat_handler(9996889) return rst_code != 0
+04-13-2011 17:47:16.546617 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:16.563202 [WARN] <b77c46c0>stat_handler(9995872) return rst_code != 0
+04-13-2011 17:47:16.564216 [WARN] <b77c46c0>stat_handler(9995890) return rst_code != 0
+04-13-2011 17:47:16.565341 [WARN] <b77c46c0>stat_handler(9995908) return rst_code != 0
+04-13-2011 17:47:16.566450 [WARN] <b77c46c0>stat_handler(9995926) return rst_code != 0
+04-13-2011 17:47:16.568668 [WARN] <b77c46c0>stat_handler(9996144) return rst_code != 0
+04-13-2011 17:47:16.570817 [WARN] <b77c46c0>stat_handler(9996162) return rst_code != 0
+04-13-2011 17:47:16.584569 [WARN] <b77c46c0>stat_handler(9996181) return rst_code != 0
+04-13-2011 17:47:16.588046 [WARN] <b77c46c0>stat_handler(9996199) return rst_code != 0
+04-13-2011 17:47:16.591180 [WARN] <b77c46c0>stat_handler(9996217) return rst_code != 0
+04-13-2011 17:47:16.594328 [WARN] <b77c46c0>stat_handler(9996235) return rst_code != 0
+04-13-2011 17:47:16.595509 [WARN] <b77c46c0>stat_handler(9997515) return rst_code != 0
+04-13-2011 17:47:16.596929 [WARN] <b77c46c0>stat_handler(9996453) return rst_code != 0
+04-13-2011 17:47:16.597952 [WARN] <b77c46c0>stat_handler(9991745) return rst_code != 0
+04-13-2011 17:47:16.599642 [WARN] <b77c46c0>stat_handler(9996471) return rst_code != 0
+04-13-2011 17:47:16.602921 [WARN] <b77c46c0>stat_handler(9996489) return rst_code != 0
+04-13-2011 17:47:16.605462 [WARN] <b77c46c0>stat_handler(9996507) return rst_code != 0
+04-13-2011 17:47:16.607964 [WARN] <b77c46c0>stat_handler(9996525) return rst_code != 0
+04-13-2011 17:47:16.609936 [WARN] <b77c46c0>stat_handler(9996743) return rst_code != 0
+04-13-2011 17:47:16.614139 [WARN] <b77c46c0>stat_handler(9996761) return rst_code != 0
+04-13-2011 17:47:16.615316 [WARN] <b77c46c0>stat_handler(9997496) return rst_code != 0
+04-13-2011 17:47:16.615496 [WARN] <b77c46c0>stat_handler(9996779) return rst_code != 0
+04-13-2011 17:47:16.616833 [WARN] <b77c46c0>stat_handler(9996797) return rst_code != 0
+04-13-2011 17:47:16.617516 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:16.618542 [WARN] <b77c46c0>stat_handler(9996815) return rst_code != 0
+04-13-2011 17:47:16.620120 [WARN] <b77c46c0>stat_handler(9996833) return rst_code != 0
+04-13-2011 17:47:16.623086 [WARN] <b77c46c0>stat_handler(9997051) return rst_code != 0
+04-13-2011 17:47:16.624120 [WARN] <b77c46c0>stat_handler(9997069) return rst_code != 0
+04-13-2011 17:47:16.625132 [WARN] <b77c46c0>stat_handler(9981669) return rst_code != 0
+04-13-2011 17:47:16.654512 [WARN] <b77c46c0>stat_handler(9981668) return rst_code != 0
+04-13-2011 17:47:16.657659 [WARN] <b77c46c0>stat_handler(9981687) return rst_code != 0
+04-13-2011 17:47:16.690659 [WARN] <b77c46c0>stat_handler(9981705) return rst_code != 0
+04-13-2011 17:47:16.786270 [WARN] <b77c46c0>stat_handler(9996299) return rst_code != 0
+04-13-2011 17:47:16.789760 [WARN] <b77c46c0>stat_handler(9996317) return rst_code != 0
+04-13-2011 17:47:16.794922 [WARN] <b77c46c0>stat_handler(9996335) return rst_code != 0
+04-13-2011 17:47:16.805914 [WARN] <b77c46c0>stat_handler(9996653) return rst_code != 0
+04-13-2011 17:47:16.807111 [WARN] <b77c46c0>stat_handler(9996671) return rst_code != 0
+04-13-2011 17:47:16.808074 [WARN] <b77c46c0>stat_handler(9996689) return rst_code != 0
+04-13-2011 17:47:16.809023 [WARN] <b77c46c0>stat_handler(9996707) return rst_code != 0
+04-13-2011 17:47:16.819671 [WARN] <b77c46c0>stat_handler(9996725) return rst_code != 0
+04-13-2011 17:47:16.820620 [WARN] <b77c46c0>stat_handler(9982277) return rst_code != 0
+04-13-2011 17:47:16.824153 [WARN] <b77c46c0>stat_handler(9996943) return rst_code != 0
+04-13-2011 17:47:16.825547 [WARN] <b77c46c0>stat_handler(9996961) return rst_code != 0
+04-13-2011 17:47:16.827046 [WARN] <b77c46c0>stat_handler(9996979) return rst_code != 0
+04-13-2011 17:47:16.830041 [WARN] <b77c46c0>stat_handler(9996997) return rst_code != 0
+04-13-2011 17:47:16.835273 [WARN] <b77c46c0>stat_handler(9997015) return rst_code != 0
+04-13-2011 17:47:16.837096 [WARN] <b77c46c0>stat_handler(9997033) return rst_code != 0
+04-13-2011 17:47:16.837652 [WARN] <b77c46c0>stat_handler(9982295) return rst_code != 0
+04-13-2011 17:47:16.839523 [WARN] <b77c46c0>stat_handler(9997151) return rst_code != 0
+04-13-2011 17:47:16.841623 [WARN] <b77c46c0>stat_handler(9997169) return rst_code != 0
+04-13-2011 17:47:16.844231 [WARN] <b77c46c0>stat_handler(9981769) return rst_code != 0
+04-13-2011 17:47:16.871161 [WARN] <b77c46c0>stat_handler(9982313) return rst_code != 0
+04-13-2011 17:47:16.883976 [WARN] <b77c46c0>stat_handler(9981768) return rst_code != 0
+04-13-2011 17:47:16.888272 [WARN] <b77c46c0>stat_handler(9981787) return rst_code != 0
+04-13-2011 17:47:16.905196 [WARN] <b77c46c0>stat_handler(9982331) return rst_code != 0
+04-13-2011 17:47:16.913310 [WARN] <b77c46c0>stat_handler(9981805) return rst_code != 0
+04-13-2011 17:47:16.949834 [WARN] <b77c46c0>stat_handler(9982449) return rst_code != 0
+04-13-2011 17:47:16.991873 [WARN] <b77c46c0>stat_handler(9982467) return rst_code != 0
+04-13-2011 17:47:17.003019 [WARN] <b77c46c0>load_old: 9, load_current: 65, load_new: 14, load_max: 4381, cpu:0.997382
+04-13-2011 17:47:17.022679 [WARN] <b77c46c0>stat_handler(9982485) return rst_code != 0
+04-13-2011 17:47:17.030605 [WARN] <b77c46c0>stat_handler(9982377) return rst_code != 0
+04-13-2011 17:47:17.051056 [WARN] <b77c46c0>stat_handler(9982503) return rst_code != 0
+04-13-2011 17:47:17.056724 [WARN] <b77c46c0>stat_handler(9982395) return rst_code != 0
+04-13-2011 17:47:17.061977 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:17.072608 [WARN] <b77c46c0>stat_handler(9982413) return rst_code != 0
+04-13-2011 17:47:17.081376 [WARN] <b77c46c0>stat_handler(9982521) return rst_code != 0
+04-13-2011 17:47:17.102494 [WARN] <b77c46c0>stat_handler(9982431) return rst_code != 0
+04-13-2011 17:47:17.108874 [WARN] <b77c46c0>stat_handler(9982539) return rst_code != 0
+04-13-2011 17:47:17.129249 [WARN] <b77c46c0>stat_handler(9982549) return rst_code != 0
+04-13-2011 17:47:17.139823 [WARN] <b77c46c0>stat_handler(9982657) return rst_code != 0
+04-13-2011 17:47:17.174311 [WARN] <b77c46c0>stat_handler(9982567) return rst_code != 0
+04-13-2011 17:47:17.193459 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:17.210924 [WARN] <b77c46c0>stat_handler(9982585) return rst_code != 0
+04-13-2011 17:47:17.234185 [WARN] <b77c46c0>stat_handler(9982603) return rst_code != 0
+04-13-2011 17:47:17.267569 [WARN] <b77c46c0>stat_handler(9982621) return rst_code != 0
+04-13-2011 17:47:18.276091 [WARN] <b77c46c0>stat_handler(9983382) return rst_code != 0
+04-13-2011 17:47:18.276229 [WARN] <b77c46c0>stat_handler(9984028) return rst_code != 0
+04-13-2011 17:47:18.276375 [WARN] <b77c46c0>stat_handler(9984426) return rst_code != 0
+04-13-2011 17:47:18.290700 [WARN] <b77c46c0>stat_handler(9984389) return rst_code != 0
+04-13-2011 17:47:18.303871 [WARN] <b77c46c0>stat_handler(9983991) return rst_code != 0
+04-13-2011 17:47:18.371658 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:18.596008 [WARN] <b77c46c0>stat_handler(9984498) return rst_code != 0
+04-13-2011 17:47:18.596281 [WARN] <b77c46c0>stat_handler(9983991) return rst_code != 0
+04-13-2011 17:47:18.596416 [WARN] <b77c46c0>stat_handler(9985006) return rst_code != 0
+04-13-2011 17:47:18.600198 [WARN] <b77c46c0>stat_handler(9984189) return rst_code != 0
+04-13-2011 17:47:18.610475 [WARN] <b77c46c0>stat_handler(9984389) return rst_code != 0
+04-13-2011 17:47:18.738320 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:18.761037 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:18.919453 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:19.002462 [WARN] <b77c46c0>load_old: 14, load_current: 30, load_new: 15, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:20.274262 [WARN] <b77c46c0>stat_handler(9987763) return rst_code != 0
+04-13-2011 17:47:20.274362 [WARN] <b77c46c0>stat_handler(9987892) return rst_code != 0
+04-13-2011 17:47:20.274987 [WARN] <b77c46c0>stat_handler(9988190) return rst_code != 0
+04-13-2011 17:47:20.280156 [WARN] <b77c46c0>stat_handler(9988017) return rst_code != 0
+04-13-2011 17:47:20.294398 [WARN] <b77c46c0>stat_handler(9986910) return rst_code != 0
+04-13-2011 17:47:20.307993 [WARN] <b77c46c0>stat_handler(9987719) return rst_code != 0
+04-13-2011 17:47:20.342362 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:20.594551 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:20.595306 [WARN] <b77c46c0>stat_handler(9988572) return rst_code != 0
+04-13-2011 17:47:20.595455 [WARN] <b77c46c0>stat_handler(9988398) return rst_code != 0
+04-13-2011 17:47:20.597019 [WARN] <b77c46c0>stat_handler(9987719) return rst_code != 0
+04-13-2011 17:47:20.597383 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:20.612458 [WARN] <b77c46c0>stat_handler(9987817) return rst_code != 0
+04-13-2011 17:47:20.666138 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:20.806506 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:21.003094 [WARN] <b77c46c0>load_old: 15, load_current: 15, load_new: 15, load_max: 4381, cpu:0.989556
+04-13-2011 17:47:22.275364 [WARN] <b77c46c0>stat_handler(9991736) return rst_code != 0
+04-13-2011 17:47:22.275499 [WARN] <b77c46c0>stat_handler(9991764) return rst_code != 0
+04-13-2011 17:47:22.275883 [WARN] <b77c46c0>stat_handler(9991638) return rst_code != 0
+04-13-2011 17:47:22.294624 [WARN] <b77c46c0>stat_handler(9991645) return rst_code != 0
+04-13-2011 17:47:22.296197 [WARN] <b77c46c0>stat_handler(9991547) return rst_code != 0
+04-13-2011 17:47:22.300791 [WARN] <b77c46c0>stat_handler(9991745) return rst_code != 0
+04-13-2011 17:47:22.595880 [WARN] <b77c46c0>stat_handler(9992344) return rst_code != 0
+04-13-2011 17:47:22.596693 [WARN] <b77c46c0>stat_handler(9992316) return rst_code != 0
+04-13-2011 17:47:22.596824 [WARN] <b77c46c0>stat_handler(9992218) return rst_code != 0
+04-13-2011 17:47:22.613067 [WARN] <b77c46c0>stat_handler(9991645) return rst_code != 0
+04-13-2011 17:47:22.623863 [WARN] <b77c46c0>stat_handler(9991547) return rst_code != 0
+04-13-2011 17:47:22.624046 [WARN] <b77c46c0>stat_handler(9991745) return rst_code != 0
+04-13-2011 17:47:22.646237 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:22.659368 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:22.782843 [WARN] <b77c46c0>stat_handler(9909041) return rst_code != 0
+04-13-2011 17:47:23.003140 [WARN] <b77c46c0>load_old: 15, load_current: 15, load_new: 15, load_max: 4381, cpu:0.992105
+04-13-2011 17:47:24.036128 [WARN] <b77c46c0>stat_handler(9994947) return rst_code != 0
+04-13-2011 17:47:24.039340 [WARN] <b77c46c0>stat_handler(9994168) return rst_code != 0
+04-13-2011 17:47:24.075715 [WARN] <b77c46c0>stat_handler(9994366) return rst_code != 0
+04-13-2011 17:47:24.275669 [WARN] <b77c46c0>stat_handler(9995037) return rst_code != 0
+04-13-2011 17:47:24.276122 [WARN] <b77c46c0>stat_handler(9994839) return rst_code != 0
+04-13-2011 17:47:24.300442 [WARN] <b77c46c0>stat_handler(9994366) return rst_code != 0
+04-13-2011 17:47:24.324276 [WARN] <b77c46c0>stat_handler(9994168) return rst_code != 0
+04-13-2011 17:47:24.356961 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:24.375814 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:24.596127 [WARN] <b77c46c0>stat_handler(9995484) return rst_code != 0
+04-13-2011 17:47:24.598513 [WARN] <b77c46c0>stat_handler(9995582) return rst_code != 0
+04-13-2011 17:47:24.619426 [WARN] <b77c46c0>stat_handler(9995273) return rst_code != 0
+04-13-2011 17:47:24.628006 [WARN] <b77c46c0>stat_handler(9995075) return rst_code != 0
+04-13-2011 17:47:24.944712 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:24.960112 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:24.999274 [WARN] <b77c46c0>load_old: 15, load_current: 957, load_new: 109, load_max: 4381, cpu:0.994805
+04-13-2011 17:47:26.278959 [WARN] <b77c46c0>stat_handler(9997731) return rst_code != 0
+04-13-2011 17:47:26.279742 [WARN] <b77c46c0>stat_handler(9998683) return rst_code != 0
+04-13-2011 17:47:26.282264 [WARN] <b77c46c0>stat_handler(9998430) return rst_code != 0
+04-13-2011 17:47:26.284875 [WARN] <b77c46c0>stat_handler(9909042) return rst_code != 0
+04-13-2011 17:47:26.287167 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:47:26.305638 [WARN] <b77c46c0>stat_handler(9997496) return rst_code != 0
+04-13-2011 17:47:26.384551 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:26.596073 [WARN] <b77c46c0>stat_handler(9999194) return rst_code != 0
+04-13-2011 17:47:26.604562 [WARN] <b77c46c0>stat_handler(9997803) return rst_code != 0
+04-13-2011 17:47:26.789825 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:26.999288 [WARN] <b77c46c0>load_old: 109, load_current: 2667, load_new: 364, load_max: 4381, cpu:0.992248
+04-13-2011 17:47:28.600821 [WARN] <b77c46c0>stat_handler(10002609) return rst_code != 0
+04-13-2011 17:47:28.615193 [WARN] <b77c46c0>stat_handler(10002218) return rst_code != 0
+04-13-2011 17:47:28.721443 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:28.999596 [WARN] <b77c46c0>load_old: 364, load_current: 3511, load_new: 678, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:30.595945 [WARN] <b77c46c0>stat_handler(10005634) return rst_code != 0
+04-13-2011 17:47:30.597071 [WARN] <b77c46c0>stat_handler(10005633) return rst_code != 0
+04-13-2011 17:47:30.999601 [WARN] <b77c46c0>load_old: 678, load_current: 3108, load_new: 921, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:31.009898 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:32.596231 [WARN] <b77c46c0>stat_handler(10008758) return rst_code != 0
+04-13-2011 17:47:32.619450 [WARN] <b77c46c0>stat_handler(10008405) return rst_code != 0
+04-13-2011 17:47:32.847580 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:32.999226 [WARN] <b77c46c0>load_old: 921, load_current: 3125, load_new: 1141, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:34.999165 [WARN] <b77c46c0>load_old: 1141, load_current: 3111, load_new: 1338, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:37.000199 [WARN] <b77c46c0>load_old: 1338, load_current: 3480, load_new: 1552, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:38.999147 [WARN] <b77c46c0>load_old: 1552, load_current: 3436, load_new: 1740, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:40.999436 [WARN] <b77c46c0>load_old: 1740, load_current: 3584, load_new: 1924, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:42.273989 [WARN] <b77c46c0>stat_handler(10011838) return rst_code != 0
+04-13-2011 17:47:42.287012 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:42.999104 [WARN] <b77c46c0>load_old: 1924, load_current: 2980, load_new: 2029, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:44.273370 [WARN] <b77c46c0>stat_handler(10015062) return rst_code != 0
+04-13-2011 17:47:44.292771 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:44.999499 [WARN] <b77c46c0>load_old: 2029, load_current: 3158, load_new: 2141, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:46.274352 [WARN] <b77c46c0>stat_handler(10018086) return rst_code != 0
+04-13-2011 17:47:46.294526 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:46.999147 [WARN] <b77c46c0>load_old: 2141, load_current: 3036, load_new: 2230, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:48.273361 [WARN] <b77c46c0>stat_handler(10021331) return rst_code != 0
+04-13-2011 17:47:48.284111 [WARN] <b77c46c0>stat_handler(10021130) return rst_code != 0
+04-13-2011 17:47:48.642263 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:48.999611 [WARN] <b77c46c0>load_old: 2230, load_current: 3353, load_new: 2342, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:50.275308 [WARN] <b77c46c0>stat_handler(10024134) return rst_code != 0
+04-13-2011 17:47:50.284991 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:50.999312 [WARN] <b77c46c0>load_old: 2342, load_current: 2713, load_new: 2379, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:52.273661 [WARN] <b77c46c0>stat_handler(10011778) return rst_code != 0
+04-13-2011 17:47:52.286629 [WARN] <b77c46c0>stat_handler(10010677) return rst_code != 0
+04-13-2011 17:47:52.297669 [WARN] <b77c46c0>stat_handler(10011798) return rst_code != 0
+04-13-2011 17:47:52.321683 [WARN] <b77c46c0>stat_handler(10011818) return rst_code != 0
+04-13-2011 17:47:52.371810 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:52.999464 [WARN] <b77c46c0>load_old: 2379, load_current: 3386, load_new: 2479, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:52.999861 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:47:53.000060 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:47:53.001205 [WARN] <b77c46c0>stat_handler(10012960) return rst_code != 0
+04-13-2011 17:47:53.017200 [WARN] <b77c46c0>stat_handler(10012639) return rst_code != 0
+04-13-2011 17:47:53.299455 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:54.273339 [WARN] <b77c46c0>stat_handler(10015083) return rst_code != 0
+04-13-2011 17:47:54.296854 [WARN] <b77c46c0>stat_handler(10015082) return rst_code != 0
+04-13-2011 17:47:54.731796 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:54.999225 [WARN] <b77c46c0>load_old: 2479, load_current: 3323, load_new: 2563, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:55.001088 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:47:55.002079 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:47:55.005853 [WARN] <b77c46c0>stat_handler(10016284) return rst_code != 0
+04-13-2011 17:47:55.029583 [WARN] <b77c46c0>stat_handler(10015863) return rst_code != 0
+04-13-2011 17:47:55.197184 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:56.273864 [WARN] <b77c46c0>stat_handler(10018307) return rst_code != 0
+04-13-2011 17:47:56.290234 [WARN] <b77c46c0>stat_handler(10018106) return rst_code != 0
+04-13-2011 17:47:56.604143 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:57.000198 [WARN] <b77c46c0>load_old: 2563, load_current: 3366, load_new: 2643, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:57.000483 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:47:57.000686 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:47:57.001726 [WARN] <b77c46c0>stat_handler(10019508) return rst_code != 0
+04-13-2011 17:47:57.027089 [WARN] <b77c46c0>stat_handler(10018887) return rst_code != 0
+04-13-2011 17:47:57.075218 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:58.272863 [WARN] <b77c46c0>stat_handler(10021130) return rst_code != 0
+04-13-2011 17:47:58.475977 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:47:58.998981 [WARN] <b77c46c0>load_old: 2643, load_current: 3493, load_new: 2728, load_max: 4381, cpu:1.000000
+04-13-2011 17:47:58.999285 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:47:58.999489 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:47:59.000575 [WARN] <b77c46c0>stat_handler(10022873) return rst_code != 0
+04-13-2011 17:47:59.009247 [WARN] <b77c46c0>stat_handler(10022692) return rst_code != 0
+04-13-2011 17:47:59.354737 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:00.273774 [WARN] <b77c46c0>stat_handler(10024254) return rst_code != 0
+04-13-2011 17:48:00.299223 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:00.999177 [WARN] <b77c46c0>load_old: 2728, load_current: 3146, load_new: 2769, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:00.999452 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:00.999677 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:01.001177 [WARN] <b77c46c0>stat_handler(10026385) return rst_code != 0
+04-13-2011 17:48:01.015071 [WARN] <b77c46c0>stat_handler(10025116) return rst_code != 0
+04-13-2011 17:48:01.212947 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:02.273946 [WARN] <b77c46c0>stat_handler(10028558) return rst_code != 0
+04-13-2011 17:48:02.298553 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:02.999084 [WARN] <b77c46c0>load_old: 2769, load_current: 3228, load_new: 2814, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:02.999353 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:02.999555 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:03.001115 [WARN] <b77c46c0>stat_handler(10029400) return rst_code != 0
+04-13-2011 17:48:03.425894 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:04.274454 [WARN] <b77c46c0>stat_handler(10031432) return rst_code != 0
+04-13-2011 17:48:04.299271 [WARN] <b77c46c0>stat_handler(10031142) return rst_code != 0
+04-13-2011 17:48:04.595627 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:04.999141 [WARN] <b77c46c0>load_old: 2814, load_current: 2942, load_new: 2826, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:04.999407 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:04.999606 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:05.000902 [WARN] <b77c46c0>stat_handler(10032558) return rst_code != 0
+04-13-2011 17:48:05.011240 [WARN] <b77c46c0>stat_handler(10031963) return rst_code != 0
+04-13-2011 17:48:05.154628 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:06.273545 [WARN] <b77c46c0>stat_handler(10034384) return rst_code != 0
+04-13-2011 17:48:06.287474 [WARN] <b77c46c0>stat_handler(10033605) return rst_code != 0
+04-13-2011 17:48:06.322935 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:06.999307 [WARN] <b77c46c0>load_old: 2826, load_current: 2969, load_new: 2840, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:06.999628 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:06.999827 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:07.000621 [WARN] <b77c46c0>stat_handler(10035411) return rst_code != 0
+04-13-2011 17:48:07.011230 [WARN] <b77c46c0>stat_handler(10035347) return rst_code != 0
+04-13-2011 17:48:07.474285 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:08.274027 [WARN] <b77c46c0>stat_handler(10037379) return rst_code != 0
+04-13-2011 17:48:08.280071 [WARN] <b77c46c0>stat_handler(10036989) return rst_code != 0
+04-13-2011 17:48:08.564439 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:08.999152 [WARN] <b77c46c0>load_old: 2840, load_current: 3094, load_new: 2865, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:08.999417 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:08.999635 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:09.000987 [WARN] <b77c46c0>stat_handler(10038426) return rst_code != 0
+04-13-2011 17:48:09.025058 [WARN] <b77c46c0>stat_handler(10037810) return rst_code != 0
+04-13-2011 17:48:09.101275 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:10.273427 [WARN] <b77c46c0>stat_handler(10040579) return rst_code != 0
+04-13-2011 17:48:10.289045 [WARN] <b77c46c0>stat_handler(10040373) return rst_code != 0
+04-13-2011 17:48:10.694196 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:10.999198 [WARN] <b77c46c0>load_old: 2865, load_current: 2947, load_new: 2873, load_max: 4381, cpu:0.997409
+04-13-2011 17:48:11.000883 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:11.002446 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:11.006268 [WARN] <b77c46c0>stat_handler(10041305) return rst_code != 0
+04-13-2011 17:48:11.014236 [WARN] <b77c46c0>stat_handler(10041094) return rst_code != 0
+04-13-2011 17:48:11.265087 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:12.273233 [WARN] <b77c46c0>stat_handler(10036168) return rst_code != 0
+04-13-2011 17:48:12.307648 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:12.522024 [WARN] <b77c46c0>stat_handler(10041705) return rst_code != 0
+04-13-2011 17:48:12.524835 [WARN] <b77c46c0>stat_handler(10041726) return rst_code != 0
+04-13-2011 17:48:12.527301 [WARN] <b77c46c0>stat_handler(10041747) return rst_code != 0
+04-13-2011 17:48:12.530001 [WARN] <b77c46c0>stat_handler(10041768) return rst_code != 0
+04-13-2011 17:48:12.532552 [WARN] <b77c46c0>stat_handler(10041789) return rst_code != 0
+04-13-2011 17:48:12.535120 [WARN] <b77c46c0>stat_handler(10041810) return rst_code != 0
+04-13-2011 17:48:12.537652 [WARN] <b77c46c0>stat_handler(10041831) return rst_code != 0
+04-13-2011 17:48:12.541027 [WARN] <b77c46c0>stat_handler(10041852) return rst_code != 0
+04-13-2011 17:48:12.543830 [WARN] <b77c46c0>stat_handler(10041873) return rst_code != 0
+04-13-2011 17:48:12.546133 [WARN] <b77c46c0>stat_handler(10041894) return rst_code != 0
+04-13-2011 17:48:12.548783 [WARN] <b77c46c0>stat_handler(10041915) return rst_code != 0
+04-13-2011 17:48:12.551271 [WARN] <b77c46c0>stat_handler(10025117) return rst_code != 0
+04-13-2011 17:48:12.575926 [WARN] <b77c46c0>stat_handler(10025116) return rst_code != 0
+04-13-2011 17:48:12.578974 [WARN] <b77c46c0>stat_handler(10025138) return rst_code != 0
+04-13-2011 17:48:12.606750 [WARN] <b77c46c0>stat_handler(10026159) return rst_code != 0
+04-13-2011 17:48:12.632753 [WARN] <b77c46c0>stat_handler(10026180) return rst_code != 0
+04-13-2011 17:48:12.732215 [WARN] <b77c46c0>stat_handler(10026364) return rst_code != 0
+04-13-2011 17:48:12.758274 [WARN] <b77c46c0>stat_handler(10026385) return rst_code != 0
+04-13-2011 17:48:12.784290 [WARN] <b77c46c0>stat_handler(10026406) return rst_code != 0
+04-13-2011 17:48:12.810607 [WARN] <b77c46c0>stat_handler(10026427) return rst_code != 0
+04-13-2011 17:48:12.837140 [WARN] <b77c46c0>stat_handler(10026548) return rst_code != 0
+04-13-2011 17:48:12.998968 [WARN] <b77c46c0>load_old: 2873, load_current: 3220, load_new: 2907, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:12.999980 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:13.000224 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:13.001395 [WARN] <b77c46c0>stat_handler(10026674) return rst_code != 0
+04-13-2011 17:48:13.008052 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:48:13.018529 [WARN] <b77c46c0>stat_handler(10025116) return rst_code != 0
+04-13-2011 17:48:13.070558 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:14.273721 [WARN] <b77c46c0>stat_handler(10028827) return rst_code != 0
+04-13-2011 17:48:14.288084 [WARN] <b77c46c0>stat_handler(10028579) return rst_code != 0
+04-13-2011 17:48:14.603172 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:14.998972 [WARN] <b77c46c0>load_old: 2907, load_current: 3292, load_new: 2945, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:14.999347 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:14.999638 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:15.000782 [WARN] <b77c46c0>stat_handler(10030016) return rst_code != 0
+04-13-2011 17:48:15.008030 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:48:15.025663 [WARN] <b77c46c0>stat_handler(10029400) return rst_code != 0
+04-13-2011 17:48:15.128494 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:16.274052 [WARN] <b77c46c0>stat_handler(10032148) return rst_code != 0
+04-13-2011 17:48:16.276934 [WARN] <b77c46c0>stat_handler(10031963) return rst_code != 0
+04-13-2011 17:48:16.657675 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:16.999249 [WARN] <b77c46c0>load_old: 2945, load_current: 3342, load_new: 2984, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:16.999517 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:16.999720 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:17.000472 [WARN] <b77c46c0>stat_handler(10033358) return rst_code != 0
+04-13-2011 17:48:17.006623 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:48:17.011145 [WARN] <b77c46c0>stat_handler(10032784) return rst_code != 0
+04-13-2011 17:48:17.164339 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:18.273649 [WARN] <b77c46c0>stat_handler(10035432) return rst_code != 0
+04-13-2011 17:48:18.296711 [WARN] <b77c46c0>stat_handler(10035347) return rst_code != 0
+04-13-2011 17:48:18.708242 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:18.999004 [WARN] <b77c46c0>load_old: 2984, load_current: 3258, load_new: 3011, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:18.999326 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:18.999675 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:19.000870 [WARN] <b77c46c0>stat_handler(10036600) return rst_code != 0
+04-13-2011 17:48:19.007484 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:48:19.019691 [WARN] <b77c46c0>stat_handler(10036168) return rst_code != 0
+04-13-2011 17:48:19.230368 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:20.274513 [WARN] <b77c46c0>stat_handler(10038632) return rst_code != 0
+04-13-2011 17:48:20.295580 [WARN] <b77c46c0>stat_handler(10038631) return rst_code != 0
+04-13-2011 17:48:20.777706 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:20.999095 [WARN] <b77c46c0>load_old: 3011, load_current: 3325, load_new: 3042, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:20.999360 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:20.999558 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:21.000747 [WARN] <b77c46c0>stat_handler(10039821) return rst_code != 0
+04-13-2011 17:48:21.007802 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:48:21.014510 [WARN] <b77c46c0>stat_handler(10039552) return rst_code != 0
+04-13-2011 17:48:21.238176 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:22.274339 [WARN] <b77c46c0>stat_handler(10041537) return rst_code != 0
+04-13-2011 17:48:22.282735 [WARN] <b77c46c0>stat_handler(10041515) return rst_code != 0
+04-13-2011 17:48:22.739018 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:22.999341 [WARN] <b77c46c0>load_old: 3042, load_current: 3172, load_new: 3055, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:22.999603 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:22.999803 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:23.000692 [WARN] <b77c46c0>stat_handler(10043213) return rst_code != 0
+04-13-2011 17:48:23.005064 [WARN] <b77c46c0>stat_handler(10041936) return rst_code != 0
+04-13-2011 17:48:23.007617 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:48:23.365487 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:24.274209 [WARN] <b77c46c0>stat_handler(10045183) return rst_code != 0
+04-13-2011 17:48:24.279510 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:48:24.287088 [WARN] <b77c46c0>stat_handler(10044762) return rst_code != 0
+04-13-2011 17:48:24.569810 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:24.999306 [WARN] <b77c46c0>load_old: 3055, load_current: 3122, load_new: 3061, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:25.001399 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:25.002144 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:25.006551 [WARN] <b77c46c0>stat_handler(10046356) return rst_code != 0
+04-13-2011 17:48:25.008760 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:48:25.018864 [WARN] <b77c46c0>stat_handler(10045625) return rst_code != 0
+04-13-2011 17:48:25.165695 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:26.273863 [WARN] <b77c46c0>stat_handler(10048182) return rst_code != 0
+04-13-2011 17:48:26.279165 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:48:26.296388 [WARN] <b77c46c0>stat_handler(10047551) return rst_code != 0
+04-13-2011 17:48:26.442407 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:26.999143 [WARN] <b77c46c0>load_old: 3061, load_current: 3009, load_new: 3055, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:26.999437 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:26.999765 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:27.000889 [WARN] <b77c46c0>stat_handler(10049311) return rst_code != 0
+04-13-2011 17:48:27.008142 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:48:27.012588 [WARN] <b77c46c0>stat_handler(10048414) return rst_code != 0
+04-13-2011 17:48:27.071284 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:28.273017 [WARN] <b77c46c0>stat_handler(10051281) return rst_code != 0
+04-13-2011 17:48:28.278324 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:48:28.302020 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:28.999335 [WARN] <b77c46c0>load_old: 3055, load_current: 3042, load_new: 3053, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:28.999598 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:28.999816 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:29.000512 [WARN] <b77c46c0>stat_handler(10052289) return rst_code != 0
+04-13-2011 17:48:29.006945 [WARN] <b77c46c0>stat_handler(10052266) return rst_code != 0
+04-13-2011 17:48:29.008731 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:48:29.551807 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:30.276543 [WARN] <b77c46c0>stat_handler(10054491) return rst_code != 0
+04-13-2011 17:48:30.303855 [WARN] <b77c46c0>stat_handler(10054092) return rst_code != 0
+04-13-2011 17:48:30.508997 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:30.999327 [WARN] <b77c46c0>load_old: 3053, load_current: 3707, load_new: 3118, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:30.999752 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:31.000074 [WARN] <b77c46c0>YES, I'm the boss , do it ! migrate !
+04-13-2011 17:48:31.000956 [WARN] <b77c46c0>stat_handler(10055818) return rst_code != 0
+04-13-2011 17:48:31.007230 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:48:31.490306 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:32.274006 [WARN] <b77c46c0>stat_handler(10057955) return rst_code != 0
+04-13-2011 17:48:32.278427 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:48:32.300489 [WARN] <b77c46c0>stat_handler(10057744) return rst_code != 0
+04-13-2011 17:48:32.724247 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:32.999221 [WARN] <b77c46c0>load_old: 1559, load_current: 2944, load_new: 1697, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:34.274984 [WARN] <b77c46c0>stat_handler(10060710) return rst_code != 0
+04-13-2011 17:48:34.290211 [WARN] <b77c46c0>stat_handler(10060433) return rst_code != 0
+04-13-2011 17:48:34.657537 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:34.999053 [WARN] <b77c46c0>load_old: 1697, load_current: 2699, load_new: 1797, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:36.273662 [WARN] <b77c46c0>stat_handler(10043147) return rst_code != 0
+04-13-2011 17:48:36.281583 [WARN] <b77c46c0>stat_handler(10041936) return rst_code != 0
+04-13-2011 17:48:36.283836 [WARN] <b77c46c0>stat_handler(10043169) return rst_code != 0
+04-13-2011 17:48:36.311848 [WARN] <b77c46c0>stat_handler(10043191) return rst_code != 0
+04-13-2011 17:48:36.339484 [WARN] <b77c46c0>stat_handler(10043213) return rst_code != 0
+04-13-2011 17:48:36.682376 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:36.999486 [WARN] <b77c46c0>load_old: 1797, load_current: 3461, load_new: 1963, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:38.273333 [WARN] <b77c46c0>stat_handler(10046566) return rst_code != 0
+04-13-2011 17:48:38.280653 [WARN] <b77c46c0>stat_handler(10045625) return rst_code != 0
+04-13-2011 17:48:38.283076 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:38.999439 [WARN] <b77c46c0>load_old: 1963, load_current: 3286, load_new: 2095, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:40.273900 [WARN] <b77c46c0>stat_handler(10050318) return rst_code != 0
+04-13-2011 17:48:40.295586 [WARN] <b77c46c0>stat_handler(10049477) return rst_code != 0
+04-13-2011 17:48:40.297949 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:40.999107 [WARN] <b77c46c0>load_old: 2095, load_current: 3566, load_new: 2242, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:42.273924 [WARN] <b77c46c0>stat_handler(10053528) return rst_code != 0
+04-13-2011 17:48:42.277755 [WARN] <b77c46c0>stat_handler(10053129) return rst_code != 0
+04-13-2011 17:48:42.567809 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:42.999220 [WARN] <b77c46c0>load_old: 2242, load_current: 3292, load_new: 2347, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:44.273427 [WARN] <b77c46c0>stat_handler(10056781) return rst_code != 0
+04-13-2011 17:48:44.618468 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:44.999116 [WARN] <b77c46c0>load_old: 2347, load_current: 4002, load_new: 2512, load_max: 4381, cpu:1.000000
+04-13-2011 17:48:44.999668 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:44.999869 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:45.000964 [WARN] <b77c46c0>stat_handler(10058585) return rst_code != 0
+04-13-2011 17:48:45.029666 [WARN] <b77c46c0>stat_handler(10057744) return rst_code != 0
+04-13-2011 17:48:45.031787 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:46.273376 [WARN] <b77c46c0>stat_handler(10060908) return rst_code != 0
+04-13-2011 17:48:46.297106 [WARN] <b77c46c0>stat_handler(10060433) return rst_code != 0
+04-13-2011 17:48:46.377962 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:46.999051 [WARN] <b77c46c0>load_old: 2512, load_current: 3963, load_new: 2657, load_max: 4381, cpu:0.997333
+04-13-2011 17:48:47.000572 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:47.001355 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:47.013196 [WARN] <b77c46c0>stat_handler(10062752) return rst_code != 0
+04-13-2011 17:48:47.033395 [WARN] <b77c46c0>stat_handler(10061459) return rst_code != 0
+04-13-2011 17:48:47.395129 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:48.273507 [WARN] <b77c46c0>stat_handler(10065396) return rst_code != 0
+04-13-2011 17:48:48.298901 [WARN] <b77c46c0>stat_handler(10064773) return rst_code != 0
+04-13-2011 17:48:48.464798 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:48.999902 [WARN] <b77c46c0>load_old: 2657, load_current: 4542, load_new: 2845, load_max: 4542, cpu:1.000000
+04-13-2011 17:48:49.000189 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:49.000408 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:49.001127 [WARN] <b77c46c0>stat_handler(10066911) return rst_code != 0
+04-13-2011 17:48:49.041419 [WARN] <b77c46c0>stat_handler(10066887) return rst_code != 0
+04-13-2011 17:48:49.490001 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:50.329234 [WARN] <b77c46c0>stat_handler(10069770) return rst_code != 0
+04-13-2011 17:48:50.338236 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:48:50.355554 [WARN] <b77c46c0>stat_handler(10069001) return rst_code != 0
+04-13-2011 17:48:50.454326 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:50.999513 [WARN] <b77c46c0>load_old: 2845, load_current: 3027, load_new: 2863, load_max: 4542, cpu:0.994118
+04-13-2011 17:48:50.999806 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:51.000009 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:51.001023 [WARN] <b77c46c0>stat_handler(10070861) return rst_code != 0
+04-13-2011 17:48:51.012343 [WARN] <b77c46c0>stat_handler(10070515) return rst_code != 0
+04-13-2011 17:48:51.107595 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:53.002429 [WARN] <b77c46c0>load_old: 2863, load_current: 3, load_new: 2577, load_max: 4542, cpu:1.000000
+04-13-2011 17:48:53.002728 [WARN] <b77c46c0>it' overload ,will I migrate? 
+04-13-2011 17:48:53.003259 [WARN] <b77c46c0>I'm not the biggest, no migrate
+04-13-2011 17:48:53.003743 [WARN] <b77c46c0>stat_handler(10073949) return rst_code != 0
+04-13-2011 17:48:53.015207 [WARN] <b77c46c0>stat_handler(10073557) return rst_code != 0
+04-13-2011 17:48:53.074248 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:48:55.002664 [WARN] <b77c46c0>load_old: 2577, load_current: 3, load_new: 2319, load_max: 4542, cpu:1.000000
+04-13-2011 17:48:57.002447 [WARN] <b77c46c0>load_old: 2319, load_current: 0, load_new: 1391, load_max: 4542, cpu:0.997389
+04-13-2011 17:48:59.002406 [WARN] <b77c46c0>load_old: 1391, load_current: 0, load_new: 834, load_max: 4542, cpu:1.000000
+04-13-2011 17:49:00.032244 [WARN] <b77c46c0>stat_handler(10073350) return rst_code != 0
+04-13-2011 17:49:00.043970 [WARN] <b77c46c0>stat_handler(10073050) return rst_code != 0
+04-13-2011 17:49:00.152394 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:49:01.002533 [WARN] <b77c46c0>load_old: 834, load_current: 3, load_new: 750, load_max: 4542, cpu:1.000000
+04-13-2011 17:49:03.002511 [WARN] <b77c46c0>load_old: 750, load_current: 0, load_new: 449, load_max: 4542, cpu:0.930946
+04-13-2011 17:49:05.002544 [WARN] <b77c46c0>load_old: 449, load_current: 0, load_new: 269, load_max: 4542, cpu:0.615578
+04-13-2011 17:49:07.002405 [WARN] <b77c46c0>load_old: 269, load_current: 0, load_new: 161, load_max: 4542, cpu:0.648990
+04-13-2011 17:49:09.006311 [WARN] <b77c46c0>load_old: 161, load_current: 0, load_new: 96, load_max: 4542, cpu:0.582915
+04-13-2011 17:49:11.002306 [WARN] <b77c46c0>load_old: 96, load_current: 0, load_new: 57, load_max: 4542, cpu:0.695980
+04-13-2011 17:49:13.002314 [WARN] <b77c46c0>load_old: 57, load_current: 0, load_new: 34, load_max: 4542, cpu:0.555276
+04-13-2011 17:49:15.002339 [WARN] <b77c46c0>load_old: 34, load_current: 0, load_new: 20, load_max: 4542, cpu:0.642317
+04-13-2011 17:49:17.002429 [WARN] <b77c46c0>load_old: 20, load_current: 0, load_new: 11, load_max: 4542, cpu:0.554156
+04-13-2011 17:49:19.003169 [WARN] <b77c46c0>load_old: 11, load_current: 0, load_new: 6, load_max: 4542, cpu:0.562814
+04-13-2011 17:49:20.999271 [WARN] <b77c46c0>load_old: 6, load_current: 0, load_new: 3, load_max: 4542, cpu:0.633838
+04-13-2011 17:49:22.999115 [WARN] <b77c46c0>load_old: 3, load_current: 0, load_new: 1, load_max: 4542, cpu:0.582500
+04-13-2011 17:49:25.000365 [WARN] <b77c46c0>load_old: 1, load_current: 0, load_new: 0, load_max: 4542, cpu:0.593985
+04-13-2011 17:49:27.000873 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.571429
+04-13-2011 17:49:29.001253 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.563910
+04-13-2011 17:49:31.002301 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.537500
+04-13-2011 17:49:31.867733 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:49:32.516452 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:49:32.605498 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:49:32.637050 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:49:33.002796 [WARN] <b77c46c0>load_old: 0, load_current: 5, load_new: 0, load_max: 4542, cpu:0.795455
+04-13-2011 17:49:35.002863 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:49:37.002805 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:49:39.003089 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:49:41.003140 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:49:43.003158 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:49:45.003184 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:49:47.003278 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:49:49.003144 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:49:50.584599 [WARN] <b77c46c0>stat_handler(10091927) return rst_code != 0
+04-13-2011 17:49:50.585395 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:49:50.586077 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:49:51.003093 [WARN] <b77c46c0>load_old: 0, load_current: 3, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:49:53.003093 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:49:55.003092 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:49:57.003104 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:49:59.002479 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:50:01.002441 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:50:02.273297 [WARN] <b77c46c0>stat_handler(10101480) return rst_code != 0
+04-13-2011 17:50:02.275275 [WARN] <b77c46c0>stat_handler(10101425) return rst_code != 0
+04-13-2011 17:50:02.276031 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:50:02.276767 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:50:02.584959 [WARN] <b77c46c0>stat_handler(10102003) return rst_code != 0
+04-13-2011 17:50:02.585631 [WARN] <b77c46c0>stat_handler(10101732) return rst_code != 0
+04-13-2011 17:50:02.586372 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:50:02.587385 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:50:03.002448 [WARN] <b77c46c0>load_old: 0, load_current: 8, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:50:04.272978 [WARN] <b77c46c0>stat_handler(10104695) return rst_code != 0
+04-13-2011 17:50:04.273923 [WARN] <b77c46c0>stat_handler(10104675) return rst_code != 0
+04-13-2011 17:50:04.274881 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:50:04.275803 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:50:05.003340 [WARN] <b77c46c0>load_old: 0, load_current: 4, load_new: 0, load_max: 4542, cpu:1.000000
+04-13-2011 17:50:06.315081 [WARN] <b77c46c0>stat_handler(10107191) return rst_code != 0
+04-13-2011 17:50:06.316170 [WARN] <b77c46c0>stat_handler(10107076) return rst_code != 0
+04-13-2011 17:50:06.316945 [WARN] <b77c46c0>stat_handler(9909040) return rst_code != 0
+04-13-2011 17:50:06.317769 [WARN] <b77c46c0>stat_handler(1) return rst_code != 0
+04-13-2011 17:50:07.000691 [WARN] <b77c46c0>load_old: 0, load_current: 4, load_new: 0, load_max: 4542, cpu:0.856777
+04-13-2011 17:50:09.002406 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.572500
+04-13-2011 17:50:11.003397 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.570000
+04-13-2011 17:50:13.001193 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.566416
+04-13-2011 17:50:14.999865 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.566416
+04-13-2011 17:50:16.999059 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.576441
+04-13-2011 17:50:18.999389 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.566751
+04-13-2011 17:50:21.002800 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.561097
+04-13-2011 17:50:23.002811 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.624060
+04-13-2011 17:50:25.002802 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.661654
+04-13-2011 17:50:27.002804 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.560000
+04-13-2011 17:50:29.002806 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.566416
+04-13-2011 17:50:31.002801 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.552500
+04-13-2011 17:50:33.002798 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.547739
+04-13-2011 17:50:35.003277 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.554156
+04-13-2011 17:50:37.002913 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.562500
+04-13-2011 17:50:39.002802 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.562814
+04-13-2011 17:50:41.002800 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.553885
+04-13-2011 17:50:43.002794 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.562500
+04-13-2011 17:50:45.002797 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.567839
+04-13-2011 17:50:47.003092 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.542500
+04-13-2011 17:50:49.002882 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.558603
+04-13-2011 17:50:51.002893 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.548872
+04-13-2011 17:50:53.002809 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.557500
+04-13-2011 17:50:55.002808 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.585000
+04-13-2011 17:50:57.006802 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.538847
+04-13-2011 17:50:59.002802 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.641604
+04-13-2011 17:51:01.002908 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.558897
+04-13-2011 17:51:03.002810 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.640898
+04-13-2011 17:51:05.002803 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.570000
+04-13-2011 17:51:07.002812 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.584383
+04-13-2011 17:51:09.002806 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.561713
+04-13-2011 17:51:11.002806 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.568922
+04-13-2011 17:51:13.006803 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.562814
+04-13-2011 17:51:15.002805 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.579345
+04-13-2011 17:51:17.002801 [WARN] <b77c46c0>load_old: 0, load_current: 0, load_new: 0, load_max: 4542, cpu:0.550251
