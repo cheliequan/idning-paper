@@ -6,7 +6,7 @@ static uint64_t version;
 void fsnode_tree_insert(fsnode * p, fsnode * n)
 {
     if (NULL == p->data.ddata.children) {
-        fsnode *new_node = fsnode_new();
+        fsnode *new_node = fsnode_new(); 
         dlist_t *pl = &(new_node->tree_dlist);
         dlist_init(pl);
         p->data.ddata.children = new_node;
@@ -149,9 +149,12 @@ int fs_setattr(uint64_t ino, struct file_stat *st)
 
     if (n == NULL) {
         st->ino = 0;
-        return RST_CODE_NOT_FOUND;
+        /*return RST_CODE_NOT_FOUND;*/
+        return 0;
     }
-    n->data.fdata.length = st->size;
+
+    if (S_ISREG(n->mode))
+        n->data.fdata.length = st->size; //原来bug在这里,set attr的时候把子树搞坏了，fsnode里面fdata, ddata用的是用一段内存
     fs_set_modify_flag(n, 0);
     version++;
     return 0;
@@ -237,6 +240,7 @@ int fs_lookup(uint64_t parent_ino, char *name, fsnode ** o_fsnode)
 void fs_del_tree_dfs(fsnode * root){
     if(!root)
         return;
+    logging(LOG_INFO, "the fs_del_tree_dfs on : %"PRIu64"  %s", root->ino, root->name);
     dlist_t *head ;
     dlist_t *pl;
     fsnode *p;
@@ -246,18 +250,21 @@ void fs_del_tree_dfs(fsnode * root){
         head = &(children_head->tree_dlist);
         for (pl = head->next; pl != head; pl = pl->next) {
             p = dlist_data(pl, fsnode, tree_dlist);
-            fs_del_tree_dfs(p);
+            if (S_ISDIR(p->mode) || S_ISREG(p->mode))
+                fs_del_tree_dfs(p);
             /*free(p); FIXME*/
         }
     }
     fsnode_tree_remove(root);
     fsnode_hash_remove(root);
-    free(root);
+    //free(root); FIXME!!
 }
 
 void fs_del_children_dfs(fsnode * root){
+
     if(!root)
         return;
+    logging(LOG_INFO, "the fs_del_children_dfs on : %"PRIu64"  %s", root->ino, root->name);
     dlist_t *head ;
     dlist_t *pl;
     fsnode *p;
@@ -267,10 +274,14 @@ void fs_del_children_dfs(fsnode * root){
         head = &(children_head->tree_dlist);
         for (pl = head->next; pl != head; pl = pl->next) {
             p = dlist_data(pl, fsnode, tree_dlist);
-            fs_del_tree_dfs(p);
+            if (S_ISDIR(p->mode) || S_ISREG(p->mode))
+                fs_del_tree_dfs(p);
             /*free(p); FIXME*/
         }
     }
+    root->data.ddata.children = NULL;
+    root->tree_cnt = 0;
+
 }
 
 //NEW
@@ -282,13 +293,16 @@ int fs_unlink(uint64_t parent_ino, char *name)
     fsnode *n = fsnode_hash_find(parent_ino);
 
     if (n == NULL) {
-        return RST_CODE_NOT_FOUND;
+        /*return RST_CODE_NOT_FOUND;*/
+        return 0; //直接扯蛋了
     }
 
     fs_set_modify_flag(n, -1);
 
     fsnode *s ;
-    if (RST_CODE_NOT_FOUND == fs_lookup(parent_ino, name, &s)){
+    if (RST_CODE_NOT_FOUND == fs_lookup(parent_ino, name, &s) || (s == NULL) ){
+        logging(LOG_DEUBG, "fs_unlink(parent_ino = %" PRIu64 " , name = %s) return RST_CODE_NOT_FOUND",
+                parent_ino, name);
         return RST_CODE_NOT_FOUND;
     }
     logging(LOG_DEUBG, "parent find :%"PRIu64"",
@@ -310,8 +324,13 @@ int fs_mknod(uint64_t parent_ino, uint64_t ino, char *name, int type,
     //如果已经存在直接忽略，这样客户端如果在两个MDS上的一个创建的成功，另一个创建失败，就不用回滚.
     fsnode *n ;
     int rst_code = fs_lookup(parent_ino, name, &n); //也可用ino在hash表中找.
-    if (n!=NULL)
+    if (rst_code == RST_CODE_NOT_FOUND){
+        return RST_CODE_NOT_FOUND;
+    }
+    if (n!=NULL){
+        * o_fsnode = n;
         return 0;
+    }
 
     n = fsnode_new();
     n->parent = fsnode_hash_find(parent_ino);

@@ -21,7 +21,10 @@ static void setattr_handler(EVRPC_STRUCT(rpc_setattr) * rpc, void *arg)
     EVTAG_ASSIGN(response, rst_code, rst_code);
 
     if(rst_code != 0 ){
-        logging(LOG_WARN, "setattr_handler return rst_code != 0");
+        logging(LOG_INFO,
+                "setattr(%" PRIu64 ", name=%s, size=%" PRIu64 ", mode=%04o) return rst_code != 0",
+                stat->ino, stat->name, stat->size, stat->mode);
+
         goto done;
     }
 
@@ -149,7 +152,7 @@ static void mknod_handler(EVRPC_STRUCT(rpc_mknod) * rpc, void *arg)
 
     struct mknod_request *request = rpc->request;
     struct mknod_response *response = rpc->reply;
-    logging(LOG_DEUBG, "mknod(parent=%" PRIu64 ", ino = % "PRIu64", name=%s, type=%d, mode=%04o)",
+    logging(LOG_INFO, "mknod(parent=%" PRIu64 ", ino = % "PRIu64", name=%s, type=%d, mode=%04o)",
             request->parent_ino, request->ino, request->name, request->type, request->mode);
 
     fsnode *n ;
@@ -402,7 +405,7 @@ static void update_clustermap_from_cmgr_on_timer_cb(evutil_socket_t fd, short wh
 
     /*logging(LOG_INFO, "load_old: %d, load_current: %d, load_new: %d, load_max: %d ",*/
             /*load_old,load_current, load_new, load_max);*/
-    logging(LOG_INFO, "load_old: %d, load_current: %d, load_new: %d, load_max: %d, cpu:%lf",
+    logging(LOG_WARN, "load_old: %d, load_current: %d, load_new: %d, load_max: %d, cpu:%lf",
             load_old,load_current, load_new, load_max, cpu_usage());
 
     set_self_machine_load(load_new);
@@ -434,6 +437,8 @@ fsnode * locate_hot_sub_tree(fsnode * root){
     DBG();
 
     fsnode *n = root->data.ddata.children;
+    if (n == 0x1000) //奇怪的bug FIXME
+        logging(LOG_INFO, "n == 0x1000  at locate_hot_sub_tree : %"PRIu64"  %s", root ->ino, root->name);
     fsnode *rst = n;
     int max_access_count = 0;
     fsnode *p;
@@ -469,14 +474,20 @@ void do_migrate(){
     fsnode * n = fsnode_hash_find(FS_ROOT_INO);
     if (n==NULL) //对于没有root的MDS，目前没实现,FIXME
         return ;
+    logging(LOG_INFO, "the finding root @ do_migrate is : %"PRIu64"  %s", n->ino, n->name);
     while(1){
         n = locate_hot_sub_tree(n);
         if (n == NULL)
             return ;
+        logging(LOG_INFO, "the finding hot @ do_migrate is : %"PRIu64"  %s", n->ino, n->name);
+        if (!S_ISDIR(n->mode))
+            return;
+        if (n->tree_cnt == 0)
+            return;
         if (n->tree_cnt < migrate_count && n->tree_cnt > 10) {// 1w
             if (n ->ino == FS_VROOT_INO || n->ino == FS_ROOT_INO)
                 return ;
-            logging(LOG_INFO, "migrate on %"PRIu64". %s, tree_cnt : %d", n->ino, n->name, n->tree_cnt);
+            logging(LOG_WARN, "migrate on %"PRIu64". %s, tree_cnt : %d", n->ino, n->name, n->tree_cnt);
             do_migrate2(n);
             return;
         }

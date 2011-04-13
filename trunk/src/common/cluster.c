@@ -88,7 +88,7 @@ void ping_handler(EVRPC_STRUCT(rpc_ping) * rpc, void *arg)
         cluster_version++;
     }
     if (type == MACHINE_MDS)
-        cluster_printf(LOG_INFO, "log load");
+        cluster_printf(LOG_WARN, "log load");
 
     if (cluster_version > ping_version) {   // new machine added to cluster
         EVTAG_ASSIGN(pong, version, cluster_version);

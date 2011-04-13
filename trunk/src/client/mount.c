@@ -187,10 +187,29 @@ static void sfs_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
     struct file_stat *stat = file_stat_new();
 
 
-    enforce_cache(parent);
-    struct machine *m = get_machine_of_inode(parent);
 
-    assert (0 == lookup_send_request(m->ip, m->port, (uint64_t) parent, name, stat));
+    while(1){
+        enforce_cache(parent);
+        struct file_stat *cached_parent ;
+        cached_parent = attr_cache_lookup(parent);
+        int i;
+        int success = 1;
+        int mid = cached_parent->pos_arr[0];
+        struct machine *m = cluster_get_machine_by_mid(mid);
+
+        if ( lookup_send_request(m->ip, m->port, (uint64_t) parent, name, stat) != 0) 
+            success = 0;
+        if (success)
+            break;
+    }
+
+
+
+
+    /*enforce_cache(parent);*/
+    /*struct machine *m = get_machine_of_inode(parent);*/
+
+    /*assert (0 == lookup_send_request(m->ip, m->port, (uint64_t) parent, name, stat));*/
 
     logging(LOG_DEUBG, "lookup(parent = %lu, name = %s) return inode: %lu",
             parent, name, e.ino);
@@ -217,9 +236,27 @@ static void sfs_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
     struct file_stat **stat_arr;
     int cnt;
 
-    enforce_cache(ino);
-    struct machine *m = get_machine_of_inode(ino);
-    assert( 0== ls_send_request(m->ip, m->port, ino, &stat_arr, &cnt));
+
+    while(1){
+        enforce_cache(ino);
+        struct file_stat *cached_parent ;
+        cached_parent = attr_cache_lookup(ino);
+        int i;
+        int success = 1;
+        int mid = cached_parent->pos_arr[0];
+        struct machine *m = cluster_get_machine_by_mid(mid);
+
+        if ( ls_send_request(m->ip, m->port, ino, &stat_arr, &cnt) != 0) 
+            success = 0;
+        if (success)
+            break;
+    }
+
+
+
+    /*enforce_cache(ino);*/
+    /*struct machine *m = get_machine_of_inode(ino);*/
+    /*assert( 0== ls_send_request(m->ip, m->port, ino, &stat_arr, &cnt));*/
     int i;
     struct dirbuf b;
     memset(&b, 0, sizeof(b));

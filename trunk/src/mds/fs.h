@@ -44,6 +44,7 @@ typedef struct _fsnode {
         uint32_t rdev;          // type==TYPE_BLOCKDEV ; type==TYPE_CHARDEV
         /////////////////
         struct _fdata {         // type==TYPE_FILE
+            int xxxxx;
             uint64_t length;
             //uint64_t *chunktab;
             //uint32_t chunks;

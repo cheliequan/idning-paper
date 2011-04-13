@@ -86,7 +86,7 @@ int setattr_send_request(char *ip, int port, struct file_stat *stat_arr)
 
     int rst = response->rst_code;
     if (rst!=0){
-        logging(LOG_WARN, "setattr_send_request return rst != 0");
+        logging(LOG_WARN, "setattr_send_request("PRIu64") return rst != 0", stat_arr->ino);
         goto done;
     }
     /*int cnt = EVTAG_ARRAY_LEN(response, stat_arr);*/

@@ -40,9 +40,9 @@
 #define migrate_precent 0.55
 #define migrate_count 50000
 
-//#define migrate_threshold 100
+//#define migrate_threshold 50
 //#define migrate_precent 0
-//#define migrate_count 5000
+//#define migrate_count 500
 
 
 

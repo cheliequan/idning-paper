@@ -82,8 +82,8 @@ run: all
 	#gnome-terminal $(ARG) -e "./mds/mds.out -c etc/mds.cfg.3" 		-t "mds3" 	--geometry=120x20+0+300	
 	#gnome-terminal $(ARG) -e "./mds/mds.out -c etc/mds.cfg.4" 		-t "mds4" 	--geometry=120x20+0+900	&
 	#
-	gnome-terminal $(ARG) -e "./osd/osd.out" 						-t "osd" 	--geometry=80x10-0+600 &
-	gnome-terminal $(ARG) -e "./osd/osd.out -c etc/osd.cfg.2" 		-t "osd2" 	--geometry=80x10-0+600 &
+	gnome-terminal $(ARG) -e "./osd/osd.out" 						-t "osd" 	--geometry=80x10-0+400 &
+	gnome-terminal $(ARG) -e "./osd/osd.out -c etc/osd.cfg.2" 		-t "osd2" 	--geometry=80x10-0+400 &
 
 rb: run-back
 run-back:
@@ -99,10 +99,11 @@ show-log:
 
 #killall
 killall: 
+	-killall -q cmgr.out osd.out mds.out mount.out
 	rm /mnt/hd1/* -rf 
 	rm /mnt/hd2/* -rf  
 	rm ./log/* -rf  
-	-killall -q cmgr.out osd.out mds.out mount.out
+	rm ./data/* -rf  
 
 indent:
 	find . -name "*.c" | xargs indent -npro -kr -i4 -ts4 -sob -l120 -ss -ncs -cp1 --no-tabs
