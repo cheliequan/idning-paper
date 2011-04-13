@@ -269,7 +269,7 @@ int mknod_send_request(char *ip, int port,
 
     int rst = response->rst_code;
     if (rst!=0){
-        logging(LOG_WARN, "mknod_send_request return rst != 0");
+        logging(LOG_WARN, "mknod_send_request(%"PRIu64", name = %s, parent = %"PRIu64") return rst != 0", ino, name, parent_ino);
         goto done;
     }
     struct file_stat *stat;
