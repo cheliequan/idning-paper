@@ -1,0 +1,335 @@
+04-13-2011 01:21:56.679963 [INFO] <b78906c0>no mds.data
+04-13-2011 01:21:58.685787 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 0, cpu:0.396177
+04-13-2011 01:22:00.685679 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 0, cpu:0.418953
+04-13-2011 01:22:01.017086 [WARN] <b78906c0>stat_handler(1) return rst_code != 0
+04-13-2011 01:22:01.017657 [INFO] <b78906c0>mkfs (mds1=10000, mds2=10001)
+04-13-2011 01:22:01.040906 [INFO] <b78906c0>mkfs (mds1=10000, mds2=10001)
+04-13-2011 01:22:01.064148 [INFO] <b78906c0>mkfs (mds1=10000, mds2=10001)
+04-13-2011 01:22:01.083310 [INFO] <b78906c0>mkfs (mds1=10000, mds2=10001)
+04-13-2011 01:22:01.107670 [INFO] <b78906c0>mkfs (mds1=10000, mds2=10001)
+04-13-2011 01:22:01.131465 [INFO] <b78906c0>mkfs (mds1=10000, mds2=10001)
+04-13-2011 01:22:01.154044 [INFO] <b78906c0>mkfs (mds1=10000, mds2=10001)
+04-13-2011 01:22:01.169916 [INFO] <b78906c0>mkfs (mds1=10000, mds2=10001)
+04-13-2011 01:22:02.686199 [INFO] <b78906c0>load_old: 0, load_current: 31, load_new: 3, load_max: 31, cpu:0.367647
+04-13-2011 01:22:04.682202 [INFO] <b78906c0>load_old: 3, load_current: 0, load_new: 1, load_max: 31, cpu:0.111374
+04-13-2011 01:22:06.682201 [INFO] <b78906c0>load_old: 1, load_current: 0, load_new: 0, load_max: 31, cpu:0.140000
+04-13-2011 01:22:08.682127 [INFO] <b78906c0>load_old: 0, load_current: 16, load_new: 1, load_max: 31, cpu:0.254237
+04-13-2011 01:22:10.682190 [INFO] <b78906c0>load_old: 1, load_current: 2636, load_new: 264, load_max: 2636, cpu:0.989691
+04-13-2011 01:22:12.682408 [INFO] <b78906c0>load_old: 264, load_current: 6691, load_new: 906, load_max: 6691, cpu:0.917989
+04-13-2011 01:22:14.682279 [INFO] <b78906c0>load_old: 906, load_current: 5532, load_new: 1368, load_max: 6691, cpu:0.898123
+04-13-2011 01:22:16.682150 [INFO] <b78906c0>load_old: 1368, load_current: 4808, load_new: 1712, load_max: 6691, cpu:0.904255
+04-13-2011 01:22:18.682217 [INFO] <b78906c0>load_old: 1712, load_current: 5385, load_new: 2079, load_max: 6691, cpu:0.917333
+04-13-2011 01:22:20.682074 [INFO] <b78906c0>load_old: 2079, load_current: 5614, load_new: 2432, load_max: 6691, cpu:0.912467
+04-13-2011 01:22:22.682060 [INFO] <b78906c0>load_old: 2432, load_current: 5011, load_new: 2689, load_max: 6691, cpu:0.904762
+04-13-2011 01:22:24.682071 [INFO] <b78906c0>load_old: 2689, load_current: 5705, load_new: 2990, load_max: 6691, cpu:0.900000
+04-13-2011 01:22:26.682119 [INFO] <b78906c0>load_old: 2990, load_current: 5103, load_new: 3201, load_max: 6691, cpu:0.898936
+04-13-2011 01:22:28.682021 [INFO] <b78906c0>load_old: 3201, load_current: 5035, load_new: 3384, load_max: 6691, cpu:0.883598
+04-13-2011 01:22:30.682132 [INFO] <b78906c0>load_old: 3384, load_current: 5826, load_new: 3628, load_max: 6691, cpu:0.898123
+04-13-2011 01:22:32.682088 [INFO] <b78906c0>load_old: 3628, load_current: 5586, load_new: 3823, load_max: 6691, cpu:0.892473
+04-13-2011 01:22:32.682766 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:22:32.683157 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:22:32.683176 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:22:34.682060 [INFO] <b78906c0>load_old: 3823, load_current: 4575, load_new: 3898, load_max: 6691, cpu:0.870370
+04-13-2011 01:22:34.682523 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:22:34.682933 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:22:34.682952 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:22:36.682069 [INFO] <b78906c0>load_old: 3898, load_current: 5874, load_new: 4095, load_max: 6691, cpu:0.882834
+04-13-2011 01:22:36.682339 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:22:36.682817 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:22:36.682835 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:22:38.681966 [INFO] <b78906c0>load_old: 4095, load_current: 5222, load_new: 4207, load_max: 6691, cpu:0.918539
+04-13-2011 01:22:38.682271 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:22:38.682565 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:22:38.682583 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:22:40.682078 [INFO] <b78906c0>load_old: 4207, load_current: 5305, load_new: 4316, load_max: 6691, cpu:0.961194
+04-13-2011 01:22:40.682282 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:22:40.682511 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10001)!!
+04-13-2011 01:22:40.682529 [WARN] <b78906c0>YES, I'm the boss , do it ! migrate !
+04-13-2011 01:22:40.682545 [INFO] <b78906c0>migrate on 8359344. 5, tree_cnt : 1950
+04-13-2011 01:22:40.682560 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10002)!!
+04-13-2011 01:22:40.694524 [INFO] <b78906c0>migrate return not zero, maybe confict 
+04-13-2011 01:22:42.682008 [INFO] <b78906c0>load_old: 2158, load_current: 5470, load_new: 2489, load_max: 6691, cpu:0.969945
+04-13-2011 01:22:44.682255 [INFO] <b78906c0>load_old: 2489, load_current: 5738, load_new: 2813, load_max: 6691, cpu:0.994638
+04-13-2011 01:22:46.681959 [INFO] <b78906c0>load_old: 2813, load_current: 6673, load_new: 3199, load_max: 6691, cpu:0.975936
+04-13-2011 01:22:48.682322 [INFO] <b78906c0>load_old: 3199, load_current: 6332, load_new: 3512, load_max: 6691, cpu:0.962466
+04-13-2011 01:22:50.681947 [INFO] <b78906c0>load_old: 3512, load_current: 6081, load_new: 3768, load_max: 6691, cpu:1.000000
+04-13-2011 01:22:50.682202 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:22:50.682414 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:22:50.682432 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:22:52.682127 [INFO] <b78906c0>load_old: 3768, load_current: 5752, load_new: 3966, load_max: 6691, cpu:0.957447
+04-13-2011 01:22:52.682411 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:22:52.682725 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:22:52.682743 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:22:54.682210 [INFO] <b78906c0>load_old: 3966, load_current: 6162, load_new: 4185, load_max: 6691, cpu:0.997305
+04-13-2011 01:22:54.682529 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:22:54.682780 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:22:54.682798 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:22:56.682066 [INFO] <b78906c0>load_old: 4185, load_current: 5209, load_new: 4287, load_max: 6691, cpu:0.997312
+04-13-2011 01:22:56.682293 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:22:56.682485 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:22:56.682504 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:22:58.682206 [INFO] <b78906c0>load_old: 4287, load_current: 5755, load_new: 4433, load_max: 6691, cpu:0.936508
+04-13-2011 01:22:58.682825 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:22:58.683178 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:22:58.683197 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:23:00.682107 [INFO] <b78906c0>load_old: 4433, load_current: 6117, load_new: 4601, load_max: 6691, cpu:0.922460
+04-13-2011 01:23:00.682843 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:23:00.683274 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10001)!!
+04-13-2011 01:23:00.683293 [WARN] <b78906c0>YES, I'm the boss , do it ! migrate !
+04-13-2011 01:23:00.683308 [INFO] <b78906c0>migrate on 8359344. 5, tree_cnt : 1565
+04-13-2011 01:23:00.683322 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10002)!!
+04-13-2011 01:23:00.693425 [INFO] <b78906c0>migrate return not zero, maybe confict 
+04-13-2011 01:23:02.682086 [INFO] <b78906c0>load_old: 2300, load_current: 5752, load_new: 2645, load_max: 6691, cpu:0.906417
+04-13-2011 01:23:04.681960 [INFO] <b78906c0>load_old: 2645, load_current: 5342, load_new: 2914, load_max: 6691, cpu:0.883289
+04-13-2011 01:23:06.682137 [INFO] <b78906c0>load_old: 2914, load_current: 5472, load_new: 3169, load_max: 6691, cpu:0.873995
+04-13-2011 01:23:08.682027 [INFO] <b78906c0>load_old: 3169, load_current: 4354, load_new: 3287, load_max: 6691, cpu:0.871053
+04-13-2011 01:23:10.682071 [INFO] <b78906c0>load_old: 3287, load_current: 5730, load_new: 3531, load_max: 6691, cpu:0.851459
+04-13-2011 01:23:12.682057 [INFO] <b78906c0>load_old: 3531, load_current: 5850, load_new: 3762, load_max: 6691, cpu:0.868074
+04-13-2011 01:23:12.682533 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:23:12.682729 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:23:12.682749 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:23:14.682049 [INFO] <b78906c0>load_old: 3762, load_current: 5483, load_new: 3934, load_max: 6691, cpu:0.849866
+04-13-2011 01:23:14.682344 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:23:14.682546 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:23:14.682564 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:23:16.681951 [INFO] <b78906c0>load_old: 3934, load_current: 5203, load_new: 4060, load_max: 6691, cpu:0.868132
+04-13-2011 01:23:16.682150 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:23:16.683566 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:23:16.683597 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:23:18.681922 [INFO] <b78906c0>load_old: 4060, load_current: 5305, load_new: 4184, load_max: 6691, cpu:0.811321
+04-13-2011 01:23:18.682796 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:23:18.683088 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:23:18.683106 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:23:20.681928 [INFO] <b78906c0>load_old: 4184, load_current: 4533, load_new: 4218, load_max: 6691, cpu:0.838710
+04-13-2011 01:23:20.682320 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:23:20.682574 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:23:20.682593 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:23:22.683090 [INFO] <b78906c0>load_old: 4218, load_current: 5767, load_new: 4372, load_max: 6691, cpu:0.846361
+04-13-2011 01:23:22.683351 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:23:22.683546 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:23:22.683565 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:23:24.682118 [INFO] <b78906c0>load_old: 4372, load_current: 5610, load_new: 4495, load_max: 6691, cpu:0.838624
+04-13-2011 01:23:24.682372 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:23:24.682559 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10000)!!
+04-13-2011 01:23:24.682576 [WARN] <b78906c0>I'm not the biggest, no migrate
+04-13-2011 01:23:26.681925 [INFO] <b78906c0>load_old: 4495, load_current: 5907, load_new: 4636, load_max: 6691, cpu:0.963989
+04-13-2011 01:23:26.682134 [WARN] <b78906c0>it' overload ,will I migrate? 
+04-13-2011 01:23:26.682326 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10001)!!
+04-13-2011 01:23:26.682343 [WARN] <b78906c0>YES, I'm the boss , do it ! migrate !
+04-13-2011 01:23:26.682359 [INFO] <b78906c0>migrate on 8359340. 1, tree_cnt : 2157
+04-13-2011 01:23:26.682373 [INFO] <b78906c0>cluster_get_mds_with_lowest_load() return (10002)!!
+04-13-2011 01:23:26.697908 [INFO] <b78906c0>migrate return ok , trying to rm AND update subtree 1 
+04-13-2011 01:23:26.698580 [INFO] <b78906c0>after rm AND update subtree 1 : [10000, 10002]
+04-13-2011 01:23:26.702438 [WARN] <b78906c0>stat_handler(8470647) return rst_code != 0
+04-13-2011 01:23:26.728004 [WARN] <b78906c0>stat_handler(8470127) return rst_code != 0
+04-13-2011 01:23:26.729982 [WARN] <b78906c0>mknod_handler return rst_code != 0
+04-13-2011 01:23:28.685698 [INFO] <b78906c0>load_old: 2318, load_current: 4518, load_new: 2538, load_max: 6691, cpu:0.925806
+04-13-2011 01:23:30.682001 [INFO] <b78906c0>load_old: 2538, load_current: 4834, load_new: 2767, load_max: 6691, cpu:0.907692
+04-13-2011 01:23:32.682112 [INFO] <b78906c0>load_old: 2767, load_current: 5875, load_new: 3077, load_max: 6691, cpu:0.839674
+04-13-2011 01:23:34.681934 [INFO] <b78906c0>load_old: 3077, load_current: 5549, load_new: 3324, load_max: 6691, cpu:0.868633
+04-13-2011 01:23:36.682251 [INFO] <b78906c0>load_old: 3324, load_current: 4538, load_new: 3445, load_max: 6691, cpu:0.843915
+04-13-2011 01:23:38.682111 [INFO] <b78906c0>load_old: 3445, load_current: 3936, load_new: 3494, load_max: 6691, cpu:0.612299
+04-13-2011 01:23:40.681954 [INFO] <b78906c0>load_old: 3494, load_current: 3600, load_new: 3504, load_max: 6691, cpu:0.544503
+04-13-2011 01:23:42.682178 [INFO] <b78906c0>load_old: 3504, load_current: 3389, load_new: 3492, load_max: 6691, cpu:0.575130
+04-13-2011 01:23:44.682128 [INFO] <b78906c0>load_old: 3492, load_current: 4020, load_new: 3544, load_max: 6691, cpu:0.617647
+04-13-2011 01:23:46.682091 [INFO] <b78906c0>load_old: 3544, load_current: 3730, load_new: 3562, load_max: 6691, cpu:0.575198
+04-13-2011 01:23:48.682122 [INFO] <b78906c0>load_old: 3562, load_current: 3599, load_new: 3565, load_max: 6691, cpu:0.622340
+04-13-2011 01:23:50.682041 [INFO] <b78906c0>load_old: 3565, load_current: 3388, load_new: 3547, load_max: 6691, cpu:0.600000
+04-13-2011 01:23:52.682150 [INFO] <b78906c0>load_old: 3547, load_current: 3871, load_new: 3579, load_max: 6691, cpu:0.558140
+04-13-2011 01:23:54.681933 [INFO] <b78906c0>load_old: 3579, load_current: 3731, load_new: 3594, load_max: 6691, cpu:0.596257
+04-13-2011 01:23:56.681927 [INFO] <b78906c0>load_old: 3594, load_current: 3550, load_new: 3589, load_max: 6691, cpu:0.560724
+04-13-2011 01:23:58.682098 [INFO] <b78906c0>load_old: 3589, load_current: 3226, load_new: 3552, load_max: 6691, cpu:0.642105
+04-13-2011 01:24:00.682109 [INFO] <b78906c0>load_old: 3552, load_current: 3764, load_new: 3573, load_max: 6691, cpu:0.563158
+04-13-2011 01:24:02.682120 [INFO] <b78906c0>load_old: 3573, load_current: 3984, load_new: 3614, load_max: 6691, cpu:0.574026
+04-13-2011 01:24:04.681948 [INFO] <b78906c0>load_old: 3614, load_current: 3535, load_new: 3606, load_max: 6691, cpu:0.594241
+04-13-2011 01:24:06.682153 [INFO] <b78906c0>load_old: 3606, load_current: 3618, load_new: 3607, load_max: 6691, cpu:0.588542
+04-13-2011 01:24:08.681988 [INFO] <b78906c0>load_old: 3607, load_current: 3189, load_new: 3565, load_max: 6691, cpu:0.639896
+04-13-2011 01:24:10.682099 [INFO] <b78906c0>load_old: 3565, load_current: 3904, load_new: 3598, load_max: 6691, cpu:0.600000
+04-13-2011 01:24:12.682315 [INFO] <b78906c0>load_old: 3598, load_current: 3974, load_new: 3635, load_max: 6691, cpu:0.577720
+04-13-2011 01:24:14.682296 [INFO] <b78906c0>load_old: 3635, load_current: 3756, load_new: 3647, load_max: 6691, cpu:0.620513
+04-13-2011 01:24:16.681967 [INFO] <b78906c0>load_old: 3647, load_current: 3481, load_new: 3630, load_max: 6691, cpu:0.786765
+04-13-2011 01:24:18.682314 [INFO] <b78906c0>load_old: 3630, load_current: 3410, load_new: 3608, load_max: 6691, cpu:0.814516
+04-13-2011 01:24:20.681953 [INFO] <b78906c0>load_old: 3608, load_current: 3126, load_new: 3559, load_max: 6691, cpu:0.740614
+04-13-2011 01:24:22.681928 [INFO] <b78906c0>load_old: 3559, load_current: 4046, load_new: 3607, load_max: 6691, cpu:0.614362
+04-13-2011 01:24:24.682151 [INFO] <b78906c0>load_old: 3607, load_current: 4044, load_new: 3650, load_max: 6691, cpu:0.575130
+04-13-2011 01:24:26.685697 [INFO] <b78906c0>load_old: 3650, load_current: 1827, load_new: 3467, load_max: 6691, cpu:0.345771
+04-13-2011 01:24:28.685697 [INFO] <b78906c0>load_old: 3467, load_current: 0, load_new: 2080, load_max: 6691, cpu:0.208543
+04-13-2011 01:24:30.685693 [INFO] <b78906c0>load_old: 2080, load_current: 0, load_new: 1247, load_max: 6691, cpu:0.230952
+04-13-2011 01:24:32.685756 [INFO] <b78906c0>load_old: 1247, load_current: 0, load_new: 748, load_max: 6691, cpu:0.191542
+04-13-2011 01:24:34.685684 [INFO] <b78906c0>load_old: 748, load_current: 0, load_new: 448, load_max: 6691, cpu:0.239709
+04-13-2011 01:24:36.685697 [INFO] <b78906c0>load_old: 448, load_current: 0, load_new: 268, load_max: 6691, cpu:0.216346
+04-13-2011 01:24:38.685858 [INFO] <b78906c0>load_old: 268, load_current: 0, load_new: 160, load_max: 6691, cpu:0.127820
+04-13-2011 01:24:40.686187 [INFO] <b78906c0>load_old: 160, load_current: 0, load_new: 95, load_max: 6691, cpu:0.143198
+04-13-2011 01:24:42.685697 [INFO] <b78906c0>load_old: 95, load_current: 0, load_new: 56, load_max: 6691, cpu:0.153477
+04-13-2011 01:24:44.685699 [INFO] <b78906c0>load_old: 56, load_current: 0, load_new: 33, load_max: 6691, cpu:0.253695
+04-13-2011 01:24:46.685707 [INFO] <b78906c0>load_old: 33, load_current: 0, load_new: 19, load_max: 6691, cpu:0.129496
+04-13-2011 01:24:48.685703 [INFO] <b78906c0>load_old: 19, load_current: 0, load_new: 11, load_max: 6691, cpu:0.183417
+04-13-2011 01:24:50.685699 [INFO] <b78906c0>load_old: 11, load_current: 0, load_new: 6, load_max: 6691, cpu:0.191388
+04-13-2011 01:24:52.685718 [INFO] <b78906c0>load_old: 6, load_current: 0, load_new: 3, load_max: 6691, cpu:0.248804
+04-13-2011 01:24:54.685620 [INFO] <b78906c0>load_old: 3, load_current: 0, load_new: 1, load_max: 6691, cpu:0.237624
+04-13-2011 01:24:55.082817 [INFO] <b78906c0>mkfs (mds1=10002, mds2=10001)
+04-13-2011 01:24:55.107953 [INFO] <b78906c0>mkfs (mds1=10002, mds2=10001)
+04-13-2011 01:24:55.137461 [INFO] <b78906c0>mkfs (mds1=10002, mds2=10001)
+04-13-2011 01:24:55.153305 [INFO] <b78906c0>mkfs (mds1=10002, mds2=10001)
+04-13-2011 01:24:55.182563 [INFO] <b78906c0>mkfs (mds1=10002, mds2=10001)
+04-13-2011 01:24:55.202382 [INFO] <b78906c0>mkfs (mds1=10002, mds2=10001)
+04-13-2011 01:24:55.220568 [INFO] <b78906c0>mkfs (mds1=10002, mds2=10001)
+04-13-2011 01:24:55.244095 [INFO] <b78906c0>mkfs (mds1=10002, mds2=10001)
+04-13-2011 01:24:56.682195 [INFO] <b78906c0>load_old: 1, load_current: 41, load_new: 5, load_max: 6691, cpu:0.460048
+04-13-2011 01:24:58.685754 [INFO] <b78906c0>load_old: 5, load_current: 0, load_new: 2, load_max: 6691, cpu:0.161692
+04-13-2011 01:25:00.685703 [INFO] <b78906c0>load_old: 2, load_current: 0, load_new: 1, load_max: 6691, cpu:0.205811
+04-13-2011 01:25:02.685703 [INFO] <b78906c0>load_old: 1, load_current: 0, load_new: 0, load_max: 6691, cpu:0.171642
+04-13-2011 01:25:04.685696 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.134715
+04-13-2011 01:25:06.685701 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.284153
+04-13-2011 01:25:08.685702 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.196023
+04-13-2011 01:25:10.685704 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.192308
+04-13-2011 01:25:12.685699 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.130982
+04-13-2011 01:25:14.685699 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.145985
+04-13-2011 01:25:16.685701 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.129114
+04-13-2011 01:25:18.685701 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.115479
+04-13-2011 01:25:20.685700 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.129353
+04-13-2011 01:25:22.685698 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.167488
+04-13-2011 01:25:24.685696 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.154040
+04-13-2011 01:25:26.686208 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.127451
+04-13-2011 01:25:28.682200 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.244216
+04-13-2011 01:25:30.685752 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.142857
+04-13-2011 01:25:32.686021 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.120000
+04-13-2011 01:25:34.686198 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.162500
+04-13-2011 01:25:36.685695 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.159036
+04-13-2011 01:25:38.685704 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.133005
+04-13-2011 01:25:40.685707 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.114914
+04-13-2011 01:25:42.685703 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.104878
+04-13-2011 01:25:44.685707 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.135802
+04-13-2011 01:25:46.685703 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.149758
+04-13-2011 01:25:48.685766 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.144578
+04-13-2011 01:25:50.686198 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.172414
+04-13-2011 01:25:52.685691 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.169811
+04-13-2011 01:25:54.685705 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.470588
+04-13-2011 01:25:56.685708 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.146766
+04-13-2011 01:25:58.685703 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.111380
+04-13-2011 01:26:00.685711 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.128079
+04-13-2011 01:26:02.685707 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.166667
+04-13-2011 01:26:04.685693 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.177458
+04-13-2011 01:26:06.685697 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.122596
+04-13-2011 01:26:08.685700 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.144550
+04-13-2011 01:26:10.685703 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.171429
+04-13-2011 01:26:12.686324 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.139024
+04-13-2011 01:26:14.686198 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.167464
+04-13-2011 01:26:16.682606 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.145585
+04-13-2011 01:26:18.682181 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.140436
+04-13-2011 01:26:20.685693 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.117788
+04-13-2011 01:26:22.685701 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.131894
+04-13-2011 01:26:24.685690 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.126829
+04-13-2011 01:26:26.685706 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.127711
+04-13-2011 01:26:28.685700 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.153846
+04-13-2011 01:26:30.685696 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.178147
+04-13-2011 01:26:32.686061 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.122596
+04-13-2011 01:26:34.685696 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.131841
+04-13-2011 01:26:36.685705 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.162228
+04-13-2011 01:26:38.685706 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.124402
+04-13-2011 01:26:40.685816 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.178218
+04-13-2011 01:26:42.957730 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.200000
+04-13-2011 01:26:44.685706 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.146893
+04-13-2011 01:26:46.685701 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.134293
+04-13-2011 01:26:48.685703 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.170264
+04-13-2011 01:26:50.685702 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.174941
+04-13-2011 01:26:52.685737 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.132850
+04-13-2011 01:26:54.685711 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.144578
+04-13-2011 01:26:56.685705 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.145320
+04-13-2011 01:26:58.685705 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.139151
+04-13-2011 01:27:00.685699 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.107843
+04-13-2011 01:27:02.686047 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.119617
+04-13-2011 01:27:04.686194 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.112981
+04-13-2011 01:27:06.685727 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.166265
+04-13-2011 01:27:08.685778 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.144231
+04-13-2011 01:27:10.686199 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.164678
+04-13-2011 01:27:12.685692 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.118227
+04-13-2011 01:27:14.685711 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.176471
+04-13-2011 01:27:16.685699 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.148936
+04-13-2011 01:27:18.685810 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.123786
+04-13-2011 01:27:20.685705 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.136691
+04-13-2011 01:27:22.686298 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.143885
+04-13-2011 01:27:24.685685 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.151961
+04-13-2011 01:27:26.685699 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.148235
+04-13-2011 01:27:28.685790 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.275556
+04-13-2011 01:27:30.966196 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.220000
+04-13-2011 01:27:32.686200 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.145658
+04-13-2011 01:27:34.686193 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.167883
+04-13-2011 01:27:36.682198 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.145278
+04-13-2011 01:27:38.685703 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.134940
+04-13-2011 01:27:40.686215 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.141487
+04-13-2011 01:27:42.686196 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.133971
+04-13-2011 01:27:44.686192 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.129717
+04-13-2011 01:27:46.682198 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.122549
+04-13-2011 01:27:48.686194 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.149758
+04-13-2011 01:27:50.686203 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.172662
+04-13-2011 01:27:52.686201 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.193627
+04-13-2011 01:27:54.686202 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.158654
+04-13-2011 01:27:56.682196 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.128505
+04-13-2011 01:27:58.685694 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.110024
+04-13-2011 01:28:00.685910 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.145985
+04-13-2011 01:28:02.685703 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.227053
+04-13-2011 01:28:04.685712 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.121140
+04-13-2011 01:28:06.685709 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.113801
+04-13-2011 01:28:08.685848 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.151659
+04-13-2011 01:28:10.686961 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.131455
+04-13-2011 01:28:12.685698 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.157248
+04-13-2011 01:28:14.686206 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.237430
+04-13-2011 01:28:16.682296 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.365169
+04-13-2011 01:28:18.685695 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.187654
+04-13-2011 01:28:20.685697 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.222222
+04-13-2011 01:28:22.689672 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.297821
+04-13-2011 01:28:24.685702 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.255422
+04-13-2011 01:28:26.685655 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.168269
+04-13-2011 01:28:28.685701 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.205379
+04-13-2011 01:28:30.685715 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.263923
+04-13-2011 01:28:32.686374 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.233735
+04-13-2011 01:28:34.686192 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.186275
+04-13-2011 01:28:36.686196 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.181818
+04-13-2011 01:28:38.682962 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.134615
+04-13-2011 01:28:40.685695 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.148418
+04-13-2011 01:28:42.685710 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.151079
+04-13-2011 01:28:44.685698 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.138015
+04-13-2011 01:28:46.685701 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.176039
+04-13-2011 01:28:48.685707 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.221154
+04-13-2011 01:28:50.685702 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.205742
+04-13-2011 01:28:52.685697 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.137681
+04-13-2011 01:28:54.685698 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.162291
+04-13-2011 01:28:56.685698 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.186567
+04-13-2011 01:28:58.685707 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.185930
+04-13-2011 01:29:00.686215 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.208437
+04-13-2011 01:29:02.682197 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.277592
+04-13-2011 01:29:05.018041 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.296482
+04-13-2011 01:29:06.685694 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.163077
+04-13-2011 01:29:08.685705 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.189781
+04-13-2011 01:29:10.685747 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.256659
+04-13-2011 01:29:12.685712 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.161765
+04-13-2011 01:29:14.689692 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.217494
+04-13-2011 01:29:16.685758 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.223881
+04-13-2011 01:29:18.685824 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.190821
+04-13-2011 01:29:20.685704 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.242054
+04-13-2011 01:29:22.685702 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.300971
+04-13-2011 01:29:24.685779 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.168293
+04-13-2011 01:29:26.685703 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.235577
+04-13-2011 01:29:28.686205 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.174877
+04-13-2011 01:29:30.682199 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.204327
+04-13-2011 01:29:32.685779 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.165432
+04-13-2011 01:29:34.685705 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.154394
+04-13-2011 01:29:36.685702 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.131068
+04-13-2011 01:29:38.685691 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.217500
+04-13-2011 01:29:40.685695 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.231884
+04-13-2011 01:29:42.685706 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.141827
+04-13-2011 01:29:44.685693 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.154217
+04-13-2011 01:29:46.685706 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.184416
+04-13-2011 01:29:48.685710 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.170000
+04-13-2011 01:29:50.685696 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.409639
+04-13-2011 01:29:52.685699 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.347594
+04-13-2011 01:29:54.685701 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.189904
+04-13-2011 01:29:56.685700 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.129108
+04-13-2011 01:29:58.685700 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.135593
+04-13-2011 01:30:00.685709 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.181373
+04-13-2011 01:30:02.685701 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.167064
+04-13-2011 01:30:04.685808 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.165501
+04-13-2011 01:30:06.685746 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.158392
+04-13-2011 01:30:08.685709 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.156627
+04-13-2011 01:30:10.685701 [INFO] <b78906c0>load_old: 0, load_current: 0, load_new: 0, load_max: 6691, cpu:0.172749
