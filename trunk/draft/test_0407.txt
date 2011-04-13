@@ -1,0 +1,16 @@
+fileop
+ning@idning:/tmp/a/xx$ ~/idning-paper/iozone3_373/fileop -f 10 -bw -s1K
+
+Fileop:  Working in ., File size is 1024,  Output is in Ops/sec. (A=Avg, B=Best, W=Worst)
+ .       mkdir   chdir   rmdir  create    open    read   write   close    stat  access   chmod readdir  link    unlink  delete  Total_files
+A   10    1959   56935    4897    2910    5079      25   49661     574   37218    8463    4988    5235    -nan    -nan    5284       1000 
+B   10    3216   67650    5592    3803   52429      28   66576    2145  102300  110376    5350    5405     inf     inf    5497       1000 
+W   10       9     779     174     434     840      23   12827       2     979    2754    2282    3534     inf     inf    1415       1000 
+
+ng@idning:/mnt/mfs/g2$ ~/idning-paper/iozone3_373/fileop -f 10 -bw -s1K
+
+Fileop:  Working in ., File size is 1024,  Output is in Ops/sec. (A=Avg, B=Best, W=Worst)
+ .       mkdir   chdir   rmdir  create    open    read   write   close    stat  access   chmod readdir  link    unlink  delete  Total_files
+A   10    7289  383752   12572    1188    8465    3505    6593   33295   18894   17360    7284   11694    -nan    -nan    5407       1000 
+B   10    8775  524288   13358    6365   10512    5023   59075   83886   22310   21732    8775   13530     inf     inf    8128       1000 
+W   10     152  123362    3002       6     238      48     801    1334     349     363     508    2106     inf     inf     486       1000 
