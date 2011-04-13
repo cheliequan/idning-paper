@@ -79,8 +79,8 @@ run: all
 	gnome-terminal $(ARG) -e "./mds/mds.out" 						-t "mds0" 	--geometry=120x20+0+000	
 	gnome-terminal $(ARG) -e "./mds/mds.out -c etc/mds.cfg.1" 		-t "mds1" 	--geometry=120x20+0+300	
 	gnome-terminal $(ARG) -e "./mds/mds.out -c etc/mds.cfg.2" 		-t "mds2" 	--geometry=120x20+0+900	&
-	#gnome-terminal $(ARG) -e "./mds/mds.out -c etc/mds.cfg.3" 		-t "mds3" 	--geometry=120x20+0+300	
-	#gnome-terminal $(ARG) -e "./mds/mds.out -c etc/mds.cfg.4" 		-t "mds4" 	--geometry=120x20+0+900	&
+	gnome-terminal $(ARG) -e "./mds/mds.out -c etc/mds.cfg.3" 		-t "mds3" 	--geometry=120x20+0+300	
+	gnome-terminal $(ARG) -e "./mds/mds.out -c etc/mds.cfg.4" 		-t "mds4" 	--geometry=120x20+0+900	&
 	#
 	gnome-terminal $(ARG) -e "./osd/osd.out" 						-t "osd" 	--geometry=80x10-0+400 &
 	gnome-terminal $(ARG) -e "./osd/osd.out -c etc/osd.cfg.2" 		-t "osd2" 	--geometry=80x10-0+400 &
