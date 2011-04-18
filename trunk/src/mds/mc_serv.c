@@ -461,6 +461,7 @@ void do_migrate2(fsnode * r){
     DBG();
     struct machine * m = cluster_get_mds_with_lowest_load();
     struct machine * self = get_self_machine();
+    logging(LOG_WARN, "migrate on %"PRIu64". %s, tree_cnt : %"PRIu64" ----- from %d to %d", r->ino, r->name, r->tree_cnt, self->mid, m->mid);
     migrate_send_request(m->ip, m->port, r, self->mid, m->mid);
 }
 /*
@@ -487,7 +488,6 @@ void do_migrate(){
         if (n->tree_cnt < migrate_count && n->tree_cnt > 10) {// 1w
             if (n ->ino == FS_VROOT_INO || n->ino == FS_ROOT_INO)
                 return ;
-            logging(LOG_WARN, "migrate on %"PRIu64". %s, tree_cnt : %d", n->ino, n->name, n->tree_cnt);
             do_migrate2(n);
             return;
         }

@@ -106,12 +106,12 @@ static struct file_stat *enforce_cache1(uint64_t ino)
 }
 /*这就是迁移的代价，就是最终一致性罢？客户端访问时一致*/
 void enforce_cache(uint64_t ino){
-    ping_send_request();
+    /*ping_send_request();*/
 
-    struct file_stat *cached = attr_cache_lookup(ino);
-    if (cached->version == cluster_get_current_version())
-        return; //FIXME ,这是会有问题的，只要实际上发生迁移，version增加，而client没有获得此增加，就必然发生问题，为此，我将client联系cmgr的频率调大，为10次/s, 在前面ping一下.
-    logging(LOG_WARN, "really enforce_cache( %"PRIu64")", ino);
+    /*struct file_stat *cached = attr_cache_lookup(ino);*/
+    /*if (cached->version == cluster_get_current_version())*/
+        /*return; //FIXME ,这是会有问题的，只要实际上发生迁移，version增加，而client没有获得此增加，就必然发生问题，为此，我将client联系cmgr的频率调大，为10次/s, 在前面ping一下.*/
+    logging(LOG_WARN, "enforce_cache( %"PRIu64")", ino);
     search_inode_over_all_mds(ino);
     /*enforce_cache1(ino);*/
 }
@@ -190,10 +190,8 @@ static void sfs_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
 
     int retry = 2;
     while(retry){
-        enforce_cache(parent);
         struct file_stat *cached_parent ;
         cached_parent = attr_cache_lookup(parent);
-        int i;
         int success = 1;
         int mid = cached_parent->pos_arr[0];
         struct machine *m = cluster_get_machine_by_mid(mid);
@@ -203,6 +201,7 @@ static void sfs_ll_lookup(fuse_req_t req, fuse_ino_t parent, const char *name)
         if (success)
             break;
         retry --;
+        enforce_cache(parent);
 
     }
 
@@ -242,7 +241,6 @@ static void sfs_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
 
     int retry = 2;
     while(retry){
-        enforce_cache(ino);
         struct file_stat *cached_parent ;
         cached_parent = attr_cache_lookup(ino);
         int i;
@@ -255,6 +253,7 @@ static void sfs_ll_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
         if (success)
             break;
         retry --;
+        enforce_cache(ino);
     }
 
 
@@ -523,7 +522,6 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
 
     int retry = 2;
     while(retry){
-        enforce_cache(parent);
         struct file_stat *cached_parent ;
         cached_parent = attr_cache_lookup(parent);
         int i;
@@ -537,8 +535,11 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
         if (success)
             break;
         retry --;
-        if (retry == 0)
+        if (retry == 0){
             fuse_reply_err(req, 1);
+            return;
+        }
+        enforce_cache(parent);
     }
 
 
@@ -571,7 +572,6 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
 
     int retry = 2;
     while(retry){
-        enforce_cache(parent);
         struct file_stat *cached_parent ;
         cached_parent = attr_cache_lookup(parent);
         int i;
@@ -585,8 +585,11 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
         if (success)
             break;
         retry --;
-        if (retry == 0)
+        if (retry == 0){
             fuse_reply_err(req, 1);
+            return ;
+        }
+        enforce_cache(parent);
     }
 
     log_file_stat("create return :", stat);
@@ -617,7 +620,6 @@ void sfs_ll_symlink(fuse_req_t req, const char *path, fuse_ino_t parent,
     
     int retry = 2;
     while(retry){
-        enforce_cache(parent);
         struct file_stat *cached_parent ;
         cached_parent = attr_cache_lookup(parent);
         int i;
@@ -631,6 +633,7 @@ void sfs_ll_symlink(fuse_req_t req, const char *path, fuse_ino_t parent,
         if (success)
             break;
         retry --;
+        enforce_cache(parent);
     }
 
 
@@ -668,7 +671,6 @@ static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
  
     int retry = 2;
     while(retry){
-        enforce_cache(parent);
         struct file_stat *cached_parent ;
         cached_parent = attr_cache_lookup(parent);
         int i;
@@ -682,6 +684,7 @@ static void sfs_ll_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
         if (success)
             break;
         retry --;
+        enforce_cache(parent);
     }
 
 
@@ -707,7 +710,6 @@ int do_set_attr(uint64_t ino){
 
     int retry = 2;
     while(retry){
-        enforce_cache(parent);
         struct file_stat *cached_parent ;
         cached_parent = attr_cache_lookup(parent);
         int i;
@@ -721,6 +723,7 @@ int do_set_attr(uint64_t ino){
         if (success)
             break;
         retry --;
+        enforce_cache(parent);
     }
 
     /*enforce_cache(cached->parent_ino);*/

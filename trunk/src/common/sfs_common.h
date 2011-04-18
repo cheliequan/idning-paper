@@ -35,9 +35,9 @@
 #include "random.h"
 #include "connection_pool.h"
 
-
+// load_new should > migrate_threshold  
 #define migrate_threshold 1000
-#define migrate_precent 0.55
+#define migrate_precent 0.65
 #define migrate_count 50000
 
 //#define migrate_threshold 50
