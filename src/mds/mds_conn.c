@@ -26,8 +26,11 @@ void migrate_handler(EVRPC_STRUCT(rpc_migrate) * rpc, void *arg)
 
     struct migrate_request * req = rpc->request;
     struct migrate_response * response = rpc->reply;
+
+
     
     int cnt = EVTAG_ARRAY_LEN(req, stat_arr);
+    logging (LOG_WARN,"migrate_handler get migrate request from %d to %d cnt is : %d", req->from_mds, req->to_mds, cnt);
     struct file_stat * stat;
     int i;
 

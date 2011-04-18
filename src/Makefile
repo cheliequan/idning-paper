@@ -100,6 +100,8 @@ show-log:
 #killall
 killall: 
 	-killall -q cmgr.out osd.out mds.out mount.out
+
+kk:killall
 	rm /mnt/hd1/* -rf 
 	rm /mnt/hd2/* -rf  
 	rm ./log/* -rf  
