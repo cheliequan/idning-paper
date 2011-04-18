@@ -486,6 +486,8 @@ int fs_load(char * path){
     }
 
     int fd = open(path, O_RDONLY , 0755);
+    if (-1 == fd)
+        return 0;
 
     /*
      * Notice:
