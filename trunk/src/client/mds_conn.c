@@ -138,7 +138,7 @@ int stat_send_request(char *ip, int port, uint64_t * ino_arr, int len,
     int cnt = EVTAG_ARRAY_LEN(response, stat_arr);
     rst = response->rst_code;
     if (cnt != len || rst!= 0) {
-        logging(LOG_WARN, "stat_send_request return rst != 0");
+        logging(LOG_DEUBG, "stat_send_request, %s:%d, %"PRIu64" return null!!", ip, port ,ino_arr[0]);
         goto done;
     }
     struct file_stat *stat;
