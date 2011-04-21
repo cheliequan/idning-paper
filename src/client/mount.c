@@ -106,7 +106,7 @@ static struct file_stat *enforce_cache1(uint64_t ino)
 }
 /*这就是迁移的代价，就是最终一致性罢？客户端访问时一致*/
 void enforce_cache(uint64_t ino){
-    /*ping_send_request();*/
+    ping_send_request();
 
     /*struct file_stat *cached = attr_cache_lookup(ino);*/
     /*if (cached->version == cluster_get_current_version())*/
@@ -536,6 +536,8 @@ void sfs_ll_create(fuse_req_t req, fuse_ino_t parent, const char *name,
             break;
         retry --;
         if (retry == 0){
+            logging(LOG_ERROR, "Error on create(parent = %lu, name = %s, mode=%04o)", parent,
+                    name, mode);
             fuse_reply_err(req, 1);
             return;
         }
@@ -586,6 +588,8 @@ void sfs_ll_mkdir(fuse_req_t req, fuse_ino_t parent, const char *name,
             break;
         retry --;
         if (retry == 0){
+            logging(LOG_ERROR, "Error on mkdir(parent = %lu, name = %s, mode=%04o)", parent,
+                    name, mode);
             fuse_reply_err(req, 1);
             return ;
         }
